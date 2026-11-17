@@ -556,6 +556,58 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .savew[hidden]{display:none}
 /* mientras la advertencia está visible, las pantallas le dejan su espacio abajo (no tapa ningún botón) */
 body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-bottom,0px))}
+
+/* ===== Etapa 5 · álbum por diseño ===== */
+.aSub{font:600 11px AV;color:rgba(255,255,255,.5);padding:0 16px 12px;letter-spacing:.02em}.aSub b{color:#fff;font-weight:700}
+.dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 9px}@media(min-width:520px){.dgrid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}}
+@media(min-width:700px){.dgrid{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:20px 14px}}
+.dt{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:7px;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.dt:active{transform:scale(.96)}.dt:focus-visible .cv{outline:2px solid var(--y);outline-offset:3px}
+.dt .cv{position:relative;aspect-ratio:480/670;border-radius:9px;overflow:hidden;background:#0d0b22;box-shadow:0 10px 18px rgba(0,0,0,.45)}
+.dt .cv img{width:100%;height:100%;display:block;object-fit:cover}
+.dt.own.r-holo .cv{box-shadow:0 0 0 2px #8fe9ff,0 0 14px rgba(143,233,255,.35),0 10px 18px rgba(0,0,0,.45)}
+.dt.own.r-dorada .cv{box-shadow:0 0 0 2px #e8b923,0 0 14px rgba(232,185,35,.4),0 10px 18px rgba(0,0,0,.45)}
+.dt.own.r-full .cv{box-shadow:0 0 0 2px #ff9edc,0 0 16px rgba(255,158,220,.35),0 10px 18px rgba(0,0,0,.45)}
+.dt.lock .cv img{filter:grayscale(1) brightness(.22) contrast(1.2)}
+.dt.lock .cv{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.dt .lk{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:16px PX;color:rgba(255,255,255,.55)}
+.dt .lk small{font:9px PX;color:rgba(255,255,255,.3)}
+.dt .cr{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:var(--y);color:#120F1A;font-size:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.dt .x{position:absolute;left:5px;top:5px;background:#e8323c;color:#fff;font:700 10px AV;border-radius:6px;padding:2px 6px}
+.pp{display:flex;align-items:center;gap:4px;padding:0 2px}
+.pp i{flex:1;height:5px;border-radius:3px;max-width:22px}
+.pp b{margin-left:auto;font:700 11px AV;color:rgba(255,255,255,.75)}.dt.done .pp b{color:var(--y)}
+.p.have.b{background:#f3f1ff}.p.have.e{background:linear-gradient(90deg,#8fe9ff,#ff9edc,#c6ff8a)}.p.have.r{background:#e8b923}.p.have.f{background:#ff9edc}
+.p.av{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+.p.soon{background:rgba(255,255,255,.06);height:3px!important;max-width:8px!important}
+.ficha{position:fixed;inset:0;z-index:45;background:rgba(5,4,26,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
+.ficha.on{display:flex;animation:fIn .2s ease-out}
+@keyframes fIn{from{opacity:0}}@keyframes fUp{from{transform:translateY(40px)}}
+.fsh{width:100%;max-width:640px;max-height:92vh;overflow:auto;background:linear-gradient(180deg,#1a1650,#0b0a30);border-radius:22px 22px 0 0;padding:18px 16px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.6);animation:fUp .25s ease-out}
+@media(min-width:700px){.ficha{align-items:center}.fsh{border-radius:22px;padding:24px}}
+.fhd{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}.fti{flex:1;min-width:0}
+.fti small{font:700 10px AV;letter-spacing:.14em;color:var(--y)}
+.fti h2{font:700 24px AV;letter-spacing:-.015em;color:#fff;margin:4px 0 8px;line-height:1.1}
+.fpr{display:flex;align-items:center;gap:8px;font:600 12px AV;color:rgba(255,255,255,.6)}.fpr .pp{width:70px;padding:0}.fpr b{color:#fff}
+.fpr .rt{font:700 10px AV;border-radius:5px;padding:3px 7px;color:#120F1A}
+.fv{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 12px}
+.fv.n1{grid-template-columns:minmax(0,58%);justify-content:center}
+@media(min-width:560px){.fv{grid-template-columns:repeat(var(--n),minmax(0,190px))!important;justify-content:center}}
+.vc{all:unset;display:flex;flex-direction:column;gap:7px;cursor:default}.vc.have{cursor:pointer}
+.vc .cv{position:relative;aspect-ratio:480/670;border-radius:10px;overflow:hidden}
+.vc.have .cv{box-shadow:0 10px 20px rgba(0,0,0,.5)}.vc.have:active .cv{transform:scale(.97)}
+.vc .cv img{width:100%;height:100%;display:block}
+.vc .x{position:absolute;right:6px;top:6px;background:#e8323c;color:#fff;font:700 11px AV;border-radius:6px;padding:2px 7px}
+.vc.av .cv{background:radial-gradient(circle at 50% 40%,#2a2470,#100d33 70%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.vc.av .cv img{width:34%;height:auto;opacity:.35;filter:grayscale(1)}
+.vc.av .cv span{font:700 10px AV;letter-spacing:.12em;color:rgba(255,255,255,.45)}
+.vl{display:flex;align-items:center;gap:6px;font:700 12px AV;color:#fff}.vl i{width:8px;height:8px;border-radius:50%;flex:none}
+.vl em{font-style:normal;font-weight:600;color:rgba(255,255,255,.45);font-size:11px}
+.vc.av .vl{color:rgba(255,255,255,.6)}
+.vl i.b{background:#f3f1ff}.vl i.e{background:linear-gradient(90deg,#8fe9ff,#ff9edc)}.vl i.r{background:#e8b923}.vl i.f{background:#ff9edc}
+.fsoon{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:600 11px AV;color:rgba(255,255,255,.4)}
+.fsoon:empty{display:none}
+.fsoon span{border:1px dashed rgba(255,255,255,.2);border-radius:14px;padding:4px 10px;color:rgba(255,255,255,.45)}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -597,7 +649,8 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Álbum</h1><span class="sp"></span><span id="aCount"></span></div>
  <div id="pTabs"></div>
  <div class="prog"><i id="aProg"></i></div>
- <div class="wrap"><div class="grid" id="grid"></div></div>
+ <div class="aSub" id="aSub"></div>
+ <div class="wrap"><div class="dgrid" id="grid"></div></div>
 </section>
 <section class="view" id="tier">
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Tier</h1><span class="sp"></span><button class="btn y" id="tShare">Compartir</button></div>
@@ -620,6 +673,7 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
  </div>
 </section>
 </div>
+<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button class="vback" id="fClose" aria-label="Cerrar"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
 <div class="zoom" id="zoom"><div class="fx idle" id="zFx"><img id="zImg"><i class="foil"></i><i class="glare"></i></div><div id="zGoty"></div><div id="zRate"></div><button class="btn" id="zClose">CERRAR</button></div>
 <div class="onb" id="onb"><img id="onImg"><h2 id="onT"></h2><p id="onP"></p><div class="d" id="onDots"></div><button class="big" id="onNext"></button></div>
 <div class="toast" id="toast"></div>
@@ -751,7 +805,6 @@ function PH(c){return PHM[c.k]||(PHM[c.k]=(()=>{const e=s=>String(s).replace(/[&
  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 670" font-family="Arial,Helvetica,sans-serif"><rect width="480" height="670" rx="26" fill="#120F1A"/><rect x="14" y="14" width="452" height="642" rx="18" fill="none" stroke="#FFD400" stroke-width="4" stroke-dasharray="14 10"/><text x="240" y="92" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="4" fill="#FFD400">INSERT COIN MX</text>${tx}<text x="240" y="510" text-anchor="middle" font-size="30" font-weight="800" letter-spacing="3" fill="#FFD400">${(VN[c.v]||'').toUpperCase()}</text><text x="240" y="552" text-anchor="middle" font-size="20" font-weight="700" letter-spacing="3" fill="#8a86a3">PRÓXIMAMENTE</text></svg>`)})())}
 const imgOf=(c,dir)=>c&&c.img?dir+'/'+c.img+'.jpg':PH(c||{k:'?',n:'Carta',v:'b'});
 const imgK=(k,dir)=>imgOf(CB[cardKey(k)||k],dir);
-const PAGES=[['GAMER',c=>c.v!=='f'&&c.cat==='GAMER'],['ANIME',c=>c.v!=='f'&&c.cat==='ANIME'],['CINE Y TV',c=>c.v!=='f'&&['PELÍCULAS','CARICATURAS','OTROS'].includes(c.cat)],['FULL ★★',c=>c.v==='f']];
 const W={comun:70,holo:18,dorada:5,full:7};
 const TN=['GOTY','GENIAL','OK','MMM'],TC=['#FFD400','#f0a830','#a9a3c4','#6e6a85'];
 const GOALS=[[16,'TORNEO'],[20,'TU TIER'],[NAV,'ALBUM COMPLETO']];
@@ -843,7 +896,7 @@ const jingle=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.11),i*
 function toast(t){const e=$('toast');e.innerHTML=t;e.classList.remove('go');void e.offsetWidth;e.classList.add('go')}
 /* ---------- navegación ---------- */
 let cur='home';
-function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
+function go(id){if(id!=='album'&&fd)closeFicha();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);go('home')}});
@@ -990,15 +1043,44 @@ $('tearZone').addEventListener('pointercancel',()=>{tx=null;$('cutp').style.widt
 {const P=$('pk');let pt;const aim=(x,y)=>{P.classList.remove('idle');P.style.setProperty('--hx',(x*100).toFixed(1)+'%');P.style.setProperty('--hy',(y*100).toFixed(1)+'%');clearTimeout(pt);pt=setTimeout(()=>P.classList.add('idle'),2500)};
  P.addEventListener('pointermove',e=>{const r=P.getBoundingClientRect();aim((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height)});
  window.addEventListener('deviceorientation',e=>{if(cur!=='pack'||e.gamma==null)return;aim(Math.max(0,Math.min(1,.5+e.gamma/40)),Math.max(0,Math.min(1,.5+(e.beta-45)/40)))})}
-/* ---------- álbum ---------- */
-let page=0;
-const albList=p=>CARDS.filter(c=>p[1](c)&&(c.img||S.have[c.k])); // solo cartas con imagen (o que ya tienes)
-function renderAlbum(){$('pTabs').innerHTML=PAGES.map((p,i)=>{const L=albList(p);const g=L.filter(c=>S.have[c.k]).length;return `<button class="btn ${i===page?'on':''}" data-p="${i}">${p[0]} <small>${g}/${L.length}</small></button>`}).join('');
- const L=albList(PAGES[page]),g=L.filter(c=>S.have[c.k]).length;$('aProg').style.width=(L.length?g/L.length*100:0)+'%';$('aCount').textContent=uniq()+'/'+NAV;
- $('grid').innerHTML=L.map(c=>S.have[c.k]?`<div class="slot have" data-k="${c.k}"><img src="${imgOf(c,'c')}" loading="lazy">${S.have[c.k]>1?`<span class="x">x${S.have[c.k]}</span>`:''}${S.rate[c.d]!==undefined?`<span class="rt" style="background:${TC[S.rate[c.d]]}">${TN[S.rate[c.d]]}</span>`:''}</div>`
-  :`<div class="slot"><span class="no">${c.r==='full'?'F':''}${String(c.no).padStart(3,'0')}</span><span class="q">?</span></div>`).join('')}
-$('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum()};
-$('grid').onclick=e=>{const s=e.target.closest('.slot.have');if(!s)return;openCard(s.dataset.k)};
+/* ---------- álbum (Etapa 5: por diseño) ----------
+   Estado de cada versión: have = la tienes · av = existe en sobres y te falta · soon = aún sin ilustración (no sale en sobres).
+   Una versión sin imagen que ya tengas cuenta como conseguida (nunca se esconde lo que es tuyo). */
+let page=0,fd=null;
+const RANK=['f','r','e','b']; // mejor ilustración primero
+const APAGES=[['TODOS',()=>1],['GAMER',d=>d.cat==='GAMER'],['ANIME',d=>d.cat==='ANIME'],['CINE Y TV',d=>['PELÍCULAS','CARICATURAS','OTROS'].includes(d.cat)]];
+const DORD=[...DESIGNS].sort((a,b)=>(a.no||999)-(b.no||999)||a.n.localeCompare(b.n,'es'));
+const SOON_N=CARDS.length-NAV;
+function dState(d){const vs=VL.map(v=>{const c=CB[d.id+'_'+v],h=S.have[c.k]||0;return{c,v,h,st:h?'have':c.img?'av':'soon'}});
+ const col=vs.filter(x=>x.st!=='soon'),got=col.filter(x=>x.h).length,by=v=>vs[VL.indexOf(v)];
+ const best=RANK.map(by).find(x=>x.h&&x.c.img)||RANK.map(by).find(x=>x.h)||RANK.map(by).find(x=>x.c.img)||vs[0];
+ return{vs,got,tot:col.length,own:got>0,done:col.length>0&&got===col.length,cover:best.c,rep:vs.reduce((n,x)=>n+Math.max(0,x.h-1),0)}}
+const pips=(st,n=1)=>`<span class="pp">${st.vs.map(x=>`<i class="p ${x.v} ${x.st}"></i>`).join('')}${n?`<b>${st.got}/${st.tot}</b>`:''}</span>`;
+function renderAlbum(){
+ const D=DORD.map(d=>({d,st:dState(d)}));
+ $('pTabs').innerHTML=APAGES.map((p,i)=>{const L=D.filter(x=>p[1](x.d));return `<button class="btn ${i===page?'on':''}" data-p="${i}">${p[0]} <small>${L.reduce((n,x)=>n+x.st.got,0)}/${L.reduce((n,x)=>n+x.st.tot,0)}</small></button>`}).join('');
+ const L=D.filter(x=>APAGES[page][1](x.d)),g=L.reduce((n,x)=>n+x.st.got,0),t=L.reduce((n,x)=>n+x.st.tot,0);
+ $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=D.reduce((n,x)=>n+x.st.got,0)+'/'+D.reduce((n,x)=>n+x.st.tot,0);
+ const dn=L.filter(x=>x.st.done).length;
+ $('aSub').innerHTML=`<b>${dn}</b> de ${L.length} diseños completos`+(SOON_N>0?` · ${SOON_N} versiones por llegar`:'');
+ $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv"><img src="${imgOf(st.cover,'c')}" loading="lazy" alt="">${st.own?'':`<span class="lk">?${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}</span>${pips(st)}</button>`).join('');
+ if(fd&&$('ficha').classList.contains('on'))renderFicha()}
+$('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
+$('grid').onclick=e=>{const t=e.target.closest('.dt');if(!t)return;beep(880,.04);openFicha(t.dataset.d)};
+function openFicha(id){if(!DB[id])return;fd=id;renderFicha();$('ficha').classList.add('on');$('ficha').setAttribute('aria-hidden','false');$('ficha').querySelector('.fsh').scrollTop=0}
+function closeFicha(){fd=null;$('ficha').classList.remove('on');$('ficha').setAttribute('aria-hidden','true')}
+function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(d);
+ $('fMeta').textContent=d.cat+(d.no?' · #'+String(d.no).padStart(3,'0'):'');$('fName').textContent=d.n;
+ const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
+ const col=st.vs.filter(x=>x.st!=='soon');$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
+ $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
+  return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv"><img src="${imgOf(x.c,'c')}" alt=""></span>${lb}</button>`
+   :`<div class="vc av"><span class="cv"><img src="coin.png" alt=""><span>EN SOBRES</span></span>${lb}</div>`}).join('');
+ const soon=st.vs.filter(x=>x.st==='soon');$('fSoon').innerHTML=soon.length?'Ilustración en camino:'+soon.map(x=>`<span>${VN[x.v]}</span>`).join(''):''}
+$('fVers').onclick=e=>{const b=e.target.closest('.vc.have');if(b)openCard(b.dataset.k)};
+$('fClose').onclick=closeFicha;
+$('ficha').onclick=e=>{if(e.target.id==='ficha')closeFicha()};
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('zoom').classList.contains('on'))$('zClose').onclick();else if(fd)closeFicha()});
 let zk=null;
 /* acepta una clave de carta o un id de diseño (desde el Tier): muestra la versión que tienes; si no, la que ya tiene imagen */
 function cardFor(k){if(CB[k])return CB[k];const d=designId(k);if(!d)return null;const L=VL.map(v=>CB[d+'_'+v]);return L.find(c=>c.img&&S.have[c.k])||L.find(c=>S.have[c.k])||L.find(c=>c.img)||L[0]}
