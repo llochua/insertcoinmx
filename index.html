@@ -626,16 +626,23 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 <div class="bkm" id="bkm"><div class="bkin"></div></div>
 <button class="savew" id="saveW" hidden>NO SE PUDO GUARDAR TU PROGRESO · TOCA PARA EXPORTARLO</button>
 
-<script>/* ===== CATÁLOGO · Etapa 2 =====
-   Un diseño = una línea. Para agregar uno nuevo:
+<script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
+   Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
+   b Base · e Especial · r Rara · f Full. La clave de una carta es diseño+'_'+letra (ej. fatality_r, x_f).
+   Para agregar un diseño nuevo:
    1) Suma su línea aquí. id = nombre de archivo sin extensión (minúsculas y números).
-      n nombre · cat GAMER/ANIME/PELÍCULAS/CARICATURAS/OTROS · r rareza (comun|holo|dorada) · no número de carta
-      f número de la carta de ilustración (solo si ya existe) · fk su clave si no es F_+id · al alias viejos
-      r:0 = todavía no hay carta base (solo ilustración): se muestra en el Tier pero no sale en sobres.
-   2) Sube sus archivos: d/id.jpg (arte del Tier y las Retas), c/id.jpg (480 px) y c2/id.jpg (960 px);
-      con ilustración también fa/id.jpg, c/F_id.jpg y c2/F_id.jpg.
-   Las claves de carta (id y F_id) son lo que guarda el progreso: nunca se renombran; si un nombre cambia,
-   el viejo se queda en `al` y sigue valiendo. */
+      n nombre · cat GAMER/ANIME/PELÍCULAS/CARICATURAS/OTROS · no número de diseño
+      r versión que ya tiene imagen en c/id.jpg: comun (=Base), holo (=Especial) o dorada (=Rara). r:0 = ninguna.
+      f número de la ilustración Full si ya existe (c/F_id.jpg) · fk su clave si no es F_+id · al alias viejos
+   2) Sube sus archivos: d/id.jpg (arte del Tier y las Retas), c/ (480 px) y c2/ (960 px) con la imagen de la versión;
+      con Full también fa/id.jpg, c/F_id.jpg y c2/F_id.jpg.
+   Para sumar la imagen de una versión que faltaba (sin regenerar nada más):
+   1) Sube c/id_b.jpg y c2/id_b.jpg (o _e / _r / _f según la versión).
+   2) Agrega la letra en el campo ex de su línea: ex:'b' (varias: ex:'br').
+   Listo: aparece en el álbum y entra a los sobres sola. Mientras una versión no tenga imagen existe como carta
+   pero se ve como un recuadro "PRÓXIMAMENTE" y no sale en sobres.
+   Las claves guardadas en el progreso (id_v) nunca se renombran; los nombres viejos se quedan en `al`.
+   El progreso del modelo anterior (id / F_id) se convierte solo al abrir: Común→Base, Holo→Especial, Dorada→Rara, F_→Full. */
 const DESIGNS=[
 {id:'9000',n:"It's Over 9000",cat:'ANIME',r:'comun',no:1},
 {id:'abuket',n:'Abuket',cat:'GAMER',r:'comun',no:2,f:1},
@@ -719,23 +726,38 @@ const DESIGNS=[
 {id:'asteroids',n:'Asteroids',cat:'GAMER',r:0,no:0,f:3},
 {id:'sonic',n:'Sonic',cat:'GAMER',r:0,no:0,f:32},
 {id:'docecasas',n:'Las Doce Casas',cat:'ANIME',r:0,no:0,f:9}];
-const CARDS=[],DB={},ALIAS={};
-for(const d of DESIGNS){d.fk=d.f?(d.fk||'F_'+d.id):null;DB[d.id]=d;
- if(d.r)CARDS.push({k:d.id,n:d.n,cat:d.cat,r:d.r,no:d.no,d:d.id})}
-for(const d of DESIGNS.filter(d=>d.f).sort((a,b)=>a.f-b.f))CARDS.push({k:d.fk,n:d.n,cat:'',r:'full',no:d.f,d:d.id});
-for(const d of DESIGNS){for(const a of [d.id,...(d.al||[])]){if(a!==d.id)ALIAS[a]=d.id;if(d.fk&&'F_'+a!==d.fk)ALIAS['F_'+a]=d.fk}}
-const CK=new Set(CARDS.map(c=>c.k));
-const cardKey=k=>{k=ALIAS[k]||k;return CK.has(k)?k:null}; // clave de carta vigente (o null si todavía no existe)
-const designId=k=>{k=ALIAS[k]||k;return DB[k]?k:null}; // id de diseño vigente (acepta alias; sin F_)
+const VL=['b','e','r','f'],VN={b:'Base',e:'Especial',r:'Rara',f:'Full'},VC={b:'comun',e:'holo',r:'dorada',f:'full'},OLDV={comun:'b',holo:'e',dorada:'r'};
+const CARDS=[],DB={},ALIAS={},CB={};
+for(const d of DESIGNS){d.fk=d.f?(d.fk||'F_'+d.id):null;DB[d.id]=d;for(const a of d.al||[])ALIAS[a]=d.id;
+ d.img={};if(d.r)d.img[OLDV[d.r]]=d.id;if(d.fk)d.img.f=d.fk;for(const l of d.ex||'')d.img[l]=d.id+'_'+l} // d.img[v] = nombre de archivo de esa versión (si existe)
+const mk=(d,v)=>({k:d.id+'_'+v,n:d.n,cat:d.cat,r:VC[v],v,no:v==='f'?(d.f||0):d.no,d:d.id,img:d.img[v]||null});
+for(const d of DESIGNS)for(const v of 'ber')CARDS.push(mk(d,v));
+for(const d of [...DESIGNS.filter(d=>d.f).sort((a,b)=>a.f-b.f),...DESIGNS.filter(d=>!d.f)])CARDS.push(mk(d,'f'));
+for(const c of CARDS)CB[c.k]=c;
+const AV=CARDS.filter(c=>c.img),NAV=AV.length; // cartas con imagen = las que se pueden conseguir hoy
+const POOL={comun:[],holo:[],dorada:[],full:[]};for(const c of AV)POOL[c.r].push(c); // mismos grupos y pesos que antes
+const FA=DESIGNS.filter(d=>d.f).sort((a,b)=>a.f-b.f);
+/* claves: acepta la nueva (id_v) y la del modelo anterior (id → su rareza de entonces, F_id → Full, con alias) */
+const NEWK=/^([a-z0-9]{1,40})_([berf])$/;
+const cardKey=k=>{if(typeof k!=='string')return null;const m=NEWK.exec(k);if(m){const id=ALIAS[m[1]]||m[1];return DB[id]?id+'_'+m[2]:null}
+ const full=k.startsWith('F_'),s=full?k.slice(2):k,d=DB[ALIAS[s]||s];if(!d)return null;return full?d.id+'_f':(d.r?d.id+'_'+OLDV[d.r]:null)};
+const designId=k=>{if(typeof k!=='string')return null;const m=NEWK.exec(k);const s=m?m[1]:k.startsWith('F_')?k.slice(2):k;const id=ALIAS[s]||s;return DB[id]?id:null}; // id de diseño vigente (acepta alias, F_ y _v)
 const artOf=id=>DB[id]&&!DB[id].r&&DB[id].fk?'fa/'+DB[id].fk.slice(2)+'.jpg':'d/'+id+'.jpg'; // arte del diseño (Tier, Retas)
-const BASE=CARDS.filter(c=>c.r!=='full'),FULL=CARDS.filter(c=>c.r==='full');
-const PAGES=[['GAMER',c=>c.cat==='GAMER'],['ANIME',c=>c.cat==='ANIME'],['CINE Y TV',c=>['PELÍCULAS','CARICATURAS','OTROS'].includes(c.cat)],['ILUSTRACIONES ★★',c=>c.r==='full']];
+/* imagen de una carta; si falta se dibuja un recuadro provisional (nunca se usa el archivo de otra versión) */
+const PHM={};
+function PH(c){return PHM[c.k]||(PHM[c.k]=(()=>{const e=s=>String(s).replace(/[&<>"']/g,m=>'&#'+m.charCodeAt(0)+';');
+ const ls=[];let l='';for(const w of String(c.n).split(' ')){if(l&&(l+' '+w).length>14){ls.push(l);l=w}else l=l?l+' '+w:w}ls.push(l);const n=Math.min(ls.length,3);
+ const tx=ls.slice(0,3).map((x,i)=>`<text x="240" y="${330+(i-(n-1)/2)*46}" text-anchor="middle" font-size="36" font-weight="800" fill="#fff">${e(x)}</text>`).join('');
+ return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 670" font-family="Arial,Helvetica,sans-serif"><rect width="480" height="670" rx="26" fill="#120F1A"/><rect x="14" y="14" width="452" height="642" rx="18" fill="none" stroke="#FFD400" stroke-width="4" stroke-dasharray="14 10"/><text x="240" y="92" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="4" fill="#FFD400">INSERT COIN MX</text>${tx}<text x="240" y="510" text-anchor="middle" font-size="30" font-weight="800" letter-spacing="3" fill="#FFD400">${(VN[c.v]||'').toUpperCase()}</text><text x="240" y="552" text-anchor="middle" font-size="20" font-weight="700" letter-spacing="3" fill="#8a86a3">PRÓXIMAMENTE</text></svg>`)})())}
+const imgOf=(c,dir)=>c&&c.img?dir+'/'+c.img+'.jpg':PH(c||{k:'?',n:'Carta',v:'b'});
+const imgK=(k,dir)=>imgOf(CB[cardKey(k)||k],dir);
+const PAGES=[['GAMER',c=>c.v!=='f'&&c.cat==='GAMER'],['ANIME',c=>c.v!=='f'&&c.cat==='ANIME'],['CINE Y TV',c=>c.v!=='f'&&['PELÍCULAS','CARICATURAS','OTROS'].includes(c.cat)],['FULL ★★',c=>c.v==='f']];
 const W={comun:70,holo:18,dorada:5,full:7};
 const TN=['GOTY','GENIAL','OK','MMM'],TC=['#FFD400','#f0a830','#a9a3c4','#6e6a85'];
-const GOALS=[[16,'TORNEO'],[20,'TU TIER'],[CARDS.length,'ALBUM COMPLETO']];
+const GOALS=[[16,'TORNEO'],[20,'TU TIER'],[NAV,'ALBUM COMPLETO']];
 const $=id=>document.getElementById(id);
 /* ===== progreso local · Etapa 1: fecha local, respaldo, protección entre pestañas ===== */
-const KEY='icmx-album2',KEY_EXT=KEY+'.ext',KEY_BAK=KEY+'.bak',KEY_BAD=KEY+'.corrupt',FORMAT=1;
+const KEY='icmx-album2',KEY_EXT=KEY+'.ext',KEY_BAK=KEY+'.bak',KEY_BAD=KEY+'.corrupt',KEY_PRE=KEY+'.premig',FORMAT=2;
 const DEF=()=>({have:{},rate:{},ini:'',seen:0,last:'',extra:0,test:0,champ:''});
 const BADK=new Set(['__proto__','constructor','prototype']);
 const pj=t=>JSON.parse(t,(k,v)=>{if(BADK.has(k))throw new Error('clave no permitida');return v});
@@ -755,12 +777,21 @@ const after=(a,b)=>!b||a>b; // ¿el día a es posterior al día b?
 function normalize(o){const t=today();
  for(const f of ['last','rdia']){const v=o[f];if(typeof v!=='string'||!DRE.test(v))continue;
   if(after(v,t)&&((o.sv||0)<2||after(v,addDays(t,2))))o[f]=t}
- o.sv=2;if(!Number.isInteger(o.rev)||o.rev<0)o.rev=0;return o}
-let S=DEF(),lastRaw=null,NOWRITE=false;
+ o.sv=2;if(!Number.isInteger(o.rev)||o.rev<0)o.rev=0;if((o.mv||0)<2)migrate(o);return o}
+/* Etapa 3: del modelo anterior (id / F_id) al de 4 versiones (id_v). Común→Base, Holo→Especial, Dorada→Rara, F_→Full.
+   Cada carta conserva su cantidad; lo que ya está en formato nuevo se queda; lo que no se reconoce no se toca.
+   Las calificaciones pasan a ser siempre por diseño. Repetirlo no cambia nada. */
+function migrate(o){const had=(o.have&&Object.keys(o.have).length)||(o.rate&&Object.keys(o.rate).length);
+ if(isObj(o.have)){const h={};for(const [k,n] of Object.entries(o.have)){if(typeof n!=='number')continue;const c=cardKey(k)||k;h[c]=(h[c]||0)+n}o.have=h}
+ if(isObj(o.rate)){const r={},E=Object.entries(o.rate);for(const [k,n] of E)if(designId(k)===k)r[k]=n;for(const [k,n] of E){const d=designId(k)||k;if(!(d in r))r[d]=n}o.rate=r}
+ o.mv=2;if(had)MIGD=true}
+let S=DEF(),lastRaw=null,NOWRITE=false,MIGD=false;
+const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
 {const raw=LS.get(KEY);lastRaw=raw;
  if(raw!==null){try{const o=pj(raw);if(!o||typeof o!=='object'||Array.isArray(o))throw 0;Object.assign(S,o)}
   catch(e){try{localStorage.setItem(KEY_BAD,raw)}catch(_){NOWRITE=true}}}
- normalize(S)}
+ normalize(S);
+ if(MIGD&&raw!==null){try{if(LS.get(KEY_PRE)===null)localStorage.setItem(KEY_PRE,raw)}catch(e){}}} // copia exacta del progreso anterior, una sola vez
 const uniq=()=>Object.keys(S.have).length;
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
 const PRUEBA=true; // quitar al lanzar: sobres ilimitados para revisar
@@ -817,21 +848,21 @@ function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);go('home')}});
 /* ---------- bienvenida ---------- */
-const ON=[['JUNTA LAS '+CARDS.length,'Cada playera de Insert Coin MX es una carta. Llénalas todas en tu álbum.','c/gatosamurai.jpg'],['UN SOBRE AL DIA','Cada día tienes un sobre gratis con 5 cartas. Las raras brillan.','c/F_gatosamurai.jpg'],['JUEGA CON ELLAS','Califícalas, arma tu tier y haz torneos. Las repetidas valen sobres extra.','c/fatality.jpg']];
+const ON=[['JUNTA LAS '+NAV,'Cada playera de Insert Coin MX es una carta. Llénalas todas en tu álbum.','c/gatosamurai.jpg'],['UN SOBRE AL DIA','Cada día tienes un sobre gratis con 5 cartas. Las raras brillan.','c/F_gatosamurai.jpg'],['JUEGA CON ELLAS','Califícalas, arma tu tier y haz torneos. Las repetidas valen sobres extra.','c/fatality.jpg']];
 let onI=0;
 function showOn(){$('onb').classList.add('on');const o=ON[onI];$('onImg').src=o[2];$('onT').textContent=o[0];$('onP').textContent=o[1];$('onDots').innerHTML=ON.map((_,i)=>`<i class="${i===onI?'on':''}"></i>`).join('');$('onNext').textContent=onI<2?'SIGUIENTE':'A JUGAR'}
 $('onNext').onclick=()=>{beep(880);if(onI<2){onI++;showOn()}else{$('onb').classList.remove('on');syncIn();S.seen=1;save()}};
 /* ---------- inicio ---------- */
 function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
-let mi=0;const MODES=()=>{const u=uniq(),N=CARDS.length,r=packReady();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
+let mi=0;const MODES=()=>{const u=uniq(),N=NAV,r=packReady();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
  {id:'pack',t:'Sobre del día',k:r?(S.extra>0&&!after(today(),S.last)&&!S.test?'SOBRE EXTRA':'HOY · GRATIS'):'YA LO ABRISTE',s:r?'5 cartas · una rara seguro':'El próximo sale en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR':countdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
  {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Pon tus iniciales',img:'F_samus',rr:'full',go:'VER'}]};
-function renderHome(){const u=uniq(),N=CARDS.length,M=MODES();
+function renderHome(){const u=uniq(),N=NAV,M=MODES();
  $('hCount').textContent=u+' / '+N;
  const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="c2/${m.img}.jpg"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
   [...fan.children].forEach((el,i)=>el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()})}
@@ -867,11 +898,11 @@ $('tDupB').onclick=()=>withLock(()=>{syncIn();if(dups()<5){renderHome();return}l
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
 function pick(){let t=Math.random()*100,r='comun';for(const k of ['full','dorada','holo','comun']){if((t-=W[k])<0){r=k;break}}
- const pool=CARDS.filter(c=>c.r===r);return Object.assign({},pool[Math.random()*pool.length|0])}
-function pickRare(){let t=Math.random()*100,r=t<15?'dorada':t<45?'full':'holo';const pool=CARDS.filter(c=>c.r===r);return Object.assign({},pool[Math.random()*pool.length|0])}
+ const pool=POOL[r].length?POOL[r]:POOL.comun;return Object.assign({},pool[Math.random()*pool.length|0])}
+function pickRare(){let t=Math.random()*100,r=t<15?'dorada':t<45?'full':'holo';const pool=POOL[r].length?POOL[r]:POOL.comun;return Object.assign({},pool[Math.random()*pool.length|0])}
 const GLOW={holo:'#9ff3ff',dorada:'#FFD400',full:'#ff6fd0'};
 let hand=[],idx=0,hintT;
-function resetPack(){{const F=CARDS.filter(c=>c.k.startsWith('F_'));const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].k.slice(2)}.jpg)`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
+function resetPack(){{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.jpg)`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
  $('stack').classList.remove('on');$('sum').classList.remove('on');$('stHint').style.display='none';$('openBtn').style.visibility='visible'}
 let tx=null;
 $('tearZone').addEventListener('pointerdown',e=>{tx=e.clientX;$('hand').style.display='none';try{$('tearZone').setPointerCapture(e.pointerId)}catch(_){}});
@@ -892,7 +923,7 @@ let opening=false;function openPack(){if(opening)return;opening=true;clearTimeou
 function buildStack(){const st=$('stack');st.innerHTML='';st.classList.add('on');
  hand.slice().reverse().forEach((c,ri)=>{const i=4-ri;const el=document.createElement('div');el.className='sc'+(i===4&&c.r!=='comun'?' down':'');el.style.setProperty('--g',GLOW[c.r]||'#fff');
   el.style.transform=`translateY(${i*-9}px) scale(${1-i*.035})`;el.dataset.i=i;
-  el.innerHTML=`<span class="badge ${c._new?'':'rep'}">${c._new?'NUEVA':'REPETIDA'}</span><div class="fx idle r-${c.r}"><img src="c2/${c.k}.jpg"><i class="foil"></i><i class="glare"></i></div><div class="bkc"><div class="bkA"><div class="ln"></div><img src="logo.png"></div></div>`;st.appendChild(el)});
+  el.innerHTML=`<span class="badge ${c._new?'':'rep'}">${c._new?'NUEVA':'REPETIDA'}</span><div class="fx idle r-${c.r}"><img src="${imgOf(c,'c2')}"><i class="foil"></i><i class="glare"></i></div><div class="bkc"><div class="bkA"><div class="ln"></div><img src="logo.png"></div></div>`;st.appendChild(el)});
  hintTop()}
 $('stack').addEventListener('click',e=>{});
 function topCard(){return $('stack').querySelector('.sc[data-i="'+idx+'"]')}
@@ -907,7 +938,7 @@ function gStart(x,y,target){if(busy||G)return;const t=target.closest&&target.clo
 function gMove(x,y){if(!G)return;G.mx=x-G.x;G.my=y-G.y;if(G.t.classList.contains('down'))return;G.t.style.transform=`translate(${G.mx}px,${G.my*.4}px) rotate(${G.mx/16}deg)`}
 function gEnd(cancel){if(!G)return;const g=G;G=null;const t=g.t;const tap=Math.abs(g.mx)<10&&Math.abs(g.my)<10;
  if(cancel){backCard(t);return}
- if(t.classList.contains('down')){if(tap){t.classList.remove('down');t.style.transition='';t.style.transform='';jingle();toast({holo:'★ HOLO',dorada:'★★★ DORADA',full:'★★ ILUSTRACION'}[hand[idx].r]);hintTop()}return}
+ if(t.classList.contains('down')){if(tap){t.classList.remove('down');t.style.transition='';t.style.transform='';jingle();toast({holo:'★ ESPECIAL',dorada:'★★★ RARA',full:'★★ FULL'}[hand[idx].r]);hintTop()}return}
  const v=Math.abs(g.mx)/Math.max(1,performance.now()-g.t0);
  if(Math.abs(g.mx)>100||(Math.abs(g.mx)>40&&v>.6))throwCard(t,g.mx,g.my);else{backCard(t);if(tap){t.classList.remove('nudge');void t.offsetWidth;t.classList.add('nudge')}}}
 const ST=$('stack');
@@ -921,7 +952,7 @@ ST.addEventListener('touchcancel',()=>gEnd(true));
 function renderTitle(){$('tiOne').textContent=uniq();const docs=(STORE.docs||[]).slice().sort((a,b)=>(b.score||0)-(a.score||0));
  const top=docs[0];$('tiHi').textContent=top?((top.ini||'???')+' '+top.score):'---';
  const list=docs.slice(0,5).map((d,i)=>`<i>${i+1}.</i> ${d.ini||'???'} ${d.score||0}`).join('   ·   ');
- $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'UN SOBRE GRATIS CADA DIA   ·   JUNTA '+CARDS.length+' CARTAS   ·   INSERTCOINMX.COM'}
+ $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'UN SOBRE GRATIS CADA DIA   ·   JUNTA '+NAV+' CARTAS   ·   INSERTCOINMX.COM'}
 renderTitle();
 $('title').addEventListener('click',()=>{beep(880,.06);setTimeout(()=>beep(1320,.08),70);$('title').classList.remove('on');renderHome();if(!S.seen)showOn()});
 document.addEventListener('pointermove',e=>{if(!$('title').classList.contains('on'))return;const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;$('tiHero').style.transform=`rotateY(${x*14}deg) rotateX(${-y*10}deg)`});
@@ -937,8 +968,8 @@ ST.addEventListener('mousedown',e=>{mdown=true;gStart(e.clientX,e.clientY,e.targ
 window.addEventListener('mousemove',e=>{if(mdown)gMove(e.clientX,e.clientY)});
 window.addEventListener('mouseup',()=>{if(mdown){mdown=false;gEnd(false)}});
 function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');s.classList.add('on');
- s.innerHTML=`<div class="px" style="color:var(--y);font-size:14px">SOBRE ABIERTO</div><div class="g">${hand.map(c=>`<div><img src="c/${c.k}.jpg"><span class="${c._new?'':'rep'}">${c._new?'NUEVA':'x'+S.have[c.k]}</span></div>`).join('')}</div>
- <div class="px" style="font-size:11px">ALBUM ${uniq()}/${CARDS.length}</div>
+ s.innerHTML=`<div class="px" style="color:var(--y);font-size:14px">SOBRE ABIERTO</div><div class="g">${hand.map(c=>`<div><img src="${imgOf(c,'c')}"><span class="${c._new?'':'rep'}">${c._new?'NUEVA':'x'+S.have[c.k]}</span></div>`).join('')}</div>
+ <div class="px" style="font-size:11px">ALBUM ${uniq()}/${NAV}</div>
  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn" id="sShare">⤓ COMPARTIR</button><button class="btn" id="sAlb">VER ALBUM</button><button class="btn y" id="sOtro">MENU</button></div>`;
  $('sAlb').onclick=()=>go('album');$('sOtro').onclick=()=>go('home');$('sShare').onclick=()=>shareGrid('ME SALIO EN MI SOBRE',hand.map(c=>c.k),'sobre-insertcoinmx.png');jingle()}
 
@@ -952,16 +983,21 @@ $('tearZone').addEventListener('pointercancel',()=>{tx=null;$('cutp').style.widt
  window.addEventListener('deviceorientation',e=>{if(cur!=='pack'||e.gamma==null)return;aim(Math.max(0,Math.min(1,.5+e.gamma/40)),Math.max(0,Math.min(1,.5+(e.beta-45)/40)))})}
 /* ---------- álbum ---------- */
 let page=0;
-function renderAlbum(){$('pTabs').innerHTML=PAGES.map((p,i)=>{const L=CARDS.filter(p[1]);const g=L.filter(c=>S.have[c.k]).length;return `<button class="btn ${i===page?'on':''}" data-p="${i}">${p[0]} <small>${g}/${L.length}</small></button>`}).join('');
- const L=CARDS.filter(PAGES[page][1]),g=L.filter(c=>S.have[c.k]).length;$('aProg').style.width=(g/L.length*100)+'%';$('aCount').textContent=uniq()+'/'+CARDS.length;
- $('grid').innerHTML=L.map(c=>S.have[c.k]?`<div class="slot have" data-k="${c.k}"><img src="c/${c.k}.jpg" loading="lazy">${S.have[c.k]>1?`<span class="x">x${S.have[c.k]}</span>`:''}${S.rate[c.k]!==undefined?`<span class="rt" style="background:${TC[S.rate[c.k]]}">${TN[S.rate[c.k]]}</span>`:''}</div>`
+const albList=p=>CARDS.filter(c=>p[1](c)&&(c.img||S.have[c.k])); // solo cartas con imagen (o que ya tienes)
+function renderAlbum(){$('pTabs').innerHTML=PAGES.map((p,i)=>{const L=albList(p);const g=L.filter(c=>S.have[c.k]).length;return `<button class="btn ${i===page?'on':''}" data-p="${i}">${p[0]} <small>${g}/${L.length}</small></button>`}).join('');
+ const L=albList(PAGES[page]),g=L.filter(c=>S.have[c.k]).length;$('aProg').style.width=(L.length?g/L.length*100:0)+'%';$('aCount').textContent=uniq()+'/'+NAV;
+ $('grid').innerHTML=L.map(c=>S.have[c.k]?`<div class="slot have" data-k="${c.k}"><img src="${imgOf(c,'c')}" loading="lazy">${S.have[c.k]>1?`<span class="x">x${S.have[c.k]}</span>`:''}${S.rate[c.d]!==undefined?`<span class="rt" style="background:${TC[S.rate[c.d]]}">${TN[S.rate[c.d]]}</span>`:''}</div>`
   :`<div class="slot"><span class="no">${c.r==='full'?'F':''}${String(c.no).padStart(3,'0')}</span><span class="q">?</span></div>`).join('')}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum()};
 $('grid').onclick=e=>{const s=e.target.closest('.slot.have');if(!s)return;openCard(s.dataset.k)};
 let zk=null;
-function openCard(k){zk=k;$('zImg').src='c2/'+k+'.jpg';const cc=CARDS.find(c=>c.k===k);$('zFx').className='fx idle r-'+(cc?cc.r:'comun');$('zoom').classList.add('on');paintRate();const p=goty(k);$('zGoty').textContent=p===null?'AUN NADIE LA CALIFICA':p+'% LA PONE GOTY'}
-function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb ${S.rate[zk]===i?'on':''}" data-r="${i}" style="--c:${TC[i]}">${n}</button>`).join('')}
-$('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zk]=+b.dataset.r;save();beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();const p=goty(zk);$('zGoty').textContent=p===null?'AUN NADIE LA CALIFICA':p+'% LA PONE GOTY';if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
+/* acepta una clave de carta o un id de diseño (desde el Tier): muestra la versión que tienes; si no, la que ya tiene imagen */
+function cardFor(k){if(CB[k])return CB[k];const d=designId(k);if(!d)return null;const L=VL.map(v=>CB[d+'_'+v]);return L.find(c=>c.img&&S.have[c.k])||L.find(c=>S.have[c.k])||L.find(c=>c.img)||L[0]}
+const zd=()=>CB[zk]?CB[zk].d:zk; // las calificaciones son por diseño, no por versión
+const zGo=()=>{const p=goty(zd());$('zGoty').textContent=p===null?'AUN NADIE LA CALIFICA':p+'% LA PONE GOTY'};
+function openCard(k){const cc=cardFor(k);if(!cc)return;zk=cc.k;$('zImg').src=imgOf(cc,'c2');$('zFx').className='fx idle r-'+(cc.img?cc.r:'comun');$('zoom').classList.add('on');paintRate();zGo()}
+function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb ${S.rate[zd()]===i?'on':''}" data-r="${i}" style="--c:${TC[i]}">${n}</button>`).join('')}
+$('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zd()]=+b.dataset.r;save();beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();zGo();if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
 $('zClose').onclick=()=>$('zoom').classList.remove('on');
 /* ---------- tier ---------- */
 const mine=()=>CARDS.filter(c=>S.have[c.k]);
@@ -983,7 +1019,7 @@ $('tShare').onclick=()=>shareTier();
 /* ---------- torneo ---------- */
 let T=null;const RN={16:'OCTAVOS',8:'CUARTOS',4:'SEMIFINAL',2:'FINAL'};
 const ORD=[0,15,7,8,3,12,4,11,1,14,6,9,2,13,5,10];
-const dn=k=>{const c=CARDS.find(x=>x.k===k);return c?c.n:k};
+const dn=k=>{const d=DB[designId(k)||k];return d?d.n:k};
 function seedScore(k){const g=goty(k);const r=S.rate[k];return (g===null?-1:g)*10+(r===undefined?0:(4-r))+Math.random()*.01}
 
 /* ---------- reta: dos playeras frente a frente, la comunidad decide ---------- */
@@ -1014,9 +1050,8 @@ function renderScores(){$('sMine').textContent=uniq();$('iniIn').value=S.ini;con
 $('iniIn').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3)};
 $('sSave').onclick=()=>{const v=$('iniIn').value;if(v.length<3){toast('3 LETRAS');return}syncIn();S.ini=v;save();jingle();toast('¡GUARDADO!');renderScores()};
 /* ---------- respaldo: exportar / importar ---------- */
-const IDRE=/^(F_)?[a-z0-9]{1,40}$/,KRE=/^[A-Za-z0-9_.-]{1,64}$/;
+const IDRE=/^(F_)?[a-z0-9]{1,40}(_[berf])?$/,KRE=/^[A-Za-z0-9_.-]{1,64}$/;
 const esc=t=>String(t).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
 const isInt=(n,a,b)=>Number.isInteger(n)&&n>=a&&n<=b;
 const isDay=v=>v===''||(typeof v==='string'&&DRE.test(v)&&addDays(v,0)===v);
 /* datos que esta versión no conoce: solo JSON simple y acotado, nunca dentro de S */
@@ -1079,7 +1114,7 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
    else if(k==='champ'){if(typeof v!=='string'||(v!==''&&!IDRE.test(v)))throw 'El campeón del respaldo no es válido.';out.champ=v}
    else if(k==='rlast'){if(!(v===null||isInt(v,0,9999)))throw 'La última reta del respaldo no es válida.';out.rlast=v}
    else if(k==='pk'){if(!Array.isArray(v)||v.length>30||!v.every(x=>typeof x==='string'&&PKRE.test(x)))throw 'El respaldo trae un dato inválido (pk).';out.pk=v.slice()}
-   else if(k==='rev'||k==='sv'){}
+   else if(k==='rev'||k==='sv'||k==='mv'){}
    else{if(!KRE.test(k))throw 'El respaldo trae un dato con nombre inválido.';safeVal(v,1);x.unk[k]=v}}
   if(b.ext!==undefined){const e=b.ext;if(!isObj(e))throw 'Los datos extra del respaldo no son válidos.';
    for(const [k,v] of Object.entries(e)){
@@ -1104,7 +1139,7 @@ function applyImport(v){clearTimeout(save.t);syncIn();
  const prevMain=LS.get(KEY),prevExt=LS.get(KEY_EXT),prevS=JSON.parse(JSON.stringify(S));
  try{localStorage.setItem(KEY_BAK,JSON.stringify({at:new Date().toISOString(),main:prevMain,ext:prevExt}))}
  catch(e){return {ok:false,err:'No hay espacio para guardar la copia de seguridad. No se cambió nada. Exporta tu progreso antes de volver a intentarlo.'}}
- const N=Object.assign(DEF(),v.data,{test:S.test||0,sv:2,rev:(S.rev||0)+1});
+ const N=Object.assign(DEF(),v.data,{test:S.test||0,sv:2,mv:2,rev:(S.rev||0)+1});
  const mainStr=JSON.stringify(N),extStr=v.ext?JSON.stringify(v.ext):null;
  try{if(extStr===null)localStorage.removeItem(KEY_EXT);else localStorage.setItem(KEY_EXT,extStr);
   localStorage.setItem(KEY,mainStr);
@@ -1154,7 +1189,7 @@ async function frame(x,W,H,title){x.fillStyle='#0c0b2a';x.fillRect(0,0,W,H);x.fi
  const lg=await li('logo.png');if(lg)x.drawImage(lg,W/2-60,H-120,120,120*lg.height/lg.width)}
 async function shareGrid(title,keys,name){await document.fonts.ready;const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');await frame(x,W,H,title);
  const n=keys.length,cols=n===1?1:3,cw=n===1?560:300,ch=cw*670/480,rows=Math.ceil(n/cols);let y0=(H-rows*ch-(rows-1)*24)/2;
- for(let i=0;i<n;i++){const im=await li('c/'+keys[i]+'.jpg');const row=i/cols|0,inRow=Math.min(cols,n-row*cols),col=i%cols;const x0=(W-inRow*cw-(inRow-1)*24)/2+col*(cw+24);if(im)x.drawImage(im,x0,y0+row*(ch+24),cw,ch)}
+ for(let i=0;i<n;i++){const im=await li(imgK(keys[i],'c'));const row=i/cols|0,inRow=Math.min(cols,n-row*cols),col=i%cols;const x0=(W-inRow*cw-(inRow-1)*24)/2+col*(cw+24);if(im)x.drawImage(im,x0,y0+row*(ch+24),cw,ch)}
  deliver(cv,name)}
 async function shareTier(){await document.fonts.ready;const W=1080,cw=96,ch=120,per=9;const m=tierKeys();const rows=TN.map((_,i)=>m.filter(c=>S.rate[c.k]===i));
  const hs=rows.map(r=>Math.max(1,Math.ceil(r.length/per))*(ch+8)+12);const H=Math.max(1350,170+hs.reduce((a,b)=>a+b+12,0)+150);
@@ -1163,5 +1198,6 @@ async function shareTier(){await document.fonts.ready;const W=1080,cw=96,ch=120,
   for(let j=0;j<rows[i].length;j++){const im=await li(artOf(rows[i][j].k));if(im)drawCover(x,im,190+(j%per)*(cw+8),y+8+(j/per|0)*(ch+8),cw,ch)}y+=hs[i]+12}
  deliver(cv,'mi-tier-insertcoinmx.png')}
 /* ---------- arranque ---------- */
+if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
 claimPend();go('home');STORE.init();
 </script></body></html>
