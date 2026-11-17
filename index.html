@@ -539,6 +539,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hcnc b{font-weight:400;color:#FFD400;font-size:20px;text-shadow:3px 3px 0 #e8323c;animation:blink .16s steps(2) infinite}
 @keyframes hcnc{0%{opacity:0}8%{opacity:1}80%{opacity:1}100%{opacity:0;visibility:hidden}}
 @keyframes blink{50%{opacity:.3}}
+/* respaldo (Etapa 1): solo los controles nuevos */
+.bkp{width:100%;max-width:340px;margin-top:6px;padding:16px 14px;border-radius:14px;background:rgba(255,255,255,.06);display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+.bkp .bkt{font-size:9px;color:var(--y);line-height:1.6}
+.bkp p,.bkin p{font:600 13px/1.45 AV;color:rgba(255,255,255,.75);margin:0}
+.bkb{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.bkm{position:fixed;inset:0;z-index:80;background:rgba(7,6,42,.95);display:none;align-items:center;justify-content:center;padding:20px}
+.bkm.on{display:flex}
+.bkin{width:100%;max-width:360px;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
+.bkin h2{font:400 13px/1.6 PX;color:var(--y);margin:0}
+.bkin textarea{width:100%;height:96px;border-radius:10px;border:2px solid rgba(255,255,255,.2);background:rgba(0,0,0,.35);color:#fff;font:11px/1.4 monospace;padding:8px;resize:none}
+.bkcmp{width:100%;display:grid;grid-template-columns:1fr auto auto;gap:6px 14px;font:600 13px AV;color:#fff;text-align:left}
+.bkcmp b{font-weight:700}.bkcmp span{color:rgba(255,255,255,.7);text-align:center}
+.bkin .bkerr{color:#ff8a8a}.bkin .bkwarn{color:var(--y)}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -599,12 +612,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
   <button class="btn y" id="sSave">GUARDAR</button>
   <div class="tbl" id="tbl"></div>
+  <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden></div>
  </div>
 </section>
 </div>
 <div class="zoom" id="zoom"><div class="fx idle" id="zFx"><img id="zImg"><i class="foil"></i><i class="glare"></i></div><div id="zGoty"></div><div id="zRate"></div><button class="btn" id="zClose">CERRAR</button></div>
 <div class="onb" id="onb"><img id="onImg"><h2 id="onT"></h2><p id="onP"></p><div class="d" id="onDots"></div><button class="big" id="onNext"></button></div>
 <div class="toast" id="toast"></div>
+<div class="bkm" id="bkm"><div class="bkin"></div></div>
 
 <script>const CARDS=[{"k":"abuket","n":"Abuket","cat":"GAMER","r":"comun","no":1},{"k":"arcade","n":"Anatomía del Arcade","cat":"GAMER","r":"comun","no":2},{"k":"arcade2","n":"Insert Coin","cat":"GAMER","r":"comun","no":3},{"k":"blooper","n":"Blooper Maki","cat":"GAMER","r":"comun","no":4},{"k":"bort","n":"Bort","cat":"CARICATURAS","r":"comun","no":5},{"k":"bustfiction","n":"Bust Fiction","cat":"PELÍCULAS","r":"comun","no":6},{"k":"challenger","n":"Here Comes a New Challenger","cat":"GAMER","r":"comun","no":7},{"k":"collector","n":"Collector","cat":"GAMER","r":"comun","no":8},{"k":"controls","n":"Controls","cat":"GAMER","r":"comun","no":9},{"k":"fatality","n":"Fatality","cat":"GAMER","r":"dorada","no":10},{"k":"fatman","n":"Fatman","cat":"PELÍCULAS","r":"comun","no":11},{"k":"fck","n":"#Fuck","cat":"GAMER","r":"holo","no":12},{"k":"futbolito","n":"Futbolito","cat":"OTROS","r":"comun","no":13},{"k":"gameover","n":"Game Over","cat":"GAMER","r":"dorada","no":14},{"k":"gamepop","n":"Game Pop","cat":"GAMER","r":"holo","no":15},{"k":"gatosamurai","n":"Gato Samurái","cat":"ANIME","r":"comun","no":16},{"k":"gunsncontrols","n":"Guns N' Controls","cat":"GAMER","r":"comun","no":17},{"k":"humangamer","n":"Human Gamer","cat":"GAMER","r":"comun","no":18},{"k":"hyrule","n":"Hyrule","cat":"GAMER","r":"comun","no":19},{"k":"invader","n":"Invader","cat":"GAMER","r":"comun","no":20},{"k":"keepcalm","n":"Keep Calm","cat":"ANIME","r":"comun","no":21},{"k":"links","n":"Links","cat":"GAMER","r":"holo","no":22},{"k":"mapa","n":"Mapa","cat":"GAMER","r":"comun","no":23},{"k":"mrkarate","n":"Mr. Karate","cat":"PELÍCULAS","r":"comun","no":24},{"k":"n64","n":"N64","cat":"GAMER","r":"comun","no":25},{"k":"nerv","n":"Nerv","cat":"ANIME","r":"holo","no":26},{"k":"omkami","n":"Ōkami","cat":"GAMER","r":"holo","no":27},{"k":"pizzcipher","n":"Pizzcipher","cat":"CARICATURAS","r":"comun","no":28},{"k":"poketaco","n":"Poké Taco","cat":"GAMER","r":"comun","no":29},{"k":"polystation","n":"PolyStation","cat":"GAMER","r":"holo","no":30},{"k":"samus","n":"Samus","cat":"GAMER","r":"comun","no":31},{"k":"sensei","n":"Sensei","cat":"ANIME","r":"comun","no":32},{"k":"shenzalcoatl","n":"Shenzalcoatl","cat":"ANIME","r":"comun","no":33},{"k":"snes","n":"Ignore All of My Adult Problems","cat":"GAMER","r":"comun","no":34},{"k":"sv001","n":"SV-001","cat":"GAMER","r":"comun","no":35},{"k":"thankyou","n":"Thank You","cat":"GAMER","r":"comun","no":36},{"k":"theworldwarrior","n":"The World Warrior","cat":"GAMER","r":"comun","no":37},{"k":"triforce","n":"Triforce","cat":"GAMER","r":"dorada","no":38},{"k":"vidaextra","n":"Una Vida Extra","cat":"GAMER","r":"holo","no":39},{"k":"wirimask","n":"Wirimask","cat":"GAMER","r":"comun","no":40},{"k":"x","n":"X","cat":"GAMER","r":"comun","no":41},{"k":"yinyang","n":"Yin Yang","cat":"GAMER","r":"holo","no":42},{"k":"zero","n":"Zero","cat":"GAMER","r":"comun","no":43},{"k":"zodiac","n":"Zodiaco","cat":"ANIME","r":"comun","no":44},{"k":"F_abuket","n":"abuket","cat":"","r":"full","no":1},{"k":"F_arcade","n":"arcade","cat":"","r":"full","no":2},{"k":"F_asteroids","n":"asteroids","cat":"","r":"full","no":3},{"k":"F_blooper","n":"blooper","cat":"","r":"full","no":4},{"k":"F_bustfiction","n":"bustfiction","cat":"","r":"full","no":5},{"k":"F_challenger","n":"challenger","cat":"","r":"full","no":6},{"k":"F_collector","n":"collector","cat":"","r":"full","no":7},{"k":"F_controls","n":"controls","cat":"","r":"full","no":8},{"k":"F_docecasas","n":"docecasas","cat":"","r":"full","no":9},{"k":"F_fatman","n":"fatman","cat":"","r":"full","no":10},{"k":"F_gamepop","n":"gamepop","cat":"","r":"full","no":11},{"k":"F_gatosamurai","n":"gatosamurai","cat":"","r":"full","no":12},{"k":"F_gunsncontrols","n":"gunsncontrols","cat":"","r":"full","no":13},{"k":"F_humangamer","n":"humangamer","cat":"","r":"full","no":14},{"k":"F_hyrule","n":"hyrule","cat":"","r":"full","no":15},{"k":"F_invader","n":"invader","cat":"","r":"full","no":16},{"k":"F_keepcalm","n":"keepcalm","cat":"","r":"full","no":17},{"k":"F_mapa","n":"mapa","cat":"","r":"full","no":18},{"k":"F_mrkarate","n":"mrkarate","cat":"","r":"full","no":19},{"k":"F_n64","n":"n64","cat":"","r":"full","no":20},{"k":"F_nerv","n":"nerv","cat":"","r":"full","no":21},{"k":"F_omkami","n":"omkami","cat":"","r":"full","no":22},{"k":"F_pizzcipher","n":"pizzcipher","cat":"","r":"full","no":23},{"k":"F_poketaco","n":"poketaco","cat":"","r":"full","no":24},{"k":"F_polystation","n":"polystation","cat":"","r":"full","no":25},{"k":"F_samus","n":"samus","cat":"","r":"full","no":26},{"k":"F_sensei","n":"sensei","cat":"","r":"full","no":27},{"k":"F_shenzalcoatl","n":"shenzalcoatl","cat":"","r":"full","no":28},{"k":"F_snes","n":"snes","cat":"","r":"full","no":29},{"k":"F_sonic","n":"sonic","cat":"","r":"full","no":30},{"k":"F_sv001","n":"sv001","cat":"","r":"full","no":31},{"k":"F_thankyou","n":"thankyou","cat":"","r":"full","no":32},{"k":"F_vidaextra","n":"vidaextra","cat":"","r":"full","no":33},{"k":"F_wirimask","n":"wirimask","cat":"","r":"full","no":34},{"k":"F_worldwarrior","n":"worldwarrior","cat":"","r":"full","no":35},{"k":"F_x","n":"x","cat":"","r":"full","no":36},{"k":"F_zero","n":"zero","cat":"","r":"full","no":37},{"k":"F_zodiaco","n":"zodiaco","cat":"","r":"full","no":38}];
 const BASE=CARDS.filter(c=>c.r!=='full'),FULL=CARDS.filter(c=>c.r==='full');
@@ -613,19 +628,53 @@ const W={comun:70,holo:18,dorada:5,full:7};
 const TN=['GOTY','GENIAL','OK','MMM'],TC=['#FFD400','#f0a830','#a9a3c4','#6e6a85'];
 const GOALS=[[16,'TORNEO'],[20,'TU TIER'],[CARDS.length,'ALBUM COMPLETO']];
 const $=id=>document.getElementById(id);
-let S={have:{},rate:{},ini:'',seen:0,last:'',extra:0,test:0,champ:''};
-try{const o=JSON.parse(localStorage.getItem('icmx-album2'));if(o)S=Object.assign(S,o)}catch(e){}
-const today=()=>new Date().toISOString().slice(0,10);
+/* ===== progreso local · Etapa 1: fecha local, respaldo, protección entre pestañas ===== */
+const KEY='icmx-album2',KEY_EXT=KEY+'.ext',KEY_BAK=KEY+'.bak',KEY_BAD=KEY+'.corrupt',FORMAT=1;
+const DEF=()=>({have:{},rate:{},ini:'',seen:0,last:'',extra:0,test:0,champ:''});
+const BADK=new Set(['__proto__','constructor','prototype']);
+const pj=t=>JSON.parse(t,(k,v)=>{if(BADK.has(k))throw new Error('clave no permitida');return v});
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}}};
+/* el día se calcula con el reloj del dispositivo, no en UTC */
+const dkey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>dkey(new Date());
+const addDays=(k,n)=>{const [y,m,d]=k.split('-').map(Number);return dkey(new Date(y,m-1,d+n))};
+const DRE=/^\d{4}-\d{2}-\d{2}$/;
+const after=(a,b)=>!b||a>b; // ¿el día a es posterior al día b?
+/* Reloj manipulado (protección local, sin servidor):
+   - un día solo cuenta como nuevo si es POSTERIOR al último usado: regresar la hora no regala sobres ni retas;
+   - una fecha guardada a más de 2 días en el futuro (reloj adelantado y luego corregido) se ajusta a hoy;
+   - las fechas que guardó la versión anterior (en UTC) se corrigen una sola vez (sv:2).
+   Límites: sin un servidor no se puede impedir adelantar el reloj un día cada día, borrar los datos
+   del navegador, usar otro navegador o dispositivo, ni editar el almacenamiento a mano. */
+function normalize(o){const t=today();
+ for(const f of ['last','rdia']){const v=o[f];if(typeof v!=='string'||!DRE.test(v))continue;
+  if(after(v,t)&&((o.sv||0)<2||after(v,addDays(t,2))))o[f]=t}
+ o.sv=2;if(!Number.isInteger(o.rev)||o.rev<0)o.rev=0;return o}
+let S=DEF(),lastRaw=null,NOWRITE=false;
+{const raw=LS.get(KEY);lastRaw=raw;
+ if(raw!==null){try{const o=pj(raw);if(!o||typeof o!=='object'||Array.isArray(o))throw 0;Object.assign(S,o)}
+  catch(e){try{localStorage.setItem(KEY_BAD,raw)}catch(_){NOWRITE=true}}}
+ normalize(S)}
 const uniq=()=>Object.keys(S.have).length;
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
 const PRUEBA=true; // quitar al lanzar: sobres ilimitados para revisar
-const packReady=()=>PRUEBA||S.test||S.last!==today()||S.extra>0;
+const packReady=()=>PRUEBA||S.test||after(today(),S.last)||S.extra>0;
 /* ---------- datos compartidos ---------- */
 const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude)return;this.db=await claude.use('db');const u=await claude.use('user');this.uid=u?await u.id():null;try{this.dl=await claude.use('downloads')}catch(e){}
  if(!this.db)return;const data=x=>x&&typeof x.data==='function'?x.data():x;
  this.db.collection('tiers').onSnapshot(s=>{const ds=s&&s.docs?s.docs:(Array.isArray(s)?s:[]);this.docs=ds.map(data).filter(d=>d&&d.v===6);refresh()},()=>{})}catch(e){}},
  put(){if(this.db&&this.uid)this.db.doc('tiers/'+this.uid).set({v:6,ini:S.ini||'???',score:uniq(),rate:S.rate,champ:S.champ||'',duel:S.duel||{}}).catch(()=>{})}};
-function save(){try{localStorage.setItem('icmx-album2',JSON.stringify(S))}catch(e){};clearTimeout(save.t);save.t=setTimeout(()=>STORE.put(),600)}
+/* Varias pestañas: lo guardado manda. Antes de cada acción se adopta lo que otra pestaña haya escrito,
+   y save() solo escribe si lo guardado sigue siendo lo último que esta pestaña leyó o escribió.
+   Adoptar nunca interrumpe: refresh() no toca sobre, reta ni un arrastre en curso. */
+function adoptRaw(raw){let o;try{o=pj(raw)}catch(e){return false}if(!o||typeof o!=='object'||Array.isArray(o))return false;
+ const r=S.rev||0;for(const k of Object.keys(S))delete S[k];Object.assign(S,DEF(),o);normalize(S);S.rev=Math.max(S.rev,r);lastRaw=raw;return true}
+function syncIn(){const raw=LS.get(KEY);if(raw===null||raw===lastRaw||!adoptRaw(raw))return false;
+ try{refresh()}catch(e){}if(document.visibilityState==='visible')toast('TU PROGRESO SE ACTUALIZÓ<br>DESDE OTRA PESTAÑA');return true}
+function save(){if(NOWRITE)return;if(syncIn())return;
+ S.rev=(S.rev||0)+1;const str=JSON.stringify(S);try{localStorage.setItem(KEY,str);lastRaw=str}catch(e){}
+ clearTimeout(save.t);save.t=setTimeout(()=>STORE.put(),600)}
+window.addEventListener('storage',e=>{if(e.key===KEY)syncIn()});
 function goty(k){const v=STORE.docs.map(d=>d.rate&&d.rate[k]).filter(x=>x!==undefined);if(S.rate[k]!==undefined&&!STORE.docs.length)v.push(S.rate[k]);if(!v.length)return null;return Math.round(v.filter(x=>x===0).length/v.length*100)}
 /* ---------- sonido / avisos ---------- */
 let AC;function beep(f,d=.07){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
@@ -641,13 +690,13 @@ document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g
 const ON=[['JUNTA LAS '+CARDS.length,'Cada playera de Insert Coin MX es una carta. Llénalas todas en tu álbum.','c/gatosamurai.jpg'],['UN SOBRE AL DIA','Cada día tienes un sobre gratis con 5 cartas. Las raras brillan.','c/F_gatosamurai.jpg'],['JUEGA CON ELLAS','Califícalas, arma tu tier y haz torneos. Las repetidas valen sobres extra.','c/fatality.jpg']];
 let onI=0;
 function showOn(){$('onb').classList.add('on');const o=ON[onI];$('onImg').src=o[2];$('onT').textContent=o[0];$('onP').textContent=o[1];$('onDots').innerHTML=ON.map((_,i)=>`<i class="${i===onI?'on':''}"></i>`).join('');$('onNext').textContent=onI<2?'SIGUIENTE':'A JUGAR'}
-$('onNext').onclick=()=>{beep(880);if(onI<2){onI++;showOn()}else{$('onb').classList.remove('on');S.seen=1;save()}};
+$('onNext').onclick=()=>{beep(880);if(onI<2){onI++;showOn()}else{$('onb').classList.remove('on');syncIn();S.seen=1;save()}};
 /* ---------- inicio ---------- */
 function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
 let mi=0;const MODES=()=>{const u=uniq(),N=CARDS.length,r=packReady();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobre del día',k:r?(S.extra>0&&S.last===today()&&!S.test?'SOBRE EXTRA':'HOY · GRATIS'):'YA LO ABRISTE',s:r?'5 cartas · una rara seguro':'El próximo sale en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR':countdown(),off:!r},
+ {id:'pack',t:'Sobre del día',k:r?(S.extra>0&&!after(today(),S.last)&&!S.test?'SOBRE EXTRA':'HOY · GRATIS'):'YA LO ABRISTE',s:r?'5 cartas · una rara seguro':'El próximo sale en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR':countdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -674,15 +723,24 @@ $('home').addEventListener('touchend',e=>{if(msx===null)return;const dx=e.change
 let mmd=null;$('home').addEventListener('mousedown',e=>mmd=e.clientX);$('home').addEventListener('mouseup',e=>{if(mmd===null)return;const dx=e.clientX-mmd;mmd=null;if(Math.abs(dx)>40){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
 function countdown(){const n=new Date();const m=new Date(n);m.setHours(24,0,0,0);const s=Math.floor((m-n)/1000);return String(s/3600|0).padStart(2,'0')+':'+String((s%3600)/60|0).padStart(2,'0')}
 setInterval(()=>{if(cur==='home'&&!packReady())renderHome()},30000);
-$('tDupB').onclick=()=>{let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');renderHome()};
-let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
+/* cambio de día sin recargar: a medianoche local, cada 30 s y al volver a la pestaña o la app */
+let dayNow=today(),retaOver=false;
+function dayTick(){const d=today();if(d===dayNow)return;dayNow=d;
+ if(cur==='torneo'){if(retaOver)startTorneo()}else refresh()}
+function armDay(){clearTimeout(armDay.t);const n=new Date(),m=new Date(n);m.setHours(24,0,1,0);armDay.t=setTimeout(()=>{dayTick();armDay()},Math.max(1000,m-n))}
+armDay();setInterval(dayTick,30000);
+{const wake=()=>{if(document.visibilityState!=='visible')return;syncIn();dayTick();armDay()};
+ document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake)}
+if(NOWRITE)setTimeout(()=>toast('NO SE PUEDE GUARDAR<br>TU PROGRESO'),1500);
+$('tDupB').onclick=()=>{syncIn();if(dups()<5){renderHome();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');renderHome()};
+let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
 function pick(){let t=Math.random()*100,r='comun';for(const k of ['full','dorada','holo','comun']){if((t-=W[k])<0){r=k;break}}
  const pool=CARDS.filter(c=>c.r===r);return Object.assign({},pool[Math.random()*pool.length|0])}
 function pickRare(){let t=Math.random()*100,r=t<15?'dorada':t<45?'full':'holo';const pool=CARDS.filter(c=>c.r===r);return Object.assign({},pool[Math.random()*pool.length|0])}
 const GLOW={holo:'#9ff3ff',dorada:'#FFD400',full:'#ff6fd0'};
 let hand=[],idx=0,hintT;
-function resetPack(){{const F=CARDS.filter(c=>c.k.startsWith('F_'));const d=Math.floor(Date.now()/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].k.slice(2)}.jpg)`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
+function resetPack(){{const F=CARDS.filter(c=>c.k.startsWith('F_'));const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].k.slice(2)}.jpg)`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
  $('stack').classList.remove('on');$('sum').classList.remove('on');$('stHint').style.display='none';$('openBtn').style.visibility='visible'}
 let tx=null;
 $('tearZone').addEventListener('pointerdown',e=>{tx=e.clientX;$('hand').style.display='none';try{$('tearZone').setPointerCapture(e.pointerId)}catch(_){}});
@@ -690,7 +748,7 @@ $('tearZone').addEventListener('pointermove',e=>{if(tx===null)return;const r=$('
  $('cutp').style.width=(p*88)+'%';if(p>.1&&Math.random()<.3)beep(200+Math.random()*200,.02);if(p>=1){tx=null;openPack()}});
 $('tearZone').addEventListener('pointerup',()=>{if(tx!==null){tx=null;$('cutp').style.width='0'}});
 $('openBtn').onclick=openPack;
-let opening=false;function openPack(){if(opening)return;opening=true;setTimeout(()=>opening=false,900);clearTimeout(hintT);if(!S.test&&!PRUEBA){if(S.last===today())S.extra=Math.max(0,S.extra-1);S.last=today()}
+let opening=false;function openPack(){if(opening)return;syncIn();if(!packReady()){toast('YA LO ABRISTE<br>EN OTRA PESTAÑA');go('home');return}opening=true;setTimeout(()=>opening=false,900);clearTimeout(hintT);if(!S.test&&!PRUEBA){if(after(today(),S.last))S.last=today();else S.extra=Math.max(0,S.extra-1)}
  $('env').classList.add('cut');beep(300,.2);hand=Array.from({length:4},pick).concat([pickRare()]);idx=0;setTimeout(()=>{$('env').style.display='none';buildStack()},420)}
 function buildStack(){const st=$('stack');st.innerHTML='';st.classList.add('on');
  hand.forEach(c=>{c._new=!S.have[c.k];S.have[c.k]=(S.have[c.k]||0)+1});save();
@@ -765,7 +823,7 @@ $('grid').onclick=e=>{const s=e.target.closest('.slot.have');if(!s)return;openCa
 let zk=null;
 function openCard(k){zk=k;$('zImg').src='c2/'+k+'.jpg';const cc=CARDS.find(c=>c.k===k);$('zFx').className='fx idle r-'+(cc?cc.r:'comun');$('zoom').classList.add('on');paintRate();const p=goty(k);$('zGoty').textContent=p===null?'AUN NADIE LA CALIFICA':p+'% LA PONE GOTY'}
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb ${S.rate[zk]===i?'on':''}" data-r="${i}" style="--c:${TC[i]}">${n}</button>`).join('')}
-$('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;S.rate[zk]=+b.dataset.r;save();beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();const p=goty(zk);$('zGoty').textContent=p===null?'AUN NADIE LA CALIFICA':p+'% LA PONE GOTY';if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
+$('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zk]=+b.dataset.r;save();beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();const p=goty(zk);$('zGoty').textContent=p===null?'AUN NADIE LA CALIFICA':p+'% LA PONE GOTY';if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
 $('zClose').onclick=()=>$('zoom').classList.remove('on');
 /* ---------- tier ---------- */
 const mine=()=>CARDS.filter(c=>S.have[c.k]);
@@ -780,7 +838,7 @@ $('tier').addEventListener('pointerdown',e=>{const ch=e.target.closest('.chip');
 $('tier').addEventListener('pointermove',e=>{if(!d)return;if(!d.g){if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<8)return;const r=d.ch.getBoundingClientRect();d.g=d.ch.cloneNode(true);d.g.className='chip ghost';d.g.style.width=r.width*1.4+'px';document.body.appendChild(d.g);d.ch.style.opacity=.25;beep(660,.03)}
  d.g.style.left=e.clientX+'px';d.g.style.top=e.clientY+'px';mark(tz(e))});
 const end=e=>{if(!d)return;const c=d;d=null;mark(null);if(!c.g){if(e.type==='pointerup')openCard(c.k);return}c.g.remove();c.ch.style.opacity='';const t=e.type==='pointerup'&&tz(e);if(!t)return;
- if(t.classList.contains('trow')){const r=+t.dataset.r;if(S.rate[c.k]!==r){S.rate[c.k]=r;beep([1319,1047,784,523][r],.08)}}else{delete S.rate[c.k];beep(330,.05)}save();renderTier()};
+ syncIn();if(t.classList.contains('trow')){const r=+t.dataset.r;if(S.rate[c.k]!==r){S.rate[c.k]=r;beep([1319,1047,784,523][r],.08)}}else{delete S.rate[c.k];beep(330,.05)}save();renderTier()};
 $('tier').addEventListener('pointerup',end);$('tier').addEventListener('pointercancel',end);
 $('tier').addEventListener('touchmove',e=>{if(d&&d.g)e.preventDefault()},{passive:false})})();
 $('tShare').onclick=()=>shareTier();
@@ -794,12 +852,12 @@ function seedScore(k){const g=goty(k);const r=S.rate[k];return (g===null?-1:g)*1
 const RETAS=[["fatality", "gameover", "Fin del juego"], ["challenger", "theworldwarrior", "Juegos de pelea"], ["abuket", "mrkarate", "Artes marciales"], ["x", "zero", "Mega Man X"], ["samus", "sv001", "Armadura contra tanque"], ["hyrule", "links", "Zelda"], ["triforce", "omkami", "Leyendas"], ["blooper", "fck", "Mario Kart"], ["yinyang", "mapa", "Mario"], ["vidaextra", "wirimask", "Hecho en México"], ["shenzalcoatl", "keepcalm", "Dragon Ball"], ["sensei", "gatosamurai", "Anime"], ["nerv", "zodiac", "Anime clásico"], ["n64", "polystation", "Consolas"], ["snes", "collector", "Super Nintendo"], ["gamepop", "humangamer", "Gamers"], ["controls", "gunsncontrols", "Controles"], ["arcade", "arcade2", "Maquinitas"], ["invader", "thankyou", "Arcade clásico"], ["poketaco", "pizzcipher", "Con hambre"], ["fatman", "bustfiction", "Películas"], ["bort", "futbolito", "De barrio"]];const RBG={"abuket": "#bf0d22", "arcade": "#f6f6f6", "arcade2": "#080a3e", "blooper": "#e2e2e2", "bort": "#e0101e", "bustfiction": "#111111", "challenger": "#041535", "collector": "#080808", "controls": "#010634", "fatality": "#0b0b0b", "fatman": "#2e2e2e", "fck": "#3333ff", "futbolito": "#4ed220", "gameover": "#0f0f0f", "gamepop": "#ffffff", "gatosamurai": "#244f9d", "gunsncontrols": "#0e0e0e", "humangamer": "#0e0e0e", "hyrule": "#090909", "invader": "#090909", "keepcalm": "#090909", "links": "#0a0a0a", "mapa": "#08fff6", "mrkarate": "#ffffff", "n64": "#011d59", "nerv": "#b8b8b8", "omkami": "#ffffff", "pizzcipher": "#ffffff", "poketaco": "#f2f2f2", "polystation": "#040303", "samus": "#031130", "sensei": "#ffffff", "shenzalcoatl": "#0b0b0b", "snes": "#292929", "sv001": "#0023a4", "thankyou": "#ececec", "theworldwarrior": "#0004b9", "triforce": "#0a3176", "vidaextra": "#ececec", "wirimask": "#100c33", "x": "#0d3aac", "yinyang": "#0069b3", "zero": "#bf0e25", "zodiac": "#090909"};
 function retaVotes(i){const v=(STORE.docs||[]).map(d=>d.duel&&d.duel[i]).filter(Boolean);const mine=S.duel&&S.duel[i];if(mine&&!(STORE.docs||[]).some(d=>d.ini===S.ini&&d.duel&&d.duel[i]===mine))v.push(mine);return v}
 const RDIA=3; // retas por día
-function retaHoy(){if(S.rdia!==today()){S.rdia=today();S.rhoy=[]}return S.rhoy}
-function retaFin(){$('vRound').innerHTML='<span class="on">POR HOY ES TODO</span>';const h=retaHoy();
+function retaHoy(){if(after(today(),S.rdia)){S.rdia=today();S.rhoy=[]}if(!Array.isArray(S.rhoy))S.rhoy=[];return S.rhoy}
+function retaFin(){retaOver=true;$('vRound').innerHTML='<span class="on">POR HOY ES TODO</span>';const h=retaHoy();
  $('vStage').innerHTML=`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center"><div style="font:15px/1.6 PX;color:#FFD400">GAME OVER</div><div style="font:600 15px/1.5 AV;color:rgba(255,255,255,.8)">Ya jugaste tus ${RDIA} retas de hoy.<br>Mañana llegan ${RDIA} retadores nuevos.</div><div style="display:flex;gap:8px">${h.map(i=>`<img src="d/${S.duel[i]}.jpg" style="width:72px;aspect-ratio:4/5;object-fit:cover;border-radius:6px;box-shadow:0 0 0 2px #FFD400">`).join('')}</div><div style="font:700 11px AV;letter-spacing:.14em;color:rgba(255,255,255,.55)">TUS ELEGIDAS DE HOY</div></div>`}
 function startTorneo(){S.duel=S.duel||{};const h=retaHoy();if(h.length>=RDIA)return retaFin();
  let i=RETAS.findIndex((r,j)=>!(j in S.duel));if(i<0){i=((S.rlast??-1)+1)%RETAS.length;delete S.duel[i]}drawReta(i,true)}
-function drawReta(i,intro){const [a,b,th]=RETAS[i];S.rlast=i;
+function drawReta(i,intro){retaOver=false;const [a,b,th]=RETAS[i];S.rlast=i;
  $('vRound').innerHTML=`<span class="on">RETA ${Math.min(retaHoy().length+1,RDIA)} DE ${RDIA}</span>`;
  const short=k=>({challenger:"New Challenger",snes:"Adult Problems",arcade:"Anatomía del Arcade",theworldwarrior:"World Warrior"})[k]||dn(k);
  const side=(k,c)=>`<button class="vsp ${c}" data-k="${k}" style="--bg:${RBG[k]||'#111'}"><div class="hp"><div class="nm"><span>${short(k)}</span><em></em></div><div class="bar"><i></i></div></div><div class="teew"><div class="tee"><img src="d/${k}.jpg" alt=""></div></div></button>`;
@@ -807,7 +865,7 @@ function drawReta(i,intro){const [a,b,th]=RETAS[i];S.rlast=i;
  if(intro){beep(660,.08);setTimeout(()=>beep(990,.1),160)}
  const show=()=>{const v=retaVotes(i),n=v.length||1;$('vsw').classList.add('done');
   $('vStage').querySelectorAll('.vsp').forEach(el=>{const p=Math.round(v.filter(x=>x===el.dataset.k).length/n*100);el.querySelector('em').textContent=p+'%';el.querySelector('.bar i').style.width=Math.max(4,p)+'%';el.classList.toggle('pick',S.duel[i]===el.dataset.k)})};
- $('vStage').querySelectorAll('.vsp').forEach(el=>el.onclick=()=>{if($('vsw').classList.contains('done'))return;S.duel[i]=el.dataset.k;const h=retaHoy();if(!h.includes(i))h.push(i);save();jingle();show();if(h.length>=RDIA)$('vsNext').textContent='VER MIS ELEGIDAS'});
+ $('vStage').querySelectorAll('.vsp').forEach(el=>el.onclick=()=>{if($('vsw').classList.contains('done'))return;syncIn();const h0=retaHoy();if(h0.length>=RDIA&&!h0.includes(i))return retaFin();S.duel=S.duel||{};S.duel[i]=el.dataset.k;const h=retaHoy();if(!h.includes(i))h.push(i);save();jingle();show();if(h.length>=RDIA)$('vsNext').textContent='VER MIS ELEGIDAS'});
  if(i in S.duel)show();
  $('vsNext').onclick=()=>startTorneo()}
 /* ---------- récords ---------- */
@@ -816,7 +874,115 @@ function renderScores(){$('sMine').textContent=uniq();$('iniIn').value=S.ini;con
  $('sPos').textContent=pos>=0?'VAS EN EL LUGAR #'+(pos+1):'PON TUS INICIALES PARA ENTRAR';
  $('tbl').innerHTML=b.slice(0,10).map((r,i)=>`<div class="r ${r.ini===S.ini?'me':''}"><span>${i+1}</span><span>${r.ini}</span><span>${r.score}</span></div>`).join('')||'<div class="r"><span></span><span>SIN RECORDS AUN</span></div>'}
 $('iniIn').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3)};
-$('sSave').onclick=()=>{const v=$('iniIn').value;if(v.length<3){toast('3 LETRAS');return}S.ini=v;save();jingle();toast('¡GUARDADO!');renderScores()};
+$('sSave').onclick=()=>{const v=$('iniIn').value;if(v.length<3){toast('3 LETRAS');return}syncIn();S.ini=v;save();jingle();toast('¡GUARDADO!');renderScores()};
+/* ---------- respaldo: exportar / importar ---------- */
+const IDRE=/^(F_)?[a-z0-9]{1,40}$/,KRE=/^[A-Za-z0-9_.-]{1,64}$/;
+const esc=t=>String(t).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
+const isInt=(n,a,b)=>Number.isInteger(n)&&n>=a&&n<=b;
+const isDay=v=>v===''||(typeof v==='string'&&DRE.test(v)&&addDays(v,0)===v);
+/* datos que esta versión no conoce: solo JSON simple y acotado, nunca dentro de S */
+function safeVal(v,depth){if(depth>6)throw 'Los datos extra del respaldo están demasiado anidados.';
+ if(v===null||typeof v==='boolean')return;
+ if(typeof v==='number'){if(!Number.isFinite(v))throw 'El respaldo trae un número inválido.';return}
+ if(typeof v==='string'){if(v.length>500)throw 'El respaldo trae un texto demasiado largo.';return}
+ if(Array.isArray(v)){if(v.length>1000)throw 'El respaldo trae una lista demasiado larga.';v.forEach(x=>safeVal(x,depth+1));return}
+ if(isObj(v)){const ks=Object.keys(v);if(ks.length>1000)throw 'El respaldo trae demasiados datos extra.';
+  for(const k of ks){if(!KRE.test(k))throw 'El respaldo trae un dato con nombre inválido.';safeVal(v[k],depth+1)}return}
+ throw 'El respaldo trae un tipo de dato no permitido.'}
+function readExt(){const r=LS.get(KEY_EXT);if(r===null)return null;try{return pj(r)}catch(e){return null}}
+const extCount=x=>x?Object.keys(x.pend||{}).length:0;
+function validateBackup(text){const E=m=>({ok:false,err:m});
+ if(typeof text!=='string'||!text.trim())return E('El archivo está vacío.');
+ if(text.length>1048576)return E('El archivo pesa más de 1 MB; no parece un respaldo.');
+ let b;try{b=pj(text)}catch(e){return E('No es un respaldo válido: el texto no se pudo leer.')}
+ if(!isObj(b)||b.app!=='insertcoinmx-album')return E('Este archivo no es un respaldo de Insert Coin MX.');
+ if(!Number.isInteger(b.format)||b.format<1)return E('El formato del respaldo no es válido.');
+ if(b.format>FORMAT)return E('Este respaldo es de una versión más nueva del álbum. Recarga la página e inténtalo otra vez.');
+ const d=b.data;if(!isObj(d))return E('El respaldo no trae datos de progreso.');
+ const CK=new Set(CARDS.map(c=>c.k)),out=DEF(),x={pend:{},pendRate:{},pendDuel:{},unk:{}};
+ const id=(k,where)=>{if(!IDRE.test(k))throw 'El respaldo trae una carta con nombre inválido ('+where+').'};
+ try{
+  for(const [k,v] of Object.entries(d)){
+   if(k==='have'){if(!isObj(v))throw 'Las cartas del respaldo no son válidas.';
+    for(const [c,n] of Object.entries(v)){id(c,'cartas');if(!isInt(n,1,9999))throw 'Una cantidad de cartas no es válida.';(CK.has(c)?out.have:x.pend)[c]=n}}
+   else if(k==='rate'){if(!isObj(v))throw 'Las calificaciones del respaldo no son válidas.';
+    for(const [c,n] of Object.entries(v)){id(c,'calificaciones');if(!isInt(n,0,3))throw 'Una calificación no es válida.';(CK.has(c)?out.rate:x.pendRate)[c]=n}}
+   else if(k==='duel'){if(!isObj(v))throw 'Las retas del respaldo no son válidas.';out.duel={};
+    for(const [i,c] of Object.entries(v)){if(!/^\d{1,4}$/.test(i)||typeof c!=='string')throw 'Una reta del respaldo no es válida.';id(c,'retas');
+     const r=RETAS[+i];if(r&&(r[0]===c||r[1]===c))out.duel[i]=c;else x.pendDuel[i]=c}}
+   else if(k==='rhoy'){if(!Array.isArray(v)||v.length>50||!v.every(n=>isInt(n,0,9999)))throw 'Las retas de hoy del respaldo no son válidas.';
+    out.rhoy=v.slice()}
+   else if(k==='ini'){if(typeof v!=='string'||!/^[A-Z0-9]{0,3}$/.test(v))throw 'Las iniciales del respaldo no son válidas.';out.ini=v}
+   else if(k==='seen'||k==='test'){if(!(v===0||v===1||v===true||v===false))throw 'El respaldo trae un dato inválido ('+k+').';out[k]=+v}
+   else if(k==='last'||k==='rdia'){if(!isDay(v))throw 'Una fecha del respaldo no es válida.';out[k]=v}
+   else if(k==='extra'){if(!isInt(v,0,999))throw 'Los sobres extra del respaldo no son válidos.';out.extra=v}
+   else if(k==='champ'){if(typeof v!=='string'||(v!==''&&!IDRE.test(v)))throw 'El campeón del respaldo no es válido.';out.champ=v}
+   else if(k==='rlast'){if(!(v===null||isInt(v,0,9999)))throw 'La última reta del respaldo no es válida.';out.rlast=v}
+   else if(k==='rev'||k==='sv'){}
+   else{if(!KRE.test(k))throw 'El respaldo trae un dato con nombre inválido.';safeVal(v,1);x.unk[k]=v}}
+  if(b.ext!==undefined){const e=b.ext;if(!isObj(e))throw 'Los datos extra del respaldo no son válidos.';
+   for(const [k,v] of Object.entries(e)){
+    if(k==='pend'){if(!isObj(v))throw 'Las cartas pendientes no son válidas.';for(const [c,n] of Object.entries(v)){id(c,'pendientes');if(!isInt(n,1,9999))throw 'Una cantidad de cartas no es válida.';x.pend[c]=(x.pend[c]||0)+n}}
+    else if(k==='pendRate'){if(!isObj(v))throw 'Las calificaciones pendientes no son válidas.';for(const [c,n] of Object.entries(v)){id(c,'pendientes');if(!isInt(n,0,3))throw 'Una calificación no es válida.';if(!(c in x.pendRate))x.pendRate[c]=n}}
+    else if(k==='pendDuel'){if(!isObj(v))throw 'Las retas pendientes no son válidas.';for(const [i,c] of Object.entries(v)){if(!/^\d{1,4}$/.test(i)||typeof c!=='string')throw 'Una reta pendiente no es válida.';id(c,'pendientes');if(!(i in x.pendDuel))x.pendDuel[i]=c}}
+    else if(k==='unk'){if(!isObj(v))throw 'Los datos extra del respaldo no son válidos.';for(const [u,w] of Object.entries(v)){if(!KRE.test(u))throw 'El respaldo trae un dato con nombre inválido.';safeVal(w,1);if(!(u in x.unk))x.unk[u]=w}}
+    else{if(!KRE.test(k))throw 'El respaldo trae un dato con nombre inválido.';safeVal(v,1);if(!(k in x.unk))x.unk[k]=v}}}
+  if(out.rhoy){const ok=n=>n<RETAS.length&&out.duel&&(String(n) in out.duel),bad=out.rhoy.filter(n=>!ok(n));out.rhoy=out.rhoy.filter(ok);if(bad.length)x.unk.rhoy=bad}
+ }catch(m){return E(typeof m==='string'?m:'El respaldo tiene datos inválidos.')}
+ for(const k of Object.keys(x))if(!Object.keys(x[k]).length)delete x[k];
+ const ext=Object.keys(x).length?x:null;
+ if(ext&&JSON.stringify(ext).length>262144)return E('Los datos extra del respaldo pesan demasiado.');
+ return {ok:true,data:out,ext,meta:{at:typeof b.exportedAt==='string'?b.exportedAt.slice(0,40):'',cards:Object.keys(out.have).length,rates:Object.keys(out.rate).length,ini:out.ini,pend:extCount(ext)}}}
+function buildBackup(){syncIn();const b={app:'insertcoinmx-album',format:FORMAT,exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(S))};
+ const e=readExt();if(e)b.ext=e;return JSON.stringify(b,null,1)}
+/* restaura cada clave por separado; no reescribe la que ya tiene su texto original (si faltó espacio, el navegador la conservó) */
+function restoreKeys(m,x){let ok=true;for(const [k,v] of [[KEY,m],[KEY_EXT,x]]){try{if(localStorage.getItem(k)!==v){if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}ok=ok&&localStorage.getItem(k)===v}catch(e){ok=false}}return ok}
+/* importar = reemplazar. Copia previa en .bak, escritura, lectura de vuelta; ante cualquier falla
+   las dos claves vuelven a su texto exacto anterior y S a su estado anterior. Nada sale del teléfono antes. */
+function applyImport(v){clearTimeout(save.t);syncIn();
+ const prevMain=LS.get(KEY),prevExt=LS.get(KEY_EXT),prevS=JSON.parse(JSON.stringify(S));
+ try{localStorage.setItem(KEY_BAK,JSON.stringify({at:new Date().toISOString(),main:prevMain,ext:prevExt}))}
+ catch(e){return {ok:false,err:'No hay espacio para guardar la copia de seguridad. No se cambió nada. Exporta tu progreso antes de volver a intentarlo.'}}
+ const N=Object.assign(DEF(),v.data,{test:S.test||0,sv:2,rev:(S.rev||0)+1});
+ const mainStr=JSON.stringify(N),extStr=v.ext?JSON.stringify(v.ext):null;
+ try{if(extStr===null)localStorage.removeItem(KEY_EXT);else localStorage.setItem(KEY_EXT,extStr);
+  localStorage.setItem(KEY,mainStr);
+  if(localStorage.getItem(KEY)!==mainStr||localStorage.getItem(KEY_EXT)!==extStr)throw new Error('verificación')}
+ catch(e){const ok=restoreKeys(prevMain,prevExt);for(const k of Object.keys(S))delete S[k];Object.assign(S,prevS);lastRaw=LS.get(KEY);
+  return {ok:false,err:ok?'No se pudo guardar el respaldo. Tu progreso quedó exactamente como estaba.':'No se pudo guardar el respaldo. Tu progreso sigue en esta pestaña y en la copia de seguridad; no la cierres y vuelve a intentarlo.'}}
+ for(const k of Object.keys(S))delete S[k];Object.assign(S,N);lastRaw=mainStr;
+ save.t=setTimeout(()=>STORE.put(),600);return {ok:true}}
+async function saveFile(name,text){const blob=new Blob([text],{type:'application/json'});
+ if(STORE.dl){try{await STORE.dl.save({filename:name,data:blob});return true}catch(e){if(e&&e.code==='declined')return false}}
+ try{const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}catch(e){return false}}
+/* ventana del respaldo */
+function bkOpen(html){const m=$('bkm');m.querySelector('.bkin').innerHTML=html;m.classList.add('on');m.querySelectorAll('[data-bkx]').forEach(b=>b.onclick=bkClose);return m}
+function bkClose(){$('bkm').classList.remove('on');$('bkFile').value=''}
+const bkMsg=(t,c)=>{const e=$('bkMsg');if(e){e.className=c||'';e.textContent=t}};
+$('bkExp').onclick=()=>{beep(880);const txt=buildBackup(),name='insertcoinmx-progreso-'+today()+'.json';
+ bkOpen(`<h2>TU RESPALDO</h2><p>${uniq()} cartas distintas y ${Object.keys(S.rate).length} calificaciones. Guarda el archivo en un lugar seguro; si no se descarga, copia el texto y guárdalo en tus notas.</p>
+ <div class="bkb"><button class="btn y" id="bkSave">GUARDAR ARCHIVO</button><button class="btn" id="bkCopy">COPIAR TEXTO</button></div>
+ <textarea id="bkTxt" readonly></textarea><p id="bkMsg"></p><button class="btn" data-bkx>CERRAR</button>`);
+ $('bkTxt').value=txt;
+ $('bkSave').onclick=async()=>{const ok=await saveFile(name,txt);bkMsg(ok?'Listo. Si no ves el archivo, usa COPIAR TEXTO.':'No se pudo guardar el archivo. Usa COPIAR TEXTO.',ok?'':'bkwarn')};
+ $('bkCopy').onclick=async()=>{const t=$('bkTxt');try{await navigator.clipboard.writeText(txt);bkMsg('Texto copiado.')}
+  catch(e){t.focus();t.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}bkMsg(ok?'Texto copiado.':'Selecciona el texto y cópialo a mano.',ok?'':'bkwarn')}}};
+$('bkImp').onclick=()=>{beep(880);bkOpen(`<h2>IMPORTAR RESPALDO</h2><p>Elige el archivo .json o pega el texto de tu respaldo.</p>
+ <button class="btn y" id="bkPick">ELEGIR ARCHIVO</button><textarea id="bkPaste" placeholder="o pega aquí el texto del respaldo"></textarea>
+ <div class="bkb"><button class="btn" id="bkCheck">REVISAR TEXTO</button><button class="btn" data-bkx>CANCELAR</button></div><p id="bkMsg"></p>`);
+ $('bkPick').onclick=()=>$('bkFile').click();$('bkCheck').onclick=()=>bkReview($('bkPaste').value)};
+$('bkFile').onchange=()=>{const f=$('bkFile').files[0];if(!f)return;if(f.size>1048576){bkMsg('El archivo pesa más de 1 MB; no parece un respaldo.','bkerr');return}
+ const r=new FileReader();r.onload=()=>bkReview(String(r.result));r.onerror=()=>bkMsg('No se pudo leer el archivo.','bkerr');r.readAsText(f)};
+function bkReview(text){const v=validateBackup(text);if(!v.ok){bkMsg(v.err,'bkerr');beep(150,.2);return}
+ syncIn();const m=v.meta,nowC=uniq(),nowR=Object.keys(S.rate).length,d=new Date(m.at),when=isNaN(d)?'fecha desconocida':d.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+ bkOpen(`<h2>¿REEMPLAZAR TU PROGRESO?</h2><p>Respaldo del ${esc(when)}</p>
+ <div class="bkcmp"><span></span><span>AHORA</span><span>RESPALDO</span><b>Cartas distintas</b><span>${nowC}</span><span>${m.cards}</span><b>Calificaciones</b><span>${nowR}</span><span>${m.rates}</span><b>Iniciales</b><span>${esc(S.ini||'—')}</span><span>${m.ini||'—'}</span></div>
+ ${m.cards<nowC?'<p class="bkwarn">Ojo: el respaldo tiene MENOS cartas que tu progreso actual.</p>':''}
+ ${m.pend?`<p>${m.pend} ${m.pend===1?'carta del respaldo todavía no existe':'cartas del respaldo todavía no existen'} en el álbum; se guardan aparte y aparecerán cuando se agreguen.</p>`:''}
+ <p>Antes de reemplazar, tu progreso actual se guarda en una copia de seguridad.</p>
+ <div class="bkb"><button class="btn y" id="bkOk">REEMPLAZAR MI PROGRESO</button><button class="btn" data-bkx>CANCELAR</button></div><p id="bkMsg"></p>`);
+ $('bkOk').onclick=()=>{const r=applyImport(v);if(!r.ok){bkMsg(r.err,'bkerr');beep(150,.2);return}bkClose();jingle();toast('¡PROGRESO<br>RESTAURADO!');refresh()}}
 /* ---------- compartir (imagen) ---------- */
 function li(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
 async function deliver(cv,name){const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
