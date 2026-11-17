@@ -777,7 +777,7 @@ const after=(a,b)=>!b||a>b; // ¿el día a es posterior al día b?
 function normalize(o){const t=today();
  for(const f of ['last','rdia']){const v=o[f];if(typeof v!=='string'||!DRE.test(v))continue;
   if(after(v,t)&&((o.sv||0)<2||after(v,addDays(t,2))))o[f]=t}
- o.sv=2;if(!Number.isInteger(o.rev)||o.rev<0)o.rev=0;if((o.mv||0)<2)migrate(o);return o}
+ o.sv=2;if(!Number.isInteger(o.rev)||o.rev<0)o.rev=0;if((o.mv||0)<2)migrate(o);if(o.fg!==1)o.fg=(isObj(o.have)&&Object.keys(o.have).length)||o.last||(Array.isArray(o.pk)&&o.pk.length)?1:0;return o}
 /* Etapa 3: del modelo anterior (id / F_id) al de 4 versiones (id_v). Común→Base, Holo→Especial, Dorada→Rara, F_→Full.
    Cada carta conserva su cantidad; lo que ya está en formato nuevo se queda; lo que no se reconoce no se toca.
    Las calificaciones pasan a ser siempre por diseño. Repetirlo no cambia nada. */
@@ -813,7 +813,7 @@ let MINE=[],saveFailed=false;
 const PKRE=/^[a-z0-9]{6,24}$/;
 function applyPack(p){S.pk=Array.isArray(S.pk)?S.pk:[];if(S.pk.includes(p.id))return false;
  for(const k in p.have)S.have[k]=(S.have[k]||0)+p.have[k];
- if(p.last&&after(p.last,S.last))S.last=p.last;if(p.extra)S.extra=Math.max(0,(S.extra||0)-p.extra);
+ if(p.fg)S.fg=1;if(p.last&&after(p.last,S.last))S.last=p.last;if(p.extra)S.extra=Math.max(0,(S.extra||0)-p.extra);
  S.pk.push(p.id);if(S.pk.length>30)S.pk=S.pk.slice(-30);return true}
 function setWarn(on){const w=$('saveW');if(w)w.hidden=!on;document.body.classList.toggle('savewarn',!!on)}
 function adoptRaw(raw){let o;try{o=pj(raw)}catch(e){return false}if(!o||typeof o!=='object'||Array.isArray(o))return false;
@@ -848,7 +848,7 @@ function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);go('home')}});
 /* ---------- bienvenida ---------- */
-const ON=[['JUNTA LAS '+NAV,'Cada playera de Insert Coin MX es una carta. Llénalas todas en tu álbum.','c/gatosamurai.jpg'],['UN SOBRE AL DIA','Cada día tienes un sobre gratis con 5 cartas. Las raras brillan.','c/F_gatosamurai.jpg'],['JUEGA CON ELLAS','Califícalas, arma tu tier y haz torneos. Las repetidas valen sobres extra.','c/fatality.jpg']];
+const ON=[['JUNTA LAS '+NAV,'Cada playera de Insert Coin MX es una carta. Llénalas todas en tu álbum.','c/gatosamurai.jpg'],['UN SOBRE AL DIA','Cada día tienes un sobre gratis con 5 cartas. Siempre viene una Especial o mejor, y brillan.','c/F_gatosamurai.jpg'],['JUEGA CON ELLAS','Califícalas, arma tu tier y haz torneos. Las repetidas valen sobres extra.','c/fatality.jpg']];
 let onI=0;
 function showOn(){$('onb').classList.add('on');const o=ON[onI];$('onImg').src=o[2];$('onT').textContent=o[0];$('onP').textContent=o[1];$('onDots').innerHTML=ON.map((_,i)=>`<i class="${i===onI?'on':''}"></i>`).join('');$('onNext').textContent=onI<2?'SIGUIENTE':'A JUGAR'}
 $('onNext').onclick=()=>{beep(880);if(onI<2){onI++;showOn()}else{$('onb').classList.remove('on');syncIn();S.seen=1;save()}};
@@ -857,7 +857,7 @@ function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
 let mi=0;const MODES=()=>{const u=uniq(),N=NAV,r=packReady();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobre del día',k:r?(S.extra>0&&!after(today(),S.last)&&!S.test?'SOBRE EXTRA':'HOY · GRATIS'):'YA LO ABRISTE',s:r?'5 cartas · una rara seguro':'El próximo sale en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR':countdown(),off:!r},
+ {id:'pack',t:'Sobre del día',k:r?(S.extra>0&&!after(today(),S.last)&&!S.test?'SOBRE EXTRA':'HOY · GRATIS'):'YA LO ABRISTE',s:r?(firstPack()?'Tu primer sobre trae una Full':'5 cartas · una Especial o mejor'):'El próximo sale en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR':countdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -897,9 +897,18 @@ if(NOWRITE){saveFailed=true;setWarn(true)}
 $('tDupB').onclick=()=>withLock(()=>{syncIn();if(dups()<5){renderHome();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');renderHome()});
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
-function pick(){let t=Math.random()*100,r='comun';for(const k of ['full','dorada','holo','comun']){if((t-=W[k])<0){r=k;break}}
- const pool=POOL[r].length?POOL[r]:POOL.comun;return Object.assign({},pool[Math.random()*pool.length|0])}
-function pickRare(){let t=Math.random()*100,r=t<15?'dorada':t<45?'full':'holo';const pool=POOL[r].length?POOL[r]:POOL.comun;return Object.assign({},pool[Math.random()*pool.length|0])}
+/* Sobre (Etapa 4): 3 Base + 1 sorpresa (30% de ser Especial o mejor) + 1 Especial o mejor segura.
+   Resultado por carta: Base 74% · Especial 17% · Rara 6.6% · Full 2.4%.
+   Solo cuentan las versiones con imagen; si una clase no tiene cartas, su parte se reparte entre las que sí
+   (Base se queda en 74%). Primer sobre de un jugador nuevo: la carta segura es una Full (una sola vez). */
+const SP={holo:17,dorada:6.6,full:2.4},SURP=.3;
+const pickFrom=r=>{const pool=POOL[r];return Object.assign({},pool[Math.random()*pool.length|0])};
+function pickSpecial(){const ks=Object.keys(SP).filter(k=>POOL[k].length);if(!ks.length)return pickFrom('comun');
+ let t=Math.random()*ks.reduce((a,k)=>a+SP[k],0);for(const k of ks)if((t-=SP[k])<0)return pickFrom(k);return pickFrom(ks[ks.length-1])}
+const pickBase=()=>POOL.comun.length?pickFrom('comun'):pickSpecial();
+const veteran=()=>Object.keys(S.have).length>0||!!S.last||(Array.isArray(S.pk)&&S.pk.length>0); // ya jugaba antes de la Etapa 4
+const firstPack=()=>!S.fg&&!veteran();
+function makeHand(first){return [pickBase(),pickBase(),pickBase(),Math.random()<SURP?pickSpecial():pickBase(),first&&POOL.full.length?pickFrom('full'):pickSpecial()]}
 const GLOW={holo:'#9ff3ff',dorada:'#FFD400',full:'#ff6fd0'};
 let hand=[],idx=0,hintT;
 function resetPack(){{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.jpg)`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
@@ -916,12 +925,12 @@ let opening=false;function openPack(){if(opening)return;opening=true;clearTimeou
  withLock(()=>{syncIn();if(!packReady()){opening=false;toast('YA LO ABRISTE<br>EN OTRA PESTAÑA');go('home');return}
   const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,saved:false,t:0};
   if(!S.test&&!PRUEBA){if(after(today(),S.last))p.last=today();else p.extra=1}
-  hand=Array.from({length:4},pick).concat([pickRare()]);const seen={};
+  hand=makeHand(firstPack());p.fg=1;const seen={};
   hand.forEach(c=>{c._new=!S.have[c.k]&&!seen[c.k];seen[c.k]=1;p.have[c.k]=(p.have[c.k]||0)+1});
   applyPack(p);MINE.push(p);save();
   setTimeout(()=>opening=false,900);$('env').classList.add('cut');beep(300,.2);idx=0;setTimeout(()=>{$('env').style.display='none';buildStack()},420)})}
 function buildStack(){const st=$('stack');st.innerHTML='';st.classList.add('on');
- hand.slice().reverse().forEach((c,ri)=>{const i=4-ri;const el=document.createElement('div');el.className='sc'+(i===4&&c.r!=='comun'?' down':'');el.style.setProperty('--g',GLOW[c.r]||'#fff');
+ hand.slice().reverse().forEach((c,ri)=>{const i=4-ri;const el=document.createElement('div');el.className='sc'+(c.r!=='comun'?' down':'');el.style.setProperty('--g',GLOW[c.r]||'#fff');
   el.style.transform=`translateY(${i*-9}px) scale(${1-i*.035})`;el.dataset.i=i;
   el.innerHTML=`<span class="badge ${c._new?'':'rep'}">${c._new?'NUEVA':'REPETIDA'}</span><div class="fx idle r-${c.r}"><img src="${imgOf(c,'c2')}"><i class="foil"></i><i class="glare"></i></div><div class="bkc"><div class="bkA"><div class="ln"></div><img src="logo.png"></div></div>`;st.appendChild(el)});
  hintTop()}
@@ -1114,6 +1123,7 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
    else if(k==='champ'){if(typeof v!=='string'||(v!==''&&!IDRE.test(v)))throw 'El campeón del respaldo no es válido.';out.champ=v}
    else if(k==='rlast'){if(!(v===null||isInt(v,0,9999)))throw 'La última reta del respaldo no es válida.';out.rlast=v}
    else if(k==='pk'){if(!Array.isArray(v)||v.length>30||!v.every(x=>typeof x==='string'&&PKRE.test(x)))throw 'El respaldo trae un dato inválido (pk).';out.pk=v.slice()}
+   else if(k==='fg'){if(!(v===0||v===1))throw 'El respaldo trae un dato inválido (fg).';out.fg=v}
    else if(k==='rev'||k==='sv'||k==='mv'){}
    else{if(!KRE.test(k))throw 'El respaldo trae un dato con nombre inválido.';safeVal(v,1);x.unk[k]=v}}
   if(b.ext!==undefined){const e=b.ext;if(!isObj(e))throw 'Los datos extra del respaldo no son válidos.';
@@ -1139,7 +1149,7 @@ function applyImport(v){clearTimeout(save.t);syncIn();
  const prevMain=LS.get(KEY),prevExt=LS.get(KEY_EXT),prevS=JSON.parse(JSON.stringify(S));
  try{localStorage.setItem(KEY_BAK,JSON.stringify({at:new Date().toISOString(),main:prevMain,ext:prevExt}))}
  catch(e){return {ok:false,err:'No hay espacio para guardar la copia de seguridad. No se cambió nada. Exporta tu progreso antes de volver a intentarlo.'}}
- const N=Object.assign(DEF(),v.data,{test:S.test||0,sv:2,mv:2,rev:(S.rev||0)+1});
+ const N=Object.assign(DEF(),v.data,{test:S.test||0,sv:2,mv:2,fg:(v.data.fg===1||Object.keys(v.data.have||{}).length||v.data.last)?1:0,rev:(S.rev||0)+1});
  const mainStr=JSON.stringify(N),extStr=v.ext?JSON.stringify(v.ext):null;
  try{if(extStr===null)localStorage.removeItem(KEY_EXT);else localStorage.setItem(KEY_EXT,extStr);
   localStorage.setItem(KEY,mainStr);
