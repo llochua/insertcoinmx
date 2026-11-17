@@ -610,8 +610,19 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .fsoon span{border:1px dashed rgba(255,255,255,.2);border-radius:14px;padding:4px 10px;color:rgba(255,255,255,.45)}
 .dt.own.done .cv{box-shadow:0 0 0 2px var(--y),0 0 18px rgba(255,212,0,.45),0 10px 18px rgba(0,0,0,.45)!important}
 .fdone{display:inline-block;margin-left:8px;background:var(--y);color:#120F1A;border-radius:5px;padding:2px 7px;letter-spacing:.08em}
-.scomp{all:unset;cursor:pointer;font:700 12px AV;color:#120F1A;background:var(--y);border-radius:10px;padding:9px 14px;text-align:center;box-shadow:0 0 22px rgba(255,212,0,.45);animation:scp .6s ease-out}
-@keyframes scp{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}}
+.dt .cr.was{background:rgba(12,10,40,.85);color:var(--y);box-shadow:inset 0 0 0 1.5px var(--y),0 2px 6px rgba(0,0,0,.5)}
+.fdone.was{display:table;margin:6px 0 0;background:none;color:var(--y);box-shadow:inset 0 0 0 1px rgba(255,212,0,.6);letter-spacing:.04em}
+.aSub span{display:block;margin-top:3px;font-size:10px;color:rgba(255,255,255,.35)}
+.scomp{all:unset;box-sizing:border-box;position:relative;overflow:hidden;cursor:pointer;display:flex;align-items:center;gap:12px;width:min(360px,100%);padding:10px 14px 10px 10px;border-radius:14px;
+ background:linear-gradient(135deg,#ffe766,#FFD400 45%,#f0a800);color:#120F1A;border:3px solid #fff;
+ box-shadow:0 0 0 3px #120F1A,0 0 30px 6px rgba(255,212,0,.7),0 0 70px 10px rgba(255,212,0,.35);animation:scp .7s cubic-bezier(.2,1.4,.4,1),scg 1.6s ease-in-out .7s infinite}
+.scomp img{width:56px;border-radius:6px;flex:none;box-shadow:0 4px 10px rgba(0,0,0,.4);transform:rotate(-5deg)}
+.scomp span{display:flex;flex-direction:column;gap:3px;text-align:left;min-width:0}
+.scomp b{font:13px PX;line-height:1.3}.scomp em{font:800 16px AV;font-style:normal;line-height:1.1}.scomp small{font:700 11px AV;opacity:.7}
+.scomp i{position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.75) 50%,transparent 65%);transform:translateX(-100%);animation:scs 2.4s ease-in-out .8s infinite;pointer-events:none}
+@keyframes scp{0%{transform:scale(.4) rotate(-6deg);opacity:0}100%{transform:none;opacity:1}}
+@keyframes scg{50%{box-shadow:0 0 0 3px #120F1A,0 0 40px 12px rgba(255,212,0,.9),0 0 90px 18px rgba(255,212,0,.45)}}
+@keyframes scs{60%,100%{transform:translateX(100%)}}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -900,7 +911,7 @@ const jingle=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.11),i*
 function toast(t){const e=$('toast');e.innerHTML=t;e.classList.remove('go');void e.offsetWidth;e.classList.add('go')}
 /* ---------- navegación ---------- */
 let cur='home';
-function go(id){if(id!=='album'&&fd)closeFicha();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
+function go(id){if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);go('home')}});
@@ -984,7 +995,7 @@ let opening=false;function openPack(){if(opening)return;opening=true;clearTimeou
   if(!S.test&&!PRUEBA){if(after(today(),S.last))p.last=today();else p.extra=1}
   hand=makeHand(firstPack());p.fg=1;const seen={};
   hand.forEach(c=>{c._new=!S.have[c.k]&&!seen[c.k];seen[c.k]=1;p.have[c.k]=(p.have[c.k]||0)+1});
-  applyPack(p);MINE.push(p);save();
+  applyPack(p);markLogros();MINE.push(p);save();
   setTimeout(()=>opening=false,900);$('env').classList.add('cut');beep(300,.2);idx=0;setTimeout(()=>{$('env').style.display='none';buildStack()},420)})}
 function buildStack(){const st=$('stack');st.innerHTML='';st.classList.add('on');
  hand.slice().reverse().forEach((c,ri)=>{const i=4-ri;const el=document.createElement('div');el.className='sc'+(c.r!=='comun'?' down':'');el.style.setProperty('--g',GLOW[c.r]||'#fff');
@@ -1034,8 +1045,9 @@ ST.addEventListener('mousedown',e=>{mdown=true;gStart(e.clientX,e.clientY,e.targ
 window.addEventListener('mousemove',e=>{if(mdown)gMove(e.clientX,e.clientY)});
 window.addEventListener('mouseup',()=>{if(mdown){mdown=false;gEnd(false)}});
 function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');s.classList.add('on');
- s.innerHTML=`<div class="px" style="color:var(--y);font-size:14px">SOBRE ABIERTO</div><div class="g">${hand.map(c=>`<div><img src="${imgOf(c,'c')}"><span class="${c._new?'':'rep'}">${c._new?'NUEVA':'x'+S.have[c.k]}</span></div>`).join('')}</div>
- ${(()=>{const D=[...new Set(hand.filter(c=>c._new).map(c=>c.d))].filter(id=>DB[id]&&dState(DB[id]).done);return D.length?`<button class="scomp" id="sComp" data-d="${D[0]}">★ DISEÑO COMPLETO: ${D.map(id=>DB[id].n).join(' · ')}</button>`:''})()}
+ s.innerHTML=`<div class="px" style="color:var(--y);font-size:14px">SOBRE ABIERTO</div>
+ ${(()=>{const D=[...new Set(hand.filter(c=>c._new).map(c=>c.d))].filter(id=>DB[id]&&dState(DB[id]).done);return D.length?`<button class="scomp" id="sComp" data-d="${D[0]}"><img src="${imgOf(dState(DB[D[0]]).cover,'c')}" alt=""><span><b>★ ¡DISEÑO COMPLETO!</b><em>${D.map(id=>DB[id].n).join(' · ')}</em><small>Ver colección ›</small></span><i></i></button>`:''})()}
+ <div class="g">${hand.map(c=>`<div><img src="${imgOf(c,'c')}"><span class="${c._new?'':'rep'}">${c._new?'NUEVA':'x'+S.have[c.k]}</span></div>`).join('')}</div>
  <div class="px" style="font-size:11px">ALBUM ${uniq()}/${NAV}</div>
  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn" id="sShare">⤓ COMPARTIR</button><button class="btn" id="sAlb">VER ALBUM</button><button class="btn y" id="sOtro">MENU</button></div>`;
  $('sAlb').onclick=()=>go('album');if($('sComp'))$('sComp').onclick=()=>{const id=$('sComp').dataset.d;go('album');openFicha(id)};$('sOtro').onclick=()=>go('home');$('sShare').onclick=()=>shareGrid('ME SALIO EN MI SOBRE',hand.map(c=>c.k),'sobre-insertcoinmx.png');jingle()}
@@ -1060,7 +1072,11 @@ function dState(d){const vs=VL.map(v=>{const c=CB[d.id+'_'+v],h=S.have[c.k]||0;r
  const col=vs.filter(x=>x.st!=='soon'),got=col.filter(x=>x.h).length,by=v=>vs[VL.indexOf(v)];
  const best=RANK.map(by).find(x=>x.h&&x.c.img)||RANK.map(by).find(x=>x.h)||RANK.map(by).find(x=>x.c.img)||vs[0];
  const all=col.length>0&&got===col.length;
- return{vs,got,tot:col.length,own:got>0,all,done:all&&col.length>1,cover:best.c,rep:vs.reduce((n,x)=>n+Math.max(0,x.h-1),0)}}
+ return{vs,got,tot:col.length,own:got>0,all,done:all&&col.length>1,was:!!(S.logro&&S.logro[d.id]),cover:best.c,rep:vs.reduce((n,x)=>n+Math.max(0,x.h-1),0)}}
+/* logro: la primera vez que completas un diseño de 2+ versiones queda la fecha en S.logro; si después llega
+   una ilustración nueva el diseño vuelve a mostrar lo que falta, pero el logro no se borra (estrella hueca). */
+function markLogros(){let ch=0;for(const d of DESIGNS){if(S.logro&&S.logro[d.id])continue;if(dState(d).done){S.logro=isObj(S.logro)?S.logro:{};S.logro[d.id]=today();ch=1}}return ch}
+const fday=f=>{const [y,m,d]=f.split('-').map(Number);return d+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m-1]+(y!==new Date().getFullYear()?' '+y:'')};
 const pips=(st,n=1)=>`<span class="pp">${st.vs.map(x=>`<i class="p ${x.v} ${x.st}"></i>`).join('')}${n?`<b>${st.got}/${st.tot}</b>`:''}</span>`;
 function renderAlbum(){
  const D=DORD.map(d=>({d,st:dState(d)}));
@@ -1068,15 +1084,15 @@ function renderAlbum(){
  const L=D.filter(x=>APAGES[page][1](x.d)),g=L.reduce((n,x)=>n+x.st.got,0),t=L.reduce((n,x)=>n+x.st.tot,0);
  $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=D.reduce((n,x)=>n+x.st.got,0)+'/'+D.reduce((n,x)=>n+x.st.tot,0);
  const dn=L.filter(x=>x.st.all).length;
- $('aSub').innerHTML=`<b>${dn}</b> de ${L.length} diseños completos`+(SOON_N>0?` · ${SOON_N} versiones por llegar`:'');
- $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv"><img src="${imgOf(st.cover,'c')}" loading="lazy" alt="">${st.own?'':`<span class="lk">?${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}</span>${pips(st)}</button>`).join('');
+ $('aSub').innerHTML=`<b>${dn}</b> de ${L.length} diseños completos · ${t} cartas en sobres`+(SOON_N>0?`<span>+ ${SOON_N} ilustraciones en camino · todavía no salen en sobres</span>`:'');
+ $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv"><img src="${imgOf(st.cover,'c')}" loading="lazy" alt="">${st.own?'':`<span class="lk">?${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}</span>${pips(st)}</button>`).join('');
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
 $('grid').onclick=e=>{const t=e.target.closest('.dt');if(!t)return;beep(880,.04);openFicha(t.dataset.d)};
 function openFicha(id){if(!DB[id])return;fd=id;renderFicha();$('ficha').classList.add('on');$('ficha').setAttribute('aria-hidden','false');$('ficha').querySelector('.fsh').scrollTop=0}
 function closeFicha(){fd=null;$('ficha').classList.remove('on');$('ficha').setAttribute('aria-hidden','true')}
 function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(d);
- $('fMeta').innerHTML=d.cat+(d.no?' · #'+String(d.no).padStart(3,'0'):'')+(st.done?'<span class="fdone">★ COMPLETO</span>':'');$('fName').textContent=d.n;
+ $('fMeta').innerHTML=d.cat+(d.no?' · #'+String(d.no).padStart(3,'0'):'')+(st.done?'<span class="fdone">★ COMPLETO</span>':st.was?'<span class="fdone was">★ COMPLETADO '+fday(S.logro[d.id]).toUpperCase()+' · NUEVA VERSIÓN</span>':'');$('fName').textContent=d.n;
  const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
  const col=st.vs.filter(x=>x.st!=='soon');$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
@@ -1211,6 +1227,7 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
    else if(k==='champ'){if(typeof v!=='string'||(v!==''&&!IDRE.test(v)))throw 'El campeón del respaldo no es válido.';out.champ=v}
    else if(k==='rlast'){if(!(v===null||isInt(v,0,9999)))throw 'La última reta del respaldo no es válida.';out.rlast=v}
    else if(k==='pk'){if(!Array.isArray(v)||v.length>30||!v.every(x=>typeof x==='string'&&PKRE.test(x)))throw 'El respaldo trae un dato inválido (pk).';out.pk=v.slice()}
+   else if(k==='logro'){if(!isObj(v))throw 'Los logros del respaldo no son válidos.';for(const [c,f] of Object.entries(v)){id(c,'logros');if(!f||!isDay(f))throw 'Una fecha de logro no es válida.';const di=designId(c);if(di){out.logro=out.logro||{};if(!out.logro[di]||f<out.logro[di])out.logro[di]=f}else{x.unk.logro=x.unk.logro||{};x.unk.logro[c]=f}}}
    else if(k==='fg'){if(!(v===0||v===1))throw 'El respaldo trae un dato inválido (fg).';out.fg=v}
    else if(k==='rev'||k==='sv'||k==='mv'){}
    else{if(!KRE.test(k))throw 'El respaldo trae un dato con nombre inválido.';safeVal(v,1);x.unk[k]=v}}
