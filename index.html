@@ -468,6 +468,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @keyframes holo{0%{background-position:0% 30%}100%{background-position:100% 70%}}
 .pkc{position:absolute;left:50%;top:20.5%;width:40%;aspect-ratio:1;transform:translateX(-50%);-webkit-mask:url(coin.png) center/contain no-repeat;mask:url(coin.png) center/contain no-repeat}
 .pkc::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.9) .6px,transparent 1.2px) 0 0/5px 5px;mix-blend-mode:overlay;opacity:.6}
+
+/* ===== SOBRE v4: diseño final de Jos (sobre.png), brillo que sigue al dedo ===== */
+#pack .pk{--w:min(78vw,310px);width:var(--w);aspect-ratio:468/668;filter:drop-shadow(0 22px 26px rgba(0,0,0,.7)) drop-shadow(0 0 16px rgba(255,212,0,.12))}
+#pack .pkimg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;user-select:none}
+#pack .pkshine{position:absolute;inset:0;pointer-events:none;-webkit-mask:url(sobre.png) center/100% 100% no-repeat;mask:url(sobre.png) center/100% 100% no-repeat;mix-blend-mode:screen;opacity:.55;
+ background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.55) 42%,rgba(255,236,150,.35) 50%,transparent 62%);background-size:300% 300%;background-position:var(--hx) var(--hy);transition:background-position .25s ease-out}
+#pack .pk.idle .pkshine{animation:holo 6s ease-in-out infinite alternate}
+#pack .pk-top{position:absolute;left:1%;top:5.2%;width:92%;height:9%;background:none;clip-path:none;transform:rotate(-4.8deg);transform-origin:0 0;z-index:3}
+#pack .pk-top .cutp{top:auto;bottom:0;left:0;height:4px;background:#fff;box-shadow:0 0 10px #fff,0 0 22px #ffd400}
+#pack .pk-top .hand{top:-6px;left:6%}
+#pack .env.cut .pk-top{animation:none}
+#pack .env.cut .pk{animation:pkgo .4s ease-in forwards}
+@keyframes pkgo{to{transform:translateY(-30px) scale(1.12) rotate(-3deg);opacity:0}}
 .pkn{position:absolute;left:0;right:0;top:51%;text-align:center;font-family:AVK;line-height:.92;letter-spacing:-.01em;-webkit-background-clip:text;background-clip:text;color:transparent}
 .pkn b{display:block;font-weight:400;font-size:calc(var(--w)*.185)}
 .pkn i{display:block;font-style:normal;font-size:calc(var(--w)*.15)}
@@ -551,15 +564,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
  <div class="stage" id="pStage">
   <div class="env" id="env">
    <div class="pk idle" id="pk">
+    <img class="pkimg" src="sobre.png" alt="Sobre Insert Coin MX" draggable="false">
+    <i class="pkshine"></i>
     <div class="pk-top" id="tearZone"><div class="cutl"></div><div class="cutp" id="cutp"></div><div class="hand" id="hand">👆</div></div>
-    <div class="pk-body">
-     <div class="pki t">CARTAS COLECCIONABLES</div>
-     <div class="pkc hol"></div>
-     <div class="pkn hol"><b>INSERT</b><i>COIN MX</i></div>
-     <div class="pki b"><span>COLECCIÓN PLAYERAS</span><span>5 CARTAS</span></div>
-     <i class="pkg"></i>
-    </div>
-    <div class="pk-bot2"></div>
    </div>
    <div class="pkhint">Rasga la orilla con el dedo</div>
    <button class="big" id="openBtn" style="visibility:hidden;margin:14px auto 0">ABRIR</button>
