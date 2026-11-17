@@ -552,6 +552,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .bkcmp{width:100%;display:grid;grid-template-columns:1fr auto auto;gap:6px 14px;font:600 13px AV;color:#fff;text-align:left}
 .bkcmp b{font-weight:700}.bkcmp span{color:rgba(255,255,255,.7);text-align:center}
 .bkin .bkerr{color:#ff8a8a}.bkin .bkwarn{color:var(--y)}
+.savew{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:75;background:var(--y);color:#120F1A;font:700 11px/1.3 AV;padding:9px 12px;border-radius:10px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.55)}
+.savew[hidden]{display:none}
+/* mientras la advertencia está visible, las pantallas le dejan su espacio abajo (no tapa ningún botón) */
+body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-bottom,0px))}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -620,6 +624,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <div class="onb" id="onb"><img id="onImg"><h2 id="onT"></h2><p id="onP"></p><div class="d" id="onDots"></div><button class="big" id="onNext"></button></div>
 <div class="toast" id="toast"></div>
 <div class="bkm" id="bkm"><div class="bkin"></div></div>
+<button class="savew" id="saveW" hidden>NO SE PUDO GUARDAR TU PROGRESO · TOCA PARA EXPORTARLO</button>
 
 <script>const CARDS=[{"k":"abuket","n":"Abuket","cat":"GAMER","r":"comun","no":1},{"k":"arcade","n":"Anatomía del Arcade","cat":"GAMER","r":"comun","no":2},{"k":"arcade2","n":"Insert Coin","cat":"GAMER","r":"comun","no":3},{"k":"blooper","n":"Blooper Maki","cat":"GAMER","r":"comun","no":4},{"k":"bort","n":"Bort","cat":"CARICATURAS","r":"comun","no":5},{"k":"bustfiction","n":"Bust Fiction","cat":"PELÍCULAS","r":"comun","no":6},{"k":"challenger","n":"Here Comes a New Challenger","cat":"GAMER","r":"comun","no":7},{"k":"collector","n":"Collector","cat":"GAMER","r":"comun","no":8},{"k":"controls","n":"Controls","cat":"GAMER","r":"comun","no":9},{"k":"fatality","n":"Fatality","cat":"GAMER","r":"dorada","no":10},{"k":"fatman","n":"Fatman","cat":"PELÍCULAS","r":"comun","no":11},{"k":"fck","n":"#Fuck","cat":"GAMER","r":"holo","no":12},{"k":"futbolito","n":"Futbolito","cat":"OTROS","r":"comun","no":13},{"k":"gameover","n":"Game Over","cat":"GAMER","r":"dorada","no":14},{"k":"gamepop","n":"Game Pop","cat":"GAMER","r":"holo","no":15},{"k":"gatosamurai","n":"Gato Samurái","cat":"ANIME","r":"comun","no":16},{"k":"gunsncontrols","n":"Guns N' Controls","cat":"GAMER","r":"comun","no":17},{"k":"humangamer","n":"Human Gamer","cat":"GAMER","r":"comun","no":18},{"k":"hyrule","n":"Hyrule","cat":"GAMER","r":"comun","no":19},{"k":"invader","n":"Invader","cat":"GAMER","r":"comun","no":20},{"k":"keepcalm","n":"Keep Calm","cat":"ANIME","r":"comun","no":21},{"k":"links","n":"Links","cat":"GAMER","r":"holo","no":22},{"k":"mapa","n":"Mapa","cat":"GAMER","r":"comun","no":23},{"k":"mrkarate","n":"Mr. Karate","cat":"PELÍCULAS","r":"comun","no":24},{"k":"n64","n":"N64","cat":"GAMER","r":"comun","no":25},{"k":"nerv","n":"Nerv","cat":"ANIME","r":"holo","no":26},{"k":"omkami","n":"Ōkami","cat":"GAMER","r":"holo","no":27},{"k":"pizzcipher","n":"Pizzcipher","cat":"CARICATURAS","r":"comun","no":28},{"k":"poketaco","n":"Poké Taco","cat":"GAMER","r":"comun","no":29},{"k":"polystation","n":"PolyStation","cat":"GAMER","r":"holo","no":30},{"k":"samus","n":"Samus","cat":"GAMER","r":"comun","no":31},{"k":"sensei","n":"Sensei","cat":"ANIME","r":"comun","no":32},{"k":"shenzalcoatl","n":"Shenzalcoatl","cat":"ANIME","r":"comun","no":33},{"k":"snes","n":"Ignore All of My Adult Problems","cat":"GAMER","r":"comun","no":34},{"k":"sv001","n":"SV-001","cat":"GAMER","r":"comun","no":35},{"k":"thankyou","n":"Thank You","cat":"GAMER","r":"comun","no":36},{"k":"theworldwarrior","n":"The World Warrior","cat":"GAMER","r":"comun","no":37},{"k":"triforce","n":"Triforce","cat":"GAMER","r":"dorada","no":38},{"k":"vidaextra","n":"Una Vida Extra","cat":"GAMER","r":"holo","no":39},{"k":"wirimask","n":"Wirimask","cat":"GAMER","r":"comun","no":40},{"k":"x","n":"X","cat":"GAMER","r":"comun","no":41},{"k":"yinyang","n":"Yin Yang","cat":"GAMER","r":"holo","no":42},{"k":"zero","n":"Zero","cat":"GAMER","r":"comun","no":43},{"k":"zodiac","n":"Zodiaco","cat":"ANIME","r":"comun","no":44},{"k":"F_abuket","n":"abuket","cat":"","r":"full","no":1},{"k":"F_arcade","n":"arcade","cat":"","r":"full","no":2},{"k":"F_asteroids","n":"asteroids","cat":"","r":"full","no":3},{"k":"F_blooper","n":"blooper","cat":"","r":"full","no":4},{"k":"F_bustfiction","n":"bustfiction","cat":"","r":"full","no":5},{"k":"F_challenger","n":"challenger","cat":"","r":"full","no":6},{"k":"F_collector","n":"collector","cat":"","r":"full","no":7},{"k":"F_controls","n":"controls","cat":"","r":"full","no":8},{"k":"F_docecasas","n":"docecasas","cat":"","r":"full","no":9},{"k":"F_fatman","n":"fatman","cat":"","r":"full","no":10},{"k":"F_gamepop","n":"gamepop","cat":"","r":"full","no":11},{"k":"F_gatosamurai","n":"gatosamurai","cat":"","r":"full","no":12},{"k":"F_gunsncontrols","n":"gunsncontrols","cat":"","r":"full","no":13},{"k":"F_humangamer","n":"humangamer","cat":"","r":"full","no":14},{"k":"F_hyrule","n":"hyrule","cat":"","r":"full","no":15},{"k":"F_invader","n":"invader","cat":"","r":"full","no":16},{"k":"F_keepcalm","n":"keepcalm","cat":"","r":"full","no":17},{"k":"F_mapa","n":"mapa","cat":"","r":"full","no":18},{"k":"F_mrkarate","n":"mrkarate","cat":"","r":"full","no":19},{"k":"F_n64","n":"n64","cat":"","r":"full","no":20},{"k":"F_nerv","n":"nerv","cat":"","r":"full","no":21},{"k":"F_omkami","n":"omkami","cat":"","r":"full","no":22},{"k":"F_pizzcipher","n":"pizzcipher","cat":"","r":"full","no":23},{"k":"F_poketaco","n":"poketaco","cat":"","r":"full","no":24},{"k":"F_polystation","n":"polystation","cat":"","r":"full","no":25},{"k":"F_samus","n":"samus","cat":"","r":"full","no":26},{"k":"F_sensei","n":"sensei","cat":"","r":"full","no":27},{"k":"F_shenzalcoatl","n":"shenzalcoatl","cat":"","r":"full","no":28},{"k":"F_snes","n":"snes","cat":"","r":"full","no":29},{"k":"F_sonic","n":"sonic","cat":"","r":"full","no":30},{"k":"F_sv001","n":"sv001","cat":"","r":"full","no":31},{"k":"F_thankyou","n":"thankyou","cat":"","r":"full","no":32},{"k":"F_vidaextra","n":"vidaextra","cat":"","r":"full","no":33},{"k":"F_wirimask","n":"wirimask","cat":"","r":"full","no":34},{"k":"F_worldwarrior","n":"worldwarrior","cat":"","r":"full","no":35},{"k":"F_x","n":"x","cat":"","r":"full","no":36},{"k":"F_zero","n":"zero","cat":"","r":"full","no":37},{"k":"F_zodiaco","n":"zodiaco","cat":"","r":"full","no":38}];
 const BASE=CARDS.filter(c=>c.r!=='full'),FULL=CARDS.filter(c=>c.r==='full');
@@ -667,14 +672,38 @@ const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude
 /* Varias pestañas: lo guardado manda. Antes de cada acción se adopta lo que otra pestaña haya escrito,
    y save() solo escribe si lo guardado sigue siendo lo último que esta pestaña leyó o escribió.
    Adoptar nunca interrumpe: refresh() no toca sobre, reta ni un arrastre en curso. */
+/* Sobres de esta pestaña: cada uno tiene un id que queda en S.pk (últimos 30).
+   - Si un guardado falla, el sobre queda pendiente y se reintenta; la advertencia queda visible hasta guardar.
+   - Si se adopta un guardado de otra pestaña, se vuelven a sumar SOLO los sobres cuyo id no está en S.pk:
+     así nunca se suman dos veces y no se pierden si otra pestaña escribió casi al mismo tiempo.
+   - Los sobres ya guardados se vigilan 60 s más por si otra pestaña los pisó en ese lapso. */
+let MINE=[],saveFailed=false;
+const PKRE=/^[a-z0-9]{6,24}$/;
+function applyPack(p){S.pk=Array.isArray(S.pk)?S.pk:[];if(S.pk.includes(p.id))return false;
+ for(const k in p.have)S.have[k]=(S.have[k]||0)+p.have[k];
+ if(p.last&&after(p.last,S.last))S.last=p.last;if(p.extra)S.extra=Math.max(0,(S.extra||0)-p.extra);
+ S.pk.push(p.id);if(S.pk.length>30)S.pk=S.pk.slice(-30);return true}
+function setWarn(on){const w=$('saveW');if(w)w.hidden=!on;document.body.classList.toggle('savewarn',!!on)}
 function adoptRaw(raw){let o;try{o=pj(raw)}catch(e){return false}if(!o||typeof o!=='object'||Array.isArray(o))return false;
- const r=S.rev||0;for(const k of Object.keys(S))delete S[k];Object.assign(S,DEF(),o);normalize(S);S.rev=Math.max(S.rev,r);lastRaw=raw;return true}
-function syncIn(){const raw=LS.get(KEY);if(raw===null||raw===lastRaw||!adoptRaw(raw))return false;
- try{refresh()}catch(e){}if(document.visibilityState==='visible')toast('TU PROGRESO SE ACTUALIZÓ<br>DESDE OTRA PESTAÑA');return true}
-function save(){if(NOWRITE)return;if(syncIn())return;
- S.rev=(S.rev||0)+1;const str=JSON.stringify(S);try{localStorage.setItem(KEY,str);lastRaw=str}catch(e){}
- clearTimeout(save.t);save.t=setTimeout(()=>STORE.put(),600)}
+ const r=S.rev||0;for(const k of Object.keys(S))delete S[k];Object.assign(S,DEF(),o);normalize(S);S.rev=Math.max(S.rev,r);lastRaw=raw;
+ const now=Date.now();MINE=MINE.filter(p=>!p.saved||now-p.t<60000);let re=0;for(const p of MINE)if(applyPack(p))re++;return re?2:1}
+function syncIn(){const raw=LS.get(KEY);if(raw===null||raw===lastRaw)return false;const a=adoptRaw(raw);if(!a)return false;
+ try{refresh()}catch(e){}if(document.visibilityState==='visible')toast('TU PROGRESO SE ACTUALIZÓ<br>DESDE OTRA PESTAÑA');
+ if(a===2)setTimeout(save,0); // había sobres propios sin guardar o pisados: guardarlos encima
+ return true}
+function save(){if(syncIn()&&!saveFailed&&!MINE.some(p=>!p.saved))return false;
+ S.rev=(S.rev||0)+1;const str=JSON.stringify(S);let ok=false;
+ if(!NOWRITE){try{localStorage.setItem(KEY,str);ok=localStorage.getItem(KEY)===str}catch(e){}}
+ if(ok){lastRaw=str;const now=Date.now();MINE.forEach(p=>{if(!p.saved){p.saved=true;p.t=now}});saveFailed=false}else{S.rev--;saveFailed=true}
+ setWarn(saveFailed);if(ok){clearTimeout(save.t);save.t=setTimeout(()=>STORE.put(),600)}return ok}
 window.addEventListener('storage',e=>{if(e.key===KEY)syncIn()});
+/* candado entre pestañas (Web Locks): abrir sobre y canjear se hacen de a uno por navegador.
+   Límites sin servidor: en un navegador sin Web Locks dos pestañas pueden abrir el mismo sobre a la vez
+   (sobre de más; las cartas no se pierden gracias a S.pk). Aun con candado, localStorage no es transaccional
+   entre procesos; se mantiene el candado 150 ms tras escribir para dar margen. Una garantía total requiere servidor. */
+function withLock(fn){let ran=false;const run=()=>{ran=true;fn()};
+ if(navigator.locks&&navigator.locks.request){return navigator.locks.request(KEY+'.lock',()=>{run();return new Promise(r=>setTimeout(r,150))}).catch(()=>{if(!ran)run()})}
+ run();return Promise.resolve()}
 function goty(k){const v=STORE.docs.map(d=>d.rate&&d.rate[k]).filter(x=>x!==undefined);if(S.rate[k]!==undefined&&!STORE.docs.length)v.push(S.rate[k]);if(!v.length)return null;return Math.round(v.filter(x=>x===0).length/v.length*100)}
 /* ---------- sonido / avisos ---------- */
 let AC;function beep(f,d=.07){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
@@ -729,10 +758,11 @@ function dayTick(){const d=today();if(d===dayNow)return;dayNow=d;
  if(cur==='torneo'){if(retaOver)startTorneo()}else refresh()}
 function armDay(){clearTimeout(armDay.t);const n=new Date(),m=new Date(n);m.setHours(24,0,1,0);armDay.t=setTimeout(()=>{dayTick();armDay()},Math.max(1000,m-n))}
 armDay();setInterval(dayTick,30000);
-{const wake=()=>{if(document.visibilityState!=='visible')return;syncIn();dayTick();armDay()};
+{const wake=()=>{if(document.visibilityState!=='visible')return;syncIn();if(saveFailed)save();dayTick();armDay()};
  document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake)}
-if(NOWRITE)setTimeout(()=>toast('NO SE PUEDE GUARDAR<br>TU PROGRESO'),1500);
-$('tDupB').onclick=()=>{syncIn();if(dups()<5){renderHome();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');renderHome()};
+setInterval(()=>{if(saveFailed)save()},30000);
+if(NOWRITE){saveFailed=true;setWarn(true)}
+$('tDupB').onclick=()=>withLock(()=>{syncIn();if(dups()<5){renderHome();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');renderHome()});
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
 function pick(){let t=Math.random()*100,r='comun';for(const k of ['full','dorada','holo','comun']){if((t-=W[k])<0){r=k;break}}
@@ -748,10 +778,17 @@ $('tearZone').addEventListener('pointermove',e=>{if(tx===null)return;const r=$('
  $('cutp').style.width=(p*88)+'%';if(p>.1&&Math.random()<.3)beep(200+Math.random()*200,.02);if(p>=1){tx=null;openPack()}});
 $('tearZone').addEventListener('pointerup',()=>{if(tx!==null){tx=null;$('cutp').style.width='0'}});
 $('openBtn').onclick=openPack;
-let opening=false;function openPack(){if(opening)return;syncIn();if(!packReady()){toast('YA LO ABRISTE<br>EN OTRA PESTAÑA');go('home');return}opening=true;setTimeout(()=>opening=false,900);clearTimeout(hintT);if(!S.test&&!PRUEBA){if(after(today(),S.last))S.last=today();else S.extra=Math.max(0,S.extra-1)}
- $('env').classList.add('cut');beep(300,.2);hand=Array.from({length:4},pick).concat([pickRare()]);idx=0;setTimeout(()=>{$('env').style.display='none';buildStack()},420)}
+/* abrir sobre: en un solo bloque, dentro del candado, se adopta lo guardado, se revisa que haya sobre,
+   se suman las cartas, se gasta el sobre y se guarda. La animación empieza después. */
+let opening=false;function openPack(){if(opening)return;opening=true;clearTimeout(hintT);
+ withLock(()=>{syncIn();if(!packReady()){opening=false;toast('YA LO ABRISTE<br>EN OTRA PESTAÑA');go('home');return}
+  const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,saved:false,t:0};
+  if(!S.test&&!PRUEBA){if(after(today(),S.last))p.last=today();else p.extra=1}
+  hand=Array.from({length:4},pick).concat([pickRare()]);const seen={};
+  hand.forEach(c=>{c._new=!S.have[c.k]&&!seen[c.k];seen[c.k]=1;p.have[c.k]=(p.have[c.k]||0)+1});
+  applyPack(p);MINE.push(p);save();
+  setTimeout(()=>opening=false,900);$('env').classList.add('cut');beep(300,.2);idx=0;setTimeout(()=>{$('env').style.display='none';buildStack()},420)})}
 function buildStack(){const st=$('stack');st.innerHTML='';st.classList.add('on');
- hand.forEach(c=>{c._new=!S.have[c.k];S.have[c.k]=(S.have[c.k]||0)+1});save();
  hand.slice().reverse().forEach((c,ri)=>{const i=4-ri;const el=document.createElement('div');el.className='sc'+(i===4&&c.r!=='comun'?' down':'');el.style.setProperty('--g',GLOW[c.r]||'#fff');
   el.style.transform=`translateY(${i*-9}px) scale(${1-i*.035})`;el.dataset.i=i;
   el.innerHTML=`<span class="badge ${c._new?'':'rep'}">${c._new?'NUEVA':'REPETIDA'}</span><div class="fx idle r-${c.r}"><img src="c2/${c.k}.jpg"><i class="foil"></i><i class="glare"></i></div><div class="bkc"><div class="bkA"><div class="ln"></div><img src="logo.png"></div></div>`;st.appendChild(el)});
@@ -919,6 +956,7 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
    else if(k==='extra'){if(!isInt(v,0,999))throw 'Los sobres extra del respaldo no son válidos.';out.extra=v}
    else if(k==='champ'){if(typeof v!=='string'||(v!==''&&!IDRE.test(v)))throw 'El campeón del respaldo no es válido.';out.champ=v}
    else if(k==='rlast'){if(!(v===null||isInt(v,0,9999)))throw 'La última reta del respaldo no es válida.';out.rlast=v}
+   else if(k==='pk'){if(!Array.isArray(v)||v.length>30||!v.every(x=>typeof x==='string'&&PKRE.test(x)))throw 'El respaldo trae un dato inválido (pk).';out.pk=v.slice()}
    else if(k==='rev'||k==='sv'){}
    else{if(!KRE.test(k))throw 'El respaldo trae un dato con nombre inválido.';safeVal(v,1);x.unk[k]=v}}
   if(b.ext!==undefined){const e=b.ext;if(!isObj(e))throw 'Los datos extra del respaldo no son válidos.';
@@ -951,7 +989,7 @@ function applyImport(v){clearTimeout(save.t);syncIn();
   if(localStorage.getItem(KEY)!==mainStr||localStorage.getItem(KEY_EXT)!==extStr)throw new Error('verificación')}
  catch(e){const ok=restoreKeys(prevMain,prevExt);for(const k of Object.keys(S))delete S[k];Object.assign(S,prevS);lastRaw=LS.get(KEY);
   return {ok:false,err:ok?'No se pudo guardar el respaldo. Tu progreso quedó exactamente como estaba.':'No se pudo guardar el respaldo. Tu progreso sigue en esta pestaña y en la copia de seguridad; no la cierres y vuelve a intentarlo.'}}
- for(const k of Object.keys(S))delete S[k];Object.assign(S,N);lastRaw=mainStr;
+ for(const k of Object.keys(S))delete S[k];Object.assign(S,N);lastRaw=mainStr;MINE=[];saveFailed=false;NOWRITE=false;setWarn(false);
  save.t=setTimeout(()=>STORE.put(),600);return {ok:true}}
 async function saveFile(name,text){const blob=new Blob([text],{type:'application/json'});
  if(STORE.dl){try{await STORE.dl.save({filename:name,data:blob});return true}catch(e){if(e&&e.code==='declined')return false}}
@@ -960,6 +998,7 @@ async function saveFile(name,text){const blob=new Blob([text],{type:'application
 function bkOpen(html){const m=$('bkm');m.querySelector('.bkin').innerHTML=html;m.classList.add('on');m.querySelectorAll('[data-bkx]').forEach(b=>b.onclick=bkClose);return m}
 function bkClose(){$('bkm').classList.remove('on');$('bkFile').value=''}
 const bkMsg=(t,c)=>{const e=$('bkMsg');if(e){e.className=c||'';e.textContent=t}};
+$('saveW').onclick=()=>$('bkExp').onclick();
 $('bkExp').onclick=()=>{beep(880);const txt=buildBackup(),name='insertcoinmx-progreso-'+today()+'.json';
  bkOpen(`<h2>TU RESPALDO</h2><p>${uniq()} cartas distintas y ${Object.keys(S.rate).length} calificaciones. Guarda el archivo en un lugar seguro; si no se descarga, copia el texto y guárdalo en tus notas.</p>
  <div class="bkb"><button class="btn y" id="bkSave">GUARDAR ARCHIVO</button><button class="btn" id="bkCopy">COPIAR TEXTO</button></div>
