@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="670" viewBox="0 0 480 670" role="img" aria-label="Álbum de colección abierto con páginas de cartas y una carta destacada">
+<defs>
+ <linearGradient id="scene" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#06343D"/><stop offset="1" stop-color="#11162F"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#19AFAE" stop-opacity=".63"/><stop offset=".52" stop-color="#19AFAE" stop-opacity=".24"/><stop offset="1" stop-color="#19AFAE" stop-opacity="0"/></radialGradient>
+ <filter id="shade" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="22" stdDeviation="16" flood-color="#05030b" flood-opacity=".55"/></filter>
+ <linearGradient id="paper" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#FFF9E9"/><stop offset=".45" stop-color="#E9E0CE"/><stop offset="1" stop-color="#ACA8A4"/></linearGradient>
+ <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF9C5"/><stop offset=".4" stop-color="#FFD344"/><stop offset=".8" stop-color="#EFA91D"/><stop offset="1" stop-color="#9C5318"/></linearGradient>
+ <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#C9FFF8"/><stop offset=".55" stop-color="#5CEAD4"/><stop offset="1" stop-color="#078DAD"/></linearGradient>
+ <linearGradient id="rose" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE6E2"/><stop offset=".45" stop-color="#FF7595"/><stop offset="1" stop-color="#BD2B5F"/></linearGradient>
+ <linearGradient id="iris" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF9A5"/><stop offset=".25" stop-color="#B8C7FF"/><stop offset=".52" stop-color="#EEBBF9"/><stop offset=".78" stop-color="#9EF4ED"/><stop offset="1" stop-color="#FFDE9C"/></linearGradient>
+</defs>
+<rect width="480" height="670" rx="18" fill="url(#scene)"/>
+<ellipse cx="240" cy="280" rx="280" ry="300" fill="url(#aura)"/>
+
+<path d="M0 460q237-80 480 0v210H0Z" fill="#0B2330" opacity=".7"/>
+<g stroke="#70E5DD" opacity=".14" fill="none"><path d="M0 471h480M0 512h480M0 562h480"/><path d="m155 470-95 200m180-200v200m84-200 95 200"/></g>
+<ellipse cx="235" cy="506" rx="213" ry="39" fill="#030E17" opacity=".54"/>
+<!-- Libro desplegado; páginas con celdas realmente coleccionables -->
+<g transform="rotate(-7 238 340)" filter="url(#shade)">
+<path d="M37 204q93-22 199 8 104-30 210-8v300q-100-30-210 6-106-35-199-6Z" fill="#0B1426" stroke="#A0FFF0" stroke-width="8" stroke-linejoin="round"/>
+<path d="M50 214q93-15 184 11v270q-97-25-184-11Z" fill="#D9FAF4"/>
+<path d="M238 225q91-26 195-11v270q-94-14-195 11Z" fill="#F2FFF4"/>
+<path d="M236 218v288" stroke="#124B5C" stroke-width="9"/><path d="M235 217v287" stroke="#DFFFF1" stroke-width="2"/>
+<!-- Espacios vacíos (dan idea de progreso) -->
+<g fill="#C0E0D9" stroke="#699EAA" stroke-width="3" stroke-dasharray="6 6">
+<rect x="67" y="238" width="70" height="105" rx="7"/><rect x="148" y="238" width="70" height="105" rx="7"/>
+<rect x="67" y="354" width="70" height="104" rx="7"/>
+<rect x="256" y="238" width="70" height="105" rx="7"/><rect x="336" y="238" width="75" height="105" rx="7"/>
+<rect x="256" y="354" width="70" height="104" rx="7"/>
+</g>
+<g>
+<rect x="151" y="355" width="65" height="104" rx="7" fill="#182844" stroke="#FBE8A2" stroke-width="5"/>
+<rect x="159" y="364" width="49" height="68" rx="4" fill="url(#sun)"/>
+<path d="m183 370 7 19 21 2-16 13 5 20-17-11-16 11 4-20-14-13 19-2Z" fill="#FBF9D8"/>
+<path d="M164 447h40" stroke="#FFE596" stroke-width="5"/>
+</g>
+<g>
+<rect x="338" y="357" width="70" height="102" rx="7" fill="#151C37" stroke="#7EDDD8" stroke-width="4"/>
+<rect x="345" y="365" width="56" height="72" rx="4" fill="url(#iris)"/>
+<path d="m355 418 18-39 20 39" fill="none" stroke="#1A345C" stroke-width="8"/>
+<path d="M351 445h45" stroke="#80FFF1" stroke-width="4"/>
+</g>
+<path d="M207 225v276" stroke="#2D7D87" stroke-width="2" stroke-dasharray="8 9" opacity=".5"/>
+<path d="M54 478q90-16 180 13m5 0q92-29 191-13" fill="none" stroke="#3D9C9D" opacity=".35"/>
+</g>
+<!-- Carta que acaba de salir del álbum -->
+<g transform="rotate(13 333 193)" filter="url(#shade)">
+<rect x="279" y="91" width="113" height="163" rx="10" fill="#18233B" stroke="#FFD76B" stroke-width="7"/>
+<rect x="289" y="104" width="93" height="109" rx="5" fill="url(#iris)"/>
+<path d="m337 126 14 28-14 12-14-12Z" fill="#173449"/>
+<circle cx="337" cy="181" r="15" fill="#FFDC68"/>
+<path d="M296 232h77" stroke="#FFF2B7" stroke-width="5"/>
+</g>
+<path d="m90 122 14 26 30 4-22 19 7 29-29-15-26 15 5-30-21-18 29-4Z" fill="#A4FFF0" opacity=".78"/>
+<path d="m420 111 8 13 15 3-11 10 3 15-15-8-13 8 3-15-10-10 14-3Z" fill="#FEE590" opacity=".7"/>
+
+</svg>
