@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="670" viewBox="0 0 480 670" role="img" aria-label="Sobre abierto con cartas coleccionables emergiendo">
+<defs>
+ <linearGradient id="scene" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#43162D"/><stop offset="1" stop-color="#170E2C"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#FB794D" stop-opacity=".63"/><stop offset=".52" stop-color="#FB794D" stop-opacity=".24"/><stop offset="1" stop-color="#FB794D" stop-opacity="0"/></radialGradient>
+ <filter id="shade" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="22" stdDeviation="16" flood-color="#05030b" flood-opacity=".55"/></filter>
+ <linearGradient id="paper" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#FFF9E9"/><stop offset=".45" stop-color="#E9E0CE"/><stop offset="1" stop-color="#ACA8A4"/></linearGradient>
+ <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF9C5"/><stop offset=".4" stop-color="#FFD344"/><stop offset=".8" stop-color="#EFA91D"/><stop offset="1" stop-color="#9C5318"/></linearGradient>
+ <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#C9FFF8"/><stop offset=".55" stop-color="#5CEAD4"/><stop offset="1" stop-color="#078DAD"/></linearGradient>
+ <linearGradient id="rose" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE6E2"/><stop offset=".45" stop-color="#FF7595"/><stop offset="1" stop-color="#BD2B5F"/></linearGradient>
+ <linearGradient id="iris" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF9A5"/><stop offset=".25" stop-color="#B8C7FF"/><stop offset=".52" stop-color="#EEBBF9"/><stop offset=".78" stop-color="#9EF4ED"/><stop offset="1" stop-color="#FFDE9C"/></linearGradient>
+</defs>
+<rect width="480" height="670" rx="18" fill="url(#scene)"/>
+<ellipse cx="240" cy="280" rx="280" ry="300" fill="url(#aura)"/>
+
+<!-- Cortes de papel y rayos detrás del sobre -->
+<path d="M20 208 191 253 66 94ZM421 99 300 250 464 227ZM31 415 180 366 22 504ZM456 445 322 343 466 553Z" fill="#FFBD52" opacity=".13"/>
+<g stroke="#FFD98A" stroke-width="4" stroke-linecap="round" opacity=".5">
+<path d="M240 73v82M134 103l43 63M347 104l-43 62M44 265l88 12M439 256l-87 17"/>
+</g>
+<ellipse cx="254" cy="521" rx="186" ry="34" fill="#070411" opacity=".46"/>
+<!-- Las cinco cartas tienen distintos tratamientos, no son simples patrones -->
+<g filter="url(#shade)">
+<g transform="rotate(-19 147 240)"><rect x="84" y="133" width="128" height="177" rx="12" fill="#120F2A" stroke="#FEF6D5" stroke-width="7"/><rect x="98" y="148" width="100" height="139" rx="6" fill="url(#iris)"/><path d="m109 262 38-88 39 88" fill="none" stroke="#372B69" stroke-width="10" stroke-linejoin="round"/><path d="M126 220h43" stroke="#FFF" stroke-width="9"/></g>
+<g transform="rotate(17 331 235)"><rect x="263" y="115" width="137" height="185" rx="12" fill="#120F2A" stroke="#E5D3FB" stroke-width="7"/><rect x="277" y="129" width="109" height="143" rx="6" fill="url(#rose)"/><path d="m327 157 28 48-26 43-32-39Z" fill="#FFF4CF" stroke="#59244C" stroke-width="6"/></g>
+<g transform="rotate(-3 250 225)"><rect x="184" y="89" width="139" height="201" rx="12" fill="#0D1F27" stroke="#FFF5BB" stroke-width="8"/><rect x="197" y="102" width="113" height="170" rx="4" fill="url(#teal)"/><path d="M228 210h53m-26-27v54" stroke="#06334B" stroke-width="17" stroke-linecap="square"/><circle cx="252" cy="145" r="22" fill="#F9F6D0"/></g>
+</g>
+<!-- Sobre físico y apertura, el personaje principal -->
+<g transform="rotate(-5 240 364)" filter="url(#shade)">
+<path d="M95 274 236 169 382 274v228H95Z" fill="#AF4A27" stroke="#FFE8AA" stroke-width="6" stroke-linejoin="round"/>
+<path d="M95 277 239 384 382 277l-144-96Z" fill="#F8AE45" stroke="#FFF2BB" stroke-width="5" stroke-linejoin="round"/>
+<path d="M95 281 239 392 382 281v221H95Z" fill="#B56D27"/>
+<path d="m96 493 133-126q10-9 21 0l130 126" fill="#D89634" stroke="#FFE0A0" stroke-width="5"/>
+<path d="M95 285 235 402 95 501Z" fill="#ECA63B" stroke="#FCE4B0" stroke-width="4"/>
+<path d="M382 285 246 402l136 100Z" fill="#F5C75E" stroke="#FCE4B0" stroke-width="4"/>
+<path d="M95 499 220 387q20-18 39 0L382 499Z" fill="url(#sun)" stroke="#FFEEAE" stroke-width="5"/>
+<circle cx="238" cy="437" r="37" fill="#17122E" stroke="#FFD855" stroke-width="6"/>
+<circle cx="238" cy="437" r="24" fill="none" stroke="#F7CF5C" stroke-width="2" stroke-dasharray="4 7"/>
+<path d="m219 438 12 12 28-30" fill="none" stroke="#FFD855" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M113 323h53m-53 11h24" stroke="#FFF4C6" stroke-width="4" opacity=".65"/>
+<path d="M312 467h45m-45 9h29" stroke="#9B632E" stroke-width="4"/>
+</g>
+<path d="m91 121 8 17-8 17-8-17Zm327 224 6 13-6 13-6-13Z" fill="#FFF8D8"/>
+
+</svg>
