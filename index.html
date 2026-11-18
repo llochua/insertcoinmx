@@ -625,55 +625,69 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 @keyframes scg{50%{box-shadow:0 0 0 3px #120F1A,0 0 40px 12px rgba(255,212,0,.9),0 0 90px 18px rgba(255,212,0,.45)}}
 @keyframes scs{60%,100%{transform:translateX(100%)}}
 
-/* ===== descubrimiento ===== */
-.disc{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;background:var(--bg);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color .4s}
-.disc.on{display:flex}.disc.lt{color:#111}
-.disc.down{background:#120F1A;color:#fff}
-.dc-top{display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 18px 0}
-.dc-dots{display:flex;gap:5px}.dc-dots i{width:22px;height:3px;border-radius:2px;background:currentColor;opacity:.2}.dc-dots i.ok{opacity:.55}.dc-dots i.cur{opacity:1}
-.dc-skip{all:unset;cursor:pointer;font:600 12px AV;opacity:.6;padding:6px 0}
-.dc-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:6px 18px 0}
-.dc-art{max-width:100%;max-height:100%;object-fit:contain;display:block;animation:dcArt .45s ease-out both}
-.disc.lt .dc-art,.disc.dk .dc-art{border-radius:4px}
-@keyframes dcArt{from{opacity:0;transform:translateY(10px)}}
-.dc-card{all:unset;cursor:pointer;position:absolute;right:20px;bottom:-14px;width:30%;max-width:150px;aspect-ratio:480/670;perspective:900px;transform:rotate(5deg);animation:dcCard .4s .25s cubic-bezier(.2,1.2,.4,1) both}
-@keyframes dcCard{from{opacity:0;transform:translateY(24px) rotate(12deg)}}
-.dc-flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,1.3,.5,1)}
-.dc-back,.dc-front{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:8px;overflow:hidden;box-shadow:0 14px 28px rgba(0,0,0,.45)}
-.dc-front{transform:rotateY(180deg)}.dc-front .fx{--rad:8px;display:block;width:100%;height:100%}
-.dc-back{background:#0d0b22;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,.25),0 14px 28px rgba(0,0,0,.45)}.dc-back img{width:36%;opacity:.8}
-.disc:not(.down) .dc-flip{transform:rotateY(180deg)}
-.disc.flipped .dc-flip{transition-duration:.6s}
-/* boca abajo: solo la carta, al centro; el diseño se descubre al voltearla */
-.disc.down .dc-art,.disc.down .dc-txt>*:not(.dc-lab){visibility:hidden}
-.disc.down .dc-card{right:50%;bottom:50%;width:52%;max-width:240px;transform:translate(50%,50%);animation:dcPulse 1.6s ease-in-out infinite}
-.disc.down .dc-lab{visibility:hidden}
-@keyframes dcPulse{50%{transform:translate(50%,50%) scale(1.03)}}
-.disc.flipped .dc-card{transition:right .5s,bottom .5s,width .5s,transform .5s}
-.disc.flipped .dc-art{animation:dcArt .5s .35s ease-out both}
-.disc.flipped .dc-txt>*{animation:dcUp .4s .5s both}
-.dc-txt{padding:26px 22px 0}
-.dc-lab{font:9px PX;letter-spacing:.06em;opacity:.75;animation:dcUp .35s .1s both}
-.dc-txt h2{font:700 30px AV;letter-spacing:-.025em;line-height:1.02;margin:8px 0 4px;animation:dcUp .35s .15s both}
-.dc-meta{font:600 12px AV;opacity:.6;letter-spacing:.04em;animation:dcUp .35s .2s both}
-.dc-row{margin-top:12px;animation:dcUp .35s .25s both}
-.dc-txt p{font:600 14px/1.4 AV;opacity:.85;margin-top:8px;max-width:420px;animation:dcUp .35s .3s both}.dc-txt p b{opacity:1}
-@keyframes dcUp{from{opacity:0;transform:translateY(8px)}}
-.dc-ver{display:inline-flex;align-items:center;gap:6px;font:700 12px AV;letter-spacing:.04em}
-.dc-ver i,.dc-v i{width:9px;height:9px;border-radius:50%;background:currentColor;flex:none}
-.dc-ver.v-e i,.dc-v.v-e i{background:linear-gradient(90deg,#8fe9ff,#ff9edc)}.dc-ver.v-r i,.dc-v.v-r i{background:#e8b923}.dc-ver.v-f i,.dc-v.v-f i{background:#ff6fd0}
-.dc-rare{font-weight:700!important;opacity:1!important}
-.dc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.dc-v{display:inline-flex;align-items:center;gap:6px;font:700 11px AV;padding:6px 9px;border-radius:20px;box-shadow:inset 0 0 0 1px currentColor;opacity:.4}
-.dc-v.on{opacity:1}.dc-v.now{box-shadow:inset 0 0 0 2px currentColor}.dc-v b{font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.06em}
-.disc.k-comp .dc-v{animation:dcOn .3s calc(.6s + var(--i)*.25s) both}
-@keyframes dcOn{from{opacity:.4;transform:scale(.85)}}
-.disc.k-rep .dc-art{max-height:62%;opacity:.9}.disc.k-rep .dc-card{transform:rotate(-3deg)}
-.dc-trade{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin-top:12px;font:600 12px AV;opacity:.85}
-.dc-trade .m{display:flex;gap:4px}.dc-trade .m i{width:14px;height:14px;border-radius:3px;box-shadow:inset 0 0 0 1.5px currentColor;opacity:.5}.dc-trade .m i.on{background:currentColor;opacity:1}
-.dc-go{padding:18px 22px calc(18px + env(safe-area-inset-bottom));font:600 12px AV;opacity:.5}
-@media(min-width:760px){.disc{display:none;flex-direction:row;flex-wrap:wrap}.disc.on{display:grid;grid-template:auto 1fr auto/1.2fr 1fr}.dc-top{grid-column:1/-1}.dc-stage{padding:20px 40px}.dc-txt{align-self:center;padding:0 48px 0 0}.dc-go{grid-column:1/-1}.dc-txt h2{font-size:44px}}
-@media (prefers-reduced-motion:reduce){.disc *{animation:none!important;transition:none!important}}
+
+/* ===== descubrimiento: tela de la playera · tu carta ===== */
+.disc{position:fixed;inset:0;z-index:30;display:none;background:var(--bg);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;overflow:hidden}
+.disc.on{display:block}.disc.t-lt{color:#120F1A}
+.disc.neu{--bg:#24212e}
+.dq-cloth{position:absolute;inset:0;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");opacity:.18;mix-blend-mode:soft-light;pointer-events:none}
+.disc.t-lt .dq-cloth{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");opacity:.22;mix-blend-mode:multiply}
+.dq-top{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:calc(16px + env(safe-area-inset-top)) 20px 0}
+.dq-n{font:11px PX;letter-spacing:.08em}
+.dq-skip{all:unset;cursor:pointer;font:600 12px AV;opacity:.55}
+/* momento 1: la playera */
+.dq-print{position:absolute;inset:64px 0 0;container-type:size;display:flex;animation:dqIn .7s cubic-bezier(.2,.9,.3,1) both}
+.dq-print .ab{flex:none}
+.dq-print .ab::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");opacity:.12;mix-blend-mode:soft-light}
+.disc.t-lt .dq-print .ab::after{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");mix-blend-mode:multiply;opacity:.18}
+@keyframes dqIn{from{opacity:0;transform:scale(1.04)}}
+.st-pos .dq-print{align-items:flex-start;justify-content:center;padding-top:6cqh}.st-pos .dq-print .ab{width:min(86cqw,66cqh*var(--ar))}
+.st-pan .dq-print{align-items:center;justify-content:center;padding-bottom:16cqh}.st-pan .dq-print .ab{width:100cqw}
+.st-sil .dq-print{align-items:flex-end;justify-content:flex-end}.st-sil .dq-print .ab{height:auto;width:min(88cqw,96cqh*var(--ar));margin-right:-4cqw}
+.neu .dq-print .ab{box-shadow:6px 6px 0 rgba(0,0,0,.45);transform:rotate(-2deg);border-radius:4px}
+.neu.st-pan .dq-print .ab{width:92cqw}.neu.st-sil .dq-print .ab{margin:0 6cqw 6cqh 0}
+.dq-tag{position:absolute;z-index:2;left:20px;bottom:calc(26px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;animation:dqUp .45s .45s both}
+.dq-tag b{font:10px PX;letter-spacing:.08em;opacity:.8}.dq-tag span{font:700 34px AV;letter-spacing:-.03em;line-height:1}
+.st-sil .dq-tag{bottom:auto;top:calc(64px + env(safe-area-inset-top));max-width:46%}
+.st-sil .dq-tag span{font-size:30px}
+@keyframes dqUp{from{opacity:0;transform:translateY(10px)}}
+/* momento 2: tu carta */
+.ph-card,.ph-back{--bg:#120F1A}
+.ph-card.v-b{background:var(--bg)}
+.ph-card.v-r,.ph-back{background:#0c0a07}
+.ph-card.v-r .dq-cloth{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");mix-blend-mode:soft-light}
+.ph-back{background:#120F1A}
+.dq-full{position:absolute;inset:-4%;background:center/cover no-repeat;animation:dqFull 1.2s ease-out both}
+@keyframes dqFull{from{opacity:0;transform:scale(1.08)}}
+.dq-dim{position:absolute;inset:0;background:rgba(10,8,22,.62)}
+.ph-card.v-r .dq-dim,.ph-back .dq-dim{display:none}
+.ph-card.v-f .dq-dim{background:rgba(10,8,22,.58)}
+.ph-card.v-f .dq-cap{text-shadow:0 2px 10px rgba(0,0,0,.8)}.ph-card.v-f .dq-cap .dq-meta>span{text-shadow:none}.ph-card.v-f .dq-pct{background:rgba(10,8,22,.75);padding:5px 9px!important;opacity:1!important}
+.dq-card.back{background:none!important;border-radius:14px;overflow:hidden}
+.ph-card{color:#fff!important}
+.dq-cardw{position:absolute;left:0;right:0;top:64px;bottom:150px;display:flex;align-items:center;justify-content:center;perspective:1000px}
+.dq-card{all:unset;cursor:pointer;display:block;height:min(100%,calc((100vw - 64px)*1.396),520px);aspect-ratio:480/670}
+.dq-card .fx{--rad:14px;display:block;width:100%;height:100%;box-shadow:0 22px 44px rgba(0,0,0,.55)}
+.ph-card .dq-card{animation:dqCard .35s cubic-bezier(.2,1,.3,1) both}
+.ph-card.v-e .dq-card,.ph-card.v-r .dq-card,.ph-card.v-f .dq-card{animation:dqTurn .6s cubic-bezier(.2,1,.3,1) both}
+@keyframes dqCard{from{opacity:0;transform:translateY(16px) scale(.96)}}
+@keyframes dqTurn{from{transform:rotateY(-90deg) scale(.95)}}
+.ph-card.v-r .dq-card .fx{box-shadow:0 0 0 1px rgba(255,214,90,.6),0 22px 44px rgba(0,0,0,.7)}
+.dq-card.back{position:relative;cursor:pointer}.dq-card.back .dc-back{position:absolute;inset:0;border-radius:14px;background:#0d0b22;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,.22),0 22px 44px rgba(0,0,0,.55)}
+.dq-card.back .dc-back img{width:34%;opacity:.85}
+.dq-card.back{animation:dqWait 2s ease-in-out infinite}@keyframes dqWait{50%{transform:translateY(-6px)}}
+.dq-card.turn{animation:dqFlip .42s ease-in forwards}@keyframes dqFlip{to{transform:rotateY(90deg)}}
+.dq-cap{position:absolute;left:0;right:0;bottom:calc(52px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:0 20px}
+.dq-name{font:700 26px AV;letter-spacing:-.02em;line-height:1}
+.dq-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+.dq-meta>span{font:700 11px AV;letter-spacing:.1em;padding:5px 9px;border-radius:5px}
+.dq-ver{color:#120F1A;background:#f3f1ff}.dq-ver.v-e{background:linear-gradient(90deg,#8fe9ff,#ffb3e6)}.dq-ver.v-r{background:#e8b923}.dq-ver.v-f{background:#ff8fd8}
+.dq-st{box-shadow:inset 0 0 0 1.5px currentColor}.dq-pct{opacity:.7;padding-left:0!important;padding-right:0!important;letter-spacing:.04em!important;font-weight:600!important}
+.ph-back .dq-cap b{font:10px PX;letter-spacing:.08em;color:#FFD400}
+.dq-cta{font:700 20px AV}
+.dq-hint{position:absolute;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom));text-align:center;font:600 11px AV;opacity:.45}
+@media (prefers-reduced-motion:reduce){.disc *{animation:none!important}}
+
 /* ===== resumen ===== */
 .sum.on{display:block!important;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;padding:0!important}
 .rs{max-width:560px;margin:0 auto;padding:6px 20px calc(30px + env(safe-area-inset-bottom))}
@@ -705,27 +719,6 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .ab{position:relative;display:block;overflow:hidden;aspect-ratio:var(--ar);width:100%}
 .ab img{position:absolute;height:auto;max-width:none;display:block}
 .ab.neu{border-radius:6px}
-.dc-stage{container-type:size}
-.dc-art{display:flex;align-items:center;justify-content:center;width:100%;height:100%;animation:dcArt .45s ease-out both}
-.dc-art{align-items:flex-start!important;padding-top:2cqh}
-.dc-art .ab{width:min(84cqw,66cqh*var(--ar));flex:none}
-.disc:not(.down) .dc-card{width:min(30%,28cqh)}
-.disc.k-rep .dc-art .ab{width:min(64cqw,58cqh*var(--ar))}
-.disc.k-rep .dc-art{max-height:none;opacity:1}
-.dc-card{bottom:-8px}
-.dc-read{position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:4px;background:#fff;color:#120F1A;font:700 10px AV;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px 4px 6px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.35);white-space:nowrap}
-.dc-read svg{width:11px;height:11px}
-.dc-front{overflow:visible!important}.dc-front .fx{border-radius:8px}
-.disc.down .dc-read{display:none}
-.dc-flipcta{display:none}
-.disc.down .dc-flipcta{display:flex;flex-direction:column;align-items:center;gap:8px;position:absolute;left:0;right:0;bottom:6%;text-align:center;pointer-events:none}
-.dc-flipcta b{font:10px PX;letter-spacing:.06em;color:#FFD400}
-.dc-flipcta span{font:700 19px AV;color:#fff;display:inline-flex;align-items:center;gap:8px}
-.dc-flipcta span::before{content:"";width:10px;height:10px;border-radius:50%;background:#FFD400;box-shadow:0 0 0 0 rgba(255,212,0,.6);animation:dcPing 1.4s ease-out infinite}
-@keyframes dcPing{to{box-shadow:0 0 0 12px rgba(255,212,0,0)}}
-.disc.down .dc-card{bottom:58%;transform:translate(50%,40%)}
-@keyframes dcPulse{50%{transform:translate(50%,40%) scale(1.03)}}
-.dc-go{display:flex;justify-content:space-between;gap:10px;opacity:.75}.dc-go b{font-weight:700}
 /* resumen: bloque con el color de la playera, el nombre vive dentro */
 .rs-tile,.rs-row{background:var(--bg);border-radius:12px;overflow:hidden;color:#fff}
 .rs-tile[data-t=lt],.rs-row[data-t=lt]{color:#120F1A}
@@ -1133,39 +1126,39 @@ function artBox(id,cls=''){const src=artOf(id),b=src.startsWith('d/')&&ABOX[id];
  return `<span class="ab ${cls}${RBG[id]?'':' neu'}" style="--ar:${ratio.toFixed(3)}"><img src="${src}" alt="" loading="lazy" style="width:${(100/cw).toFixed(2)}%;left:${(-x0/cw*100).toFixed(2)}%;top:${(-y0/ch*100).toFixed(2)}%"></span>`}
 const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255};
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
-function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;
+function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;
  for(const c of hand)c._comp=!c._doneB&&dState(DB[c.d]).done&&hand.filter(x=>x.d===c.d).pop()===c; // completó en este sobre
  lastPack=new Set(hand.filter(c=>c._new).map(c=>c.d));showCard()}
 function caseOf(c){return !c._new?'rep':c._comp?'comp':c._dnew?'dnew':'vnew'}
 function chips(c,anim){const st=dState(DB[c.d]);return st.vs.filter(x=>x.st!=='soon').map((x,i)=>{const now=x.c.k===c.k&&c._new;
  return `<span class="dc-v v-${x.v}${x.h?' on':''}${now?' now':''}" style="--i:${i}"><i></i>${VN[x.v]}${now?' <b>nueva</b>':''}</span>`}).join('')}
+/* Cada carta tiene hasta tres momentos, solo los que corresponden:
+   design = descubres la playera (solo si el diseño es nuevo) · back = carta especial boca abajo · card = tu carta, grande y legible.
+   Una versión nueva de un diseño que ya tenías va directo a la carta: la noticia es la carta, no el diseño. */
+const STAGE=id=>{const d=DB[id];if(d&&d.cm)return d.cm;const b=ABOX[id];if(!b||!artOf(id).startsWith('d/'))return 'pos';const ar=(b[2]-b[0])*640/((b[3]-b[1])*800);return ar>1.35?'pan':ar<.78?'sil':'pos'}; // cm:'pan'|'pos'|'sil' en DESIGNS lo fija a mano
+let pi=0,PHS=[];
+function phasesOf(c){const L=[];if(c._dnew)L.push('design');if(c._new&&c.v!=='b')L.push('back');L.push('card');return L}
 function showCard(){const D=$('disc'),c=hand[idx];if(!c){D.classList.remove('on');showSum();return}
- const d=DB[c.d],col=dcol(d.id),dark=lum(col)<.55,k=caseOf(c),st=dState(d),down=c.v!=='b'&&c._new;
- const lab={dnew:'DISEÑO NUEVO',vnew:'NUEVA VERSIÓN',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
- const ver=`<span class="dc-ver v-${c.v}"><i></i>Versión ${VN[c.v]}</span>`;
- let why='';
- if(k==='rep'){const n=dups(),r=n%5;why=`<p>Ya la tenías · ahora tienes <b>×${S.have[c.k]}</b>.</p><div class="dc-trade"><span>Repetidas para canje</span><span class="m">${[0,1,2,3,4].map(i=>`<i class="${i<(n>=5&&r===0?5:r)?'on':''}"></i>`).join('')}</span><span>${n>=5?'¡Ya puedes cambiar 5 por un sobre extra!':'Cada 5 = un sobre extra'}</span></div>`}
- else if(k==='dnew')why=`<p>${c.v==='b'?'Tu primera carta de este diseño.':`Tu primera carta de este diseño, y en versión ${VN[c.v]}.`}${st.tot>1?` Tiene ${st.tot} versiones para coleccionar.`:' Por ahora es su única versión.'}</p>`;
- else if(k==='vnew')why=`<p>Ya tenías este diseño en ${c._prev.map(v=>VN[v]).join(' y ')}. Esta es otra versión de la misma playera.</p>`;
- else why=`<p>Juntaste todas las versiones disponibles de esta playera.</p>`;
- const rare=c._new&&PCT[c.v]?`<p class="dc-rare v-${c.v}">La ${VN[c.v]} sale en ${PCT[c.v]} de cada 100 cartas.</p>`:'';
- D.className='disc on k-'+k+(dark?' dk':' lt')+(down?' down':'');D.style.setProperty('--bg',col);
- D.innerHTML=`<div class="dc-top"><span class="dc-dots">${hand.map((_,i)=>`<i class="${i<idx?'ok':i===idx?'cur':''}"></i>`).join('')}</span><button class="dc-skip" id="dcSkip">Ver resumen</button></div>
-  <div class="dc-stage"><div class="dc-art" role="img" aria-label="Diseño original de ${esc(d.n)}">${artBox(d.id)}</div>
-   <button class="dc-card" id="dcCard" aria-label="${down?'Voltear carta':'Ver carta en grande'}"><span class="dc-flip"><span class="dc-back"><img src="coin.png" alt=""></span><span class="dc-front">${`<span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span>`}<span class="dc-read"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>Leer</span></span></span></button>
-   <div class="dc-flipcta"><b>CARTA ESPECIAL</b><span>Tócala para voltearla</span></div></div>
-  <div class="dc-txt"><div class="dc-lab">${lab}</div><h2>${esc(d.n)}</h2><div class="dc-meta">${d.no?'#'+String(d.no).padStart(3,'0')+' · ':''}${d.cat}</div>
-   <div class="dc-row">${ver}</div>${why}${rare}${k==='comp'||k==='vnew'||(k==='dnew'&&st.tot>1)?`<div class="dc-chips">${chips(c)}</div>`:''}</div>
-  <div class="dc-go">${down?'':goTxt()}</div>`;
- $('dcSkip').onclick=e=>{e.stopPropagation();idx=5;D.classList.remove('on');showSum()};
- $('dcCard').onclick=e=>{e.stopPropagation();if(D.classList.contains('down'))flip();else openCard(c.k)};
- D.onclick=()=>{if(D.classList.contains('down'))return flip();beep(k==='rep'?440:880,.05);idx++;showCard()};
- if(!down)react(k,c)}
-const goTxt=()=>`<span><b>Toca la carta</b> para leerla</span><span>${idx<4?'Toca la pantalla para la siguiente':'Toca la pantalla para ver qué cambió'} ›</span>`;
-function flip(){const D=$('disc');D.classList.remove('down');D.classList.add('flipped');D.querySelector('.dc-go').innerHTML=goTxt();react(caseOf(hand[idx]),hand[idx])}
-function react(k,c){ // respuesta proporcionada: sonido según lo que pasó, nada más
- if(k==='rep')beep(330,.06);else if(k==='comp'){jingle();setTimeout(()=>[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.1),i*120)),450)}
- else if(c.v!=='b')jingle();else beep(988,.08)}
+ if(!pi)PHS=phasesOf(c);const ph=PHS[pi],d=DB[c.d],col=dcol(d.id),tone=lum(col)<.55?'dk':'lt';
+ const cnt=`<div class="dq-top"><span class="dq-n">${String(idx+1).padStart(2,'0')} / 05</span><button class="dq-skip" id="dcSkip">Saltar al resumen</button></div>`;
+ D.className=`disc on ph-${ph} v-${c.v} t-${tone}${RBG[d.id]?'':' neu'}`;D.style.setProperty('--bg',col);
+ if(ph==='design'){const st=STAGE(d.id);D.classList.add('st-'+st);
+  D.innerHTML=`<div class="dq-cloth"></div>${cnt}<div class="dq-print">${artBox(d.id)}</div>
+   <div class="dq-tag"><b>DISEÑO NUEVO</b><span>${esc(d.n)}</span></div>`;beep(784,.06)}
+ else if(ph==='back'){D.innerHTML=`<div class="dq-cloth"></div>${cnt}<div class="dq-cardw"><div class="dq-card back" id="dcCard"><span class="dc-back"><img src="coin.png" alt=""></span></div></div>
+   <div class="dq-cap"><b>CARTA ESPECIAL</b><span class="dq-cta">Tócala para voltearla</span></div>`}
+ else{const fa=c.v==='f'&&DB[c.d].fk?'fa/'+DB[c.d].fk.slice(2)+'.jpg':null;
+  D.innerHTML=`<div class="dq-cloth"></div>${fa?`<div class="dq-full" style="background-image:url(${fa})"></div>`:''}<div class="dq-dim"></div>${cnt}
+   <div class="dq-cardw"><button class="dq-card" id="dcCard" aria-label="Leer la carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c2')}" alt=""><i class="foil"></i><i class="glare"></i></span></button></div>
+   <div class="dq-cap"><span class="dq-name">${esc(d.n)}</span><span class="dq-meta"><span class="dq-ver v-${c.v}">${VN[c.v].toUpperCase()}</span><span class="dq-st">${c._new?'NUEVA':'REPETIDA ×'+S.have[c.k]}</span>${c._new&&PCT[c.v]?`<span class="dq-pct">${PCT[c.v]} de cada 100</span>`:''}</span></div>
+   <div class="dq-hint">Toca la carta para leerla</div>`;
+  if(c.v==='b')beep(c._new?988:440,.07)}
+ $('dcSkip').onclick=e=>{e.stopPropagation();idx=5;pi=0;D.classList.remove('on');showSum()};
+ const cd=$('dcCard');if(cd)cd.onclick=e=>{e.stopPropagation();if(ph==='back')return next();openCard(c.k)};
+ D.onclick=()=>next()}
+function next(){const D=$('disc'),ph=PHS[pi];
+ if(ph==='back'){const k=D.querySelector('.dq-card');if(k.classList.contains('turn'))return;k.classList.add('turn');jingle();setTimeout(()=>{pi++;showCard()},420);return}
+ pi++;if(pi>=PHS.length){pi=0;idx++}showCard()}
 $('stack').addEventListener('click',e=>{});
 function topCard(){return $('stack').querySelector('.sc[data-i="'+idx+'"]')}
 function hintTop(){const t=topCard();document.querySelectorAll('.sc').forEach(x=>x.classList.toggle('top',x===t));$('stHint').style.display='block';$('stHint').textContent=t&&t.classList.contains('down')?'Algo bueno viene… tócala para voltearla':'Aviéntala a un lado · '+(idx+1)+' de 5'}
