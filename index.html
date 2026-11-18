@@ -927,7 +927,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <button class="mgo" id="mGo"></button>
 </section>
 <section class="view" id="pack">
- <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Sobre del día</h1><span class="sp"></span></div>
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Sobres</h1><span class="sp"></span></div>
  <div class="stage" id="pStage">
   <div class="env" id="env">
    <div class="pk idle" id="pk">
@@ -1137,7 +1137,18 @@ const after=(a,b)=>!b||a>b; // ¿el día a es posterior al día b?
 function normalize(o){const t=today();
  for(const f of ['last','rdia']){const v=o[f];if(typeof v!=='string'||!DRE.test(v))continue;
   if(after(v,t)&&((o.sv||0)<2||after(v,addDays(t,2))))o[f]=t}
- o.sv=2;if(!Number.isInteger(o.rev)||o.rev<0)o.rev=0;if((o.mv||0)<2)migrate(o);if(o.fg!==1)o.fg=(isObj(o.have)&&Object.keys(o.have).length)||o.last||(Array.isArray(o.pk)&&o.pk.length)?1:0;return o}
+ o.sv=2;if(!Number.isInteger(o.rev)||o.rev<0)o.rev=0;if((o.mv||0)<2)migrate(o);if(o.fg!==1)o.fg=(isObj(o.have)&&Object.keys(o.have).length)||o.last||(Array.isArray(o.pk)&&o.pk.length)?1:0;
+ /* Un progreso existente mantiene sus cartas y NO recibe una segunda bienvenida.
+    Nuevo jugador: 5 sobres de inicio. Veteranía anterior: cuenta como usado 1 sobre
+    del día de su último consumo, para no quitarle el segundo sobre al actualizar. */
+ const oldQuota=!Number.isInteger(o.welcomeLeft)||o.welcomeLeft<0||o.welcomeLeft>5;
+ if(oldQuota){const played=!!(Object.keys(o.have||{}).length||o.last||(Array.isArray(o.pk)&&o.pk.length));
+  o.welcomeLeft=played?0:5;
+  if(played&&o.last&&DRE.test(o.last)){o.freeDay=o.last;o.freeUsed=1}}
+ if(typeof o.freeDay!=='string'||!DRE.test(o.freeDay))o.freeDay='';
+ if(!Number.isInteger(o.freeUsed))o.freeUsed=0;
+ o.freeUsed=Math.max(0,Math.min(2,o.freeUsed));
+ return o}
 /* Etapa 3: del modelo anterior (id / F_id) al de 4 versiones (id_v). Común→Base, Holo→Especial, Dorada→Rara, F_→Full.
    Cada carta conserva su cantidad; lo que ya está en formato nuevo se queda; lo que no se reconoce no se toca.
    Las calificaciones pasan a ser siempre por diseño. Repetirlo no cambia nada. */
@@ -1155,7 +1166,15 @@ const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
 const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
 const PRUEBA=false; // quitar al lanzar: sobres ilimitados para revisar
-const packReady=()=>PRUEBA||S.test||after(today(),S.last)||S.extra>0;
+/* Regla pactada: 5 sobres de bienvenida, luego 2 por día.
+   La bienvenida se conserva hasta gastarla; los 2 diarios comienzan al día
+   siguiente del último sobre de bienvenida. Canjes extra van aparte. */
+const freePacksLeft=()=>{const t=today();
+ if(S.welcomeLeft>0)return S.welcomeLeft;
+ if(S.freeDay&&after(S.freeDay,t))return 0;
+ if(S.last&&after(S.last,t))return 0;
+ return S.freeDay===t?Math.max(0,2-(S.freeUsed||0)):2};
+const packReady=()=>PRUEBA||S.test||freePacksLeft()>0||S.extra>0;
 /* ---------- datos compartidos ---------- */
 const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude)return;this.db=await claude.use('db');const u=await claude.use('user');this.uid=u?await u.id():null;try{this.dl=await claude.use('downloads')}catch(e){}
  if(!this.db)return;const data=x=>x&&typeof x.data==='function'?x.data():x;
@@ -1173,7 +1192,13 @@ let MINE=[],saveFailed=false;
 const PKRE=/^[a-z0-9]{6,24}$/;
 function applyPack(p){S.pk=Array.isArray(S.pk)?S.pk:[];if(S.pk.includes(p.id))return false;
  for(const k in p.have)S.have[k]=(S.have[k]||0)+p.have[k];
- if(p.fg)S.fg=1;if(p.last&&after(p.last,S.last))S.last=p.last;if(p.extra)S.extra=Math.max(0,(S.extra||0)-p.extra);
+ if(p.fg)S.fg=1;
+ if(p.welcome){S.welcomeLeft=Math.max(0,(S.welcomeLeft||0)-p.welcome);
+  if(S.welcomeLeft===0){S.freeDay=p.last;S.freeUsed=2}}
+ if(p.daily&&p.dailyDay){if(after(p.dailyDay,S.freeDay)){S.freeDay=p.dailyDay;S.freeUsed=0}
+  if(S.freeDay===p.dailyDay)S.freeUsed=Math.min(2,(S.freeUsed||0)+p.daily)}
+ if(p.last&&after(p.last,S.last))S.last=p.last;
+ if(p.extra)S.extra=Math.max(0,(S.extra||0)-p.extra);
  S.pk.push(p.id);if(S.pk.length>30)S.pk=S.pk.slice(-30);return true}
 function setWarn(on){const w=$('saveW');if(w)w.hidden=!on;document.body.classList.toggle('savewarn',!!on)}
 function adoptRaw(raw){let o;try{o=pj(raw)}catch(e){return false}if(!o||typeof o!=='object'||Array.isArray(o))return false;
@@ -1208,16 +1233,16 @@ function go(id){if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(ma
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);go('home')}});
 /* ---------- bienvenida ---------- */
-const ON=[['JUNTA LAS '+NAV,'Cada playera de Insert Coin MX es una carta. Llénalas todas en tu álbum.','c/gatosamurai.jpg'],['UN SOBRE AL DIA','Cada día tienes un sobre gratis con 5 cartas. Siempre viene una Especial o mejor, y brillan.','c/F_gatosamurai.jpg'],['JUEGA CON ELLAS','Califícalas, arma tu tier y haz torneos. Las repetidas valen sobres extra.','c/fatality.jpg']];
+const ON=[['JUNTA LAS '+NAV,'Cada playera de Insert Coin MX es una carta. Llénalas todas en tu álbum.','c/gatosamurai.jpg'],['5 SOBRES PARA EMPEZAR','Recibe 5 sobres de bienvenida. Después, 2 sobres gratis diarios. Cada sobre tiene 5 cartas.','c/F_gatosamurai.jpg'],['JUEGA CON ELLAS','Califícalas, arma tu tier y haz torneos. Las repetidas valen sobres extra.','c/fatality.jpg']];
 let onI=0;
 function showOn(){$('onb').classList.add('on');const o=ON[onI];$('onImg').src=o[2];$('onT').textContent=o[0];$('onP').textContent=o[1];$('onDots').innerHTML=ON.map((_,i)=>`<i class="${i===onI?'on':''}"></i>`).join('');$('onNext').textContent=onI<2?'SIGUIENTE':'A JUGAR'}
 $('onNext').onclick=()=>{beep(880);if(onI<2){onI++;showOn()}else{$('onb').classList.remove('on');syncIn();S.seen=1;save()}};
 /* ---------- inicio ---------- */
 function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
-let mi=0;const MODES=()=>{const u=uniq(),N=NAV,r=packReady();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
+let mi=0;const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobre del día',k:r?(S.extra>0&&!after(today(),S.last)&&!S.test?'SOBRE EXTRA':'HOY · GRATIS'):'YA LO ABRISTE',s:r?(firstPack()?'Tu primer sobre trae una Especial':'5 cartas · una Especial o mejor'):'El próximo sale en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR':countdown(),off:!r},
+ {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Full garantizada en tu bienvenida':'5 cartas por sobre · una Especial o mejor'):'Próximos 2 sobres en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':countdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -1234,7 +1259,7 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES();
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
- if(m.id==='pack'&&m.off){beep(150,.2);toast('VUELVE MAÑANA<br>O CAMBIA REPETIDAS');return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
+ if(m.id==='pack'&&m.off){beep(150,.2);toast('MAÑANA TIENES 2 SOBRES<br>O CAMBIA REPETIDAS');return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
 let mMoved=false,msx=null,msy=null;
 $('mGo').onclick=mEnter;
 $('mTabs').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;mi=+b.dataset.i;beep(660,.03);renderHome()};
@@ -1288,8 +1313,11 @@ $('openBtn').onclick=openPack;
    se suman las cartas, se gasta el sobre y se guarda. La animación empieza después. */
 let opening=false;function openPack(){if(opening)return;opening=true;clearTimeout(hintT);
  withLock(()=>{syncIn();if(!packReady()){opening=false;toast('YA LO ABRISTE<br>EN OTRA PESTAÑA');go('home');return}
-  const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,saved:false,t:0};
-  if(!S.test&&!PRUEBA){if(after(today(),S.last))p.last=today();else p.extra=1}
+  const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,welcome:0,daily:0,dailyDay:'',saved:false,t:0};
+  if(!S.test&&!PRUEBA){
+   if(S.welcomeLeft>0){p.welcome=1;p.last=today()}
+   else if(freePacksLeft()>0){p.daily=1;p.dailyDay=today();p.last=p.dailyDay}
+   else p.extra=1}
   hand=makeHand(firstPack());p.fg=1;const seen={},seenD={};
   const doneB=new Set(DESIGNS.filter(d=>dState(d).done).map(d=>d.id));
   hand.forEach(c=>{c._new=!S.have[c.k]&&!seen[c.k];seen[c.k]=1;p.have[c.k]=(p.have[c.k]||0)+1;
@@ -1402,7 +1430,7 @@ ST.addEventListener('touchcancel',()=>gEnd(true));
 function renderTitle(){$('tiOne').textContent=uniq();const docs=(STORE.docs||[]).slice().sort((a,b)=>(b.score||0)-(a.score||0));
  const top=docs[0];$('tiHi').textContent=top?((top.ini||'???')+' '+top.score):'---';
  const list=docs.slice(0,5).map((d,i)=>`<i>${i+1}.</i> ${d.ini||'???'} ${d.score||0}`).join('   ·   ');
- $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'UN SOBRE GRATIS CADA DIA   ·   JUNTA '+NAV+' CARTAS   ·   INSERTCOINMX.COM'}
+ $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'5 SOBRES DE BIENVENIDA · 2 DIARIOS   ·   JUNTA '+NAV+' CARTAS   ·   INSERTCOINMX.COM'}
 renderTitle();
 $('title').addEventListener('click',()=>{beep(880,.06);setTimeout(()=>beep(1320,.08),70);$('title').classList.remove('on');renderHome();if(!S.seen)showOn()});
 document.addEventListener('pointermove',e=>{if(!$('title').classList.contains('on'))return;const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;$('tiHero').style.transform=`rotateY(${x*14}deg) rotateX(${-y*10}deg)`});
@@ -1442,12 +1470,12 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
   ${sec('Colección completa',G.comp)}${sec('Diseños nuevos',G.dnew)}${sec('Versiones nuevas',G.vnew)}${sec('Repetidas',G.rep)}
   <div class="rs-group rs-redeem">${tradeH}</div>
   <div class="rs-pg">${disc} de ${PD.length} diseños · ${AV.filter(c=>S.have[c.k]).length} de ${NAV} cartas</div>
-  <button class="rs-out" id="sOtro">Volver al menú</button>
+  <button class="rs-out" id="sOtro">${packReady()?'ABRIR SIGUIENTE SOBRE'+((S.test||PRUEBA)?'':' · '+(freePacksLeft()+(S.extra||0))+' RESTANTES'):'Volver al menú'}</button>
  </div>`;
  if(entering)s.scrollTop=0;
  s.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>openCard(b.dataset.k));
  if($('sTrade'))$('sTrade').onclick=()=>trade(()=>{showSum();($('sTrade')||$('sAlb')).focus({preventScroll:true})});
- $('sAlb').onclick=()=>go('album');$('sOtro').onclick=()=>go('home');
+ $('sAlb').onclick=()=>go('album');$('sOtro').onclick=()=>go(packReady()?'pack':'home');
  $('sShare').onclick=()=>shareGrid(H._comp?'COMPLETE '+d.n.toUpperCase():'ME SALIO EN MI SOBRE',hand.map(c=>c.k),'sobre-insertcoinmx.png')}
 
 /* robustez en celular: evitar que el navegador se robe el gesto y no quedarse trabado */
