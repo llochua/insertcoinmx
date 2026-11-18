@@ -68,7 +68,7 @@ Si un texto no cabe en su ancho máximo, el generador baja el tamaño (hasta 55 
 | Común ● | `b` | `marco_comun.png`: amarillo, borde crema | a color, tal cual | #191200 |
 | Holo ★ | `e` | `marco_holo.png`: todo iridiscente con cuadros | a color, tal cual | #131111 |
 | Dorada ★★★ | `r` | `marco_dorada.png`: oro cepillado | **dorado**: luminancia → `rampa_oro.json` | #191203 |
-| Full ★★ | `f` | ilustración completa aparte (`fa/`, `c/F_*.jpg`) | — | — |
+| Full ★★ | `f` | `cartas/full/<id>.jpg` a sangre + velo oscuro abajo (ver §5b) | ilustración completa | blanco / amarillo |
 
 Los marcos, pastillas, ícono, etiquetas y la rampa de oro están en `cartas/plantillas/`. Se sacaron
 del acabado aprobado de las cartas (18 nov 2026). Para cambiar el look de una rareza se edita
@@ -96,6 +96,29 @@ su `marco_*.png` y se regenera todo.
 Cambiar un texto: corregir la hoja → paso 2 → `python3 cartas/generar.py --solo <id>`.
 
 Agregar un diseño cambia el total (`/076`): corre el generador completo para renumerar todas.
+
+## 5b. Full (ilustración completa)
+
+La Full también se genera. **La fuente es la ilustración**: `cartas/full/<id>.jpg` (vertical 2:3, sin texto).
+Si ese archivo existe, el diseño tiene Full.
+
+Actualizar o agregar Full:
+1. Guarda la ilustración en `E:\icmx\fichas\fullillustrations\` con el **id del diseño** como nombre
+   (`arcade.png`). Excepciones ya registradas: `evilexcess`→evilexes, `finishhim`→fatality,
+   `worldwarrior`→theworldwarrior, `zodiaco`→zodiac.
+2. Pídele a Claude "actualiza las Full" (o cópiala a `cartas/full/<id>.jpg`, máx. 1024 px de ancho).
+3. `python3 cartas/generar.py --fulls`.
+
+- Número: las Full conservan su `F##`; una nueva toma el siguiente (por id) y se guarda en el catálogo.
+  Al cambiar el total (`/49`) se rehacen todas solas.
+- Encuadre: llena 960×1340; si sobra alto se recorta 30 % arriba / 70 % abajo (el héroe va arriba).
+- Velo: oscurece desde y=700 hasta 95 % abajo, para que nombre, habilidad y frase se lean con cualquier
+  ilustración. Valores en `F_VELO` de `generar.py`.
+- Capas: `plantillas/full_marca.png` (pestaña INSERT COIN MX), pastilla de categoría, nombre blanco,
+  VALOR + moneda blanca (`full_moneda.png`) + 100, HABILIDAD ESPECIAL, ✦ referencia y — GOTY en amarillo,
+  frase en pastilla amarilla, pie `Carta F02/49 · ★★ Ilustración · Valor –`.
+- Salida: `c2/F_<id>.jpg`, `c/F_<id>.jpg` y `fa/<id>.jpg` (600×900, ilustración limpia).
+  Los nombres viejos se respetan (`F_worldwarrior`, `F_zodiaco`, por `fk` en `DESIGNS`).
 
 ## 6. Requisitos
 

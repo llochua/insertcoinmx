@@ -31,6 +31,8 @@ def main(ruta):
         if not d['id']:
             continue
         d['version_original'] = previo.get(d['id'], {}).get('version_original', 'comun')
+        if not d['full']:                        # número de Full: si la hoja no lo trae, se conserva
+            d['full'] = previo.get(d['id'], {}).get('full', '')
         cat.append(d)
     # numeración: álbum en orden alfabético por id
     album = sorted(d['id'] for d in cat if d['tipo'] == 'Álbum')
