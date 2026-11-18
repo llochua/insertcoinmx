@@ -146,7 +146,7 @@ function sound(kind){
   };
   if(kind==="hit"){note(190,0,.08,.047,"sawtooth");note(82,.052,.19,.055,"square")}
   if(kind==="start"){note(440,0,.06,.02);note(660,.10,.08,.02)}
-  if(kind==="win"){[392,523,659,784].forEach((v,i)=>note(v,i*.09,.12,.03))}
+  if(kind==="win"){[392,494,587,784,1047].forEach((v,i)=>note(v,i*.125,i===4?.42:.17,i===4?.042:.035,i===4?"triangle":"square"))}
  }catch(e){}
 }
 function select(side){
@@ -190,10 +190,15 @@ function end(side){
  // playera ganadora, WINNER IS y la siguiente acción.
  previousChampion=champion;
  $('winnerName').textContent=safeName(champion);
+ const fallen=slots[side==='top'?'bottom':'top'];
+ const earlier=PAIRS.filter(id=>id!==champion&&id!==fallen).slice(-1)[0]||fallen;
  $('winnerShirt').innerHTML=shirt(champion,'finish');
+ $('winnerEchoLeft').innerHTML=shirt(fallen,'echo-left');
+ $('winnerEchoRight').innerHTML=shirt(earlier,'echo-right');
  $('winnerBg').style.setProperty('--winner-art',`url("c2/${champion}.jpg")`);
- bgSample(champion);
+ bgSample(champion);bgSample(fallen);bgSample(earlier);
  const screen=$('finish');
+ screen.dataset.origin=side;
  screen.classList.remove('on');void screen.offsetWidth;
  screen.classList.add('on');
  screen.setAttribute('aria-hidden','false');
