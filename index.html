@@ -906,6 +906,25 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .zoom #zRate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
 .zoom #zRate .rb{min-width:0}
 @media(prefers-reduced-motion:reduce){.dx.cov .dx-back.dx-opening span,.dx.cov .dx-back.dx-opening::after,.dx-revealed .dx-art,.dx-revealed .dx-scene,.dx-revealed .dx-card,.dx-revealed .dx-info{animation:none!important}}
+
+/* Inicio: navegación visible, foco claro y espacio para el contenido */
+#home{overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior-y:contain;padding-bottom:calc(18px + env(safe-area-inset-bottom))!important}
+#home .mfan{flex:1 0 auto;min-height:clamp(280px,48dvh,520px)}
+#home .mh{flex-shrink:0}
+#home .mtabs{flex-shrink:0;padding-bottom:10px;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}
+#home .mtabs::-webkit-scrollbar{display:none}
+#home .mtabs button{min-height:38px;padding:9px 12px;border:1px solid transparent}
+#home .mtabs button.on{background:#fff;color:#120F1A;border-color:#fff}
+#home .mgo{flex-shrink:0;min-height:48px;margin-bottom:12px;order:1}
+#home .home-quick{order:2;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:4px 2px 12px;flex-shrink:0}
+#home .hq-item{appearance:none;text-align:left;min-width:0;min-height:64px;padding:11px 12px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.035));color:#fff;display:flex;flex-direction:column;justify-content:center;gap:5px;cursor:pointer}
+#home .hq-name{font:700 14px AV;letter-spacing:-.02em}
+#home .hq-sub{font:600 11px AV;color:rgba(255,255,255,.62)}
+#home .hq-lock{font:7px PX;color:#ffd400}
+#home .hq-locked{background:rgba(255,255,255,.035);border-style:dashed}
+#home .hq-locked .hq-name{color:rgba(255,255,255,.72)}
+#home .hq-item:focus-visible,#home .mtabs button:focus-visible,#home .mgo:focus-visible,#home .mc:focus-visible{outline:3px solid #FFD400;outline-offset:3px}
+@media(max-height:690px){#home .mfan{min-height:300px}#home .home-quick{gap:6px}#home .hq-item{min-height:55px;padding:9px 10px}}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -922,7 +941,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div></header>
  <span id="test" class="htest"></span>
  <div class="mfan" id="mFan"></div>
- <div class="mtabs" id="mTabs"></div>
+ <div class="mtabs" id="mTabs" aria-label="Explorar modos de juego"></div>
+ <div class="home-quick" id="homeQuick" aria-label="Accesos directos"></div>
  <div class="dupbar" id="dupBar"><span id="tDup"></span><button id="tDupB">CAMBIAR</button></div>
  <button class="mgo" id="mGo"></button>
 </section>
@@ -1229,7 +1249,8 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES();
  [...fan.children].forEach((el,i)=>{const m=M[i];el.classList.toggle('lock',!!m.lock);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
   let d=i-mi;if(d>2)d-=5;if(d<-2)d+=5;const a=Math.abs(d);
   el.style.transform=`translate(-50%,-50%) translateX(${d*60}%) rotate(${d*11}deg) translateY(${a*6}%) scale(${1-a*.16})`;el.style.zIndex=10-a;el.style.filter=a?`brightness(${1-a*.3})`:'';el.style.opacity=a>1?0:1;el.style.pointerEvents=a>1?'none':''});
- $('mTabs').innerHTML=M.map((m,i)=>`<button class="${i===mi?'on':''} ${m.lock?'lock':''}" data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
+ $('mTabs').innerHTML=M.map((m,i)=>`<button class="${i===mi?'on':''} ${m.lock?'lock':''}" data-i="${i}" aria-pressed="${i===mi}">${m.t.replace(' del día','')}</button>`).join('');
+ $('homeQuick').innerHTML=M.filter(m=>m.id!=='pack').map(m=>`<button type="button" data-quick="${m.id}" class="hq-item ${m.lock?'hq-locked':''}" aria-label="${m.t}: ${m.s}"><span class="hq-name">${m.t}${m.lock?' <span class="hq-lock">· BLOQUEADO</span>':''}</span><span class="hq-sub">${m.id==='album'?u+' / '+N+' cartas':m.id==='torneo'?'3 retas al día':m.id==='tier'?(m.lock?'Faltan '+(20-u):'Tu ranking'):'Comunidad'}</span></button>`).join('');
  const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(c/${m.img}.jpg)`;
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
@@ -1238,6 +1259,7 @@ function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '
 let mMoved=false,msx=null,msy=null;
 $('mGo').onclick=mEnter;
 $('mTabs').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;mi=+b.dataset.i;beep(660,.03);renderHome()};
+$('homeQuick').onclick=e=>{const b=e.target.closest('[data-quick]');if(!b)return;const m=MODES().find(m=>m.id===b.dataset.quick);if(!m)return;if(m.lock){toast('FALTAN '+Math.max(0,20-uniq())+' CARTAS PARA TIER');return}beep(880,.05);go(m.id)};
 $('home').addEventListener('touchstart',e=>{const p=e.touches[0];msx=p.clientX;msy=p.clientY;mMoved=false},{passive:true});
 $('home').addEventListener('touchmove',e=>{if(msx!==null&&Math.abs(e.touches[0].clientX-msx)>10)e.preventDefault()},{passive:false});
 $('home').addEventListener('touchend',e=>{if(msx===null)return;const dx=e.changedTouches[0].clientX-msx;msx=null;if(Math.abs(dx)>40){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
