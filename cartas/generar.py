@@ -414,7 +414,7 @@ def main():
     fks = leer_fk()
     # si se agregó una Full, cambia el total (/NN): se rehacen todas las Full
     sel_f = [d for d in cat if d.get('full') and os.path.exists(os.path.join(FULL_DIR, d['id'] + '.jpg'))
-             and (not a.solo or d['id'] in a.solo or nuevos or a.fulls)]
+             and (not a.solo or d['id'] in a.solo or nuevos)]
     if a.fulls:
         sel = []
     for d in sel_f:
