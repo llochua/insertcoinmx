@@ -105,3 +105,96 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
 @media(max-height:720px){.brandbar{height:43px;padding-top:6px;padding-bottom:5px}.hud{padding-top:9px;padding-bottom:8px;gap:6px}.prompt{padding-top:8px;padding-bottom:7px}.fighter .team{top:6px}.fighter.bottom .team{bottom:6px}.f-title strong{font-size:clamp(16px,4.6vw,24px)}.f-title small{padding:4px}.screen-bottom{height:32px}.vs-divider{height:22px}.vs-divider b{font-size:33px;height:41px}.fighter .shirt{height:97%}}
 @media(max-height:570px){.hud-title{font-size:23px}.hud{padding-top:6px;padding-bottom:6px}.brandbar{height:36px}.prompt strong{font-size:17px}.screen-bottom{display:none}.team span{font-size:6px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}.app.impact{animation:none}.fighter.enter{animation:none}}
+
+
+/* RETA V4.1 — La elección se entiende tocando el diseño, sin DEFENDER/CAMBIAR. */
+.fighter .f-title{bottom:13px;right:13px;max-width:65%}
+.fighter.bottom .f-title{top:13px;bottom:auto}
+.fighter .f-title strong{font-size:clamp(17px,5vw,26px);text-shadow:2px 3px 0 #06050ba8,0 0 16px #000}
+.fighter .team span{color:#cbd9ff}
+.fighter .team i{background:#92b4fc}
+.fighter.is-champion .team span{color:#FFD400}
+.fighter.is-champion .team i{background:#FFD400}
+.fighter.bottom .team span{color:#cbd9ff}
+.fighter.bottom.is-champion .team span{color:#FFD400}
+.fighter:not(.is-champion) .team span{color:#cbd9ff}
+.fighter .print{opacity:1;transition:opacity .25s}
+.fighter .print.pending{opacity:0}
+/* El jersey SVG tiene iluminación propia y el fondo del arte se elimina mediante canvas.
+   Evita parches rectangulares, sin sacrificar la gráfica original del diseño. */
+.fighter .shirt{width:min(95vw,410px);height:100%;max-height:100%;filter:drop-shadow(4px 16px 10px #000b)}
+.fighter .f-title strong{max-width:100%;text-wrap:balance}
+.fighter.bottom .team{top:auto;bottom:12px}
+.fighter.top .team{top:12px}
+.fighter:not(.is-champion) .team span{font-size:7px}
+@media(max-height:720px){
+ .fighter .f-title{bottom:9px}.fighter.bottom .f-title{top:9px}
+ .fighter.bottom .team{bottom:7px}.fighter.top .team{top:7px}
+}
+/* Celebración: la misma carta original del Álbum, no una gráfica nueva ni un premio inventado. */
+.finish{display:none!important;position:absolute;inset:0;z-index:31;padding:clamp(16px,2.5vh,24px) 20px clamp(14px,2vh,22px);overflow:hidden;
+ background:radial-gradient(ellipse at 50% 48%,#342857,#100f29 66%,#080715 100%);text-align:center;
+ align-items:center;justify-content:unset;gap:0}
+.finish.on{display:grid!important;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;animation:finStageEnter .42s ease-out both}
+@keyframes finStageEnter{0%{opacity:0;transform:scale(1.035)}100%{opacity:1;transform:none}}
+.finish::before{content:"";position:absolute;z-index:0;inset:-10%;pointer-events:none;opacity:.2;background:
+ repeating-conic-gradient(from 15deg at 50% 42%,rgba(255,212,0,.36) 0 4deg,transparent 4deg 19deg);
+ mask-image:radial-gradient(ellipse at 50% 42%,#000,transparent 68%)}
+.fin-backdrop{position:absolute;z-index:0;inset:-22%;background:transparent center/cover no-repeat;filter:blur(38px) brightness(.48) saturate(1.4);opacity:.42;pointer-events:none;transform:scale(1.1)}
+.finish>*:not(.fin-backdrop){position:relative;z-index:2}
+.fin-top{display:flex;align-items:center;justify-content:center;gap:9px;padding:0 0 9px;color:#fff}
+.fin-top img{width:22px;height:22px;object-fit:contain}
+.fin-top span{font:800 12px/1.15 AVK,Arial,sans-serif;letter-spacing:.12em;text-align:left}
+.fin-top small{font:6px PX,monospace;color:#FFD400;letter-spacing:.06em}
+.fin-title{align-self:end;display:flex;align-items:baseline;justify-content:center;gap:9px;white-space:nowrap;padding-top:5px;transform:skewX(-8deg)}
+.fin-title span{font:11px PX,monospace;color:#FFD400}
+.fin-title strong{font:900 clamp(39px,10vw,57px)/1 AVK,Arial,sans-serif;font-style:italic;letter-spacing:-.06em;color:#fff;
+ text-shadow:3px 3px 0 #b42d35,6px 6px 0 #080710;animation:finTitle .55s .14s cubic-bezier(.1,1.1,.3,1) both}
+@keyframes finTitle{from{opacity:0;transform:translateY(-24px) scale(1.13)}to{opacity:1;transform:none}}
+.fin-card-stage{width:100%;min-height:0;height:100%;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible}
+.fin-halo{position:absolute;left:50%;top:50%;width:min(110vw,420px);aspect-ratio:1;transform:translate(-50%,-50%);
+ background:radial-gradient(circle,rgba(255,247,173,.5) 0,rgba(255,212,0,.16) 28%,rgba(255,212,0,0) 67%);filter:blur(4px);pointer-events:none;animation:finHalo 3.5s ease-in-out infinite alternate}
+@keyframes finHalo{to{opacity:.65;transform:translate(-50%,-50%) scale(1.18)}}
+.fin-reveal{position:relative;display:block;height:min(100%,340px);max-height:100%;width:auto;aspect-ratio:480/670;min-height:0;
+ border-radius:11px;transform-origin:50% 56%;transform:rotate(-3deg);box-shadow:0 20px 52px #000b,0 0 0 2px rgba(255,244,192,.8),0 0 40px rgba(255,212,0,.32);
+ overflow:hidden;animation:finReveal .82s .24s cubic-bezier(.16,.83,.25,1.12) both}
+@keyframes finReveal{
+ 0%{opacity:0;transform:perspective(550px) rotateY(76deg) translateY(80px) scale(.62);filter:brightness(3)}
+ 60%{opacity:1;transform:perspective(550px) rotateY(-12deg) translateY(-6px) scale(1.055);filter:brightness(1.7)}
+ 100%{opacity:1;transform:perspective(550px) rotateY(0deg) translateY(0) rotate(-3deg) scale(1);filter:brightness(1)}
+}
+.fin-reveal img{width:100%;height:100%;display:block;object-fit:cover;border-radius:9px}
+.fin-sheen{position:absolute;pointer-events:none;inset:-20%;opacity:0;background:linear-gradient(118deg,transparent 29%,rgba(255,251,208,.15) 38%,rgba(255,255,255,.83) 46%,rgba(255,235,165,.24) 53%,transparent 61%);transform:translateX(-95%) skewX(-10deg);mix-blend-mode:screen;animation:finSheen 1.1s .7s ease-in-out both}
+@keyframes finSheen{20%{opacity:1}90%{opacity:.7}100%{opacity:0;transform:translateX(95%) skewX(-10deg)}}
+.fin-copy{width:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;padding:7px 0 10px;position:relative}
+.fin-kicker{font:7px PX,monospace;line-height:1.4;color:#FFD400;letter-spacing:.055em}
+.fin-copy h2{font:900 clamp(21px,5.7vw,28px)/1.05 AVK,Arial,sans-serif;font-style:italic;color:#fff;letter-spacing:-.035em;
+ text-shadow:2px 2px 0 #5f2b51;margin:0}
+.fin-copy h3{font:800 clamp(19px,5vw,26px)/1.05 AVK,Arial,sans-serif;color:#FFD400;margin:0;text-wrap:balance}
+.fin-copy p#finRounds{font:8px PX,monospace;color:#dad4f0;letter-spacing:.06em;line-height:1.5}
+.fin-copy p.fin-next{max-width:320px;margin:0;color:#e3deef;font:600 clamp(11px,2.8vw,13px)/1.4 Arial,sans-serif}
+.fin-copy .thanks{margin-top:5px;font:9px PX,monospace;color:#FFD400;letter-spacing:.03em;line-height:1.5}
+.fin-cta{align-self:end;justify-self:center;width:min(100%,320px);border-radius:9px;background:#FFD400;color:#111019;font:900 13px AVK,Arial,sans-serif;
+ padding:12px 15px;box-shadow:0 4px 0 #9e7c00,0 11px 20px #0007;display:flex;align-items:center;justify-content:center;gap:9px}
+.fin-cta small{font:8px PX,monospace;color:#584b12}
+.fin-cta:active{transform:translateY(3px);box-shadow:0 1px 0 #9e7c00}
+.fin-cta:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-height:700px){
+ .finish{padding-top:12px;padding-bottom:12px}
+ .fin-top{padding-bottom:3px}
+ .fin-title strong{font-size:38px}
+ .fin-copy{gap:4px;padding:5px 0 7px}
+ .fin-copy h2{font-size:22px}
+ .fin-copy h3{font-size:19px}
+ .fin-copy p.fin-next{font-size:11px}
+ .fin-cta{padding:10px 12px}
+}
+@media(max-height:580px){
+ .fin-title strong{font-size:31px}.fin-title span{font-size:8px}
+ .fin-kicker{font-size:6px}.fin-copy h2{font-size:18px}
+ .fin-copy .thanks{font-size:7px;margin-top:2px}
+ .fin-copy p#finRounds{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){
+ .fin-title strong,.fin-reveal,.fin-sheen,.fin-halo{animation:none!important}
+}
