@@ -711,6 +711,8 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
    2) Agrega la letra en el campo ex de su línea: ex:'b' (varias: ex:'br').
    Listo: aparece en el álbum y entra a los sobres sola. Mientras una versión no tenga imagen existe como carta
    pero se ve como un recuadro "PRÓXIMAMENTE" y no sale en sobres.
+   bx:1 = playera que NUNCA se produjo: queda reservada para bonus/easter eggs. No entra a los sobres normales
+   (sin importar su rareza), no cuenta en el álbum ni en los totales y solo se ve si ya la tienes.
    Las claves guardadas en el progreso (id_v) nunca se renombran; los nombres viejos se quedan en `al`.
    El progreso del modelo anterior (id / F_id) se convierte solo al abrir: Común→Base, Holo→Especial, Dorada→Rara, F_→Full. */
 const DESIGNS=[
@@ -718,7 +720,7 @@ const DESIGNS=[
 {id:'abuket',n:'Abuket',cat:'GAMER',r:'comun',no:2,f:1},
 {id:'alienonboard',n:'Alien on Board',cat:'PELÍCULAS',r:'comun',no:3},
 {id:'androidsdays',n:'Androids Days',cat:'ANIME',r:'comun',no:4},
-{id:'animehero',n:'Anime Héroe',cat:'ANIME',r:'comun',no:5},
+{id:'animehero',bx:1,n:'Anime Héroe',cat:'ANIME',r:'comun',no:5},
 {id:'arcade',n:'Anatomía del Arcade',cat:'GAMER',r:'comun',no:6,f:2},
 {id:'arcade2',n:'Insert Coin',cat:'GAMER',r:'comun',no:7},
 {id:'artemis',n:'Artemis',cat:'ANIME',r:'comun',no:8},
@@ -731,26 +733,26 @@ const DESIGNS=[
 {id:'collector',n:'Collector',cat:'GAMER',r:'comun',no:15,f:7},
 {id:'controls',n:'Controls',cat:'GAMER',r:'comun',no:16,f:8},
 {id:'evilexes',n:'Evil Exes',cat:'PELÍCULAS',r:'comun',no:17},
-{id:'family',n:'Family',cat:'GAMER',r:'comun',no:18},
+{id:'family',bx:1,n:'Family',cat:'GAMER',r:'comun',no:18},
 {id:'fatality',n:'Fatality',cat:'GAMER',r:'dorada',no:19},
 {id:'fatman',n:'Fatman',cat:'PELÍCULAS',r:'comun',no:20,f:10},
 {id:'fck',n:'#Fuck',cat:'GAMER',r:'holo',no:21,f:11},
 {id:'futbolito',n:'Futbolito',cat:'OTROS',r:'comun',no:22,f:12},
-{id:'galaxianwars',n:'Galaxian Wars',cat:'ANIME',r:'comun',no:23},
+{id:'galaxianwars',bx:1,n:'Galaxian Wars',cat:'ANIME',r:'comun',no:23},
 {id:'gameover',n:'Game Over',cat:'GAMER',r:'dorada',no:24},
 {id:'gamepop',n:'Game Pop',cat:'GAMER',r:'holo',no:25,f:13},
 {id:'gatosamurai',n:'Gato Samurái',cat:'ANIME',r:'comun',no:26,f:14},
 {id:'gunsncontrols',n:"Guns N' Controls",cat:'GAMER',r:'comun',no:27,f:15},
 {id:'humangamer',n:'Human Gamer',cat:'GAMER',r:'comun',no:28,f:16},
 {id:'hyrule',n:'Hyrule',cat:'GAMER',r:'comun',no:29,f:17},
-{id:'imposible',n:'Imposible',cat:'OTROS',r:'comun',no:30},
+{id:'imposible',bx:1,n:'Imposible',cat:'OTROS',r:'comun',no:30},
 {id:'invader',n:'Invader',cat:'GAMER',r:'comun',no:31,f:18},
 {id:'kaiji',n:'Kaiju Club',cat:'PELÍCULAS',r:'comun',no:32},
 {id:'kame',n:'Kame Hame Ha',cat:'ANIME',r:'comun',no:33},
-{id:'karting',n:'Karting Party',cat:'GAMER',r:'comun',no:34},
+{id:'karting',bx:1,n:'Karting Party',cat:'GAMER',r:'comun',no:34},
 {id:'keepcalm',n:'Keep Calm',cat:'ANIME',r:'comun',no:35,f:19},
 {id:'killbills',n:'Kill Bills',cat:'PELÍCULAS',r:'comun',no:36},
-{id:'kof',n:'KOF Héroes',cat:'GAMER',r:'comun',no:37},
+{id:'kof',bx:1,n:'KOF Héroes',cat:'GAMER',r:'comun',no:37},
 {id:'konamicode',n:'Konami Code',cat:'GAMER',r:'comun',no:38},
 {id:'linkfloyd',n:'Link Floyd',cat:'GAMER',r:'comun',no:39},
 {id:'links',n:'Links',cat:'GAMER',r:'holo',no:40},
@@ -773,7 +775,7 @@ const DESIGNS=[
 {id:'polystation',n:'PolyStation',cat:'GAMER',r:'holo',no:57,f:27},
 {id:'portatiles',n:'Portátiles',cat:'GAMER',r:'comun',no:58},
 {id:'sailors',n:'Sailor Scout',cat:'ANIME',r:'comun',no:59},
-{id:'sailourss',n:'Sailor URSS',cat:'ANIME',r:'comun',no:60},
+{id:'sailourss',bx:1,n:'Sailor URSS',cat:'ANIME',r:'comun',no:60},
 {id:'samus',n:'Samus',cat:'GAMER',r:'comun',no:61,f:28},
 {id:'sensei',n:'Sensei',cat:'ANIME',r:'comun',no:62,f:29},
 {id:'shadaloo',n:'Shadaloo',cat:'GAMER',r:'comun',no:63},
@@ -783,7 +785,7 @@ const DESIGNS=[
 {id:'thankyou',n:'Thank You',cat:'GAMER',r:'comun',no:67,f:34},
 {id:'thelostgame',n:'The Lost Game',cat:'GAMER',r:'comun',no:68},
 {id:'theworldwarrior',n:'The World Warrior',cat:'GAMER',r:'comun',no:69,f:38,fk:'F_worldwarrior',al:['worldwarrior']},
-{id:'tmnt',n:'Tortugas Ninja',cat:'CARICATURAS',r:'comun',no:70},
+{id:'tmnt',bx:1,n:'Tortugas Ninja',cat:'CARICATURAS',r:'comun',no:70},
 {id:'toto',n:'Totoro',cat:'ANIME',r:'comun',no:71},
 {id:'triforce',n:'Triforce',cat:'GAMER',r:'dorada',no:72,f:35},
 {id:'vamonospest',n:'Vámonos Pest',cat:'CARICATURAS',r:'comun',no:73},
@@ -800,11 +802,11 @@ const VL=['b','e','r','f'],VN={b:'Base',e:'Especial',r:'Rara',f:'Full'},VC={b:'c
 const CARDS=[],DB={},ALIAS={},CB={};
 for(const d of DESIGNS){d.fk=d.f?(d.fk||'F_'+d.id):null;DB[d.id]=d;for(const a of d.al||[])ALIAS[a]=d.id;
  d.img={};if(d.r)d.img[OLDV[d.r]]=d.id;if(d.fk)d.img.f=d.fk;for(const l of d.ex||'')d.img[l]=d.id+'_'+l} // d.img[v] = nombre de archivo de esa versión (si existe)
-const mk=(d,v)=>({k:d.id+'_'+v,n:d.n,cat:d.cat,r:VC[v],v,no:v==='f'?(d.f||0):d.no,d:d.id,img:d.img[v]||null});
+const mk=(d,v)=>({k:d.id+'_'+v,n:d.n,cat:d.cat,r:VC[v],v,bx:!!d.bx,no:v==='f'?(d.f||0):d.no,d:d.id,img:d.img[v]||null});
 for(const d of DESIGNS)for(const v of 'ber')CARDS.push(mk(d,v));
 for(const d of [...DESIGNS.filter(d=>d.f).sort((a,b)=>a.f-b.f),...DESIGNS.filter(d=>!d.f)])CARDS.push(mk(d,'f'));
 for(const c of CARDS)CB[c.k]=c;
-const AV=CARDS.filter(c=>c.img),NAV=AV.length; // cartas con imagen = las que se pueden conseguir hoy
+const AV=CARDS.filter(c=>c.img&&!c.bx),NAV=AV.length; // cartas con imagen que salen en sobres = las que se pueden conseguir hoy (nunca las bonus)
 const POOL={comun:[],holo:[],dorada:[],full:[]};for(const c of AV)POOL[c.r].push(c); // mismos grupos y pesos que antes
 const FA=DESIGNS.filter(d=>d.f).sort((a,b)=>a.f-b.f);
 /* claves: acepta la nueva (id_v) y la del modelo anterior (id → su rareza de entonces, F_id → Full, con alias) */
@@ -861,7 +863,7 @@ const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
   catch(e){try{localStorage.setItem(KEY_BAD,raw)}catch(_){NOWRITE=true}}}
  normalize(S);
  if(MIGD&&raw!==null){try{if(LS.get(KEY_PRE)===null)localStorage.setItem(KEY_PRE,raw)}catch(e){}}} // copia exacta del progreso anterior, una sola vez
-const uniq=()=>Object.keys(S.have).length;
+const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
 const PRUEBA=true; // quitar al lanzar: sobres ilimitados para revisar
 const packReady=()=>PRUEBA||S.test||after(today(),S.last)||S.extra>0;
@@ -1068,11 +1070,11 @@ let page=0,fd=null;
 const RANK=['f','r','e','b']; // mejor ilustración primero
 const APAGES=[['TODOS',()=>1],['GAMER',d=>d.cat==='GAMER'],['ANIME',d=>d.cat==='ANIME'],['CINE Y TV',d=>['PELÍCULAS','CARICATURAS','OTROS'].includes(d.cat)]];
 const DORD=[...DESIGNS].sort((a,b)=>(a.no||999)-(b.no||999)||a.n.localeCompare(b.n,'es'));
-const SOON_N=CARDS.length-NAV;
-function dState(d){const vs=VL.map(v=>{const c=CB[d.id+'_'+v],h=S.have[c.k]||0;return{c,v,h,st:h?'have':c.img?'av':'soon'}});
- const col=vs.filter(x=>x.st!=='soon'),got=col.filter(x=>x.h).length,by=v=>vs[VL.indexOf(v)];
+const SOON_N=CARDS.filter(c=>!c.bx&&!c.img).length;
+function dState(d){const vs=VL.map(v=>{const c=CB[d.id+'_'+v],h=S.have[c.k]||0;return{c,v,h,st:h?'have':d.bx?'bx':c.img?'av':'soon'}});
+ const col=vs.filter(x=>x.st==='have'||x.st==='av'),got=col.filter(x=>x.h).length,by=v=>vs[VL.indexOf(v)];
  const best=RANK.map(by).find(x=>x.h&&x.c.img)||RANK.map(by).find(x=>x.h)||RANK.map(by).find(x=>x.c.img)||vs[0];
- const all=col.length>0&&got===col.length;
+ const all=!d.bx&&col.length>0&&got===col.length; // bonus: sin festejo ni logro
  return{vs,got,tot:col.length,own:got>0,all,done:all&&col.length>1,was:!!(S.logro&&S.logro[d.id]),cover:best.c,rep:vs.reduce((n,x)=>n+Math.max(0,x.h-1),0)}}
 /* logro: la primera vez que completas un diseño de 2+ versiones queda la fecha en S.logro; si después llega
    una ilustración nueva el diseño vuelve a mostrar lo que falta, pero el logro no se borra (estrella hueca). */
@@ -1080,12 +1082,12 @@ function markLogros(){let ch=0;for(const d of DESIGNS){if(S.logro&&S.logro[d.id]
 const fday=f=>{const [y,m,d]=f.split('-').map(Number);return d+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m-1]+(y!==new Date().getFullYear()?' '+y:'')};
 const pips=(st,n=1)=>`<span class="pp">${st.vs.map(x=>`<i class="p ${x.v} ${x.st}"></i>`).join('')}${n?`<b>${st.got}/${st.tot}</b>`:''}</span>`;
 function renderAlbum(){
- const D=DORD.map(d=>({d,st:dState(d)}));
- $('pTabs').innerHTML=APAGES.map((p,i)=>{const L=D.filter(x=>p[1](x.d));return `<button class="btn ${i===page?'on':''}" data-p="${i}">${p[0]} <small>${L.reduce((n,x)=>n+x.st.got,0)}/${L.reduce((n,x)=>n+x.st.tot,0)}</small></button>`}).join('');
- const L=D.filter(x=>APAGES[page][1](x.d)),g=L.reduce((n,x)=>n+x.st.got,0),t=L.reduce((n,x)=>n+x.st.tot,0);
- $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=D.reduce((n,x)=>n+x.st.got,0)+'/'+D.reduce((n,x)=>n+x.st.tot,0);
- const dn=L.filter(x=>x.st.all).length;
- $('aSub').innerHTML=`<b>${dn}</b> de ${L.length} diseños completos · ${t} cartas en sobres`+(SOON_N>0?`<span>+ ${SOON_N} ilustraciones en camino · todavía no salen en sobres</span>`:'');
+ const D=DORD.map(d=>({d,st:dState(d)})).filter(x=>!x.d.bx||x.st.own); // bonus: solo si ya la tienes
+ $('pTabs').innerHTML=APAGES.map((p,i)=>{const L=D.filter(x=>!x.d.bx&&p[1](x.d));return `<button class="btn ${i===page?'on':''}" data-p="${i}">${p[0]} <small>${L.reduce((n,x)=>n+x.st.got,0)}/${L.reduce((n,x)=>n+x.st.tot,0)}</small></button>`}).join('');
+ const L=D.filter(x=>APAGES[page][1](x.d)),LN=L.filter(x=>!x.d.bx),DN=D.filter(x=>!x.d.bx),g=LN.reduce((n,x)=>n+x.st.got,0),t=LN.reduce((n,x)=>n+x.st.tot,0); // bonus: se ven si las tienes, pero no suman
+ $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=DN.reduce((n,x)=>n+x.st.got,0)+'/'+DN.reduce((n,x)=>n+x.st.tot,0);
+ const dn=LN.filter(x=>x.st.all).length;
+ $('aSub').innerHTML=`<b>${dn}</b> de ${LN.length} diseños completos · ${t} cartas en sobres`+(SOON_N>0?`<span>+ ${SOON_N} ilustraciones en camino · todavía no salen en sobres</span>`:'');
  $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv">${st.own?`<img src="${imgOf(st.cover,'c')}" loading="lazy" alt="">`:`<span class="lk"><img src="coin.png" alt="">${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}</span>${pips(st)}</button>`).join('');
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
@@ -1093,9 +1095,9 @@ $('grid').onclick=e=>{const t=e.target.closest('.dt');if(!t)return;beep(880,.04)
 function openFicha(id){if(!DB[id])return;fd=id;renderFicha();$('ficha').classList.add('on');$('ficha').setAttribute('aria-hidden','false');$('ficha').querySelector('.fsh').scrollTop=0}
 function closeFicha(){fd=null;$('ficha').classList.remove('on');$('ficha').setAttribute('aria-hidden','true')}
 function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(d);
- $('fMeta').innerHTML=d.cat+(d.no?' · #'+String(d.no).padStart(3,'0'):'')+(st.done?'<span class="fdone">★ COMPLETO</span>':st.was?'<span class="fdone was">★ COMPLETADO '+fday(S.logro[d.id]).toUpperCase()+' · NUEVA VERSIÓN</span>':'');$('fName').textContent=d.n;
+ $('fMeta').innerHTML=d.cat+(d.bx?' · BONUS':d.no?' · #'+String(d.no).padStart(3,'0'):'')+(st.done?'<span class="fdone">★ COMPLETO</span>':st.was?'<span class="fdone was">★ COMPLETADO '+fday(S.logro[d.id]).toUpperCase()+' · NUEVA VERSIÓN</span>':'');$('fName').textContent=d.n;
  const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
- const col=st.vs.filter(x=>x.st!=='soon');$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
+ const col=st.vs.filter(x=>x.st==='have'||x.st==='av');$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
   return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv"><img src="${imgOf(x.c,'c')}" alt=""></span>${lb}</button>`
    :`<div class="vc av"><span class="cv"><img src="coin.png" alt=""><span>EN SOBRES</span></span>${lb}</div>`}).join('');
