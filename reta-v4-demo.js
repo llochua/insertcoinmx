@@ -232,5 +232,11 @@ document.addEventListener("keydown",e=>{
  if(e.key==="ArrowUp"){e.preventDefault();select("top")}
  if(e.key==="ArrowDown"){e.preventDefault();select("bottom")}
 });
+/* Atajo exclusivo de revisión: simula que ya ocurrieron los seis
+   primeros encuentros. Una elección permite evaluar el K.O. y el Stage Clear. */
+if(new URLSearchParams(location.search).get('preview')==='final'){
+ round=TOTAL-1;
+ slots={top:champion,bottom:challengers[round]};
+}
 render(true);
 })();
