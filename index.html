@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="es"><head><meta charset="utf-8">
+<!-- Google Analytics 4 (G-1PZ5B99JMH) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1PZ5B99JMH"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-1PZ5B99JMH');</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Insert Coin MX · El Álbum</title><style>
 @font-face{font-family:PX;src:url(ps2p.ttf)}
 :root{--y:#FFD400;--ink:#f3f1ff;--dim:#8b88b8}
@@ -1321,6 +1325,9 @@ const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
   catch(e){try{localStorage.setItem(KEY_BAD,raw)}catch(_){NOWRITE=true}}}
  normalize(S);
  if(MIGD&&raw!==null){try{if(LS.get(KEY_PRE)===null)localStorage.setItem(KEY_PRE,raw)}catch(e){}}} // copia exacta del progreso anterior, una sola vez
+/* ===== Analytics: eventos propios (nunca rompen el juego si GA no carga) ===== */
+const ga=(n,p)=>{try{if(window.gtag)gtag('event',n,p||{})}catch(e){}};
+try{if(S.last&&S.last<today())ga('regreso',{dias_desde_ultimo_sobre:Math.round((new Date(today())-new Date(S.last))/864e5)})}catch(e){}
 const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
 const PRUEBA=false; // quitar al lanzar: sobres ilimitados para revisar
@@ -1386,7 +1393,7 @@ const jingle=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.11),i*
 function toast(t){const e=$('toast');e.innerHTML=t;e.classList.remove('go');void e.offsetWidth;e.classList.add('go')}
 /* ---------- navegación ---------- */
 let cur='home';
-function go(id){if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
+function go(id){if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);go('home')}});
@@ -1498,11 +1505,14 @@ let opening=false;function openPack(){if(opening)return;opening=true;clearTimeou
    if(S.welcomeLeft>0){p.welcome=1;p.last=today()}
    else if(freePacksLeft()>0){p.daily=1;p.dailyDay=today();p.last=p.dailyDay}
    else p.extra=1}
-  hand=makeHand(firstPack());p.fg=1;const seen={},seenD={};
+  const fp0=firstPack();hand=makeHand(fp0);p.fg=1;const seen={},seenD={};
   const doneB=new Set(DESIGNS.filter(d=>dState(d).done).map(d=>d.id));
   hand.forEach(c=>{c._new=!S.have[c.k]&&!seen[c.k];seen[c.k]=1;p.have[c.k]=(p.have[c.k]||0)+1;
    c._prev=VL.filter(v=>S.have[c.d+'_'+v]);c._dnew=c._new&&!c._prev.length&&!seenD[c.d];seenD[c.d]=1;c._doneB=doneB.has(c.d)});
-  applyPack(p);markLogros();MINE.push(p);save();
+  const u0=uniq();applyPack(p);markLogros();MINE.push(p);save();
+  ga('abrir_sobre',{tipo:p.welcome?'bienvenida':p.daily?'diario':p.extra?'extra':'prueba',primero:fp0?1:0});
+  hand.forEach(c=>ga('carta_obtenida',{diseno:c.d,rareza:VC[c.v],nueva:c._new?1:0}));
+  {const u1=uniq();GOALS.forEach(g=>{if(u0<g[0]&&u1>=g[0])ga('hito',{hito:g[1],cartas:u1})})}
   setTimeout(()=>opening=false,900);$('env').classList.add('cut');const bv=hand.reduce((a,c)=>VORD[c.v]<VORD[a]?c.v:a,'b');leak(bv);idx=0;setTimeout(()=>{$('env').style.display='none';buildStack()},bv==='b'?450:1000)})}
 /* ===== DESCUBRIMIENTO: una carta a la vez; la playera original es el escenario, la carta la complementa =====
    Cada caso tiene su respuesta: diseño nuevo, versión nueva de un diseño que ya tenías, repetida (útil para canje),
@@ -1732,7 +1742,7 @@ function renderAlbum(){
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
 $('grid').onclick=e=>{const t=e.target.closest('.dt');if(!t)return;beep(880,.04);openFicha(t.dataset.d)};
-function openFicha(id){if(!DB[id])return;fd=id;renderFicha();$('ficha').classList.add('on');$('ficha').setAttribute('aria-hidden','false');$('ficha').querySelector('.fsh').scrollTop=0}
+function openFicha(id){if(!DB[id])return;fd=id;ga('ver_ficha',{diseno:id});renderFicha();$('ficha').classList.add('on');$('ficha').setAttribute('aria-hidden','false');$('ficha').querySelector('.fsh').scrollTop=0}
 function closeFicha(){fd=null;$('ficha').classList.remove('on');$('ficha').setAttribute('aria-hidden','true')}
 function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(d);
  $('fMeta').innerHTML=d.cat+(d.bx?' · BONUS':d.no?' · #'+String(d.no).padStart(3,'0'):'')+(st.done?'<span class="fdone">★ COMPLETO</span>':st.was?'<span class="fdone was">★ COMPLETADO '+fday(S.logro[d.id]).toUpperCase()+' · NUEVA VERSIÓN</span>':'');$('fName').textContent=d.n;
