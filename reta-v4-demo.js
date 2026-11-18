@@ -175,38 +175,17 @@ function select(side){
  },prefersReduce?10:480);
 }
 function end(side){
- const prior=previousChampion,status=prior===null?"TU PRIMERA CAMPEONA":prior===champion?"¡LA CAMPEONA SIGUE EN PIE!":"¡NUEVA CAMPEONA!";
+ // La pantalla de victoria no es una ficha ni un resumen: solo la
+ // playera ganadora, WINNER IS y la siguiente acción.
  previousChampion=champion;
  $('winnerName').textContent=safeName(champion);
- $('egStatus').textContent=status;
- $('egCount').textContent=TOTAL+" ENCUENTROS · "+PAIRS.length+" DISEÑOS ENFRENTADOS";
- $('egContext').textContent=prior===null
-  ?"Tu favorita por ahora. Las playeras que descubras en Sobres podrían destronarla."
-  :prior===champion
-  ?"Sigue siendo tu favorita. Abre sobres para descubrir quién podría destronarla."
-  :"Cambiaste de favorita. Nuevos diseños en Sobres pueden volver a retarla.";
  $('winnerShirt').innerHTML=shirt(champion,'finish');
  bgSample(champion);
- const modal=$('finish');
- modal.classList.remove('on');modal.dataset.phase='entry';
- modal.classList.toggle('from-bottom',side==='bottom');modal.classList.toggle('from-top',side==='top');
- void modal.offsetWidth;
- modal.classList.add('on');modal.setAttribute('aria-hidden','false');
+ const screen=$('finish');
+ screen.classList.remove('on');void screen.offsetWidth;
+ screen.classList.add('on');
+ screen.setAttribute('aria-hidden','false');
  locked=true;
- const token=run;
- // De Sobres recuperamos el timing: primero impacto, después protagonista
- // y al final qué significa el resultado y qué puedes hacer con él.
- const after=(ms,phase)=>setTimeout(()=>{
-  if(token!==run||!modal.classList.contains('on'))return;
-  modal.dataset.phase=phase;
-  if(phase==='future'){
-   const action=modal.querySelector('.eg-cta');
-   if(action)action.focus({preventScroll:true});
-  }
- },prefersReduce?1:ms);
- after(200,'hero');
- after(920,'identity');
- after(1480,'future');
  sound('win');
 }
 function reset(){
@@ -216,7 +195,7 @@ function reset(){
  slots={top:champion,bottom:challengers[0]};
  locked=false;
  $('app').classList.remove('victory-hold');
- $('finish').classList.remove('on');$('finish').dataset.phase='entry';
+ $('finish').classList.remove('on');
  $('finish').setAttribute('aria-hidden','true');
  render(true);sound('start');
 }
