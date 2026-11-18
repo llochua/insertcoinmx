@@ -18,74 +18,79 @@ const TOTAL=PAIRS.length-1;
 const $=id=>document.getElementById(id);
 const prefersReduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 let round=0,champion=PAIRS[0],slots={top:PAIRS[0],bottom:PAIRS[1]},locked=false,run=0,muted=false,soundCtx=null;
-const PRINTS=new Map();
+/* RETA V4.2: fondo de la playera = color real de la plasta del diseño.
+   El JPG original se enmascara suavemente dentro de la silueta, SIN borrar
+   píxeles del estampado. Se evita el parche rectangular sin inventar arte. */
+const SHIRT_BG=new Map();
 function safeName(id){return DESIGNS[id]?.name||id}
-/* El JPG de catálogo conserva su fondo original. Lo separamos por color
-   para integrarlo sobre tela, sin inventar ni regenerar las ilustraciones. */
-function preparePrint(id){
- if(PRINTS.has(id))return;
- PRINTS.set(id,null);
+function bgSample(id){
+ if(SHIRT_BG.has(id))return;
+ SHIRT_BG.set(id,DESIGNS[id].base);
  const im=new Image();
  im.onload=()=>{
   try{
-   const w=im.naturalWidth,h=im.naturalHeight,cv=document.createElement("canvas");
-   cv.width=w;cv.height=h;const ctx=cv.getContext("2d",{willReadFrequently:true});
-   ctx.drawImage(im,0,0);const raw=ctx.getImageData(0,0,w,h),p=raw.data;
-   const pts=[[3,3],[w-4,3],[3,h-4],[w-4,h-4],[Math.floor(w/2),h-4]];
-   const colors=pts.map(([x,y])=>{const k=(y*w+x)*4;return[p[k],p[k+1],p[k+2]]});
-   colors.sort((a,b)=>(a[0]+a[1]+a[2])-(b[0]+b[1]+b[2]));
-   const bg=colors[Math.floor(colors.length/2)];
-   for(let k=0;k<p.length;k+=4){
-    const dr=p[k]-bg[0],dg=p[k+1]-bg[1],db=p[k+2]-bg[2];
-    const d=Math.sqrt((dr*dr+dg*dg+db*db)/3);
-    const t=Math.max(0,Math.min(1,(d-12)/34));
-    const alpha=t*t*(3-2*t);
-    if(alpha>0&&alpha<1){
-     // Quitar halo del JPG al recuperar los tonos originales del estampado.
-     const a=Math.max(alpha,.14);
-     for(let z=0;z<3;z++)p[k+z]=Math.max(0,Math.min(255,(p[k+z]-bg[z]*(1-a))/a));
-    }
-    p[k+3]=Math.round(alpha*255);
+   const cv=document.createElement("canvas");
+   cv.width=80;cv.height=100;
+   const c=cv.getContext("2d",{willReadFrequently:true});
+   c.drawImage(im,0,0,80,100);
+   const d=c.getImageData(0,0,80,100).data, pts=[];
+   for(const [x,y] of [[2,2],[77,2],[2,97],[77,97],[40,97],[2,50],[77,50]]){
+    const z=(y*80+x)*4;pts.push([d[z],d[z+1],d[z+2]]);
    }
-   ctx.putImageData(raw,0,0);
-   const uri=cv.toDataURL("image/png");
-   PRINTS.set(id,uri);
-   document.querySelectorAll('image[data-print-id="'+id+'"]').forEach(n=>{
-    n.setAttribute("href",uri);n.classList.remove("pending");
-   });
-  }catch(err){PRINTS.set(id,"d/"+id+".jpg");injectPrint(id,"d/"+id+".jpg")}
+   const median=channel=>pts.map(p=>p[channel]).sort((a,b)=>a-b)[Math.floor(pts.length/2)];
+   const hex='#'+[0,1,2].map(ch=>median(ch).toString(16).padStart(2,'0')).join('');
+   SHIRT_BG.set(id,hex);
+   document.querySelectorAll('svg.shirt[data-shirt-id="'+id+'"]').forEach(svg=>svg.style.setProperty('--shirt',hex));
+  }catch(e){/* El color declarado de respaldo ya está aplicado. */}
  };
- im.onerror=()=>{PRINTS.set(id,"d/"+id+".jpg");injectPrint(id,"d/"+id+".jpg")};
- im.src="d/"+id+".jpg";
-}
-function injectPrint(id,url){
- document.querySelectorAll('image[data-print-id="'+id+'"]').forEach(n=>{
-  n.setAttribute("href",url);n.classList.remove("pending");
- });
+ im.src='d/'+id+'.jpg';
 }
 function shirt(id,uid){
- const d=DESIGNS[id],key=id+"-"+uid,shape="M106 29L143 16Q180 42 217 16L254 29L342 88L309 148L281 133L278 286H82L79 133L51 148L18 88Z";
- const uri=PRINTS.get(id),ready=!!uri;
- return '<svg class="shirt" viewBox="0 0 360 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="--shirt:'+d.base+'">'+
- '<defs><linearGradient id="fold-'+key+'" x1="0" y1="0" x2="1" y2=".1">'+
- '<stop offset="0" stop-color="#000" stop-opacity=".5"/><stop offset=".18" stop-color="#fff" stop-opacity=".1"/>'+
- '<stop offset=".36" stop-color="#000" stop-opacity=".12"/><stop offset=".56" stop-color="#fff" stop-opacity=".12"/>'+
- '<stop offset=".79" stop-color="#000" stop-opacity=".08"/><stop offset="1" stop-color="#000" stop-opacity=".48"/></linearGradient>'+
- '<linearGradient id="vertical-'+key+'" x1="0" y1="0" x2=".05" y2="1">'+
- '<stop offset="0" stop-color="#fff" stop-opacity=".21"/><stop offset=".37" stop-color="#fff" stop-opacity=".02"/>'+
- '<stop offset="1" stop-color="#000" stop-opacity=".35"/></linearGradient>'+
- '<clipPath id="shape-'+key+'"><path d="'+shape+'"/></clipPath></defs>'+
+ const d=DESIGNS[id],key=id+'-'+uid;
+ const shape='M106 29L143 16Q180 42 217 16L254 29L342 88L309 148L281 133L278 286H82L79 133L51 148L18 88Z';
+ const base=SHIRT_BG.get(id)||d.base;
+ return '<svg class="shirt" data-shirt-id="'+id+'" viewBox="0 0 360 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="--shirt:'+base+'">'+
+ '<defs>'+
+ '<clipPath id="shape-'+key+'"><path d="'+shape+'"/></clipPath>'+
+ '<linearGradient id="fold-'+key+'" x1="0" y1="0" x2="1" y2="0">'+
+ '<stop offset="0" stop-color="#000" stop-opacity=".44"/>'+
+ '<stop offset=".13" stop-color="#fff" stop-opacity=".05"/>'+
+ '<stop offset=".29" stop-color="#000" stop-opacity=".12"/>'+
+ '<stop offset=".52" stop-color="#fff" stop-opacity=".13"/>'+
+ '<stop offset=".76" stop-color="#000" stop-opacity=".07"/>'+
+ '<stop offset="1" stop-color="#000" stop-opacity=".39"/></linearGradient>'+
+ '<linearGradient id="depth-'+key+'" x1="0" y1="0" x2="0" y2="1">'+
+ '<stop offset="0" stop-color="#fff" stop-opacity=".11"/>'+
+ '<stop offset=".35" stop-color="#fff" stop-opacity="0"/>'+
+ '<stop offset="1" stop-color="#000" stop-opacity=".27"/></linearGradient>'+
+ /* The JPEG is 4:5, projected almost at native ratio across the torso. */
+ '<linearGradient id="fadeX-'+key+'" x1="0%" y1="0%" x2="100%" y2="0%">'+
+ '<stop offset="0" stop-color="#fff" stop-opacity="0"/>'+
+ '<stop offset=".045" stop-color="#fff" stop-opacity="1"/>'+
+ '<stop offset=".955" stop-color="#fff" stop-opacity="1"/>'+
+ '<stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>'+
+ '<linearGradient id="fadeY-'+key+'" x1="0%" y1="0%" x2="0%" y2="100%">'+
+ '<stop offset="0" stop-color="#fff" stop-opacity="0"/>'+
+ '<stop offset=".045" stop-color="#fff" stop-opacity="1"/>'+
+ '<stop offset=".955" stop-color="#fff" stop-opacity="1"/>'+
+ '<stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>'+
+ '<mask id="fadeVertical-'+key+'" maskUnits="userSpaceOnUse" x="73" y="28" width="214" height="267">'+
+ '<rect x="73" y="28" width="214" height="267" fill="url(#fadeY-'+key+')"/></mask>'+
+ '<mask id="artMask-'+key+'" maskUnits="userSpaceOnUse" x="73" y="28" width="214" height="267">'+
+ '<rect x="73" y="28" width="214" height="267" fill="url(#fadeX-'+key+')" mask="url(#fadeVertical-'+key+')"/></mask>'+
+ '</defs>'+
  '<g clip-path="url(#shape-'+key+')">'+
- '<path class="garment" d="'+shape+'"/>'+
- '<path d="M0 0H360V300H0Z" fill="url(#vertical-'+key+')"/>'+
- '<path d="M70 120Q85 134 108 151L114 283M290 120Q275 134 252 151L246 283" stroke="#000" stroke-width="4" fill="none" opacity=".16"/>'+
- '<image class="print'+(ready?'':' pending')+'" data-print-id="'+id+'" href="'+(ready?uri:'')+'" x="87" y="45" width="186" height="222" preserveAspectRatio="xMidYMid meet"/>'+
+ '<path d="'+shape+'" fill="var(--shirt)"/>'+
+ '<image class="print" href="d/'+id+'.jpg" x="73" y="28" width="214" height="267" preserveAspectRatio="xMidYMid meet" mask="url(#artMask-'+key+')"/>'+
  '<path d="M0 0H360V300H0Z" fill="url(#fold-'+key+')"/>'+
- '<path d="M86 280H274" stroke="#fff" stroke-width="2" opacity=".13"/></g>'+
- '<path d="'+shape+'" fill="none" stroke="#fff" stroke-width="2.5" opacity=".23"/>'+
- '<path d="M142 16Q180 55 218 16Q180 34 142 16Z" fill="#0d0c16" stroke="#ffffff50" stroke-width="2"/>'+
+ '<path d="M0 0H360V300H0Z" fill="url(#depth-'+key+')"/>'+
+ '<path d="M92 130Q101 163 106 280M268 130Q257 163 253 280" fill="none" stroke="#000" stroke-width="3" opacity=".08"/>'+
+ '<path d="M85 280H276" stroke="#fff" stroke-width="1.7" opacity=".13"/>'+
+ '</g>'+
+ '<path d="'+shape+'" fill="none" stroke="#fff" stroke-width="2.2" opacity=".19"/>'+
+ '<path d="M142 16Q180 55 218 16Q180 34 142 16Z" fill="#101018" stroke="#ffffff46" stroke-width="2"/>'+
  '<path d="M141 16Q180 54 219 16" fill="none" stroke="#000" stroke-width="4" opacity=".35"/>'+
- '<path d="M55 111L80 133M280 133L305 111" stroke="#fff" stroke-width="2" opacity=".16"/>'+
+ '<path d="M55 111L80 133M280 133L305 111" stroke="#fff" stroke-width="2" opacity=".11"/>'+
  '</svg>'
 }
 function fighter(id,slot,isChamp,entry){
@@ -103,7 +108,7 @@ function paintSlot(slot,enter){
  const id=slots[slot],isChamp=champion===id;
  $(slot+"Wrap").innerHTML=fighter(id,slot,isChamp,enter);
  $(slot).onclick=()=>select(slot);
- preparePrint(id);
+ bgSample(id);
 }
 function refreshRoles(){
  for(const slot of ["top","bottom"]){
@@ -166,13 +171,14 @@ function select(side){
 }
 function end(){
  progress();
- $("winnerName").textContent=safeName(champion);
- $("winnerCard").src="c2/"+champion+".jpg";
- $("finBackdrop").style.backgroundImage='url("d/'+champion+'.jpg")';
- $("finRounds").textContent=TOTAL+" ENCUENTROS · "+PAIRS.length+" DISEÑOS COMPARADOS";
- $("finish").classList.remove("on");void $("finish").offsetWidth;$("finish").classList.add("on");
- $("finish").setAttribute("aria-hidden","false");
- locked=true;sound("win");
+ $('winnerName').textContent=safeName(champion);
+ $('winnerShirt').innerHTML=shirt(champion,'finish');
+ bgSample(champion);
+ $('finBackdrop').style.backgroundImage='url("d/'+champion+'.jpg")';
+ $('finRounds').textContent=TOTAL+' ENCUENTROS · '+PAIRS.length+' DISEÑOS ENFRENTADOS';
+ $('finish').classList.remove('on');void $('finish').offsetWidth;$('finish').classList.add('on');
+ $('finish').setAttribute('aria-hidden','false');
+ locked=true;sound('win');
 }
 function reset(){
  run++;round=0;champion=PAIRS[0];slots={top:PAIRS[0],bottom:PAIRS[1]};locked=false;
