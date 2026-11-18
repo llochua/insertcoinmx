@@ -18,7 +18,7 @@ const TOTAL=PAIRS.length-1;
 const $=id=>document.getElementById(id);
 const prefersReduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 let round=0,champion=PAIRS[0],slots={top:PAIRS[0],bottom:PAIRS[1]},locked=false,run=0,muted=false,soundCtx=null;
-let previousChampion=null,challengers=PAIRS.slice(1);
+let previousChampion=null,challengers=PAIRS.slice(1),streak=0;
 /* RETA V4.2: fondo de la playera = color real de la plasta del diseño.
    El JPG original se enmascara suavemente dentro de la silueta, SIN borrar
    píxeles del estampado. Se evita el parche rectangular sin inventar arte. */
@@ -99,7 +99,7 @@ function fighter(id,slot,isChamp,entry){
  '" id="'+slot+'" data-side="'+slot+'" aria-label="Elegir '+safeName(id)+'">'+
  '<div class="team"><i></i><span>'+(isChamp?'CHAMPION':'CHALLENGER')+'</span></div>'+
  shirt(id,slot)+
- '<div class="f-title"><strong>'+safeName(id)+'</strong></div></button>';
+ '</button>';
 }
 function progress(){
  $('roundNum').textContent=String(Math.min(round+1,TOTAL)).padStart(2,"0");
@@ -117,6 +117,10 @@ function refreshRoles(){
   el.classList.toggle("is-champion",isChamp);
   el.querySelector(".team span").textContent=isChamp?"CHAMPION":"CHALLENGER";
  }
+ $("duelTop").textContent=safeName(slots.top);
+ $("duelBottom").textContent=safeName(slots.bottom);
+ $("duelTop").classList.toggle("incumbent",slots.top===champion);
+ $("duelBottom").classList.toggle("incumbent",slots.bottom===champion);
  $('arena').setAttribute("aria-label","Encuentro "+(round+1)+" de "+TOTAL+
  ". "+safeName(slots.top)+" contra "+safeName(slots.bottom));
 }
@@ -152,7 +156,14 @@ function select(side){
  const winner=$(side),loser=$(lostSide),n=++run;
  winner.classList.add("win");
  loser.classList.add(lostSide==="top"?"ko-left":"ko-right");
- $("impactText").textContent=round===TOTAL-1?"K.O.!":"HIT!";
+ // Conteo consecutivo del mismo diseño: un cambio de campeón es COUNTER.
+ const counter=id!==champion;
+ streak=counter?1:streak+1;
+ const finisher=round===TOTAL-1;
+ const call=finisher?"FINISH HIM!":counter?"COUNTER!":streak>=2?streak+" HITS!":"HIT!";
+ $("impactText").textContent=call;
+ $("shock").classList.toggle("finisher",finisher);
+ $("shock").classList.toggle("counter",counter&&!finisher);
  $("shock").classList.remove("show");void $("shock").offsetWidth;$("shock").classList.add("show");
  $("app").classList.add("impact");sound("hit");
  setTimeout(()=>{
@@ -190,7 +201,7 @@ function end(side){
  sound('win');
 }
 function reset(){
- run++;round=0;
+ run++;round=0;streak=0;
  champion=previousChampion||PAIRS[0];
  challengers=PAIRS.filter(id=>id!==champion);
  slots={top:champion,bottom:challengers[0]};
