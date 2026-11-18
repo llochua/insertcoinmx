@@ -769,7 +769,7 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .dx-card .fx{--rad:6px;display:block;width:100%;height:100%;box-shadow:0 0 0 1.5px rgba(255,255,255,.7),0 14px 28px rgba(0,0,0,.6)}
 @keyframes dxCard{from{opacity:0;transform:translateY(20px) rotate(4deg)}}
 .dx.k-rep .dx-art,.dx.k-rep .dx-info,.dx.k-rep .dx-card{animation-duration:.25s;animation-delay:0s}
-.dx.k-rep .dx-art{opacity:.85}
+.ab.whole img{position:static;width:100%;height:100%;object-fit:cover}
 @media(min-width:760px){.dx-art{height:70%}.dx-info h2{font-size:52px}.dx-card{width:130px}}
 .rs-row[data-t=lt] .dc-v,.rs-tile[data-t=lt] .dc-v{color:#120F1A!important}.rs-row .dc-v{opacity:.55}.rs-row .dc-v.on{opacity:1}
 
@@ -1200,7 +1200,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c){D.classList.remove('on'
  /* la ilustración es la de esta versión: Base/Especial = estampa original · Rara = su arte en oro · Full = su escena completa */
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
   :v==='r'&&c.img?`<div class="dx-art"><span class="dx-mv"><span class="dx-gold" style="background-image:url(${imgOf(c,'c2')})"></span></span></div>`
-  :`<div class="dx-art"><span class="dx-mv">${artBox(d.id).replace(' loading="lazy"','')}${v==='e'?'<i class="dx-holo"></i>':''}</span></div>`;
+  :`<div class="dx-art"><span class="dx-mv">${RBG[d.id]?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:${artOf(d.id).startsWith('d/')?.8:.667}"><img src="${artOf(d.id)}" alt=""></span>`}${v==='e'?'<i class="dx-holo"></i>':''}</span></div>`;
  D.className=`disc on dx v-${v} k-${k}${RBG[d.id]?'':' neu'}`;D.style.setProperty('--bg',v==='r'?'#0d0a05':col);
  D.innerHTML=`${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
   <div class="dx-top"><span>${String(idx+1).padStart(2,'0')} / 05</span><button id="dcSkip">Saltar</button></div>
