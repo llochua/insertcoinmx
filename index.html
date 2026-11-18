@@ -1044,7 +1044,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-height:640px){.onb{padding-top:13px;padding-bottom:16px}.on-visual{min-height:130px}.onb h2{font-size:clamp(21px,5vw,30px)}.onb p{margin-top:8px;font-size:12px}.on-kicker{margin-bottom:7px}.on-progress{margin-top:3px;min-height:28px}.on-actions .on-next{padding:13px 10px!important}}
 @media(prefers-reduced-motion:reduce){.on-scene{animation:none}.on-progress i{transition:none}}
 
-</style></head><body>
+</style><link rel="stylesheet" href="reta-v3.css"></head><body>
 <div class="crt">
 <section id="title" class="on">
  <div class="tbg"></div><div class="tbg2"></div>
@@ -1097,7 +1097,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </section>
 <section class="view" id="torneo">
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Reta</h1><span class="sp"></span></div><div id="vRound" style="justify-content:center;padding:0 12px 6px"></div>
- <div class="stage" id="vStage"></div>
+ <div class="stage r3-stage" id="vStage" aria-live="polite"></div>
 </section>
 <section class="view" id="scores">
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Récords</h1><span class="sp"></span></div>
@@ -1424,7 +1424,7 @@ let mi=0;const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();c
  return [
  {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Full garantizada en tu bienvenida':'5 cartas por sobre · una Especial o mejor'):'Próximos 2 sobres en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':countdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
- {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
+ {id:'torneo',t:'Reta',k:r3Owned().length>=R3_MIN?'HERE COMES A NEW CHALLENGER':'DESBLOQUEA RETA',s:r3Owned().length>=R3_MIN?'Elige la playera que defenderá tu título':'Descubre '+R3_MIN+' diseños distintos · '+r3Owned().length+'/'+R3_MIN,img:'fatality',rr:'dorada',go:r3Owned().length>=R3_MIN?'JUGAR RETA':'FALTAN '+(R3_MIN-r3Owned().length)+' DISEÑOS',lock:r3Owned().length<R3_MIN},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
  {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Pon tus iniciales',img:'F_samus',rr:'full',go:'VER'}]};
 function renderHome(){const u=uniq(),N=NAV,M=MODES();
@@ -1438,7 +1438,7 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES();
  const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(c/${m.img}.jpg)`;
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
-function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
+function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast(m.id==='torneo'?'DESCUBRE 16 DISEÑOS<br>DISTINTOS PARA JUGAR':m.id==='tier'?'NECESITAS 20 CARTAS':'AÚN NO DISPONIBLE');return}
  if(m.id==='pack'&&m.off){beep(150,.2);toast('MAÑANA TIENES 2 SOBRES<br>O CAMBIA REPETIDAS');return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
 let mMoved=false,msx=null,msy=null;
 $('mGo').onclick=mEnter;
@@ -1452,7 +1452,7 @@ setInterval(()=>{if(cur==='home'&&!packReady())renderHome()},30000);
 /* cambio de día sin recargar: a medianoche local, cada 30 s y al volver a la pestaña o la app */
 let dayNow=today(),retaOver=false;
 function dayTick(){const d=today();if(d===dayNow)return;dayNow=d;
- if(cur==='torneo'){if(retaOver)startTorneo()}else refresh()}
+ if(cur==='torneo')startTorneo();else refresh()}
 function armDay(){clearTimeout(armDay.t);const n=new Date(),m=new Date(n);m.setHours(24,0,1,0);armDay.t=setTimeout(()=>{dayTick();armDay()},Math.max(1000,m-n))}
 armDay();setInterval(dayTick,30000);
 {const wake=()=>{if(document.visibilityState!=='visible')return;syncIn();if(saveFailed)save();dayTick();armDay()};
@@ -1797,23 +1797,137 @@ function seedScore(k){const g=goty(k);const r=S.rate[k];return (g===null?-1:g)*1
 /* ---------- reta: dos playeras frente a frente, la comunidad decide ---------- */
 const RETAS=[["fatality", "gameover", "Fin del juego"], ["challenger", "theworldwarrior", "Juegos de pelea"], ["abuket", "mrkarate", "Artes marciales"], ["x", "zero", "Mega Man X"], ["samus", "sv001", "Armadura contra tanque"], ["hyrule", "links", "Zelda"], ["triforce", "omkami", "Leyendas"], ["blooper", "fck", "Mario Kart"], ["yinyang", "mapa", "Mario"], ["vidaextra", "wirimask", "Hecho en México"], ["shenzalcoatl", "keepcalm", "Dragon Ball"], ["sensei", "gatosamurai", "Anime"], ["nerv", "zodiac", "Anime clásico"], ["n64", "polystation", "Consolas"], ["snes", "collector", "Super Nintendo"], ["gamepop", "humangamer", "Gamers"], ["controls", "gunsncontrols", "Controles"], ["arcade", "arcade2", "Maquinitas"], ["invader", "thankyou", "Arcade clásico"], ["poketaco", "pizzcipher", "Con hambre"], ["fatman", "bustfiction", "Películas"], ["bort", "futbolito", "De barrio"]];const RBG={"abuket": "#bf0d22", "arcade": "#f6f6f6", "arcade2": "#080a3e", "blooper": "#e2e2e2", "bort": "#e0101e", "bustfiction": "#111111", "challenger": "#041535", "collector": "#080808", "controls": "#010634", "fatality": "#0b0b0b", "fatman": "#2e2e2e", "fck": "#3333ff", "futbolito": "#4ed220", "gameover": "#0f0f0f", "gamepop": "#ffffff", "gatosamurai": "#244f9d", "gunsncontrols": "#0e0e0e", "humangamer": "#0e0e0e", "hyrule": "#090909", "invader": "#090909", "keepcalm": "#090909", "links": "#0a0a0a", "mapa": "#08fff6", "mrkarate": "#ffffff", "n64": "#011d59", "nerv": "#b8b8b8", "omkami": "#ffffff", "pizzcipher": "#ffffff", "poketaco": "#f2f2f2", "polystation": "#040303", "samus": "#031130", "sensei": "#ffffff", "shenzalcoatl": "#0b0b0b", "snes": "#292929", "sv001": "#0023a4", "thankyou": "#ececec", "theworldwarrior": "#0004b9", "triforce": "#0a3176", "vidaextra": "#ececec", "wirimask": "#100c33", "x": "#0d3aac", "yinyang": "#0069b3", "zero": "#bf0e25", "zodiac": "#090909"};
 function retaVotes(i){const v=(STORE.docs||[]).map(d=>d.duel&&d.duel[i]).filter(Boolean);const mine=S.duel&&S.duel[i];if(mine&&!(STORE.docs||[]).some(d=>d.ini===S.ini&&d.duel&&d.duel[i]===mine))v.push(mine);return v}
-const RDIA=3; // retas por día
-function retaHoy(){if(after(today(),S.rdia)){S.rdia=today();S.rhoy=[]}if(!Array.isArray(S.rhoy))S.rhoy=[];return S.rhoy}
-function retaFin(){retaOver=true;$('vRound').innerHTML='<span class="on">POR HOY ES TODO</span>';const h=retaHoy();
- $('vStage').innerHTML=`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center"><div style="font:15px/1.6 PX;color:#FFD400">GAME OVER</div><div style="font:600 15px/1.5 AV;color:rgba(255,255,255,.8)">Ya jugaste tus ${RDIA} retas de hoy.<br>Mañana llegan ${RDIA} retadores nuevos.</div><div style="display:flex;gap:8px">${h.map(i=>`<img src="d/${S.duel[i]}.jpg" style="width:72px;aspect-ratio:4/5;object-fit:cover;border-radius:6px;box-shadow:0 0 0 2px #FFD400">`).join('')}</div><div style="font:700 11px AV;letter-spacing:.14em;color:rgba(255,255,255,.55)">TUS ELEGIDAS DE HOY</div></div>`}
-function startTorneo(){S.duel=S.duel||{};const h=retaHoy();if(h.length>=RDIA)return retaFin();
- let i=RETAS.findIndex((r,j)=>!(j in S.duel));if(i<0){i=((S.rlast??-1)+1)%RETAS.length;delete S.duel[i]}drawReta(i,true)}
-function drawReta(i,intro){retaOver=false;const [a,b,th]=RETAS[i];S.rlast=i;
- $('vRound').innerHTML=`<span class="on">RETA ${Math.min(retaHoy().length+1,RDIA)} DE ${RDIA}</span>`;
- const short=k=>({challenger:"New Challenger",snes:"Adult Problems",arcade:"Anatomía del Arcade",theworldwarrior:"World Warrior"})[k]||dn(k);
- const side=(k,c)=>`<button class="vsp ${c}" data-k="${k}" style="--bg:${RBG[k]||'#111'}"><div class="hp"><div class="nm"><span>${short(k)}</span><em></em></div><div class="bar"><i></i></div></div><div class="teew"><div class="tee"><img src="d/${k}.jpg" alt=""></div></div></button>`;
- $('vStage').innerHTML=`<div class="vsw" id="vsw">${side(a,'a')}<div class="vsmid"><span>${th}</span><b>VS</b><span>¿CUÁL TE PONES?</span></div>${side(b,'b')}</div><button class="big vsnext" id="vsNext">SIGUIENTE RETA</button>${intro?'<div class="hcnc"><span>HERE COMES A</span><b>NEW CHALLENGER!</b></div>':''}`;
- if(intro){beep(660,.08);setTimeout(()=>beep(990,.1),160)}
- const show=()=>{const v=retaVotes(i),n=v.length||1;$('vsw').classList.add('done');
-  $('vStage').querySelectorAll('.vsp').forEach(el=>{const p=Math.round(v.filter(x=>x===el.dataset.k).length/n*100);el.querySelector('em').textContent=p+'%';el.querySelector('.bar i').style.width=Math.max(4,p)+'%';el.classList.toggle('pick',S.duel[i]===el.dataset.k)})};
- $('vStage').querySelectorAll('.vsp').forEach(el=>el.onclick=()=>{if($('vsw').classList.contains('done'))return;syncIn();const h0=retaHoy();if(h0.length>=RDIA&&!h0.includes(i))return retaFin();S.duel=S.duel||{};S.duel[i]=el.dataset.k;const h=retaHoy();if(!h.includes(i))h.push(i);save();jingle();show();if(h.length>=RDIA)$('vsNext').textContent='VER MIS ELEGIDAS'});
- if(i in S.duel)show();
- $('vsNext').onclick=()=>startTorneo()}
+/* RETA v3 · Arcade de elecciones con una campeona persistente.
+   Solo participan playeras REALES descubiertas: las bonus nunca hechas quedan fuera.
+   Es una decisión personal, no una votación de comunidad. */
+const R3_MIN=16,R3_ROUNDS=7,RETA3_PREVIEW=new URLSearchParams(location.search).get('preview')==='reta';
+const R3_SEED=['fatality','gameover','challenger','theworldwarrior','samus','x','zero','hyrule','links','gatosamurai','shenzalcoatl','arcade','arcade2','controls','gunsncontrols','snes','collector','n64','gamepop','vidaextra'];
+let r3PreviewState=null;
+function r3Owned(){
+ const got=new Set();
+ for(const [k,n] of Object.entries(S.have||{})){
+  const id=designId(k);if(n>0&&id&&DB[id]&&!DB[id].bx)got.add(id)
+ }
+ if(RETA3_PREVIEW&&got.size<R3_MIN)for(const id of R3_SEED)if(DB[id]&&!DB[id].bx)got.add(id);
+ return [...got].sort()
+}
+function r3Shuffle(keys,seed){
+ const a=[...keys];let h=2166136261>>>0;
+ for(const ch of seed){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)>>>0}
+ for(let i=a.length-1;i>0;i--){h^=h<<13;h^=h>>>17;h^=h<<5;const j=(h>>>0)%(i+1);[a[i],a[j]]=[a[j],a[i]]}
+ return a
+}
+const r3Current=()=>RETA3_PREVIEW?r3PreviewState:S.reta3;
+function r3Persist(st){if(RETA3_PREVIEW){r3PreviewState=st;return}S.reta3=st;save()}
+function r3Valid(st,owned){
+ if(!st||st.v!==1||!DRE.test(st.day)||!owned.includes(st.initial))return false;
+ if(!Array.isArray(st.challengers)||st.challengers.length!==R3_ROUNDS||
+   new Set(st.challengers).size!==R3_ROUNDS||st.challengers.some(k=>!owned.includes(k)||k===st.initial))return false;
+ if(!Array.isArray(st.choices)||st.choices.length>R3_ROUNDS)return false;
+ if(!Array.isArray(st.seen)||st.seen.length>200||st.seen.some(k=>!DB[k]||DB[k].bx))return false;
+ let champion=st.initial;
+ for(let i=0;i<st.choices.length;i++){const c=st.choices[i];if(c!==champion&&c!==st.challengers[i])return false;champion=c}
+ return st.champ===champion
+}
+function r3Today(){
+ if(!RETA3_PREVIEW)syncIn();
+ const owned=r3Owned();if(owned.length<R3_MIN)return null;
+ const prev=r3Current(),d=today();
+ if(r3Valid(prev,owned)&&prev.day>=d)return prev;
+ const initial=(prev&&owned.includes(prev.champ))?prev.champ:r3Shuffle(owned,'inicio:'+d+':'+owned.join(','))[0];
+ const seen=(prev&&Array.isArray(prev.seen)?prev.seen:[]).filter(k=>owned.includes(k)&&k!==initial);
+ const remaining=owned.filter(k=>k!==initial&&!seen.includes(k));
+ const newOnes=r3Shuffle(remaining,d+':nuevos:'+initial);
+ const revisits=r3Shuffle(owned.filter(k=>k!==initial&&seen.includes(k)),d+':otros:'+initial);
+ const challengers=[...newOnes,...revisits].slice(0,R3_ROUNDS);
+ if(challengers.length!==R3_ROUNDS)return null;
+ const st={v:1,day:d,initial,champ:initial,challengers,choices:[],seen};
+ r3Persist(st);return st
+}
+function r3Pips(step){
+ $('vRound').innerHTML='<span>'+Math.min(step+1,R3_ROUNDS)+' / '+R3_ROUNDS+' ENCUENTROS</span><span class="r3-pips">'+
+ Array.from({length:R3_ROUNDS},(_,i)=>'<i class="'+(i<step?'done':i===step?'now':'')+'"></i>').join('')+'</span>'
+}
+function r3Shirt(id){
+ const bg=RBG[id]||'#1b2445';return '<div class="r3-shirt" style="--shirt:'+bg+'"><div class="r3-shirt-body"></div><img class="r3-shirt-art" src="'+artOf(id)+'" alt="" draggable="false"></div>'
+}
+function r3Locked(){
+ $('vRound').textContent='RETA BLOQUEADA';
+ $('vStage').innerHTML='<div class="r3-locked"><span class="r3-eyebrow">INSERT COIN MX · RETA</span><h2>Tu colección entra en combate.</h2>'+
+ '<p>Consigue 16 diseños de playeras diferentes para descubrir quién se convierte en tu favorita.</p>'+
+ '<div class="r3-count">'+r3Owned().length+' / '+R3_MIN+' DISEÑOS</div>'+
+ '<button class="r3-main" id="r3GoAlbum">VER MI ÁLBUM</button></div>';
+ $('r3GoAlbum').onclick=()=>go('album')
+}
+function r3Arena(st){
+ const n=st.choices.length,chall=st.challengers[n],champ=st.champ;
+ r3Pips(n);
+ const fighter=(id,which)=>'<button type="button" class="r3-fighter '+which+'" data-r3="'+id+'" aria-label="'+
+  (which==='champion'?'Seguir con ':'Elegir ')+dn(id)+'">'+
+  '<div class="r3-role">'+(which==='champion'?'TU CAMPEONA':'NEW CHALLENGER')+
+  '<small>'+(which==='champion'?'DEFENDIENDO EL TÍTULO':'QUIERE EL TÍTULO')+'</small></div>'+
+  '<div class="r3-shirt-wrap">'+r3Shirt(id)+'</div>'+
+  '<div class="r3-name">'+dn(id)+'</div><span class="r3-pick">'+
+  (which==='champion'?'ME QUEDO CON ESTA':'PREFIERO ESTA')+'</span></button>';
+ $('vStage').innerHTML='<div class="r3-heading"><span class="r3-eyebrow">HERE COMES A NEW CHALLENGER!</span>'+
+  '<h2>¿Cuál te pondrías?</h2><p>La elegida continúa al siguiente encuentro.</p></div>'+
+  '<div class="r3-arena">'+fighter(champ,'champion')+'<span class="r3-vs">VS</span>'+fighter(chall,'challenger')+'</div>'+
+  '<div class="r3-footer"><span class="r3-turn">TU ELECCIÓN DECIDE QUIÉN CONTINÚA</span></div>';
+ $('vStage').querySelectorAll('[data-r3]').forEach(b=>b.onclick=()=>r3Pick(b.dataset.r3,n));
+}
+function r3Pick(chosen,round){
+ if(!RETA3_PREVIEW)syncIn();
+ const st=r3Current();if(!st||st.day!==today()||st.choices.length!==round){startTorneo();return}
+ if(chosen!==st.champ&&chosen!==st.challengers[round])return;
+ const changed=st.champ!==chosen,other=st.challengers[round];
+ st.choices.push(chosen);st.champ=chosen;
+ if(!st.seen.includes(other))st.seen.push(other);
+ st.seen=st.seen.slice(-200);
+ r3Persist(st);beep(changed?950:770,.12);
+ r3Result(st,changed)
+}
+function r3Result(st,changed){
+ const done=st.choices.length===R3_ROUNDS;
+ r3Pips(Math.min(st.choices.length,R3_ROUNDS));
+ $('vStage').innerHTML='<div class="r3-result"><span class="r3-eyebrow">'+
+  (changed?'NUEVA CAMPEONA':'LA CAMPEONA CONTINÚA')+'</span>'+
+  '<h2>'+(changed?'¡CAMBIO DE CAMPEONA!':'¡SIGUE EN PIE!')+'</h2>'+
+  '<p>'+(changed?'La preferiste a la anterior. Ahora le toca defender su lugar.':'Sigue siendo tu favorita. Pero aún quedan rivales.')+'</p>'+
+  '<div class="r3-winner-art">'+r3Shirt(st.champ)+'</div><strong class="r3-winner-name">'+dn(st.champ)+'</strong>'+
+  '<button type="button" class="r3-main" id="r3Next">'+(done?'VER MI CAMPEONA':'SIGUIENTE RETADOR')+'</button>'+
+  '<span class="r3-hold">'+st.choices.length+' / '+R3_ROUNDS+' ENCUENTROS</span></div>';
+ $('r3Next').onclick=()=>{beep(880,.06);if(done)r3Final(st);else r3Arena(st)}
+}
+function r3Final(st){
+ $('vRound').innerHTML='<span>RETA COMPLETADA · '+R3_ROUNDS+' ENCUENTROS</span>';
+ $('vStage').innerHTML='<div class="r3-finale"><span class="r3-eyebrow">RETA COMPLETADA</span>'+
+  '<h2>TU CAMPEONA DE HOY</h2>'+
+  '<div class="r3-winner-art">'+r3Shirt(st.champ)+'</div>'+
+  '<strong class="r3-winner-name">'+dn(st.champ)+'</strong>'+
+  '<p>Sobrevivió a tus elecciones. Mañana habrá nuevos retadores de tu colección.</p>'+
+  '<div class="r3-thanks">THANK YOU<br>FOR PLAYING</div>'+
+  '<button type="button" class="r3-main" id="r3Menu">VOLVER AL MENÚ</button>'+
+  '<button type="button" class="r3-secondary" id="r3Album">VER MI ÁLBUM</button></div>';
+ $('r3Menu').onclick=()=>go('home');$('r3Album').onclick=()=>go('album')
+}
+function startTorneo(){
+ const st=r3Today();
+ if(!st)return r3Locked();
+ if(st.choices.length>=R3_ROUNDS)r3Final(st);
+ else r3Arena(st)
+}
+/* Sanear y conservar la campeona cuando se importa un respaldo. */
+function r3FromBackup(v){
+ if(!v||!isObj(v)||v.v!==1||!DRE.test(v.day))return null;
+ const validId=k=>typeof k==='string'&&!!DB[k]&&!DB[k].bx;
+ if(!validId(v.initial)||!validId(v.champ)||!Array.isArray(v.challengers)||v.challengers.length!==R3_ROUNDS||
+    v.challengers.some(k=>!validId(k))||!Array.isArray(v.choices)||v.choices.length>R3_ROUNDS||
+    v.choices.some(k=>!validId(k))||!Array.isArray(v.seen)||v.seen.length>200||v.seen.some(k=>!validId(k)))return null;
+ const st={v:1,day:v.day,initial:v.initial,champ:v.champ,challengers:v.challengers.slice(),choices:v.choices.slice(),seen:v.seen.slice()};
+ const ids=[st.initial,...st.challengers];if(new Set(ids).size!==ids.length)return null;
+ let c=st.initial;for(let i=0;i<st.choices.length;i++){if(st.choices[i]!==c&&st.choices[i]!==st.challengers[i])return null;c=st.choices[i]}
+ return c===st.champ?st:null
+}
 /* ---------- récords ---------- */
 function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STORE.docs.length&&S.ini)m.push({ini:S.ini,score:uniq()});return m.filter(r=>r.ini).sort((a,b)=>b.score-a.score)}
 function renderScores(){$('sMine').textContent=uniq();$('iniIn').value=S.ini;const b=board();const pos=b.findIndex(r=>r.ini===S.ini);
@@ -1877,6 +1991,7 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
    else if(k==='duel'){if(!isObj(v))throw 'Las retas del respaldo no son válidas.';out.duel={};
     for(const [i,c] of Object.entries(v)){if(!/^\d{1,4}$/.test(i)||typeof c!=='string')throw 'Una reta del respaldo no es válida.';id(c,'retas');
      const r=RETAS[+i],dc=designId(c)||c;if(r&&(r[0]===dc||r[1]===dc))out.duel[i]=dc;else x.pendDuel[i]=c}}
+   else if(k==='reta3'){const st=r3FromBackup(v);if(!st)throw 'El progreso de Reta del respaldo no es válido.';out.reta3=st}
    else if(k==='rhoy'){if(!Array.isArray(v)||v.length>50||!v.every(n=>isInt(n,0,9999)))throw 'Las retas de hoy del respaldo no son válidas.';
     out.rhoy=v.slice()}
    else if(k==='ini'){if(typeof v!=='string'||!/^[A-Z0-9]{0,3}$/.test(v))throw 'Las iniciales del respaldo no son válidas.';out.ini=v}
@@ -1996,4 +2111,5 @@ async function shareTier(){await document.fonts.ready;const W=1080,cw=96,ch=120,
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
 claimPend();go('home');STORE.init();
 if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
+if(RETA3_PREVIEW){$('title').classList.remove('on');go('torneo')}
 </script></body></html>
