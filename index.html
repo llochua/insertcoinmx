@@ -1048,6 +1048,19 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-height:640px){.onb{padding-top:13px;padding-bottom:16px}.on-visual{min-height:130px}.onb h2{font-size:clamp(21px,5vw,30px)}.onb p{margin-top:8px;font-size:12px}.on-kicker{margin-bottom:7px}.on-progress{margin-top:3px;min-height:28px}.on-actions .on-next{padding:13px 10px!important}}
 @media(prefers-reduced-motion:reduce){.on-scene{animation:none}.on-progress i{transition:none}}
 
+
+/* ===== RETA DIARIA INTEGRADA (el CRT exterior y la navegación son del Álbum) ===== */
+#torneo #vRound{display:none!important}
+#torneo #vStage{
+ flex:1 1 auto!important;min-height:0!important;
+ padding:0!important;margin:0!important;gap:0!important;
+ display:flex!important;flex-direction:column!important;
+ overflow:hidden!important;background:#0c0b2a!important;
+}
+#torneo #vStage .reta-iframe{
+ display:block;flex:1 1 auto;width:100%;height:100%;
+ min-height:0;border:0;background:#0c0b2a;
+}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1469,7 +1482,7 @@ setInterval(()=>{if(cur==='home'&&!packReady())renderHome()},30000);
 /* cambio de día sin recargar: a medianoche local, cada 30 s y al volver a la pestaña o la app */
 let dayNow=today(),retaOver=false;
 function dayTick(){const d=today();if(d===dayNow)return;dayNow=d;
- if(cur==='torneo'){if(retaOver)startTorneo()}else refresh()}
+ if(cur==='torneo')startTorneo();else refresh()}
 function armDay(){clearTimeout(armDay.t);const n=new Date(),m=new Date(n);m.setHours(24,0,1,0);armDay.t=setTimeout(()=>{dayTick();armDay()},Math.max(1000,m-n))}
 armDay();setInterval(dayTick,30000);
 {const wake=()=>{if(document.visibilityState!=='visible')return;syncIn();if(saveFailed)save();dayTick();armDay()};
@@ -1817,23 +1830,95 @@ function seedScore(k){const g=goty(k);const r=S.rate[k];return (g===null?-1:g)*1
 /* ---------- reta: dos playeras frente a frente, la comunidad decide ---------- */
 const RETAS=[["fatality", "gameover", "Fin del juego"], ["challenger", "theworldwarrior", "Juegos de pelea"], ["abuket", "mrkarate", "Artes marciales"], ["x", "zero", "Mega Man X"], ["samus", "sv001", "Armadura contra tanque"], ["hyrule", "links", "Zelda"], ["triforce", "omkami", "Leyendas"], ["blooper", "fck", "Mario Kart"], ["yinyang", "mapa", "Mario"], ["vidaextra", "wirimask", "Hecho en México"], ["shenzalcoatl", "keepcalm", "Dragon Ball"], ["sensei", "gatosamurai", "Anime"], ["nerv", "zodiac", "Anime clásico"], ["n64", "polystation", "Consolas"], ["snes", "collector", "Super Nintendo"], ["gamepop", "humangamer", "Gamers"], ["controls", "gunsncontrols", "Controles"], ["arcade", "arcade2", "Maquinitas"], ["invader", "thankyou", "Arcade clásico"], ["poketaco", "pizzcipher", "Con hambre"], ["fatman", "bustfiction", "Películas"], ["bort", "futbolito", "De barrio"]];const RBG={"abuket": "#bf0d22", "arcade": "#f6f6f6", "arcade2": "#080a3e", "blooper": "#e2e2e2", "bort": "#e0101e", "bustfiction": "#111111", "challenger": "#041535", "collector": "#080808", "controls": "#010634", "fatality": "#0b0b0b", "fatman": "#2e2e2e", "fck": "#3333ff", "futbolito": "#4ed220", "gameover": "#0f0f0f", "gamepop": "#ffffff", "gatosamurai": "#244f9d", "gunsncontrols": "#0e0e0e", "humangamer": "#0e0e0e", "hyrule": "#090909", "invader": "#090909", "keepcalm": "#090909", "links": "#0a0a0a", "mapa": "#08fff6", "mrkarate": "#ffffff", "n64": "#011d59", "nerv": "#b8b8b8", "omkami": "#ffffff", "pizzcipher": "#ffffff", "poketaco": "#f2f2f2", "polystation": "#040303", "samus": "#031130", "sensei": "#ffffff", "shenzalcoatl": "#0b0b0b", "snes": "#292929", "sv001": "#0023a4", "thankyou": "#ececec", "theworldwarrior": "#0004b9", "triforce": "#0a3176", "vidaextra": "#ececec", "wirimask": "#100c33", "x": "#0d3aac", "yinyang": "#0069b3", "zero": "#bf0e25", "zodiac": "#090909"};
 function retaVotes(i){const v=(STORE.docs||[]).map(d=>d.duel&&d.duel[i]).filter(Boolean);const mine=S.duel&&S.duel[i];if(mine&&!(STORE.docs||[]).some(d=>d.ini===S.ini&&d.duel&&d.duel[i]===mine))v.push(mine);return v}
-const RDIA=3; // retas por día
-function retaHoy(){if(after(today(),S.rdia)){S.rdia=today();S.rhoy=[]}if(!Array.isArray(S.rhoy))S.rhoy=[];return S.rhoy}
-function retaFin(){retaOver=true;$('vRound').innerHTML='<span class="on">POR HOY ES TODO</span>';const h=retaHoy();
- $('vStage').innerHTML=`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center"><div style="font:15px/1.6 PX;color:#FFD400">GAME OVER</div><div style="font:600 15px/1.5 AV;color:rgba(255,255,255,.8)">Ya jugaste tus ${RDIA} retas de hoy.<br>Mañana llegan ${RDIA} retadores nuevos.</div><div style="display:flex;gap:8px">${h.map(i=>`<img src="d/${S.duel[i]}.jpg" style="width:72px;aspect-ratio:4/5;object-fit:cover;border-radius:6px;box-shadow:0 0 0 2px #FFD400">`).join('')}</div><div style="font:700 11px AV;letter-spacing:.14em;color:rgba(255,255,255,.55)">TUS ELEGIDAS DE HOY</div></div>`}
-function startTorneo(){S.duel=S.duel||{};const h=retaHoy();if(h.length>=RDIA)return retaFin();
- let i=RETAS.findIndex((r,j)=>!(j in S.duel));if(i<0){i=((S.rlast??-1)+1)%RETAS.length;delete S.duel[i]}drawReta(i,true)}
-function drawReta(i,intro){retaOver=false;const [a,b,th]=RETAS[i];S.rlast=i;
- $('vRound').innerHTML=`<span class="on">RETA ${Math.min(retaHoy().length+1,RDIA)} DE ${RDIA}</span>`;
- const short=k=>({challenger:"New Challenger",snes:"Adult Problems",arcade:"Anatomía del Arcade",theworldwarrior:"World Warrior"})[k]||dn(k);
- const side=(k,c)=>`<button class="vsp ${c}" data-k="${k}" style="--bg:${RBG[k]||'#111'}"><div class="hp"><div class="nm"><span>${short(k)}</span><em></em></div><div class="bar"><i></i></div></div><div class="teew"><div class="tee"><img src="d/${k}.jpg" alt=""></div></div></button>`;
- $('vStage').innerHTML=`<div class="vsw" id="vsw">${side(a,'a')}<div class="vsmid"><span>${th}</span><b>VS</b><span>¿CUÁL TE PONES?</span></div>${side(b,'b')}</div><button class="big vsnext" id="vsNext">SIGUIENTE RETA</button>${intro?'<div class="hcnc"><span>HERE COMES A</span><b>NEW CHALLENGER!</b></div>':''}`;
- if(intro){beep(660,.08);setTimeout(()=>beep(990,.1),160)}
- const show=()=>{const v=retaVotes(i),n=v.length||1;$('vsw').classList.add('done');
-  $('vStage').querySelectorAll('.vsp').forEach(el=>{const p=Math.round(v.filter(x=>x===el.dataset.k).length/n*100);el.querySelector('em').textContent=p+'%';el.querySelector('.bar i').style.width=Math.max(4,p)+'%';el.classList.toggle('pick',S.duel[i]===el.dataset.k)})};
- $('vStage').querySelectorAll('.vsp').forEach(el=>el.onclick=()=>{if($('vsw').classList.contains('done'))return;syncIn();const h0=retaHoy();if(h0.length>=RDIA&&!h0.includes(i))return retaFin();S.duel=S.duel||{};S.duel[i]=el.dataset.k;const h=retaHoy();if(!h.includes(i))h.push(i);save();jingle();show();if(h.length>=RDIA)$('vsNext').textContent='VER MIS ELEGIDAS'});
- if(i in S.duel)show();
- $('vsNext').onclick=()=>startTorneo()}
+/* Reta diaria integrada · siete elecciones, campeona persistente.
+   Conservar RETAS y S.duel anteriores para importar respaldos históricos.
+   Catálogo: DESIGNS actual, sin bonus ni diseños todavía sin cartas. */
+const RDIA=1;
+function retaPool(){
+ return DESIGNS.filter(d=>!d.bx&&d.img&&Object.values(d.img).some(Boolean))
+ .map(d=>({id:d.id,name:d.n,art:artOf(d.id),ambient:artOf(d.id),base:RBG[d.id]||'#1b2148'}));
+}
+function retaHash(txt){
+ let h=2166136261>>>0;
+ for(let i=0;i<txt.length;i++){h^=txt.charCodeAt(i);h=Math.imul(h,16777619)}
+ return h>>>0;
+}
+function retaValid(r,pool){
+ if(!r||typeof r!=='object'||!DRE.test(r.day)||r.day<today())return false;
+ if(!Array.isArray(r.roster)||r.roster.length!==8||new Set(r.roster).size!==8)return false;
+ const ids=new Set(pool.map(d=>d.id));
+ if(!r.roster.every(k=>ids.has(k)))return false;
+ if(!Number.isInteger(r.round)||r.round<0||r.round>7)return false;
+ if(!r.roster.includes(r.champion)||!r.roster.includes(r.top)||!r.roster.includes(r.bottom)||r.top===r.bottom)return false;
+ return true;
+}
+function retaNueva(pool){
+ const prev=S.reta2||{},day=today();
+ const seed=Number.isInteger(prev.seed)&&prev.seed>0?prev.seed:Math.floor(Math.random()*0x7fffffff)+1;
+ const sorted=pool.slice().sort((a,b)=>retaHash(seed+':'+day+':'+a.id)-retaHash(seed+':'+day+':'+b.id)||a.id.localeCompare(b.id));
+ const prior=S.champ&&sorted.some(d=>d.id===S.champ)?S.champ:null;
+ const first=prior||sorted[0].id;
+ const roster=[first,...sorted.filter(d=>d.id!==first).slice(0,7).map(d=>d.id)];
+ return {day,seed,roster,round:0,champion:first,top:roster[0],bottom:roster[1],
+  streak:0,lastChampion:prior,startingChampion:first,lastSide:'top',
+  done:false,titleDefended:false,defenses:Math.max(0,prev.defenses|0),
+  history:Array.isArray(prev.history)?prev.history.slice(-30):[]};
+}
+function startTorneo(){
+ syncIn();const pool=retaPool();
+ if(pool.length<8){
+  $('vStage').innerHTML='<div style="padding:24px;text-align:center;color:#FFD400;font:11px/2 PX">LA RETA NECESITA MÁS DISEÑOS ACTIVOS</div>';
+  return;
+ }
+ if(!retaValid(S.reta2,pool)){
+  S.reta2=retaNueva(pool);
+  if(save())ga('reta_iniciada',{dia:S.reta2.day,retadores:7});
+ }
+ retaOver=!!S.reta2.done;
+ $('vStage').innerHTML='<iframe id="retaLive" class="reta-iframe" src="reta-diaria.html?embedded=1" title="Reta de playeras · 7 encuentros" loading="eager"></iframe>';
+}
+function retaInitFrame(f){
+ const pool=retaPool();
+ if(!retaValid(S.reta2,pool)){startTorneo();return}
+ f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool},location.origin);
+}
+function retaElegir(f,msg){
+ withLock(()=>{
+  syncIn();
+  const r=S.reta2;
+  const sides=['top','bottom'];
+  if(!retaValid(r,retaPool())||r.done||msg.day!==r.day||msg.round!==r.round||
+     !sides.includes(msg.side)||r[msg.side]!==msg.winner){
+   retaInitFrame(f);return;
+  }
+  const lost=msg.side==='top'?'bottom':'top',previous=r.champion;
+  r.champion=msg.winner;r.streak=msg.winner===previous?r.streak+1:1;
+  r.lastSide=msg.side;
+  r.round++;
+  if(r.round>=7){
+   r.done=true;
+   r.titleDefended=!!r.lastChampion&&r.lastChampion===r.champion;
+   r.defenses=r.titleDefended?r.defenses+1:0;
+   r.history=Array.isArray(r.history)?r.history.slice(-29):[];
+   r.history.push({day:r.day,champion:r.champion,defended:r.titleDefended,defenses:r.defenses});
+   S.champ=r.champion;
+   retaOver=true;
+   ga('reta_completada',{campeona:r.champion,defendida:r.titleDefended?1:0});
+  }else{r[lost]=r.roster[r.round+1]}
+  const ok=save();
+  if(!ok)toast('RETA: GUARDADO PENDIENTE');
+  ga('reta_eleccion',{ronda:r.round,diseno:msg.winner,campeona:r.champion});
+ });
+}
+window.addEventListener('message',e=>{
+ if(e.origin!==location.origin||cur!=='torneo')return;
+ const f=$('retaLive');if(!f||e.source!==f.contentWindow)return;
+ const m=e.data;
+ if(!m||typeof m!=='object')return;
+ if(m.type==='icmx-reta-ready')retaInitFrame(f);
+ if(m.type==='icmx-reta-choice')retaElegir(f,m);
+ if(m.type==='icmx-reta-pack'&&S.reta2&&m.day===S.reta2.day)go('pack');
+});
 /* ---------- récords ---------- */
 function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STORE.docs.length&&S.ini)m.push({ini:S.ini,score:uniq()});return m.filter(r=>r.ini).sort((a,b)=>b.score-a.score)}
 function renderScores(){$('sMine').textContent=uniq();$('iniIn').value=S.ini;const b=board();const pos=b.findIndex(r=>r.ini===S.ini);
@@ -1906,6 +1991,7 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
    else if(k==='welcomeLeft'||k==='freeUsed'){if(!isInt(v,0,k==='welcomeLeft'?5:2))throw 'Los sobres gratuitos del respaldo no son válidos.';out[k]=v}
    else if(k==='freeDay'){if(!isDay(v))throw 'La fecha de sobres gratuitos no es válida.';out.freeDay=v}
    else if(k==='champ'){if(typeof v!=='string'||(v!==''&&!IDRE.test(v)))throw 'El campeón del respaldo no es válido.';out.champ=v}
+   else if(k==='reta2'){if(!isObj(v))throw 'La Reta diaria del respaldo no es válida.';safeVal(v,1);out.reta2=v}
    else if(k==='rlast'){if(!(v===null||isInt(v,0,9999)))throw 'La última reta del respaldo no es válida.';out.rlast=v}
    else if(k==='pk'){if(!Array.isArray(v)||v.length>30||!v.every(x=>typeof x==='string'&&PKRE.test(x)))throw 'El respaldo trae un dato inválido (pk).';out.pk=v.slice()}
    else if(k==='logro'){if(!isObj(v))throw 'Los logros del respaldo no son válidos.';for(const [c,f] of Object.entries(v)){id(c,'logros');if(!f||!isDay(f))throw 'Una fecha de logro no es válida.';const di=designId(c);if(di){out.logro=out.logro||{};if(!out.logro[di]||f<out.logro[di])out.logro[di]=f}else{x.unk.logro=x.unk.logro||{};x.unk.logro[c]=f}}}
