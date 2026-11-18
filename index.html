@@ -866,6 +866,13 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .zoom::backdrop{background:#07062a}
 .z-bar{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;width:min(100%,600px);padding:8px 0;background:#07062a}
 .z-bar h2{font:700 16px AV;margin:0}
+.z-bar .z-close{flex:0 0 44px;width:44px;height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(255,255,255,.26);border-radius:50%;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.z-bar .z-close svg{width:20px;height:20px;display:block}
+.z-bar .z-close:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.56)}
+.z-bar .z-close:active{transform:scale(.94)}
+.z-bar .z-close:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+.z-bar h2{min-width:0;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){.z-bar .z-close{transition:none}}
 .z-bar .btn,#zToggle{min-height:44px}
 #zoom .fx{width:min(100%,600px)!important;touch-action:pan-y pinch-zoom}
 #zVoting{width:min(100%,480px);scroll-margin-bottom:12px}
@@ -975,7 +982,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </div>
 <div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button class="vback" id="fClose" aria-label="Cerrar"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
 <dialog class="zoom" id="zoom" aria-labelledby="zName">
- <header class="z-bar"><h2 id="zName"></h2><button class="btn" id="zClose" autofocus>Cerrar</button></header>
+ <header class="z-bar"><h2 id="zName"></h2><button class="z-close" id="zClose" type="button" aria-label="Cerrar carta" title="Cerrar carta" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></header>
  <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i></div>
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
  <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
