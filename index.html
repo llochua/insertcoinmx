@@ -384,6 +384,35 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .mgo:active{transform:translateY(4px);box-shadow:0 2px 0 #b08f00}
 .mgo.off{background:rgba(255,255,255,.1);color:rgba(255,255,255,.65);box-shadow:none;letter-spacing:.1em}
 
+
+/* IC-04 · La selección del menú respira: no modifica el movimiento del abanico. */
+.mc.is-selected::after{
+ content:"";position:absolute;inset:-4px;z-index:6;pointer-events:none;
+ border:1.5px solid rgba(255,212,0,.78);border-radius:18px;
+ box-shadow:0 0 0 1px rgba(255,240,170,.12),0 0 14px 2px rgba(255,212,0,.2),0 0 32px 5px rgba(255,212,0,.12);
+ animation:icMenuGlow 2.9s ease-in-out infinite
+}
+@keyframes icMenuGlow{
+ 0%,100%{opacity:.78;box-shadow:0 0 0 1px rgba(255,240,170,.12),0 0 12px 2px rgba(255,212,0,.18),0 0 24px 4px rgba(255,212,0,.1)}
+ 50%{opacity:1;box-shadow:0 0 0 1px rgba(255,240,170,.28),0 0 20px 4px rgba(255,212,0,.29),0 0 38px 7px rgba(255,212,0,.15)}
+}
+.mtabs button{position:relative;transition:color .2s ease,background .2s ease}
+.mtabs button.on{
+ color:#fff7d5;background:rgba(255,212,0,.13);
+ box-shadow:inset 0 0 0 1px rgba(255,212,0,.43)
+}
+.mtabs button.on::after{
+ content:"";position:absolute;left:27%;right:27%;height:2px;bottom:-3px;
+ border-radius:3px;background:#FFD400;box-shadow:0 0 10px rgba(255,212,0,.6);
+ animation:icTabGlow 2.9s ease-in-out infinite
+}
+@keyframes icTabGlow{50%{opacity:.58;box-shadow:0 0 4px rgba(255,212,0,.3)}}
+.mtabs button:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+ .mc.is-selected::after,.mtabs button.on::after{animation:none!important}
+ .mtabs button{transition:none!important}
+}
+
 /* ===== SISTEMA DE PANTALLAS (mismo lenguaje que inicio y menú) ===== */
 .view:not(#home){isolation:isolate}
 .view:not(#home)::before{content:"";position:absolute;inset:-14%;z-index:-2;background:var(--amb) center 30%/cover;filter:blur(34px) saturate(1.3) brightness(.42)}
@@ -1307,10 +1336,10 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES();
  $('hCount').textContent=u+' / '+N;
  const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="c2/${m.img}.jpg"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
   [...fan.children].forEach((el,i)=>el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()})}
- [...fan.children].forEach((el,i)=>{const m=M[i];el.classList.toggle('lock',!!m.lock);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
+ [...fan.children].forEach((el,i)=>{const m=M[i];el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
   let d=i-mi;if(d>2)d-=5;if(d<-2)d+=5;const a=Math.abs(d);
   el.style.transform=`translate(-50%,-50%) translateX(${d*60}%) rotate(${d*11}deg) translateY(${a*6}%) scale(${1-a*.16})`;el.style.zIndex=10-a;el.style.filter=a?`brightness(${1-a*.3})`:'';el.style.opacity=a>1?0:1;el.style.pointerEvents=a>1?'none':''});
- $('mTabs').innerHTML=M.map((m,i)=>`<button class="${i===mi?'on':''} ${m.lock?'lock':''}" data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
+ $('mTabs').innerHTML=M.map((m,i)=>`<button class="${i===mi?'on':''} ${m.lock?'lock':''}" data-i="${i}" aria-pressed="${i===mi}">${m.t.replace(' del día','')}</button>`).join('');
  const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(c/${m.img}.jpg)`;
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
