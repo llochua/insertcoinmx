@@ -4,13 +4,12 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
  <meta name="theme-color" content="#0b0a11">
- <title>Insert Coin MX — Reta v4.4 · Revelación de campeona</title>
+ <title>Insert Coin MX — Reta v4.5 · Winner Is</title>
  <meta name="description" content="Prueba de experiencia Reta v4: una campeona, nuevos retadores, una pelea continua.">
  <link rel="preload" as="image" href="d/gatosamurai.jpg">
  <link rel="preload" as="image" href="d/x.jpg">
  <link rel="stylesheet" href="reta-v4-demo.css">
- <link rel="stylesheet" href="reta-v4-clear.css">
- <link rel="stylesheet" href="reta-v4-victory.css">
+ <link rel="stylesheet" href="reta-v4-winner.css">
 </head>
 <body>
  <main class="app" id="app">
@@ -53,32 +52,19 @@
    <strong>NEW<br>CHALLENGER!</strong>
   </div>
 
-  <section class="endgame" id="finish" aria-hidden="true" aria-label="Resultado de Reta" role="dialog" aria-modal="true" data-phase="entry">
-   <div class="eg-flash" aria-hidden="true"></div>
-   <header class="eg-head">
-    <div class="eg-brand"><img src="coin.png" alt=""><span>INSERT COIN MX</span></div>
-    <button type="button" class="eg-replay" id="again" aria-label="Repetir demo de Reta" title="Repetir demo">↻</button>
-    <div class="eg-banner"><span class="eg-stage">STAGE 01</span><h2>CLEAR<strong>!</strong></h2></div>
-   </header>
-   <div class="eg-shirt-space">
-    <div class="eg-halo" aria-hidden="true"></div>
-    <div class="eg-ring" aria-hidden="true"></div>
-    <div class="eg-shirt" id="winnerShirt" aria-hidden="true"></div>
-    <div class="eg-spark eg-spark-a" aria-hidden="true"></div>
-    <div class="eg-spark eg-spark-b" aria-hidden="true"></div>
+  <section class="winner-screen" id="finish" aria-hidden="true" aria-label="Ganador de la Reta" role="dialog" aria-modal="true">
+   <div class="winner-scene">
+    <header class="winner-top">
+     <div class="winner-brand"><img src="coin.png" alt=""> INSERT COIN MX</div>
+     <button type="button" class="winner-retry" id="again" aria-label="Repetir esta demo" title="Repetir">↻</button>
+    </header>
+    <h2 class="winner-announcement">WINNER <em>IS...</em></h2>
+    <div class="winner-shirt-area"><div id="winnerShirt" class="winner-shirt" aria-hidden="true"></div></div>
+    <div class="winner-name-wrap"><i class="winner-name-rule" aria-hidden="true"></i><h3 class="winner-name" id="winnerName">Gato Samurái</h3></div>
    </div>
-   <div class="eg-bottom">
-    <div class="eg-identity">
-     <span class="eg-label" id="egStatus">TU CAMPEONA</span>
-     <h3 class="eg-name" id="winnerName">Gato Samurái</h3>
-    </div>
-    <div class="eg-future">
-     <div class="eg-progress"><i></i><span id="egCount">7 ENCUENTROS · 8 DISEÑOS</span><i></i></div>
-     <p class="eg-why" id="egContext">Esta es tu favorita por ahora. Nuevas playeras podrán destronarla.</p>
-     <a class="eg-cta" href="https://insertcoinmx.com/">DESCUBRIR MÁS EN SOBRES <span aria-hidden="true">→</span></a>
-     <span class="eg-thanks">THANK YOU FOR PLAYING</span>
-    </div>
-   </div>
+   <a class="winner-next" href="https://insertcoinmx.com/" aria-label="Descubre más diseños en Sobres">
+    <span>DESCUBRE MÁS DISEÑOS EN SOBRES</span><b aria-hidden="true">→</b>
+   </a>
   </section>
  </main>
 
