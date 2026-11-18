@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="670" viewBox="0 0 480 670" role="img" aria-label="Clasificación tier list con filas S A B C y cartas colocadas en niveles">
+<defs>
+ <linearGradient id="scene" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#30134E"/><stop offset="1" stop-color="#0E1438"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#9359DE" stop-opacity=".63"/><stop offset=".52" stop-color="#9359DE" stop-opacity=".24"/><stop offset="1" stop-color="#9359DE" stop-opacity="0"/></radialGradient>
+ <filter id="shade" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="22" stdDeviation="16" flood-color="#05030b" flood-opacity=".55"/></filter>
+ <linearGradient id="paper" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#FFF9E9"/><stop offset=".45" stop-color="#E9E0CE"/><stop offset="1" stop-color="#ACA8A4"/></linearGradient>
+ <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF9C5"/><stop offset=".4" stop-color="#FFD344"/><stop offset=".8" stop-color="#EFA91D"/><stop offset="1" stop-color="#9C5318"/></linearGradient>
+ <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#C9FFF8"/><stop offset=".55" stop-color="#5CEAD4"/><stop offset="1" stop-color="#078DAD"/></linearGradient>
+ <linearGradient id="rose" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE6E2"/><stop offset=".45" stop-color="#FF7595"/><stop offset="1" stop-color="#BD2B5F"/></linearGradient>
+ <linearGradient id="iris" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF9A5"/><stop offset=".25" stop-color="#B8C7FF"/><stop offset=".52" stop-color="#EEBBF9"/><stop offset=".78" stop-color="#9EF4ED"/><stop offset="1" stop-color="#FFDE9C"/></linearGradient>
+</defs>
+<rect width="480" height="670" rx="18" fill="url(#scene)"/>
+<ellipse cx="240" cy="280" rx="280" ry="300" fill="url(#aura)"/>
+
+<!-- Luz de clasificación y líneas de perspectiva -->
+<ellipse cx="245" cy="487" rx="180" ry="23" fill="#060714" opacity=".45"/>
+<path d="m42 501 45-35 328 0 34 35" stroke="#C4A1FF" opacity=".4" stroke-width="4" fill="none"/>
+<g font-family="Arial Black,Arial,sans-serif" font-weight="900">
+<!-- Las cuatro filas se leen incluso en tamaño pequeño -->
+<g transform="rotate(-5 240 342)" filter="url(#shade)">
+<rect x="35" y="154" width="410" height="80" rx="12" fill="#2B184B" stroke="#FFE28A" stroke-width="5"/>
+<path d="M47 156h81v75H47Z" fill="#F4C84A"/>
+<text x="86" y="212" font-size="57" fill="#33224F" text-anchor="middle">S</text>
+<rect x="153" y="169" width="55" height="53" rx="5" fill="#161D39" stroke="#FFF2B5" stroke-width="3"/>
+<rect x="219" y="169" width="55" height="53" rx="5" fill="#162B41" stroke="#C5D5FF" stroke-width="3"/>
+<rect x="285" y="169" width="55" height="53" rx="5" fill="#2E204C" stroke="#FFF2B5" stroke-width="3"/>
+<path d="m178 178 7 12 13 2-10 9 3 12-13-6-12 6 2-13-9-9 13-1Z" fill="#FFE47D"/>
+<path d="m238 181 14 11-14 14-14-14Z" fill="#9AEFF0"/>
+<circle cx="312" cy="195" r="13" fill="#F9B4ED"/>
+<rect x="35" y="243" width="410" height="73" rx="12" fill="#321B4F" stroke="#C966B6" stroke-width="4"/>
+<path d="M47 245h81v69H47Z" fill="#F68BC1"/>
+<text x="86" y="294" font-size="49" fill="#542047" text-anchor="middle">A</text>
+<rect x="153" y="255" width="55" height="50" rx="5" fill="#251637" stroke="#FFA7CF" stroke-width="3"/>
+<rect x="219" y="255" width="55" height="50" rx="5" fill="#241736" stroke="#FFA7CF" stroke-width="3"/>
+<path d="m180 269 14 13-14 12-14-12Z" fill="#F3B5DE"/>
+<path d="M245 263v32m-16-16h32" stroke="#EBC7EA" stroke-width="6"/>
+<rect x="35" y="325" width="410" height="73" rx="12" fill="#1C284B" stroke="#63BEEA" stroke-width="4"/>
+<path d="M47 327h81v69H47Z" fill="#7AC9F1"/>
+<text x="86" y="377" font-size="49" fill="#153051" text-anchor="middle">B</text>
+<rect x="153" y="338" width="55" height="50" rx="5" fill="#142238" stroke="#80C7EE" stroke-width="3"/>
+<path d="m180 350 13 25h-26Z" fill="#92DEFF"/>
+<rect x="35" y="407" width="410" height="73" rx="12" fill="#1E2440" stroke="#7A83A9" stroke-width="4"/>
+<path d="M47 409h81v69H47Z" fill="#8994B1"/>
+<text x="86" y="459" font-size="49" fill="#28324C" text-anchor="middle">C</text>
+<rect x="153" y="420" width="55" height="50" rx="5" fill="#121C36" stroke="#8D99C5" stroke-width="3"/>
+<path d="m166 447 15-15 15 15-15 15Z" fill="#8DA6D5"/>
+</g>
+</g>
+<!-- Carta en movimiento hacia el rango S -->
+<g transform="rotate(13 365 126)" filter="url(#shade)">
+<rect x="326" y="63" width="79" height="112" rx="9" fill="#15132C" stroke="#FFF3B4" stroke-width="6"/>
+<rect x="336" y="75" width="59" height="69" rx="4" fill="url(#iris)"/>
+<path d="m366 82 7 20 18 1-14 13 4 20-15-10-16 10 4-20-14-13 19-1Z" fill="#FFE56F"/>
+<path d="M344 155h43" stroke="#F8D76B" stroke-width="4"/>
+</g>
+<path d="M326 220q52-13 63-47" stroke="#FFF5A6" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="9 12"/>
+<path d="m390 180 8-18-21 6" fill="none" stroke="#FFF5A6" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+
+</svg>
