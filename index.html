@@ -1879,8 +1879,9 @@ function r3Pick(chosen,round){
  if(!RETA3_PREVIEW)syncIn();
  const st=r3Current();if(!st||st.day!==today()||st.choices.length!==round){startTorneo();return}
  if(chosen!==st.champ&&chosen!==st.challengers[round])return;
- const changed=st.champ!==chosen,other=st.challengers[round];
+ const changed=st.champ!==chosen,other=st.challengers[round],old=st.champ;
  st.choices.push(chosen);st.champ=chosen;
+ if(!st.seen.includes(old))st.seen.push(old);
  if(!st.seen.includes(other))st.seen.push(other);
  st.seen=st.seen.slice(-200);
  r3Persist(st);beep(changed?950:770,.12);
@@ -1899,12 +1900,14 @@ function r3Result(st,changed){
  $('r3Next').onclick=()=>{beep(880,.06);if(done)r3Final(st);else r3Arena(st)}
 }
 function r3Final(st){
+ const total=r3Owned().length,seen=Math.min(total,new Set(st.seen).size);
+ const progress=seen>=total?'Ya aparecieron todos tus diseños en Reta. ¿Quién podrá destronarla?':'Ya han aparecido '+seen+' de tus '+total+' diseños en Reta.';
  $('vRound').innerHTML='<span>RETA COMPLETADA · '+R3_ROUNDS+' ENCUENTROS</span>';
  $('vStage').innerHTML='<div class="r3-finale"><span class="r3-eyebrow">RETA COMPLETADA</span>'+
   '<h2>TU CAMPEONA DE HOY</h2>'+
   '<div class="r3-winner-art">'+r3Shirt(st.champ)+'</div>'+
   '<strong class="r3-winner-name">'+dn(st.champ)+'</strong>'+
-  '<p>Sobrevivió a tus elecciones. Mañana habrá nuevos retadores de tu colección.</p>'+
+  '<p>'+progress+' Tu campeona continuará mañana frente a nuevos retadores.</p>'+
   '<div class="r3-thanks">THANK YOU<br>FOR PLAYING</div>'+
   '<button type="button" class="r3-main" id="r3Menu">VOLVER AL MENÚ</button>'+
   '<button type="button" class="r3-secondary" id="r3Album">VER MI ÁLBUM</button></div>';
