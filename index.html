@@ -950,6 +950,18 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .dt .cv.fx>i,.vc.have .cv.fx>i{pointer-events:none}
 .dt .cv.fx>.cr,.dt .cv.fx>.x,.dt .cv.fx>.nw{z-index:2}
 @media(prefers-reduced-motion:reduce){.fx.idle{animation:none!important}}
+
+/* IC-03 · Cierre estándar: ficha, ampliación y respaldo */
+.ic-close{all:unset;box-sizing:border-box;flex:0 0 44px;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.26);border-radius:50%;background:rgba(255,255,255,.08);color:#fff;transition:background .18s,border-color .18s,transform .18s}
+.ic-close svg{width:20px;height:20px;display:block;flex:none}
+.ic-close:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.56)}
+.ic-close:active{transform:scale(.94)}
+.ic-close:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+.fhd .ic-close,.z-bar .ic-close{margin-left:auto}
+.bk-frame{position:relative;width:100%;max-width:360px;max-height:100%;padding-top:52px;display:flex;flex-direction:column;align-items:stretch}
+.bk-frame .bkin{width:100%;max-height:100%;min-height:0}
+.bk-frame>.ic-close{position:absolute;top:0;right:0;z-index:2}
+@media(prefers-reduced-motion:reduce){.ic-close{transition:none}}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1017,16 +1029,16 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  </div>
 </section>
 </div>
-<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button class="vback" id="fClose" aria-label="Cerrar"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
+<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
 <dialog class="zoom" id="zoom" aria-labelledby="zName">
- <header class="z-bar"><h2 id="zName"></h2><button class="btn" id="zClose" autofocus>Cerrar</button></header>
+ <header class="z-bar"><h2 id="zName"></h2><button type="button" class="ic-close" id="zClose" aria-label="Cerrar carta" title="Cerrar carta" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></header>
  <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i></div>
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
  <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
 </dialog>
 <div class="onb" id="onb"><img id="onImg"><h2 id="onT"></h2><p id="onP"></p><div class="d" id="onDots"></div><button class="big" id="onNext"></button></div>
 <div class="toast" id="toast"></div>
-<div class="bkm" id="bkm"><div class="bkin"></div></div>
+<div class="bkm" id="bkm" role="dialog" aria-modal="true" aria-label="Respaldo del progreso" aria-hidden="true"><div class="bk-frame"><button type="button" class="ic-close" id="bkX" aria-label="Cerrar respaldo" title="Cerrar respaldo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button><div class="bkin"></div></div></div>
 <button class="savew" id="saveW" hidden>NO SE PUDO GUARDAR TU PROGRESO · TOCA PARA EXPORTARLO</button>
 
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
@@ -1793,14 +1805,32 @@ async function saveFile(name,text){const blob=new Blob([text],{type:'application
  if(STORE.dl){try{await STORE.dl.save({filename:name,data:blob});return true}catch(e){if(e&&e.code==='declined')return false}}
  try{const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}catch(e){return false}}
 /* ventana del respaldo */
-function bkOpen(html){const m=$('bkm');m.querySelector('.bkin').innerHTML=html;m.classList.add('on');m.querySelectorAll('[data-bkx]').forEach(b=>b.onclick=bkClose);return m}
-function bkClose(){$('bkm').classList.remove('on');$('bkFile').value=''}
+let bkReturnFocus=null;
+function bkOpen(html){
+ const m=$('bkm');
+ if(!m.classList.contains('on'))bkReturnFocus=document.activeElement;
+ m.querySelector('.bkin').innerHTML=html;
+ m.classList.add('on');m.setAttribute('aria-hidden','false');
+ m.querySelectorAll('[data-bkx]').forEach(b=>b.onclick=bkClose);
+ $('bkX').focus({preventScroll:true});
+ return m
+}
+function bkClose(){
+ $('bkm').classList.remove('on');$('bkm').setAttribute('aria-hidden','true');
+ $('bkFile').value='';
+ if(bkReturnFocus&&bkReturnFocus.isConnected)bkReturnFocus.focus({preventScroll:true});
+ bkReturnFocus=null
+}
+$('bkX').onclick=bkClose;
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&$('bkm').classList.contains('on')){e.preventDefault();bkClose()}
+});
 const bkMsg=(t,c)=>{const e=$('bkMsg');if(e){e.className=c||'';e.textContent=t}};
 $('saveW').onclick=()=>$('bkExp').onclick();
 $('bkExp').onclick=()=>{beep(880);const txt=buildBackup(),name='insertcoinmx-progreso-'+today()+'.json';
  bkOpen(`<h2>TU RESPALDO</h2><p>${uniq()} cartas distintas y ${Object.keys(S.rate).length} calificaciones. Guarda el archivo en un lugar seguro; si no se descarga, copia el texto y guárdalo en tus notas.</p>
  <div class="bkb"><button class="btn y" id="bkSave">GUARDAR ARCHIVO</button><button class="btn" id="bkCopy">COPIAR TEXTO</button></div>
- <textarea id="bkTxt" readonly></textarea><p id="bkMsg"></p><button class="btn" data-bkx>CERRAR</button>`);
+ <textarea id="bkTxt" readonly></textarea><p id="bkMsg"></p>`);
  $('bkTxt').value=txt;
  $('bkSave').onclick=async()=>{const ok=await saveFile(name,txt);bkMsg(ok?'Listo. Si no ves el archivo, usa COPIAR TEXTO.':'No se pudo guardar el archivo. Usa COPIAR TEXTO.',ok?'':'bkwarn')};
  $('bkCopy').onclick=async()=>{const t=$('bkTxt');try{await navigator.clipboard.writeText(txt);bkMsg('Texto copiado.')}
