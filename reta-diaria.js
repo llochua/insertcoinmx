@@ -230,7 +230,7 @@ function reset(){
 $("reset").onclick=isEmbedded?()=>{}:reset;
 $("again").onclick=isEmbedded?()=>{}:reset;
 const sobres=$('finish').querySelector('.winner-next');
-if(isEmbedded&&sobres)sobres.onclick=e=>{e.preventDefault();tellParent({type:'icmx-reta-pack',day:dailyDay})};
+if(isEmbedded&&sobres)sobres.onclick=e=>{e.preventDefault();tellParent({type:'icmx-reta-pack',day:dailyDay,action:sobres.dataset.action||'pack'})};
 $("mute").onclick=()=>{
  muted=!muted;$("mute").textContent=muted?"♪̸":"♫";
  $("mute").setAttribute("aria-label",muted?"Activar sonido":"Silenciar sonido");
@@ -257,6 +257,14 @@ function hydrate(config){
  const state=config.state;
  if(!state||!Array.isArray(state.roster)||state.roster.length!==8||state.roster.some(id=>!DESIGNS[id]))return;
  dailyState=state;dailyDay=state.day;
+  if(isEmbedded&&sobres){
+   const action=config.packsAvailable?'pack':config.canTrade?'trade':'album';
+   sobres.dataset.action=action;
+   sobres.textContent=action==='pack'?'ABRIR SOBRE':action==='trade'?'CANJEAR UN SOBRE EXTRA':'VER MI ÁLBUM';
+   const note=$('winnerPackNote');
+   note.hidden=action==='pack';
+   note.textContent=action==='trade'?'Sin sobres por hoy. Tienes repetidas para conseguir otro.':action==='album'?'Sin sobres por hoy. Mañana llegan 2 más.':'';
+  }
  PAIRS=state.roster.slice();TOTAL=PAIRS.length-1;
  champion=state.champion;
  slots={top:state.top,bottom:state.bottom};
