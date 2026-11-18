@@ -4,11 +4,12 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
  <meta name="theme-color" content="#0b0a11">
- <title>Insert Coin MX — Reta v4.5 · Winner Is</title>
+ <title>Insert Coin MX — Reta · Refinamiento del sistema</title>
  <meta name="description" content="Prueba de experiencia Reta v4: una campeona, nuevos retadores, una pelea continua.">
  <link rel="preload" as="image" href="d/gatosamurai.jpg">
  <link rel="preload" as="image" href="d/x.jpg">
  <link rel="stylesheet" href="reta-v4-demo.css">
+ <link rel="stylesheet" href="reta-v4-refine.css">
  <link rel="stylesheet" href="reta-v4-winner.css">
 </head>
 <body>
@@ -16,7 +17,7 @@
   <header class="brandbar">
    <div class="brand">
     <img src="coin.png" alt="">
-    <span class="brandword">INSERT COIN MX<small>RETA · LABORATORIO V4</small></span>
+    <span class="brandword">Reta<small>EL ÁLBUM</small></span>
    </div>
    <div class="minictrls">
     <button type="button" class="tinybtn" id="mute" aria-label="Silenciar sonido" aria-pressed="false" title="Sonido">♫</button>
@@ -40,11 +41,7 @@
    <div class="slot" id="bottomWrap"></div>
   </section>
 
-  <footer class="screen-bottom">
-   <span>UNA PLAYERA SIGUE EN PIE.</span>
-   <b>INSERT COIN MX</b>
-  </footer>
-
+  
   <div class="shock" id="shock" aria-hidden="true"><span id="impactText">HIT!</span></div>
 
   <div class="intro" aria-hidden="true">
@@ -53,18 +50,18 @@
   </div>
 
   <section class="winner-screen" id="finish" aria-hidden="true" aria-label="Ganador de la Reta" role="dialog" aria-modal="true">
-   <div class="winner-scene">
-    <header class="winner-top">
-     <div class="winner-brand"><img src="coin.png" alt=""> INSERT COIN MX</div>
-     <button type="button" class="winner-retry" id="again" aria-label="Repetir esta demo" title="Repetir">↻</button>
-    </header>
-    <h2 class="winner-announcement">WINNER <em>IS...</em></h2>
-    <div class="winner-shirt-area"><div id="winnerShirt" class="winner-shirt" aria-hidden="true"></div></div>
-    <div class="winner-name-wrap"><i class="winner-name-rule" aria-hidden="true"></i><h3 class="winner-name" id="winnerName">Gato Samurái</h3></div>
+   <div class="winner-bg" id="winnerBg" aria-hidden="true"></div>
+   <button type="button" class="winner-retry" id="again" aria-label="Repetir demo" title="Repetir">↻</button>
+   <div class="winner-mark">
+    <img src="logo.png" alt="Insert Coin MX">
+    <div class="winner-album">EL ÁLBUM</div>
    </div>
-   <a class="winner-next" href="https://insertcoinmx.com/" aria-label="Descubre más diseños en Sobres">
-    <span>DESCUBRE MÁS DISEÑOS EN SOBRES</span><b aria-hidden="true">→</b>
-   </a>
+   <div class="winner-body">
+    <div class="winner-announcement">WINNER IS...</div>
+    <div class="winner-shirt-area"><div id="winnerShirt" class="winner-shirt" aria-hidden="true"></div></div>
+    <h2 class="winner-name" id="winnerName">Gato Samurái</h2>
+   </div>
+   <a class="winner-next" href="https://insertcoinmx.com/">DESCUBRE MÁS DISEÑOS EN SOBRES</a>
   </section>
  </main>
 
