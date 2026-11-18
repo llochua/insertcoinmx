@@ -1,0 +1,80 @@
+/* RETA · STAGE CLEAR
+   Pantalla final única: 1) victoria 2) playera 3) campeona 4) descubrir más.
+   Comparte tipografías e iluminación de Sobres, no utiliza una carta. */
+.endgame{
+ --gold:#FFD400;--cream:#FFF7D0;
+ display:none;position:absolute;inset:0;z-index:31;isolation:isolate;
+ padding:clamp(15px,2.5vh,23px) 20px clamp(17px,3vh,26px);
+ overflow:hidden;background:#0B0A22;color:#fff;text-align:center;
+}
+.endgame.on{
+ display:grid;grid-template-columns:minmax(0,1fr);
+ grid-template-rows:auto minmax(0,1fr) auto;
+ animation:endgameShow .4s ease-out both;
+}
+@keyframes endgameShow{from{opacity:0;background-color:#FFD400}to{opacity:1;background-color:#0B0A22}}
+.endgame::before{
+ content:"";position:absolute;inset:-15%;z-index:-2;pointer-events:none;
+ background:radial-gradient(ellipse 62% 43% at 50% 43%,rgba(246,201,78,.36),rgba(135,78,63,.13) 55%,transparent 90%),
+ linear-gradient(150deg,#1B163F 2%,#11102C 46%,#09091A 100%);
+}
+.endgame::after{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.35;
+ background:linear-gradient(180deg,transparent 78%,#000a),repeating-linear-gradient(0deg,transparent 0 3px,#0003 4px 4.5px);
+}
+.eg-head{display:flex;flex-direction:column;align-items:center;gap:10px;position:relative}
+.eg-brand{display:flex;align-items:center;justify-content:center;gap:8px;font:800 11px/1 AVK,Arial,sans-serif;letter-spacing:.1em;color:#fff}
+.eg-brand img{height:19px;width:19px;object-fit:contain}
+.eg-brand span{opacity:.93}
+.eg-replay{position:absolute;right:-7px;top:-7px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:rgba(255,255,255,.63);border-radius:50%;border:1px solid rgba(255,255,255,.2);background:#11101b;transition:color .15s,border-color .15s;font:20px/1 Arial,sans-serif}
+.eg-replay:hover{color:var(--gold);border-color:var(--gold)}
+.eg-replay:focus-visible,.eg-cta:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.eg-banner{display:flex;align-items:baseline;justify-content:center;gap:8px;margin-top:2px;white-space:nowrap;transform:skewX(-8deg);filter:drop-shadow(3px 4px 0 #8F2632)}
+.eg-banner .eg-stage{font:8px/1.2 PX,monospace;color:var(--gold);letter-spacing:.02em}
+.eg-banner h2{margin:0;font:900 clamp(35px,9.5vw,50px)/.94 AVK,Arial,sans-serif;font-style:italic;letter-spacing:-.06em;color:#fff}
+.eg-banner h2 strong{color:var(--gold)}
+.eg-shirt-space{position:relative;min-height:0;display:flex;align-items:center;justify-content:center;margin:-4px -24px -2px;overflow:visible}
+.eg-halo{position:absolute;left:50%;top:49%;width:min(106vw,480px);aspect-ratio:1;transform:translate(-50%,-50%);
+ pointer-events:none;opacity:.95;background:radial-gradient(circle,rgba(255,246,183,.44) 0%,rgba(255,212,0,.21) 22%,rgba(255,212,0,.05) 42%,transparent 66%);
+ animation:egHalo 4s ease-in-out infinite alternate}
+@keyframes egHalo{to{opacity:.6;transform:translate(-50%,-50%) scale(1.12)}}
+.eg-ring{position:absolute;left:50%;top:49%;width:min(79vw,345px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(-8deg);border:1px solid rgba(255,225,126,.17);border-radius:50%;pointer-events:none;box-shadow:0 0 0 27px rgba(255,213,90,.024),0 0 0 55px rgba(255,213,90,.018)}
+.eg-shirt{position:relative;display:flex;align-items:center;justify-content:center;
+ width:min(112%,505px);height:100%;max-height:490px;min-height:0;
+ filter:drop-shadow(0 25px 19px #000c) drop-shadow(0 0 18px #FFD40029);
+ animation:egReveal .88s .14s cubic-bezier(.15,.9,.24,1.08) both}
+.eg-shirt svg{width:100%;height:100%;overflow:visible;display:block;transform:rotate(-3deg)}
+@keyframes egReveal{
+ 0%{opacity:0;transform:translateY(98px) scale(.67) rotate(-10deg);filter:brightness(2.7)}
+ 56%{opacity:1;transform:translateY(-12px) scale(1.065) rotate(3deg);filter:brightness(1.5)}
+ 100%{opacity:1;transform:translateY(0) scale(1) rotate(0);filter:brightness(1)}
+}
+.eg-bottom{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;padding:0 0 0;position:relative;z-index:2}
+.eg-label{font:8px/1.4 PX,monospace;letter-spacing:.075em;color:var(--gold);margin-bottom:8px}
+.eg-name{font:900 clamp(26px,7.5vw,39px)/.97 AVK,Arial,sans-serif;letter-spacing:-.045em;
+ text-transform:uppercase;color:#fff;text-wrap:balance;max-width:100%;text-shadow:0 3px 0 #201531}
+.eg-why{font:500 clamp(12px,3.1vw,14px)/1.4 Arial,system-ui,sans-serif;color:rgba(255,255,255,.73);margin:10px 0 17px;max-width:300px}
+.eg-cta{width:min(100%,350px);min-height:48px;display:flex;align-items:center;justify-content:center;
+ padding:13px 16px;border-radius:8px;background:var(--gold);color:#101019;text-decoration:none;
+ box-shadow:0 5px 0 #9D7900,0 12px 22px #0009;
+ font:900 13px/1.15 AVK,Arial,sans-serif;letter-spacing:.04em;transition:filter .15s}
+.eg-cta:hover{filter:brightness(1.08)}
+.eg-cta:active{transform:translateY(3px);box-shadow:0 2px 0 #9D7900}
+.eg-thanks{font:8px/1.4 PX,monospace;letter-spacing:.04em;color:rgba(255,212,0,.83);margin-top:16px;white-space:nowrap}
+@media(max-height:760px){
+ .endgame{padding-top:12px;padding-bottom:12px}
+ .eg-head{gap:6px}
+ .eg-banner h2{font-size:clamp(32px,8.7vw,43px)}
+ .eg-why{margin:6px 0 11px}
+ .eg-label{margin-bottom:5px}
+ .eg-cta{min-height:43px;padding:10px 12px}
+ .eg-thanks{margin-top:10px}
+}
+@media(max-height:620px){
+ .eg-brand{font-size:9px}.eg-banner h2{font-size:32px}
+ .eg-name{font-size:clamp(21px,6.6vw,31px)}
+ .eg-why{font-size:11px;margin:4px 0 9px}
+ .eg-cta{min-height:39px;font-size:11px}
+ .eg-thanks{margin-top:7px;font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){.endgame.on,.eg-halo,.eg-shirt{animation:none!important}}
