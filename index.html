@@ -326,13 +326,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .fx.r-holo .foil{
  background:repeating-linear-gradient(110deg,rgba(255,45,111,.9) 0,rgba(255,212,0,.9) 2.2%,rgba(61,255,154,.9) 4.4%,rgba(47,214,255,.9) 6.6%,rgba(176,92,255,.9) 8.8%,rgba(255,45,111,.9) 11%);
  background-size:260% 260%;background-position:var(--mx) var(--my);
- mix-blend-mode:color-dodge;opacity:.32}
+ mix-blend-mode:screen;opacity:.42}
 /* DORADA: brillo metálico que corre + destellos */
 .fx.r-dorada .foil{
  background:
   radial-gradient(circle,rgba(255,255,255,.85) 0 1px,transparent 1.6px) 0 0/11px 11px,
-  linear-gradient(115deg,transparent 30%,rgba(255,246,200,.9) 47%,rgba(255,196,40,.5) 52%,transparent 64%) var(--mx) var(--my)/260% 260%;
- mix-blend-mode:overlay;opacity:.9}
+  linear-gradient(115deg,rgba(236,158,32,.24) 18%,rgba(255,246,200,.82) 47%,rgba(255,196,40,.55) 52%,rgba(239,169,55,.23) 76%) var(--mx) var(--my)/260% 260%;
+ mix-blend-mode:screen;opacity:.57}
 .fx.r-dorada::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2px rgba(255,224,120,.9),inset 0 0 22px rgba(255,200,60,.45);pointer-events:none}
 /* ILUSTRACIÓN: solo destellos finos que se mueven, sin teñir el arte */
 .fx.r-full .foil{
@@ -344,7 +344,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .fx.r-full .foil{opacity:.75}
 .fx.r-comun .foil{display:none}
 /* el foil baja sobre la zona de texto para que se lea */
-.fx.r-holo .foil{-webkit-mask:linear-gradient(#000 0,#000 52%,rgba(0,0,0,.28) 64%,rgba(0,0,0,.28) 100%);mask:linear-gradient(#000 0,#000 52%,rgba(0,0,0,.28) 64%,rgba(0,0,0,.28) 100%)}
+.fx.r-holo .foil{-webkit-mask:linear-gradient(#000 0,#000 52%,rgba(0,0,0,.58) 64%,rgba(0,0,0,.58) 100%);mask:linear-gradient(#000 0,#000 52%,rgba(0,0,0,.58) 64%,rgba(0,0,0,.58) 100%)}
 .fx .glare{-webkit-mask:linear-gradient(#000 0,#000 55%,rgba(0,0,0,.4) 68%);mask:linear-gradient(#000 0,#000 55%,rgba(0,0,0,.4) 68%)}
 /* movimiento solo cuando nadie la toca */
 .fx.idle{animation:fxIdle 5s ease-in-out infinite alternate}
@@ -810,20 +810,27 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 /* navegación: segmentos, flecha, cómo avanzar */
 .dx-top{gap:12px}.dx-seg{flex:1;display:flex;gap:4px}.dx-seg i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.28)}.dx-seg i.ok{background:rgba(255,255,255,.75)}.dx-seg i.cur{background:#fff}
 .dx-n{font:9px PX}
-.dx-next{all:unset;cursor:pointer;position:absolute;z-index:4;right:10px;top:42%;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.28);color:#fff;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.dx-next svg{width:16px;height:16px}
-.dx-how{margin-top:12px;font:600 12px AV;opacity:.6}
+.disc.dx{cursor:auto}
+.dx-controls{position:absolute;z-index:4;inset:auto 20px calc(12px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dx-controls button{min-height:44px;border-radius:10px;background:#292633;color:#fff;font:700 14px AV;touch-action:manipulation}
+.dx-controls button:disabled{opacity:.52;cursor:default}
+.dx-controls .dx-primary{background:#FFD400;color:#120F1A}
+.disc.dx .dx-info{bottom:calc(72px + env(safe-area-inset-bottom))}
+.disc.dx .dx-card{bottom:calc(170px + env(safe-area-inset-bottom))!important;width:min(44%, 34dvh)!important}
+.dx-read{display:block;width:max-content;max-width:100%;margin:8px auto 0;padding:5px 8px;border-radius:5px;background:#120f2a;color:#fff;font:700 12px AV;transform:rotate(-5deg)}
+.dx-top button{min-height:44px;padding-inline:6px;color:#fff;opacity:1;background:#181524;border-radius:7px}
+.dx-controls button:focus-visible,.dx-top button:focus-visible,.dx-card:focus-visible,.rs2 button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 /* especial cubierta */
 .dx.cov{background:#0c0a14!important}
 .dx-mat.pink{background:radial-gradient(ellipse at 50% 40%,rgba(255,111,208,.55),rgba(255,111,208,0) 70%)}
-.dx-back{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-bottom:90px;z-index:2}
-.dx-back span{width:58%;max-width:280px;aspect-ratio:480/670;border-radius:14px;background:#120F2a;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,.35),0 30px 60px rgba(0,0,0,.6);animation:dxBack 1.8s ease-in-out infinite}
+.dx-back{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-bottom:90px;z-index:2;pointer-events:none}
+.dx-back span{width:min(58%,39dvh);max-width:280px;aspect-ratio:480/670;border-radius:14px;background:#120F2a;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,.35),0 30px 60px rgba(0,0,0,.6);animation:dxBack 1.8s ease-in-out infinite}
 .dx-back img{width:34%}
 .v-e .dx-back span{box-shadow:0 0 0 2px #8fe9ff,0 0 40px rgba(143,233,255,.45),0 30px 60px rgba(0,0,0,.6)}
 .v-r .dx-back span{box-shadow:0 0 0 2px #e8b923,0 0 40px rgba(232,185,35,.5),0 30px 60px rgba(0,0,0,.6)}
 .v-f .dx-back span{box-shadow:0 0 0 2px #ff8fd8,0 0 40px rgba(255,111,208,.5),0 30px 60px rgba(0,0,0,.6)}
 @keyframes dxBack{50%{transform:translateY(-8px) rotate(-1.5deg)}}
-.dx-cta{position:absolute;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));z-index:3;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center}
+.dx-cta{position:absolute;left:0;right:0;bottom:calc(78px + env(safe-area-inset-bottom));z-index:3;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center}
 .dx-cta b{font:10px PX;letter-spacing:.1em;color:#FFD400}.dx-cta span{font:700 22px AV}
 
 /* ===== resumen ===== */
@@ -835,9 +842,9 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .rs-act2{display:grid;grid-template-columns:3fr 2fr;gap:10px;padding:16px 20px 6px}
 .rs-main,.rs-sec2{all:unset;cursor:pointer;text-align:center;height:46px;border-radius:10px;font:700 14px AV;display:flex;align-items:center;justify-content:center}
 .rs-main{background:#FFD400;color:#120F1A}.rs-sec2{background:rgba(255,255,255,.08);color:#fff}
-.rb{padding:22px 20px 0}
-.rb h3{display:flex;align-items:center;gap:8px;font:9px PX;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:14px;text-transform:uppercase}
-.rb h3 span{font:700 11px AV;color:#120F1A;background:rgba(255,255,255,.85);border-radius:9px;padding:1px 7px}
+.rs-group{padding:22px 20px 0}
+.rs-group h3{display:flex;align-items:center;gap:8px;font:9px PX;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:14px;text-transform:uppercase}
+.rs-group h3 span{font:700 11px AV;color:#120F1A;background:rgba(255,255,255,.85);border-radius:9px;padding:1px 7px}
 .rg{display:grid;grid-template-columns:1fr 1fr;gap:18px 14px}
 .rc{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:8px}
 .rc .fx{--rad:10px;display:block;width:100%;aspect-ratio:480/670;box-shadow:0 14px 26px rgba(0,0,0,.5)}
@@ -851,6 +858,25 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .rs2 .rs-out{display:block;margin:10px auto 0}
 .dx-v.v-b{background:#fff;color:#111}.dx-v.v-e{background:linear-gradient(90deg,#8fe9ff,#ffb3e6);color:#111}.dx-v.v-r{background:#e8b923;color:#111}.dx-v.v-f{background:#ff8fd8;color:#111}
 .rh .dx-card{bottom:128px!important;width:36%!important}
+.rs-redeem{padding-top:8px}
+.rs-enter{animation:rsEnter .35s ease-out both}
+@keyframes rsEnter{from{opacity:0;transform:translateY(10px)}}
+.zoom[open]{display:flex;align-items:center}
+dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;color:#fff;padding:0 12px 20px!important;overscroll-behavior:contain}
+.zoom::backdrop{background:#07062a}
+.z-bar{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;width:min(100%,600px);padding:8px 0;background:#07062a}
+.z-bar h2{font:700 16px AV;margin:0}
+.z-bar .btn,#zToggle{min-height:44px}
+#zoom .fx{width:min(100%,600px)!important;touch-action:pan-y pinch-zoom}
+#zVoting{width:min(100%,480px);scroll-margin-bottom:12px}
+@media(max-height:530px){
+ .disc.dx .dx-info h2{font-size:26px;margin:5px 0}
+ .disc.dx .dx-card{bottom:calc(121px + env(safe-area-inset-bottom))!important;width:min(34%,24dvh)!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .dx-scene,.dx-info,.dx-art,.dx-back span,.dx-mat,.dx-holo,.fx.idle,.rs-enter{animation:none}
+ .dx .dx-card{animation:none!important}
+}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -887,7 +913,7 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
   <div class="disc" id="disc" aria-live="polite"></div>
   <div class="leak" id="leak"></div>
   <div class="px" id="stHint" style="display:none;position:absolute;bottom:20px;left:0;right:0;text-align:center;font-size:9px;color:var(--dim)"></div>
-  <div class="sum" id="sum"></div>
+  <div class="sum" id="sum" tabindex="-1" aria-label="Resumen del sobre"></div>
  </div>
 </section>
 <section class="view" id="album">
@@ -919,7 +945,12 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 </section>
 </div>
 <div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button class="vback" id="fClose" aria-label="Cerrar"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
-<div class="zoom" id="zoom"><div class="fx idle" id="zFx"><img id="zImg"><i class="foil"></i><i class="glare"></i></div><div id="zGoty"></div><div id="zRate"></div><button class="btn" id="zClose">CERRAR</button></div>
+<dialog class="zoom" id="zoom" aria-labelledby="zName">
+ <header class="z-bar"><h2 id="zName"></h2><button class="btn" id="zClose" autofocus>Cerrar</button></header>
+ <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i></div>
+ <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
+ <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
+</dialog>
 <div class="onb" id="onb"><img id="onImg"><h2 id="onT"></h2><p id="onP"></p><div class="d" id="onDots"></div><button class="big" id="onNext"></button></div>
 <div class="toast" id="toast"></div>
 <div class="bkm" id="bkm"><div class="bkin"></div></div>
@@ -945,85 +976,85 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
    Las claves guardadas en el progreso (id_v) nunca se renombran; los nombres viejos se quedan en `al`.
    El progreso del modelo anterior (id / F_id) se convierte solo al abrir: Común→Base, Holo→Especial, Dorada→Rara, F_→Full. */
 const DESIGNS=[
-{id:'9000',n:"It's Over 9000",cat:'ANIME',r:'comun',no:1},
-{id:'abuket',n:'Abuket',cat:'GAMER',r:'comun',no:2,f:1},
-{id:'alienonboard',n:'Alien on Board',cat:'PELÍCULAS',r:'comun',no:3},
-{id:'androidsdays',n:'Androids Days',cat:'ANIME',r:'comun',no:4},
+{id:'9000',bx:1,n:"It's Over 9000",cat:'ANIME',r:'comun',no:0},
+{id:'abuket',n:'Abuket',cat:'GAMER',r:'comun',no:1,f:1},
+{id:'alienonboard',bx:1,n:'Alien on Board',cat:'PELÍCULAS',r:'comun',no:0},
+{id:'androidsdays',bx:1,n:'Androids Days',cat:'ANIME',r:'comun',no:0},
 {id:'animehero',bx:1,n:'Anime Héroe',cat:'ANIME',r:'comun',no:0},
-{id:'arcade',n:'Anatomía del Arcade',cat:'GAMER',r:'comun',no:5,f:2},
-{id:'arcade2',n:'Insert Coin',cat:'GAMER',r:'comun',no:6},
-{id:'artemis',n:'Artemis',cat:'ANIME',r:'comun',no:7},
-{id:'blooper',n:'Blooper Maki',cat:'GAMER',r:'comun',no:8,f:4},
-{id:'bort',n:'Bort',cat:'CARICATURAS',r:'comun',no:9},
-{id:'bustfiction',n:'Bust Fiction',cat:'PELÍCULAS',r:'comun',no:10,f:5},
-{id:'challenger',n:'Here Comes a New Challenger',cat:'GAMER',r:'comun',no:11,f:6},
-{id:'choochoo',n:'Choo Choo',cat:'CARICATURAS',r:'comun',no:12},
-{id:'chorriuken',n:'Chorriuken',cat:'GAMER',r:'comun',no:13},
-{id:'collector',n:'Collector',cat:'GAMER',r:'comun',no:14,f:7},
-{id:'controls',n:'Controls',cat:'GAMER',r:'comun',no:15,f:8},
-{id:'evilexes',n:'Evil Exes',cat:'PELÍCULAS',r:'comun',no:16},
+{id:'arcade',n:'Anatomía del Arcade',cat:'GAMER',r:'comun',no:2,f:2},
+{id:'arcade2',n:'Insert Coin',cat:'GAMER',r:'comun',no:3},
+{id:'artemis',n:'Artemis',cat:'ANIME',r:'comun',no:4},
+{id:'blooper',n:'Blooper Maki',cat:'GAMER',r:'comun',no:5,f:4},
+{id:'bort',n:'Bort',cat:'CARICATURAS',r:'comun',no:6},
+{id:'bustfiction',n:'Bust Fiction',cat:'PELÍCULAS',r:'comun',no:7,f:5},
+{id:'challenger',n:'Here Comes a New Challenger',cat:'GAMER',r:'comun',no:8,f:6},
+{id:'choochoo',n:'Choo Choo',cat:'CARICATURAS',r:'comun',no:9},
+{id:'chorriuken',n:'Chorriuken',cat:'GAMER',r:'comun',no:10},
+{id:'collector',n:'Collector',cat:'GAMER',r:'comun',no:11,f:7},
+{id:'controls',n:'Controls',cat:'GAMER',r:'comun',no:12,f:8},
+{id:'evilexes',n:'Evil Exes',cat:'PELÍCULAS',r:'comun',no:13},
 {id:'family',bx:1,n:'Family',cat:'GAMER',r:'comun',no:0},
-{id:'fatality',n:'Fatality',cat:'GAMER',r:'dorada',no:17},
-{id:'fatman',n:'Fatman',cat:'PELÍCULAS',r:'comun',no:18,f:10},
-{id:'fck',n:'#Fuck',cat:'GAMER',r:'holo',no:19,f:11},
-{id:'futbolito',n:'Futbolito',cat:'OTROS',r:'comun',no:20,f:12},
+{id:'fatality',n:'Fatality',cat:'GAMER',r:'dorada',no:14},
+{id:'fatman',n:'Fatman',cat:'PELÍCULAS',r:'comun',no:15,f:10},
+{id:'fck',n:'#Fuck',cat:'GAMER',r:'holo',no:16,f:11},
+{id:'futbolito',n:'Futbolito',cat:'OTROS',r:'comun',no:17,f:12},
 {id:'galaxianwars',bx:1,n:'Galaxian Wars',cat:'ANIME',r:'comun',no:0},
-{id:'gameover',n:'Game Over',cat:'GAMER',r:'dorada',no:21},
-{id:'gamepop',n:'Game Pop',cat:'GAMER',r:'holo',no:22,f:13},
-{id:'gatosamurai',n:'Gato Samurái',cat:'ANIME',r:'comun',no:23,f:14},
-{id:'gunsncontrols',n:"Guns N' Controls",cat:'GAMER',r:'comun',no:24,f:15},
-{id:'humangamer',n:'Human Gamer',cat:'GAMER',r:'comun',no:25,f:16},
-{id:'hyrule',n:'Hyrule',cat:'GAMER',r:'comun',no:26,f:17},
+{id:'gameover',n:'Game Over',cat:'GAMER',r:'dorada',no:18},
+{id:'gamepop',n:'Game Pop',cat:'GAMER',r:'holo',no:19,f:13},
+{id:'gatosamurai',n:'Gato Samurái',cat:'ANIME',r:'comun',no:20,f:14},
+{id:'gunsncontrols',n:"Guns N' Controls",cat:'GAMER',r:'comun',no:21,f:15},
+{id:'humangamer',n:'Human Gamer',cat:'GAMER',r:'comun',no:22,f:16},
+{id:'hyrule',n:'Hyrule',cat:'GAMER',r:'comun',no:23,f:17},
 {id:'imposible',bx:1,n:'Imposible',cat:'OTROS',r:'comun',no:0},
-{id:'invader',n:'Invader',cat:'GAMER',r:'comun',no:27,f:18},
-{id:'kaiji',n:'Kaiju Club',cat:'PELÍCULAS',r:'comun',no:28},
-{id:'kame',n:'Kame Hame Ha',cat:'ANIME',r:'comun',no:29},
+{id:'invader',n:'Invader',cat:'GAMER',r:'comun',no:24,f:18},
+{id:'kaiji',n:'Kaiju Club',cat:'PELÍCULAS',r:'comun',no:25},
+{id:'kame',n:'Kame Hame Ha',cat:'ANIME',r:'comun',no:26},
 {id:'karting',bx:1,n:'Karting Party',cat:'GAMER',r:'comun',no:0},
-{id:'keepcalm',n:'Keep Calm',cat:'ANIME',r:'comun',no:30,f:19},
-{id:'killbills',n:'Kill Bills',cat:'PELÍCULAS',r:'comun',no:31},
+{id:'keepcalm',n:'Keep Calm',cat:'ANIME',r:'comun',no:27,f:19},
+{id:'killbills',n:'Kill Bills',cat:'PELÍCULAS',r:'comun',no:28},
 {id:'kof',bx:1,n:'KOF Héroes',cat:'GAMER',r:'comun',no:0},
-{id:'konamicode',n:'Konami Code',cat:'GAMER',r:'comun',no:32},
-{id:'linkfloyd',n:'Link Floyd',cat:'GAMER',r:'comun',no:33},
-{id:'links',n:'Links',cat:'GAMER',r:'holo',no:34},
-{id:'luna',n:'Luna',cat:'ANIME',r:'comun',no:35},
-{id:'mainstream',n:'Mainstream',cat:'GAMER',r:'comun',no:36},
-{id:'mapa',n:'Mapa',cat:'GAMER',r:'comun',no:37,f:20},
-{id:'mrkarate',n:'Mr. Karate',cat:'PELÍCULAS',r:'comun',no:38,f:21},
-{id:'n64',n:'N64',cat:'GAMER',r:'comun',no:39,f:22},
-{id:'navidadgamer',n:'Navidad Gamer',cat:'GAMER',r:'comun',no:40},
-{id:'nerv',n:'Nerv',cat:'ANIME',r:'holo',no:41,f:23},
-{id:'no',n:'NO',cat:'GAMER',r:'comun',no:42},
-{id:'nowloading',n:'Now Loading',cat:'GAMER',r:'comun',no:43},
-{id:'ochentas',n:'Ochentas',cat:'GAMER',r:'comun',no:44},
-{id:'oldschool',n:'Old School',cat:'GAMER',r:'comun',no:45},
-{id:'omkami',n:'Ōkami',cat:'GAMER',r:'holo',no:46,f:24},
-{id:'patronus',n:'Mi Patronus',cat:'PELÍCULAS',r:'comun',no:47},
-{id:'pikaball',n:'Pika Ball',cat:'GAMER',r:'comun',no:48},
-{id:'pizzcipher',n:'Pizzcipher',cat:'CARICATURAS',r:'comun',no:49,f:25},
-{id:'poketaco',n:'Poké Taco',cat:'GAMER',r:'comun',no:50,f:26},
-{id:'polystation',n:'PolyStation',cat:'GAMER',r:'holo',no:51,f:27},
-{id:'portatiles',n:'Portátiles',cat:'GAMER',r:'comun',no:52},
-{id:'sailors',n:'Sailor Scout',cat:'ANIME',r:'comun',no:53},
+{id:'konamicode',n:'Konami Code',cat:'GAMER',r:'comun',no:29},
+{id:'linkfloyd',n:'Link Floyd',cat:'GAMER',r:'comun',no:30},
+{id:'links',n:'Links',cat:'GAMER',r:'holo',no:31},
+{id:'luna',n:'Luna',cat:'ANIME',r:'comun',no:32},
+{id:'mainstream',n:'Mainstream',cat:'GAMER',r:'comun',no:33},
+{id:'mapa',n:'Mapa',cat:'GAMER',r:'comun',no:34,f:20},
+{id:'mrkarate',n:'Mr. Karate',cat:'PELÍCULAS',r:'comun',no:35,f:21},
+{id:'n64',n:'N64',cat:'GAMER',r:'comun',no:36,f:22},
+{id:'navidadgamer',n:'Navidad Gamer',cat:'GAMER',r:'comun',no:37},
+{id:'nerv',n:'Nerv',cat:'ANIME',r:'holo',no:38,f:23},
+{id:'no',bx:1,n:'NO',cat:'GAMER',r:'comun',no:0},
+{id:'nowloading',n:'Now Loading',cat:'GAMER',r:'comun',no:39},
+{id:'ochentas',n:'Ochentas',cat:'GAMER',r:'comun',no:40},
+{id:'oldschool',n:'Old School',cat:'GAMER',r:'comun',no:41},
+{id:'omkami',n:'Ōkami',cat:'GAMER',r:'holo',no:42,f:24},
+{id:'patronus',bx:1,n:'Mi Patronus',cat:'PELÍCULAS',r:'comun',no:0},
+{id:'pikaball',n:'Pika Ball',cat:'GAMER',r:'comun',no:43},
+{id:'pizzcipher',n:'Pizzcipher',cat:'CARICATURAS',r:'comun',no:44,f:25},
+{id:'poketaco',n:'Poké Taco',cat:'GAMER',r:'comun',no:45,f:26},
+{id:'polystation',n:'PolyStation',cat:'GAMER',r:'holo',no:46,f:27},
+{id:'portatiles',n:'Portátiles',cat:'GAMER',r:'comun',no:47},
+{id:'sailors',n:'Sailor Scout',cat:'ANIME',r:'comun',no:48},
 {id:'sailourss',bx:1,n:'Sailor URSS',cat:'ANIME',r:'comun',no:0},
-{id:'samus',n:'Samus',cat:'GAMER',r:'comun',no:54,f:28},
-{id:'sensei',n:'Sensei',cat:'ANIME',r:'comun',no:55,f:29},
-{id:'shadaloo',n:'Shadaloo',cat:'GAMER',r:'comun',no:56},
-{id:'shenzalcoatl',n:'Shenzalcoatl',cat:'ANIME',r:'comun',no:57,f:30},
-{id:'snes',n:'Ignore All of My Adult Problems',cat:'GAMER',r:'comun',no:58,f:31},
-{id:'sv001',n:'SV-001',cat:'GAMER',r:'comun',no:59,f:33},
-{id:'thankyou',n:'Thank You',cat:'GAMER',r:'comun',no:60,f:34},
-{id:'thelostgame',n:'The Lost Game',cat:'GAMER',r:'comun',no:61},
-{id:'theworldwarrior',n:'The World Warrior',cat:'GAMER',r:'comun',no:62,f:38,fk:'F_worldwarrior',al:['worldwarrior']},
+{id:'samus',n:'Samus',cat:'GAMER',r:'comun',no:49,f:28},
+{id:'sensei',n:'Sensei',cat:'ANIME',r:'comun',no:50,f:29},
+{id:'shadaloo',n:'Shadaloo',cat:'GAMER',r:'comun',no:51},
+{id:'shenzalcoatl',n:'Shenzalcoatl',cat:'ANIME',r:'comun',no:52,f:30},
+{id:'snes',n:'Ignore All of My Adult Problems',cat:'GAMER',r:'comun',no:53,f:31},
+{id:'sv001',n:'SV-001',cat:'GAMER',r:'comun',no:54,f:33},
+{id:'thankyou',n:'Thank You',cat:'GAMER',r:'comun',no:55,f:34},
+{id:'thelostgame',bx:1,n:'The Lost Game',cat:'GAMER',r:'comun',no:0},
+{id:'theworldwarrior',n:'The World Warrior',cat:'GAMER',r:'comun',no:56,f:38,fk:'F_worldwarrior',al:['worldwarrior']},
 {id:'tmnt',bx:1,n:'Tortugas Ninja',cat:'CARICATURAS',r:'comun',no:0},
-{id:'toto',n:'Totoro',cat:'ANIME',r:'comun',no:63},
-{id:'triforce',n:'Triforce',cat:'GAMER',r:'dorada',no:64,f:35},
-{id:'vamonospest',n:'Vámonos Pest',cat:'CARICATURAS',r:'comun',no:65},
-{id:'vidaextra',n:'Una Vida Extra',cat:'GAMER',r:'holo',no:66,f:36},
-{id:'wirimask',n:'Wirimask',cat:'GAMER',r:'comun',no:67,f:37},
-{id:'x',n:'X',cat:'GAMER',r:'comun',no:68,f:39},
-{id:'yinyang',n:'Yin Yang',cat:'GAMER',r:'holo',no:69,f:40},
-{id:'zero',n:'Zero',cat:'GAMER',r:'comun',no:70,f:41},
-{id:'zodiac',n:'Zodiaco',cat:'ANIME',r:'comun',no:71,f:42,fk:'F_zodiaco',al:['zodiaco']},
+{id:'toto',n:'Totoro',cat:'ANIME',r:'comun',no:57},
+{id:'triforce',n:'Triforce',cat:'GAMER',r:'dorada',no:58,f:35},
+{id:'vamonospest',bx:1,n:'Vámonos Pest',cat:'CARICATURAS',r:'comun',no:0},
+{id:'vidaextra',n:'Una Vida Extra',cat:'GAMER',r:'holo',no:59,f:36},
+{id:'wirimask',n:'Wirimask',cat:'GAMER',r:'comun',no:60,f:37},
+{id:'x',n:'X',cat:'GAMER',r:'comun',no:61,f:39},
+{id:'yinyang',n:'Yin Yang',cat:'GAMER',r:'holo',no:62,f:40},
+{id:'zero',n:'Zero',cat:'GAMER',r:'comun',no:63,f:41},
+{id:'zodiac',n:'Zodiaco',cat:'ANIME',r:'comun',no:64,f:42,fk:'F_zodiaco',al:['zodiaco']},
 {id:'asteroids',n:'Asteroids',cat:'GAMER',r:0,no:0,f:3},
 {id:'sonic',n:'Sonic',cat:'GAMER',r:0,no:0,f:32},
 {id:'docecasas',n:'Las Doce Casas',cat:'ANIME',r:0,no:0,f:9}];
@@ -1094,7 +1125,7 @@ const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
  if(MIGD&&raw!==null){try{if(LS.get(KEY_PRE)===null)localStorage.setItem(KEY_PRE,raw)}catch(e){}}} // copia exacta del progreso anterior, una sola vez
 const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
-const PRUEBA=true; // quitar al lanzar: sobres ilimitados para revisar
+const PRUEBA=false; // quitar al lanzar: sobres ilimitados para revisar
 const packReady=()=>PRUEBA||S.test||after(today(),S.last)||S.extra>0;
 /* ---------- datos compartidos ---------- */
 const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude)return;this.db=await claude.use('db');const u=await claude.use('user');this.uid=u?await u.id():null;try{this.dl=await claude.use('downloads')}catch(e){}
@@ -1267,19 +1298,38 @@ let pi=0,PHS=[];
 function phasesOf(c){const L=[];if(c._dnew)L.push('design');if(c._new&&c.v!=='b')L.push('back');L.push('card');return L}
 let REV=new Set();
 const dxTop=()=>`<div class="dx-top"><span class="dx-seg">${hand.map((_,i)=>`<i class="${i<idx?'ok':i===idx?'cur':''}"></i>`).join('')}</span><span class="dx-n">${String(idx+1).padStart(2,'0')}/05</span><button id="dcSkip">Saltar</button></div>`;
-function dxNav(D){ /* tocar = siguiente · tocar a la izquierda o deslizar a la derecha = anterior · deslizar a la izquierda = siguiente */
- D.onclick=e=>{if(e.clientX<innerWidth*.25&&idx>0){idx--;showCard()}else{idx++;showCard()}};
- const n=D.querySelector('.dx-next');if(n)n.onclick=e=>{e.stopPropagation();idx++;showCard()};
- $('dcSkip').onclick=e=>{e.stopPropagation();idx=5;D.classList.remove('on');showSum()}}
-if(!window._dxSw){window._dxSw=1;let x0=null;const D0=document.getElementById('disc');
- D0.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
- D0.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)<50||D0.classList.contains('cov'))return;e.preventDefault();if(dx<0){idx++;showCard()}else if(idx>0){idx--;showCard()}},{passive:false})}
-function showCard(){const D=$('disc'),c=hand[idx];if(!c){D.classList.remove('on');showSum();return}
+const dxControls=(covered=false)=>`<nav class="dx-controls" aria-label="Cartas del sobre">
+ <button id="dcPrev"${idx===0?' disabled':''}>Anterior</button>
+ ${covered?'<button id="dcReveal" class="dx-primary">Revelar carta</button>':`<button id="dcNext" class="dx-primary">${idx===hand.length-1?'Ver resumen':'Siguiente'}</button>`}
+ </nav>`;
+function finishDiscovery(){
+ $('disc').classList.remove('on');
+ showSum();
+ $('sum').focus({preventScroll:true});
+}
+function dxNav(){
+ const move=step=>e=>{
+  idx+=step;
+  if(idx===hand.length){finishDiscovery();return}
+  showCard();
+  if(e.detail===0){
+   const dest=$('dcReveal')||(step<0&&!$('dcPrev').disabled?$('dcPrev'):$('dcNext'));
+   dest.focus();
+  }
+ };
+ $('dcPrev').onclick=move(-1);
+ if($('dcNext'))$('dcNext').onclick=move(1);
+ $('dcSkip').onclick=finishDiscovery;
+}
+function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
  if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
   D.className=`disc on dx cov v-${c.v}`;D.style.setProperty('--bg','#0c0a14');
   D.innerHTML=`${c.v==='e'?'<i class="dx-mat holo"></i>':c.v==='r'?'<i class="dx-mat gold"></i>':'<i class="dx-mat pink"></i>'}${dxTop()}
-   <div class="dx-back"><span><img src="coin.png" alt=""></span></div><div class="dx-cta"><b>ALGO ESPECIAL</b><span>Toca para revelar</span></div>`;
-  D.onclick=()=>{REV.add(idx);showCard()};$('dcSkip').onclick=e=>{e.stopPropagation();idx=5;D.classList.remove('on');showSum()};return}
+   <div class="dx-back"><span><img src="coin.png" alt=""></span></div><div class="dx-cta"><b>ALGO ESPECIAL</b></div>${dxControls(true)}`;
+  $('dcReveal').onclick=e=>{REV.add(idx);showCard();if(e.detail===0)$('dcNext').focus()};
+  dxNav();
+  return}
+
  const d=DB[c.d],col=dcol(d.id),k=caseOf(c),v=c.v,fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':null;
  const lab={dnew:'DISEÑO NUEVO',vnew:'NUEVA VERSIÓN',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
  /* la ilustración es la de esta versión: Base/Especial = estampa original · Rara = su arte en oro · Full = su escena completa */
@@ -1288,12 +1338,12 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c){D.classList.remove('on'
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:${artOf(d.id).startsWith('d/')?.8:.667}"><img src="${artOf(d.id)}" alt=""></span>`}${v==='e'?'<i class="dx-holo"></i>':''}</span></div>`;
  D.className=`disc on dx v-${v} k-${k}${hasCol(d.id)?'':' neu'}`;D.style.setProperty('--bg',v==='r'?'#0d0a05':col);
  D.innerHTML=`${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
-  ${dxTop()}<button class="dx-next" aria-label="Siguiente"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button>
+  ${dxTop()}${dxControls()}
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>
-   <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${idx===0?'<div class="dx-how">Toca o desliza para ver la siguiente</div>':''}</div>
-  <button class="dx-card" id="dcCard" aria-label="Ver la carta en grande"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span></button>`;
- $('dcCard').onclick=e=>{e.stopPropagation();openCard(c.k)};
- dxNav(D);
+   <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div></div>
+  <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read">Ampliar carta</span></button>`;
+ $('dcCard').onclick=()=>openCard(c.k);
+ dxNav();
  if(k==='rep')beep(440,.05);else if(v==='b')beep(988,.07);else jingle();
  if(k==='comp')setTimeout(()=>[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.1),i*120)),500)}
 $('stack').addEventListener('click',e=>{});
@@ -1333,14 +1383,14 @@ window.addEventListener('deviceorientation',e=>{if(!$('title').classList.contain
 function fxAim(fx,x,y){fx.classList.remove('idle');fx.style.setProperty('--mx',(x*100).toFixed(1)+'%');fx.style.setProperty('--my',(y*100).toFixed(1)+'%');clearTimeout(fx._t);fx._t=setTimeout(()=>{fx.classList.add('idle');fx.style.removeProperty('--mx');fx.style.removeProperty('--my')},2500)}
 document.addEventListener('pointermove',e=>{const fx=e.target.closest&&e.target.closest('.fx');if(!fx)return;const r=fx.getBoundingClientRect();fxAim(fx,(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height)},{passive:true});
 document.addEventListener('touchmove',e=>{const p=e.touches[0];if(!p)return;const el=document.elementFromPoint(p.clientX,p.clientY);const fx=el&&el.closest&&el.closest('.fx');if(!fx)return;const r=fx.getBoundingClientRect();fxAim(fx,Math.min(1,Math.max(0,(p.clientX-r.left)/r.width)),Math.min(1,Math.max(0,(p.clientY-r.top)/r.height)))},{passive:true});
-window.addEventListener('deviceorientation',e=>{if(e.gamma==null)return;const x=Math.max(0,Math.min(1,.5+e.gamma/50)),y=Math.max(0,Math.min(1,.5+(e.beta-45)/50));document.querySelectorAll('.sc.top .fx,.zoom.on .fx,#title.on .tc.m .fx').forEach(fx=>fxAim(fx,x,y))});
+window.addEventListener('deviceorientation',e=>{if(e.gamma==null)return;const x=Math.max(0,Math.min(1,.5+e.gamma/50)),y=Math.max(0,Math.min(1,.5+(e.beta-45)/50));document.querySelectorAll('.sc.top .fx,.zoom[open] .fx,#title.on .tc.m .fx').forEach(fx=>fxAim(fx,x,y))});
 let mdown=false;
 ST.addEventListener('mousedown',e=>{mdown=true;gStart(e.clientX,e.clientY,e.target)});
 window.addEventListener('mousemove',e=>{if(mdown)gMove(e.clientX,e.clientY)});
 window.addEventListener('mouseup',()=>{if(mdown){mdown=false;gEnd(false)}});
 /* ===== RESUMEN: qué cambió en tu colección, agrupado por significado ===== */
 /* ===== RESUMEN (lista de Jos): protagonista con el logro integrado · compartir junto a ella · bloques: completas, diseños nuevos, versiones nuevas, repetidas · progreso chico ===== */
-function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');s.classList.add('on');s.scrollTop=0;
+function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');const entering=!s.classList.contains('on');s.classList.add('on');
  const comp=hand.filter(c=>c._comp),rank=c=>(c._comp?-10:0)+VORD[c.v]+(c._new?0:5);
  const H=hand.slice().sort((a,b)=>rank(a)-rank(b))[0],d=DB[H.d],v=H.v,st=dState(d);
  const fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':null;
@@ -1352,20 +1402,22 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
  const tag=c=>`<span class="rc-t"><span class="dx-v v-${c.v}">${VN[c.v].toUpperCase()}</span>${c._new?'<span class="rc-n">NUEVA</span>':`<span class="rc-r">REPETIDA ×${S.have[c.k]}</span>`}</span>`;
  const card=c=>`<button class="rc ${c._new?'nw':'rp'}" data-k="${c.k}"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><b>${esc(c.n)}</b>${tag(c)}</button>`;
  const rest=hand.filter(c=>c!==H),G={comp:rest.filter(c=>c._comp),dnew:rest.filter(c=>c._new&&!c._comp&&c._dnew),vnew:rest.filter(c=>c._new&&!c._comp&&!c._dnew),rep:rest.filter(c=>!c._new)};
- const sec=(t,L,extra='')=>L.length?`<section class="rb"><h3>${t}<span>${L.length}</span></h3><div class="rg">${L.map(card).join('')}</div>${extra}</section>`:'';
+ const sec=(t,L)=>L.length?`<section class="rs-group"><h3>${t}<span>${L.length}</span></h3><div class="rg">${L.map(card).join('')}</div></section>`:'';
  const n=dups(),PD=DESIGNS.filter(x=>!x.bx),disc=PD.filter(x=>dState(x).own).length;
  const tradeH=n>=5?'<button class="rs-trade" id="sTrade">Cambiar 5 repetidas por un sobre extra</button>':`<p class="rb-p">Llevas ${n%5} de 5 repetidas para un sobre extra</p>`;
- s.innerHTML=`<div class="rs2">
+ s.innerHTML=`<div class="rs2${entering?' rs-enter':''}">
   <div class="rh dx v-${v}${hasCol(d.id)?'':' neu'}" style="--bg:${v==='r'?'#0d0a05':dcol(d.id)}">${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
    <button class="dx-card" data-k="${H.k}" aria-label="Ver la carta en grande"><span class="fx idle r-${H.img?H.r:'comun'}"><img src="${imgOf(H,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span></button>
    <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${H._comp?`<div class="rh-vs">${vchips}</div>`:tag(H)}</div></div>
   <div class="rs-act2"><button class="rs-main" id="sShare">Compartir mi sobre</button><button class="rs-sec2" id="sAlb">Ver álbum</button></div>
-  ${sec('Colección completa',G.comp)}${sec('Diseños nuevos',G.dnew)}${sec('Versiones nuevas',G.vnew)}${sec('Repetidas',G.rep,tradeH)}
+  ${sec('Colección completa',G.comp)}${sec('Diseños nuevos',G.dnew)}${sec('Versiones nuevas',G.vnew)}${sec('Repetidas',G.rep)}
+  <div class="rs-group rs-redeem">${tradeH}</div>
   <div class="rs-pg">${disc} de ${PD.length} diseños · ${AV.filter(c=>S.have[c.k]).length} de ${NAV} cartas</div>
   <button class="rs-out" id="sOtro">Volver al menú</button>
  </div>`;
+ if(entering)s.scrollTop=0;
  s.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>openCard(b.dataset.k));
- if($('sTrade'))$('sTrade').onclick=()=>trade(showSum);
+ if($('sTrade'))$('sTrade').onclick=()=>trade(()=>{showSum();($('sTrade')||$('sAlb')).focus({preventScroll:true})});
  $('sAlb').onclick=()=>go('album');$('sOtro').onclick=()=>go('home');
  $('sShare').onclick=()=>shareGrid(H._comp?'COMPLETE '+d.n.toUpperCase():'ME SALIO EN MI SOBRE',hand.map(c=>c.k),'sobre-insertcoinmx.png')}
 
@@ -1419,17 +1471,32 @@ function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(
 $('fVers').onclick=e=>{const b=e.target.closest('.vc.have');if(b)openCard(b.dataset.k)};
 $('fClose').onclick=closeFicha;
 $('ficha').onclick=e=>{if(e.target.id==='ficha')closeFicha()};
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('zoom').classList.contains('on'))$('zClose').onclick();else if(fd)closeFicha()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('zoom').open&&fd)closeFicha()});
 let zk=null;
 /* acepta una clave de carta o un id de diseño (desde el Tier): muestra la versión que tienes; si no, la que ya tiene imagen */
 function cardFor(k){if(CB[k])return CB[k];const d=designId(k);if(!d)return null;const L=VL.map(v=>CB[d+'_'+v]);return L.find(c=>c.img&&S.have[c.k])||L.find(c=>S.have[c.k])||L.find(c=>c.img)||L[0]}
 const zd=()=>CB[zk]?CB[zk].d:zk; // las calificaciones son por diseño, no por versión
 const zGo=()=>{const p=goty(zd());$('zGoty').textContent=p===null?'AUN NADIE LA CALIFICA':p+'% LA PONE GOTY'};
-function openCard(k){const cc=cardFor(k);if(!cc)return;zk=cc.k;$('zImg').src=imgOf(cc,'c2');$('zFx').className='fx idle r-'+(cc.img?cc.r:'comun');$('zoom').classList.add('on');paintRate();zGo()}
+function openCard(k){
+ const cc=cardFor(k);if(!cc)return;
+ zk=cc.k;
+ $('zName').textContent=cc.n+' · '+VN[cc.v];
+ $('zImg').alt=cc.n+' · '+VN[cc.v];
+ $('zImg').src=imgOf(cc,'c2');
+ $('zFx').className='fx idle r-'+(cc.img?cc.r:'comun');
+ setVoting(false);
+ $('zoom').showModal();
+ $('zoom').scrollTop=0;
+}
+function setVoting(on){
+ $('zToggle').setAttribute('aria-expanded',String(on));
+ $('zVoting').hidden=!on;
+ if(on){paintRate();zGo();$('zVoting').scrollIntoView({block:'nearest'})}
+}
+$('zToggle').onclick=()=>setVoting($('zVoting').hidden);
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb ${S.rate[zd()]===i?'on':''}" data-r="${i}" style="--c:${TC[i]}">${n}</button>`).join('')}
 $('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zd()]=+b.dataset.r;save();beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();zGo();if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
-$('zClose').onclick=()=>$('zoom').classList.remove('on');
-$('zoom').addEventListener('click',e=>{if(e.target===$('zoom'))$('zoom').classList.remove('on')});
+$('zClose').onclick=()=>$('zoom').close();
 /* ---------- tier ---------- */
 const mine=()=>CARDS.filter(c=>S.have[c.k]);
 const tierKeys=()=>[...new Set(mine().map(c=>c.d))].map(k=>({k}));
