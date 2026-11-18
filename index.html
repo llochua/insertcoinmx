@@ -317,7 +317,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hnav .lk{display:none;position:absolute;top:8px;right:8px;width:9px;height:9px;color:rgba(255,255,255,.5)}
 .hnav .lock .lk{display:block}.hnav .lock>svg:first-child{opacity:.35}.hnav .lock b{color:rgba(255,255,255,.45)}
 
-/* ===== EFECTOS DE CARTA (foil vivo) ===== */
+/* ===== EFECTOS DE CARTA · fuente visual única para todas las vistas ===== */
+/* Holo = bandas iridiscentes suaves; Dorado = reflejo metálico, sin tramas de puntos. */
 .fx{position:relative;border-radius:var(--rad,16px);overflow:hidden;isolation:isolate;--mx:50%;--my:50%;--o:0;transform:translateZ(0)}
 .fx>img{width:100%;height:100%;display:block;pointer-events:none}
 .fx>i{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
@@ -894,10 +895,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @keyframes icArt{from{opacity:0;transform:scale(1.13);filter:brightness(2)}to{opacity:1;transform:scale(1);filter:brightness(1)}}
 @keyframes icCard{from{opacity:0;transform:translateY(24px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes icInfo{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.fx.r-holo .foil{background:radial-gradient(circle,#ffffffbb 0 .7px,transparent 1.5px) 0 0/19px 23px,linear-gradient(115deg,transparent 14%,#84dcff26 33%,#ffe6f844 45%,#fffbd759 52%,#a6f3e429 62%,transparent 79%);background-size:19px 23px,230% 230%;background-position:0 0,var(--mx) var(--my);mix-blend-mode:screen;opacity:.62}
 .dx-holo,.dx-mat.holo{background:linear-gradient(115deg,transparent 15%,#84dcff1f 35%,#fff3d74a 50%,#f4b2e11f 64%,transparent 80%) 0 0/230% 230%;mix-blend-mode:screen;opacity:.52;animation:dxHolo 8s ease-in-out infinite alternate}
-.fx.r-dorada .foil{background:radial-gradient(circle,#fffcd9e6 0 .9px,transparent 1.8px) 0 0/17px 21px,linear-gradient(110deg,transparent 12%,#6e3f0529 26%,#eaaa2647 39%,#fff9c0aa 49%,#d48f1457 57%,transparent 78%) var(--mx) var(--my)/260% 260%;mix-blend-mode:screen;opacity:.68}
-.fx.r-dorada::after{box-shadow:inset 0 0 0 2px #ffd963f2,inset 0 0 0 5px #63380773,inset 0 0 23px #f4ae2852}
 .zoom #zToggle{display:none!important}
 .zoom #zVoting{box-sizing:border-box;width:min(100%,480px);margin:16px auto 0;padding:15px;border:1px solid #ffffff29;border-radius:14px;background:#ffffff0e}
 .zoom #zVoting[hidden]{display:none}
@@ -945,6 +943,13 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  .disc.dx.dx-settled .dx-card{transition:none!important}
  .dx-art-flash.on{animation:none;opacity:1}
 }
+
+/* IC-02 · Holo y Dorada en álbum y fichas utilizan la misma superficie .fx
+   que portada, descubrimiento, resumen y zoom; solo cambia el tamaño de cada vista. */
+.dt.own .cv.fx,.vc.have .cv.fx{isolation:isolate}
+.dt .cv.fx>i,.vc.have .cv.fx>i{pointer-events:none}
+.dt .cv.fx>.cr,.dt .cv.fx>.x,.dt .cv.fx>.nw{z-index:2}
+@media(prefers-reduced-motion:reduce){.fx.idle{animation:none!important}}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1587,7 +1592,7 @@ function renderAlbum(){
  $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=DN.reduce((n,x)=>n+x.st.got,0)+'/'+DN.reduce((n,x)=>n+x.st.tot,0);
  const dn=LN.filter(x=>x.st.all).length;
  $('aSub').innerHTML=`<b>${dn}</b> de ${LN.length} diseños completos · ${t} cartas en sobres`+(SOON_N>0?`<span>+ ${SOON_N} ilustraciones en camino · todavía no salen en sobres</span>`:'');
- $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv">${st.own?`<img src="${imgOf(st.cover,'c')}" loading="lazy" alt="">`:`<span class="lk"><img src="coin.png" alt="">${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
+ $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv${st.own?` fx idle r-${st.cover.r}`:''}">${st.own?`<img src="${imgOf(st.cover,'c')}" loading="lazy" alt=""><i class="foil"></i><i class="glare"></i>`:`<span class="lk"><img src="coin.png" alt="">${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
 $('grid').onclick=e=>{const t=e.target.closest('.dt');if(!t)return;beep(880,.04);openFicha(t.dataset.d)};
@@ -1598,7 +1603,7 @@ function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(
  const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
  const col=st.vs.filter(x=>x.st==='have'||x.st==='av');$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
-  return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv"><img src="${imgOf(x.c,'c')}" alt=""></span>${lb}</button>`
+  return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv fx idle r-${x.c.img?x.c.r:'comun'}"><img src="${imgOf(x.c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span>${lb}</button>`
    :`<div class="vc av"><span class="cv"><img src="coin.png" alt=""><span>EN SOBRES</span></span>${lb}</div>`}).join('');
  const soon=st.vs.filter(x=>x.st==='soon');$('fSoon').innerHTML=soon.length?'Ilustración en camino:'+soon.map(x=>`<span>${VN[x.v]}</span>`).join(''):''}
 $('fVers').onclick=e=>{const b=e.target.closest('.vc.have');if(b)openCard(b.dataset.k)};
