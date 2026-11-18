@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+ <meta name="theme-color" content="#0b0a11">
+ <title>Insert Coin MX — Reta v4 · Laboratorio de combate</title>
+ <meta name="description" content="Prueba de experiencia Reta v4: una campeona, nuevos retadores, una pelea continua.">
+ <link rel="preload" as="image" href="d/gatosamurai.jpg">
+ <link rel="preload" as="image" href="d/x.jpg">
+ <link rel="stylesheet" href="reta-v4-demo.css">
+</head>
+<body>
+ <main class="app" id="app">
+  <header class="brandbar">
+   <div class="brand">
+    <img src="coin.png" alt="">
+    <span class="brandword">INSERT COIN MX<small>RETA · LABORATORIO V4</small></span>
+   </div>
+   <div class="minictrls">
+    <button type="button" class="tinybtn" id="mute" aria-label="Silenciar sonido" aria-pressed="false" title="Sonido">♫</button>
+    <button type="button" class="tinybtn" id="reset" aria-label="Reiniciar la prueba" title="Reiniciar">↻</button>
+   </div>
+  </header>
+
+  <section class="hud" aria-label="Progreso">
+   <div class="hud-line">
+    <div class="hud-title">STAGE <b>01</b></div>
+    <div class="hud-meta"><span id="roundNum">01</span> / 07<br>ENCUENTROS</div>
+   </div>
+   <div class="progress" id="pips" aria-hidden="true"></div>
+  </section>
+
+  <div class="prompt"><strong>¿CUÁL TE PONDRÍAS?</strong><small>TOCA PARA ELEGIR</small></div>
+
+  <section class="arena" id="arena" aria-label="Enfrentamiento de playeras">
+   <div class="slot" id="topWrap"></div>
+   <div class="vs-divider" aria-hidden="true"><b>VS</b></div>
+   <div class="slot" id="bottomWrap"></div>
+  </section>
+
+  <footer class="screen-bottom">
+   <span>UNA PLAYERA SIGUE EN PIE.</span>
+   <b>INSERT COIN MX</b>
+  </footer>
+
+  <div class="shock" id="shock" aria-hidden="true"><span id="impactText">HIT!</span></div>
+
+  <div class="intro" aria-hidden="true">
+   <small>HERE COMES A</small>
+   <strong>NEW<br>CHALLENGER!</strong>
+  </div>
+
+  <section class="finish" id="finish" aria-hidden="true" aria-label="Resultado final">
+   <div class="fin-backdrop" id="finBackdrop" aria-hidden="true"></div>
+   <div class="fin-top"><img src="coin.png" alt=""><span>INSERT COIN MX<br><small>EL ÁLBUM · RETA</small></span></div>
+   <div class="fin-title"><span>STAGE 01</span><strong>CLEAR!</strong></div>
+   <div class="fin-card-stage">
+    <div class="fin-halo"></div>
+    <div class="fin-reveal" id="finReveal"><img id="winnerCard" src="c2/gatosamurai.jpg" alt="Carta original de la playera campeona"><i class="fin-sheen"></i></div>
+   </div>
+   <div class="fin-copy">
+    <div class="fin-kicker">SOBREVIVIÓ A TUS ELECCIONES</div>
+    <h2>TU FAVORITA<br>POR AHORA</h2>
+    <h3 id="winnerName">Gato Samurái</h3>
+    <p id="finRounds">7 ENCUENTROS · 8 DISEÑOS COMPARADOS</p>
+    <p class="fin-next">Cada playera que descubras podrá destronarla en tu próxima Reta.</p>
+    <div class="thanks">THANK YOU FOR PLAYING</div>
+   </div>
+   <button type="button" class="fin-cta" id="again">VOLVER A JUGAR <small>DEMO</small></button>
+  </section>
+ </main>
+
+ <aside class="debug">VISTA DE PRUEBA · Diseño y ritmo únicamente. No utiliza ni modifica tus cartas, no guarda resultados y no está publicado en el juego.</aside>
+ <script src="reta-v4-demo.js"></script>
+</body>
+</html>
