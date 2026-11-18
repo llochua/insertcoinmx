@@ -877,6 +877,35 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  .dx-scene,.dx-info,.dx-art,.dx-back span,.dx-mat,.dx-holo,.fx.idle,.rs-enter{animation:none}
  .dx .dx-card{animation:none!important}
 }
+
+/* Refinamiento Insert Coin: revelación, foil y clasificación */
+.dx.cov .dx-back{all:unset;box-sizing:border-box;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-bottom:90px;z-index:3;cursor:pointer;touch-action:manipulation}
+.dx.cov .dx-back:focus-visible span{outline:3px solid #FFD400;outline-offset:9px}
+.dx.cov .dx-back span{position:relative;will-change:transform}
+.dx.cov .dx-back::after{content:"";position:absolute;left:50%;top:45%;width:min(68vw,380px);aspect-ratio:1;transform:translate(-50%,-50%) scale(.65);background:radial-gradient(circle,#fff8, #ffda7055 30%,transparent 70%);opacity:0;pointer-events:none}
+.dx.cov.v-e .dx-back::after{background:radial-gradient(circle,#fff9,#8de9ff77 30%,#ff8de933 50%,transparent 70%)}
+.dx.cov.v-r .dx-back::after{background:radial-gradient(circle,#fff9,#ffc84b88 30%,#ba711633 50%,transparent 70%)}
+.dx.cov.v-f .dx-back::after{background:radial-gradient(circle,#fff,#ff90dd88 30%,#ff69ba33 50%,transparent 70%)}
+.dx.cov .dx-back.dx-opening span{animation:icPop .43s cubic-bezier(.2,.8,.3,1) both!important}
+.dx.cov .dx-back.dx-opening::after{animation:icFlash .43s ease-out both}
+@keyframes icPop{0%{transform:scale(1)}35%{transform:translateY(-22px) scale(1.1) rotate(-3deg)}72%{transform:translateY(-6px) scale(1.04) rotate(2deg)}100%{transform:translateY(-4px) scale(.94);filter:brightness(1.8)}}
+@keyframes icFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}42%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}}
+.dx-revealed .dx-art,.dx-revealed .dx-scene{animation:icArt .65s cubic-bezier(.18,.8,.25,1) both}
+.dx-revealed .dx-card{animation:icCard .65s cubic-bezier(.18,.8,.25,1) both}
+.dx-revealed .dx-info{animation:icInfo .65s .14s ease-out both}
+@keyframes icArt{from{opacity:0;transform:scale(1.13);filter:brightness(2)}to{opacity:1;transform:scale(1);filter:brightness(1)}}
+@keyframes icCard{from{opacity:0;transform:translateY(24px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes icInfo{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.fx.r-holo .foil{background:radial-gradient(circle,#ffffffbb 0 .7px,transparent 1.5px) 0 0/19px 23px,linear-gradient(115deg,transparent 14%,#84dcff26 33%,#ffe6f844 45%,#fffbd759 52%,#a6f3e429 62%,transparent 79%);background-size:19px 23px,230% 230%;background-position:0 0,var(--mx) var(--my);mix-blend-mode:screen;opacity:.62}
+.dx-holo,.dx-mat.holo{background:linear-gradient(115deg,transparent 15%,#84dcff1f 35%,#fff3d74a 50%,#f4b2e11f 64%,transparent 80%) 0 0/230% 230%;mix-blend-mode:screen;opacity:.52;animation:dxHolo 8s ease-in-out infinite alternate}
+.fx.r-dorada .foil{background:radial-gradient(circle,#fffcd9e6 0 .9px,transparent 1.8px) 0 0/17px 21px,linear-gradient(110deg,transparent 12%,#6e3f0529 26%,#eaaa2647 39%,#fff9c0aa 49%,#d48f1457 57%,transparent 78%) var(--mx) var(--my)/260% 260%;mix-blend-mode:screen;opacity:.68}
+.fx.r-dorada::after{box-shadow:inset 0 0 0 2px #ffd963f2,inset 0 0 0 5px #63380773,inset 0 0 23px #f4ae2852}
+.zoom #zToggle{display:none!important}
+.zoom #zVoting{box-sizing:border-box;width:min(100%,480px);margin:16px auto 0;padding:15px;border:1px solid #ffffff29;border-radius:14px;background:#ffffff0e}
+.zoom #zVoting[hidden]{display:none}
+.zoom #zRate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.zoom #zRate .rb{min-width:0}
+@media(prefers-reduced-motion:reduce){.dx.cov .dx-back.dx-opening span,.dx.cov .dx-back.dx-opening::after,.dx-revealed .dx-art,.dx-revealed .dx-scene,.dx-revealed .dx-card,.dx-revealed .dx-info{animation:none!important}}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1058,7 +1087,7 @@ const DESIGNS=[
 {id:'asteroids',n:'Asteroids',cat:'GAMER',r:0,no:0,f:3},
 {id:'sonic',n:'Sonic',cat:'GAMER',r:0,no:0,f:32},
 {id:'docecasas',n:'Las Doce Casas',cat:'ANIME',r:0,no:0,f:9}];
-const VL=['b','e','r','f'],VN={b:'Base',e:'Especial',r:'Rara',f:'Full'},VC={b:'comun',e:'holo',r:'dorada',f:'full'},OLDV={comun:'b',holo:'e',dorada:'r'};
+const VL=['b','e','r','f'],VN={b:'Base',e:'Holo',r:'Rara',f:'Especial'},VC={b:'comun',e:'holo',r:'dorada',f:'full'},OLDV={comun:'b',holo:'e',dorada:'r'};
 const CARDS=[],DB={},ALIAS={},CB={};
 for(const d of DESIGNS){d.fk=d.f?(d.fk||'F_'+d.id):null;DB[d.id]=d;for(const a of d.al||[])ALIAS[a]=d.id;
  d.img={};if(d.r)d.img[OLDV[d.r]]=d.id;if(d.fk)d.img.f=d.fk;for(const l of d.ex||'')d.img[l]=d.id+'_'+l} // d.img[v] = nombre de archivo de esa versión (si existe)
@@ -1188,7 +1217,7 @@ function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
 let mi=0;const MODES=()=>{const u=uniq(),N=NAV,r=packReady();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobre del día',k:r?(S.extra>0&&!after(today(),S.last)&&!S.test?'SOBRE EXTRA':'HOY · GRATIS'):'YA LO ABRISTE',s:r?(firstPack()?'Tu primer sobre trae una Full':'5 cartas · una Especial o mejor'):'El próximo sale en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR':countdown(),off:!r},
+ {id:'pack',t:'Sobre del día',k:r?(S.extra>0&&!after(today(),S.last)&&!S.test?'SOBRE EXTRA':'HOY · GRATIS'):'YA LO ABRISTE',s:r?(firstPack()?'Tu primer sobre trae una Especial':'5 cartas · una Especial o mejor'):'El próximo sale en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR':countdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -1325,8 +1354,8 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
  if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
   D.className=`disc on dx cov v-${c.v}`;D.style.setProperty('--bg','#0c0a14');
   D.innerHTML=`${c.v==='e'?'<i class="dx-mat holo"></i>':c.v==='r'?'<i class="dx-mat gold"></i>':'<i class="dx-mat pink"></i>'}${dxTop()}
-   <div class="dx-back"><span><img src="coin.png" alt=""></span></div><div class="dx-cta"><b>ALGO ESPECIAL</b></div>${dxControls(true)}`;
-  $('dcReveal').onclick=e=>{REV.add(idx);showCard();if(e.detail===0)$('dcNext').focus()};
+   <button type="button" class="dx-back" id="dcBack" aria-label="Tocar para revelar la carta"><span><img src="coin.png" alt=""></span></button><div class="dx-cta"><b>ALGO ESPECIAL</b></div>${dxControls(true)}`;
+  const revealCard=e=>{if(REV.has(idx))return;const cover=$('dcBack');if(cover){cover.classList.add('dx-opening');cover.disabled=true}const btn=$('dcReveal');if(btn)btn.disabled=true;beep(c.v==='r'?1175:c.v==='f'?1568:988,.12);setTimeout(()=>{REV.add(idx);showCard();const stage=$('disc');stage.classList.add('dx-revealed');setTimeout(()=>stage.classList.remove('dx-revealed'),1000);if(e.detail===0&&$('dcNext'))$('dcNext').focus()},430)}; $('dcReveal').onclick=revealCard;$('dcBack').onclick=revealCard;
   dxNav();
   return}
 
@@ -1359,7 +1388,7 @@ function gStart(x,y,target){if(busy||G)return;const t=target.closest&&target.clo
 function gMove(x,y){if(!G)return;G.mx=x-G.x;G.my=y-G.y;if(G.t.classList.contains('down'))return;G.t.style.transform=`translate(${G.mx}px,${G.my*.4}px) rotate(${G.mx/16}deg)`}
 function gEnd(cancel){if(!G)return;const g=G;G=null;const t=g.t;const tap=Math.abs(g.mx)<10&&Math.abs(g.my)<10;
  if(cancel){backCard(t);return}
- if(t.classList.contains('down')){if(tap){t.classList.remove('down');t.style.transition='';t.style.transform='';jingle();toast({holo:'★ ESPECIAL',dorada:'★★★ RARA',full:'★★ FULL'}[hand[idx].r]);hintTop()}return}
+ if(t.classList.contains('down')){if(tap){t.classList.remove('down');t.style.transition='';t.style.transform='';jingle();toast({holo:'★ ESPECIAL',dorada:'★★★ RARA',full:'★★ ESPECIAL'}[hand[idx].r]);hintTop()}return}
  const v=Math.abs(g.mx)/Math.max(1,performance.now()-g.t0);
  if(Math.abs(g.mx)>100||(Math.abs(g.mx)>40&&v>.6))throwCard(t,g.mx,g.my);else{backCard(t);if(tap){t.classList.remove('nudge');void t.offsetWidth;t.classList.add('nudge')}}}
 const ST=$('stack');
@@ -1484,14 +1513,14 @@ function openCard(k){
  $('zImg').alt=cc.n+' · '+VN[cc.v];
  $('zImg').src=imgOf(cc,'c2');
  $('zFx').className='fx idle r-'+(cc.img?cc.r:'comun');
- setVoting(false);
+ setVoting(true);
  $('zoom').showModal();
  $('zoom').scrollTop=0;
 }
 function setVoting(on){
  $('zToggle').setAttribute('aria-expanded',String(on));
  $('zVoting').hidden=!on;
- if(on){paintRate();zGo();$('zVoting').scrollIntoView({block:'nearest'})}
+ if(on){paintRate();zGo();/* sin desplazamiento automático */}
 }
 $('zToggle').onclick=()=>setVoting($('zVoting').hidden);
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb ${S.rate[zd()]===i?'on':''}" data-r="${i}" style="--c:${TC[i]}">${n}</button>`).join('')}
