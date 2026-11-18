@@ -318,6 +318,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hnav .lock .lk{display:block}.hnav .lock>svg:first-child{opacity:.35}.hnav .lock b{color:rgba(255,255,255,.45)}
 
 /* ===== EFECTOS DE CARTA (foil vivo) ===== */
+/* Fuente única para Holo y Dorado: no reintroducir patrones al final del CSS.
+   Este mismo .fx se usa en portada, carrusel, revelación, resumen y ampliación. */
 .fx{position:relative;border-radius:var(--rad,16px);overflow:hidden;isolation:isolate;--mx:50%;--my:50%;--o:0;transform:translateZ(0)}
 .fx>img{width:100%;height:100%;display:block;pointer-events:none}
 .fx>i{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
@@ -864,6 +866,13 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .zoom::backdrop{background:#07062a}
 .z-bar{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;width:min(100%,600px);padding:8px 0;background:#07062a}
 .z-bar h2{font:700 16px AV;margin:0}
+.z-bar .z-close{flex:0 0 44px;width:44px;height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(255,255,255,.26);border-radius:50%;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.z-bar .z-close svg{width:20px;height:20px;display:block}
+.z-bar .z-close:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.56)}
+.z-bar .z-close:active{transform:scale(.94)}
+.z-bar .z-close:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+.z-bar h2{min-width:0;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){.z-bar .z-close{transition:none}}
 .z-bar .btn,#zToggle{min-height:44px}
 #zoom .fx{width:min(100%,600px)!important;touch-action:pan-y pinch-zoom}
 #zVoting{width:min(100%,480px);scroll-margin-bottom:12px}
@@ -894,9 +903,9 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @keyframes icArt{from{opacity:0;transform:scale(1.13);filter:brightness(2)}to{opacity:1;transform:scale(1);filter:brightness(1)}}
 @keyframes icCard{from{opacity:0;transform:translateY(24px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes icInfo{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.fx.r-holo .foil{background:radial-gradient(circle,#ffffffbb 0 .7px,transparent 1.5px) 0 0/19px 23px,linear-gradient(115deg,transparent 14%,#84dcff26 33%,#ffe6f844 45%,#fffbd759 52%,#a6f3e429 62%,transparent 79%);background-size:19px 23px,230% 230%;background-position:0 0,var(--mx) var(--my);mix-blend-mode:screen;opacity:.62}
+
 .dx-holo,.dx-mat.holo{background:linear-gradient(115deg,transparent 15%,#84dcff1f 35%,#fff3d74a 50%,#f4b2e11f 64%,transparent 80%) 0 0/230% 230%;mix-blend-mode:screen;opacity:.52;animation:dxHolo 8s ease-in-out infinite alternate}
-.fx.r-dorada .foil{background:radial-gradient(circle,#fffcd9e6 0 .9px,transparent 1.8px) 0 0/17px 21px,linear-gradient(110deg,transparent 12%,#6e3f0529 26%,#eaaa2647 39%,#fff9c0aa 49%,#d48f1457 57%,transparent 78%) var(--mx) var(--my)/260% 260%;mix-blend-mode:screen;opacity:.68}
+
 .fx.r-dorada::after{box-shadow:inset 0 0 0 2px #ffd963f2,inset 0 0 0 5px #63380773,inset 0 0 23px #f4ae2852}
 .zoom #zToggle{display:none!important}
 .zoom #zVoting{box-sizing:border-box;width:min(100%,480px);margin:16px auto 0;padding:15px;border:1px solid #ffffff29;border-radius:14px;background:#ffffff0e}
@@ -973,7 +982,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </div>
 <div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button class="vback" id="fClose" aria-label="Cerrar"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
 <dialog class="zoom" id="zoom" aria-labelledby="zName">
- <header class="z-bar"><h2 id="zName"></h2><button class="btn" id="zClose" autofocus>Cerrar</button></header>
+ <header class="z-bar"><h2 id="zName"></h2><button class="z-close" id="zClose" type="button" aria-label="Cerrar carta" title="Cerrar carta" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></header>
  <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i></div>
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
  <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
