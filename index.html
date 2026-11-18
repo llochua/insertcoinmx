@@ -1666,6 +1666,8 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
    else if(k==='seen'||k==='test'){if(!(v===0||v===1||v===true||v===false))throw 'El respaldo trae un dato inválido ('+k+').';out[k]=+v}
    else if(k==='last'||k==='rdia'){if(!isDay(v))throw 'Una fecha del respaldo no es válida.';out[k]=v}
    else if(k==='extra'){if(!isInt(v,0,999))throw 'Los sobres extra del respaldo no son válidos.';out.extra=v}
+   else if(k==='welcomeLeft'||k==='freeUsed'){if(!isInt(v,0,k==='welcomeLeft'?5:2))throw 'Los sobres gratuitos del respaldo no son válidos.';out[k]=v}
+   else if(k==='freeDay'){if(!isDay(v))throw 'La fecha de sobres gratuitos no es válida.';out.freeDay=v}
    else if(k==='champ'){if(typeof v!=='string'||(v!==''&&!IDRE.test(v)))throw 'El campeón del respaldo no es válido.';out.champ=v}
    else if(k==='rlast'){if(!(v===null||isInt(v,0,9999)))throw 'La última reta del respaldo no es válida.';out.rlast=v}
    else if(k==='pk'){if(!Array.isArray(v)||v.length>30||!v.every(x=>typeof x==='string'&&PKRE.test(x)))throw 'El respaldo trae un dato inválido (pk).';out.pk=v.slice()}
@@ -1697,6 +1699,7 @@ function applyImport(v){clearTimeout(save.t);syncIn();
  try{localStorage.setItem(KEY_BAK,JSON.stringify({at:new Date().toISOString(),main:prevMain,ext:prevExt}))}
  catch(e){return {ok:false,err:'No hay espacio para guardar la copia de seguridad. No se cambió nada. Exporta tu progreso antes de volver a intentarlo.'}}
  const N=Object.assign(DEF(),v.data,{test:S.test||0,sv:2,mv:2,fg:(v.data.fg===1||Object.keys(v.data.have||{}).length||v.data.last)?1:0,rev:(S.rev||0)+1});
+ normalize(N);
  const mainStr=JSON.stringify(N),extStr=v.ext?JSON.stringify(v.ext):null;
  try{if(extStr===null)localStorage.removeItem(KEY_EXT);else localStorage.setItem(KEY_EXT,extStr);
   localStorage.setItem(KEY,mainStr);
