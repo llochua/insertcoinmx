@@ -4,7 +4,7 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
  <meta name="theme-color" content="#0b0a11">
- <title>Insert Coin MX — Reta v4 · Laboratorio de combate</title>
+ <title>Insert Coin MX — Reta v4.2 · Aura / prueba de playeras</title>
  <meta name="description" content="Prueba de experiencia Reta v4: una campeona, nuevos retadores, una pelea continua.">
  <link rel="preload" as="image" href="d/gatosamurai.jpg">
  <link rel="preload" as="image" href="d/x.jpg">
@@ -31,7 +31,7 @@
    <div class="progress" id="pips" aria-hidden="true"></div>
   </section>
 
-  <div class="prompt"><strong>¿CUÁL TE PONDRÍAS?</strong><small>TOCA PARA ELEGIR</small></div>
+  <div class="prompt"><strong>¿CON CUÁL FARMEAS MÁS AURA?</strong></div>
 
   <section class="arena" id="arena" aria-label="Enfrentamiento de playeras">
    <div class="slot" id="topWrap"></div>
@@ -51,23 +51,24 @@
    <strong>NEW<br>CHALLENGER!</strong>
   </div>
 
-  <section class="finish" id="finish" aria-hidden="true" aria-label="Resultado final">
+  <section class="finish" id="finish" aria-hidden="true" aria-label="Resultado de Reta">
    <div class="fin-backdrop" id="finBackdrop" aria-hidden="true"></div>
    <div class="fin-top"><img src="coin.png" alt=""><span>INSERT COIN MX<br><small>EL ÁLBUM · RETA</small></span></div>
    <div class="fin-title"><span>STAGE 01</span><strong>CLEAR!</strong></div>
-   <div class="fin-card-stage">
+   <div class="fin-card-stage fin-shirt-stage">
     <div class="fin-halo"></div>
-    <div class="fin-reveal" id="finReveal"><img id="winnerCard" src="c2/gatosamurai.jpg" alt="Carta original de la playera campeona"><i class="fin-sheen"></i></div>
+    <div class="fin-reveal" id="winnerShirt" aria-hidden="true"></div>
    </div>
    <div class="fin-copy">
-    <div class="fin-kicker">SOBREVIVIÓ A TUS ELECCIONES</div>
-    <h2>TU FAVORITA<br>POR AHORA</h2>
+    <div class="fin-kicker">LA ÚLTIMA EN PIE</div>
+    <h2>TU PLAYERA<br>CON MÁS AURA</h2>
     <h3 id="winnerName">Gato Samurái</h3>
-    <p id="finRounds">7 ENCUENTROS · 8 DISEÑOS COMPARADOS</p>
-    <p class="fin-next">Cada playera que descubras podrá destronarla en tu próxima Reta.</p>
+    <p id="finRounds">7 ENCUENTROS · 8 DISEÑOS ENFRENTADOS</p>
+    <p class="fin-next">Es tu campeona por ahora. Abre sobres para descubrir nuevas playeras que puedan destronarla.</p>
     <div class="thanks">THANK YOU FOR PLAYING</div>
    </div>
-   <button type="button" class="fin-cta" id="again">VOLVER A JUGAR <small>DEMO</small></button>
+   <a class="fin-cta" href="index.html">DESCUBRIR PLAYERAS EN SOBRES</a>
+   <button type="button" class="fin-again" id="again">REPETIR ESTA DEMO</button>
   </section>
  </main>
 
