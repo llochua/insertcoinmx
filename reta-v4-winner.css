@@ -1,217 +1,97 @@
-/* INSERT COIN MX · RETA | WINNER IS
-   Una sola escena de victoria. La playera es el personaje, el nombre es el golpe
-   tipográfico y "Sobres" es la única acción. Sin tarjetas, estadísticas o subtítulos. */
+/* RETA WINNER — mismo lenguaje de la portada y del sobre.
+   Fondo: arte real difuminado. Centro: playera. Tipografía: AV y PX. */
 .winner-screen{
- --win-gold:#ffd400;
- --win-text:#fffcf5;
- display:none;
- position:absolute;
- z-index:31;
- inset:0;
- isolation:isolate;
- flex-direction:column;
- min-height:0;
- overflow:hidden;
- background:#110e22;
- color:var(--win-text);
- text-align:left;
+ --gold:#ffd400;
+ display:none;position:absolute;inset:0;z-index:31;
+ isolation:isolate;flex-direction:column;align-items:center;
+ padding:clamp(16px,4vh,30px) 20px clamp(18px,5vh,40px);
+ overflow:hidden;text-align:center;color:#f3f1ff;background:#07062a;
 }
 .winner-screen.on{display:flex}
-.winner-scene{
- position:relative;
- flex:1 1 auto;
- min-height:0;
- overflow:hidden;
- isolation:isolate;
- background:
-  radial-gradient(ellipse 78% 65% at 54% 40%,rgba(240,162,77,.35),transparent 68%),
-  linear-gradient(125deg,#551a28 0%,#301829 37%,#1b2144 68%,#11162c 100%);
+.winner-bg{
+ position:absolute;inset:-12%;z-index:-2;
+ background:var(--winner-art,url("c/F_gatosamurai.jpg")) center 36%/cover no-repeat;
+ filter:blur(28px) saturate(1.3) brightness(.56);
+ transform:scale(1.12);pointer-events:none;
 }
-.winner-scene::before{
- content:"";
- position:absolute;
- left:-24%;top:27%;
- width:154%;height:30%;
- transform:rotate(-21deg);
- background:linear-gradient(90deg,rgba(255,212,0,.04),rgba(255,212,0,.13) 46%,rgba(255,212,0,.025));
- border-top:1px solid rgba(255,212,0,.2);
- border-bottom:1px solid rgba(255,212,0,.13);
- pointer-events:none;
+.winner-screen::before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:radial-gradient(90% 66% at 50% 47%,rgba(7,6,42,.1),rgba(7,6,42,.58) 64%,#07062a 100%),
+ linear-gradient(180deg,#07062a 0,transparent 24%,transparent 67%,#07062a 100%);
 }
-.winner-scene::after{
- content:"";
- position:absolute;
- z-index:1;
- inset:0;
- pointer-events:none;
- background:
- linear-gradient(90deg,rgba(0,0,0,.34),transparent 18%,transparent 82%,rgba(0,0,0,.33)),
- linear-gradient(0deg,rgba(12,9,26,.87) 0%,rgba(12,9,26,.2) 22%,transparent 41%);
-}
-.winner-top{
- position:absolute;
- z-index:5;
- top:0;left:0;right:0;
- display:flex;align-items:center;justify-content:space-between;
- padding:15px 17px;
-}
-.winner-brand{
- display:flex;gap:7px;align-items:center;
- font:900 10px/1.1 AVK,Arial,sans-serif;
- letter-spacing:.075em;
- opacity:.8;
-}
-.winner-brand img{height:20px;width:20px;object-fit:contain}
 .winner-retry{
- display:flex;
- align-items:center;justify-content:center;
- height:35px;width:35px;
- border:1px solid #ffffff46;
- background:#10101a66;
- border-radius:6px;
- font:25px/1 Arial,sans-serif;
- color:#fff;
+ position:absolute;right:15px;top:14px;z-index:5;
+ display:flex;align-items:center;justify-content:center;
+ width:32px;height:32px;border:1px solid #ffffff28;border-radius:50%;
+ background:#0c0b2a7d;color:#d8d4e8;font:18px/1 Arial,sans-serif;
 }
-.winner-retry:hover{border-color:var(--win-gold)}
-.winner-retry:focus-visible,.winner-next:focus-visible{outline:3px solid var(--win-gold);outline-offset:3px}
+.winner-retry:hover{color:#fff;border-color:#ffffff66}
+.winner-mark{
+ flex:none;display:flex;flex-direction:column;align-items:center;
+ gap:9px;margin-top:clamp(16px,5vh,52px);
+}
+.winner-mark img{width:118px;height:auto;object-fit:contain;filter:drop-shadow(0 6px 17px #0009)}
+.winner-album{
+ display:flex;align-items:center;gap:12px;
+ font:700 11px/1.2 AV,Arial,sans-serif;letter-spacing:.54em;
+ margin-right:-.54em;color:#fff;
+}
+.winner-album:before,.winner-album:after{content:"";width:23px;height:1px;background:#ffffff70}
+.winner-body{
+ flex:1 1 auto;min-height:0;width:100%;max-width:440px;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ margin:clamp(16px,3vh,24px) 0 0;
+}
 .winner-announcement{
- position:absolute;
- z-index:4;
- top:clamp(63px,9.3dvh,95px);
- left:20px;
- right:12px;
- margin:0;
- font:900 clamp(33px,10.9vw,61px)/.9 AVK,Arial,sans-serif;
- font-style:italic;
- letter-spacing:-.075em;
- text-transform:uppercase;
- white-space:nowrap;
- transform:skewX(-8deg);
- color:var(--win-text);
- text-shadow:3px 4px 0 #101020,5px 6px 0 #8c2431;
-}
-.winner-announcement em{font-style:inherit;color:var(--win-gold)}
-.winner-announcement::after{
- content:"";
- display:block;
- margin:14px 0 0 4px;
- height:5px;
- width:50px;
- transform:skewX(-25deg);
- background:var(--win-gold);
- box-shadow:16px 0 0 #ffcf4380;
+ flex:none;
+ font:10px/1.5 PX,monospace;letter-spacing:.055em;color:#FFD400;
+ margin-bottom:clamp(8px,1.6vh,18px);
 }
 .winner-shirt-area{
- position:absolute;
- z-index:2;
- left:-7%;
- right:-7%;
- top:clamp(129px,17dvh,175px);
- bottom:clamp(63px,11dvh,115px);
- display:flex;
- align-items:center;
- justify-content:center;
- pointer-events:none;
-}
-.winner-shirt-area::before{
- content:"";
- position:absolute;
- width:min(110vw,560px);
- aspect-ratio:1;
- top:48%;left:50%;
- transform:translate(-50%,-50%);
- background:radial-gradient(circle,rgba(255,229,127,.26),rgba(255,212,0,.07) 38%,transparent 69%);
- pointer-events:none;
+ flex:1 1 auto;min-height:0;max-height:380px;
+ width:100%;display:flex;align-items:center;justify-content:center;
+ position:relative;
 }
 .winner-shirt{
- width:100%;
- height:100%;
- position:relative;
- z-index:1;
- display:flex;align-items:center;justify-content:center;
- filter:drop-shadow(0 26px 22px #000b);
+ width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+ filter:drop-shadow(0 24px 19px #000b);
 }
-.winner-shirt .shirt{
- width:100%;height:100%;
- max-height:100%;
- display:block;
- overflow:visible;
- transform:rotate(-2.5deg);
-}
-.winner-name-wrap{
- position:absolute;
- z-index:4;
- bottom:clamp(15px,3.4dvh,36px);
- left:17px;
- right:17px;
- display:flex;
- flex-direction:column;
- align-items:flex-start;
- gap:8px;
- pointer-events:none;
-}
-.winner-name-rule{
- display:block;
- width:46px;height:5px;
- transform:skewX(-25deg);
- background:var(--win-gold);
-}
+.winner-shirt svg{width:100%;height:100%;display:block;overflow:visible;transform:rotate(-2deg)}
 .winner-name{
- font:900 clamp(35px,11.8vw,66px)/.93 AVK,Arial,sans-serif;
- letter-spacing:-.07em;
- font-style:italic;
- text-transform:uppercase;
- color:#fff;
- text-shadow:3px 4px 0 #0a081b,0 9px 20px #090617b3;
- overflow-wrap:normal;
- word-break:normal;
- text-wrap:balance;
- margin:0;
- max-width:100%;
+ flex:none;max-width:100%;margin:clamp(8px,1.5vh,14px) 0 0;
+ font:700 clamp(25px,7.1vw,34px)/1.05 AV,Arial,sans-serif;
+ letter-spacing:-.03em;color:#fff;text-transform:none;text-wrap:balance;
+ text-shadow:0 4px 18px #000b;
 }
 .winner-next{
- flex:0 0 auto;
- min-height:80px;
- display:flex;gap:12px;
- align-items:center;
- justify-content:space-between;
- padding:16px 20px max(16px,env(safe-area-inset-bottom));
- width:100%;
- background:#100d20;
- border-top:4px solid var(--win-gold);
- text-decoration:none;
- color:var(--win-gold);
- font:900 clamp(12px,3.5vw,15px)/1.25 AVK,Arial,sans-serif;
- letter-spacing:.025em;
- text-transform:uppercase;
+ flex:none;display:flex;align-items:center;justify-content:center;
+ width:min(100%,340px);min-height:47px;
+ padding:15px 12px;margin-top:clamp(20px,4vh,42px);margin-bottom:auto;
+ border-radius:10px;background:#FFD400;box-shadow:0 5px 0 #a88a00;
+ color:#0f0c1b;text-decoration:none;
+ font:9px/1.5 PX,monospace;letter-spacing:0;
 }
-.winner-next b{
- display:flex;align-items:center;justify-content:center;
- font:900 28px/1 Arial,sans-serif;
- color:var(--win-gold);
- flex:none;
-}
-.winner-next:hover{background:#211b3a}
-@media(max-height:720px){
- .winner-top{padding:9px 15px}
- .winner-announcement{top:54px;font-size:clamp(29px,9vw,44px)}
- .winner-announcement::after{margin-top:9px}
- .winner-shirt-area{top:110px;bottom:65px}
- .winner-name-wrap{bottom:14px;gap:5px}
- .winner-name{font-size:clamp(31px,10vw,52px)}
- .winner-next{min-height:68px;padding:11px 16px max(11px,env(safe-area-inset-bottom))}
+.winner-next:hover{background:#ffe451}
+.winner-next:active{transform:translateY(3px);box-shadow:0 2px 0 #a88a00}
+.winner-next:focus-visible,.winner-retry:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-height:725px){
+ .winner-screen{padding-top:15px;padding-bottom:17px}
+ .winner-mark{margin-top:20px;gap:6px}
+ .winner-mark img{width:100px}
+ .winner-album{font-size:9px}
+ .winner-body{margin-top:13px}
+ .winner-announcement{font-size:9px;margin-bottom:8px}
+ .winner-name{font-size:clamp(23px,6.7vw,29px);margin-top:6px}
+ .winner-next{min-height:42px;margin-top:19px;padding:12px}
 }
 @media(max-height:580px){
- .winner-top{padding:5px 14px}
- .winner-announcement{top:40px;font-size:30px}
- .winner-shirt-area{top:86px;bottom:56px}
- .winner-name{font-size:33px}
- .winner-next{min-height:56px}
+ .winner-mark{margin-top:7px}
+ .winner-mark img{width:78px}
+ .winner-album{font-size:8px;gap:7px}
+ .winner-album:before,.winner-album:after{width:14px}
+ .winner-body{margin-top:8px}
+ .winner-announcement{font-size:8px;margin-bottom:4px}
+ .winner-next{min-height:38px;margin-top:10px;font-size:8px}
+ .winner-name{font-size:22px}
 }
-@media(min-width:510px){
- .winner-announcement{font-size:58px}
- .winner-name{font-size:64px}
-}
-/* La demo conserva sus animaciones de combate; el diseño del cierre debe
-   sostenerse sin ningún efecto temporal. */
-@media(prefers-reduced-motion:reduce){.winner-shirt .shirt{transform:none}}
+@media(prefers-reduced-motion:reduce){.winner-shirt svg{transform:none}}

@@ -97,7 +97,7 @@ function shirt(id,uid){
 function fighter(id,slot,isChamp,entry){
  return '<button type="button" class="fighter '+slot+(isChamp?' is-champion':'')+(entry?' enter':'')+
  '" id="'+slot+'" data-side="'+slot+'" aria-label="Elegir '+safeName(id)+'">'+
- '<div class="team"><i></i><span>'+(isChamp?'TU CAMPEONA':'HERE COMES A NEW CHALLENGER!')+'</span></div>'+
+ '<div class="team"><i></i><span>'+(isChamp?'CHAMPION':'CHALLENGER')+'</span></div>'+
  shirt(id,slot)+
  '<div class="f-title"><strong>'+safeName(id)+'</strong></div></button>';
 }
@@ -115,7 +115,7 @@ function refreshRoles(){
  for(const slot of ["top","bottom"]){
   const el=$(slot),isChamp=slots[slot]===champion;
   el.classList.toggle("is-champion",isChamp);
-  el.querySelector(".team span").textContent=isChamp?"TU CAMPEONA":"HERE COMES A NEW CHALLENGER!";
+  el.querySelector(".team span").textContent=isChamp?"CHAMPION":"CHALLENGER";
  }
  $('arena').setAttribute("aria-label","Encuentro "+(round+1)+" de "+TOTAL+
  ". "+safeName(slots.top)+" contra "+safeName(slots.bottom));
@@ -180,6 +180,7 @@ function end(side){
  previousChampion=champion;
  $('winnerName').textContent=safeName(champion);
  $('winnerShirt').innerHTML=shirt(champion,'finish');
+ $('winnerBg').style.setProperty('--winner-art',`url("c2/${champion}.jpg")`);
  bgSample(champion);
  const screen=$('finish');
  screen.classList.remove('on');void screen.offsetWidth;
