@@ -772,6 +772,21 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .dx.k-rep .dx-art{opacity:.85}
 @media(min-width:760px){.dx-art{height:70%}.dx-info h2{font-size:52px}.dx-card{width:130px}}
 .rs-row[data-t=lt] .dc-v,.rs-tile[data-t=lt] .dc-v{color:#120F1A!important}.rs-row .dc-v{opacity:.55}.rs-row .dc-v.on{opacity:1}
+
+/* material de la versión en TODA la pantalla, y carta grande flotando junto a la ilustración */
+.dx-mat{position:absolute;inset:0;z-index:1;pointer-events:none}
+.dx-mat.holo{background:repeating-linear-gradient(115deg,rgba(255,45,111,.9) 0,rgba(255,212,0,.9) 3%,rgba(61,255,154,.9) 6%,rgba(47,214,255,.9) 9%,rgba(176,92,255,.9) 12%,rgba(255,45,111,.9) 15%) 0 0/300% 300%;mix-blend-mode:color-dodge;opacity:.42;animation:dxMat 7s linear infinite}
+.dx-mat.holo::after{content:"";position:absolute;inset:0;background:repeating-conic-gradient(rgba(255,255,255,.18) 0 25%,transparent 0 50%) 0 0/22px 22px;mix-blend-mode:overlay}
+.dx-mat.gold{background:radial-gradient(circle,rgba(255,240,190,.9) 0 1px,transparent 1.7px) 0 0/13px 13px,linear-gradient(115deg,transparent 25%,rgba(255,236,170,.75) 45%,rgba(255,190,50,.45) 52%,transparent 70%) 0 0/300% 300%;mix-blend-mode:overlay;opacity:.95;animation:dxMat 5s ease-in-out infinite alternate}
+.dx.v-r{background:radial-gradient(ellipse at 50% 35%,#5a3e0c,#1a1104 70%)!important}
+.dx.v-e .dx-v,.dx.v-r .dx-v{box-shadow:0 0 14px rgba(255,255,255,.35)}
+@keyframes dxMat{to{background-position:100% 100%,100% 100%}}
+.dx-card{width:44%!important;max-width:220px;right:16px!important;bottom:calc(150px + env(safe-area-inset-bottom))!important;transform:rotate(5deg);animation:dxCardB .6s .35s cubic-bezier(.2,1.3,.4,1) both!important}
+@keyframes dxCardB{from{opacity:0;transform:translateY(30px) rotate(12deg)}to{transform:rotate(5deg)}}
+.dx-card .fx{--rad:10px!important;box-shadow:0 0 0 2px rgba(255,255,255,.85),0 24px 48px rgba(0,0,0,.6)!important}
+.dx.v-f .dx-card{animation-delay:1s!important}
+.dx-info{right:20px!important;z-index:3}
+.dx-card{z-index:2}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1187,7 +1202,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c){D.classList.remove('on'
   :v==='r'&&c.img?`<div class="dx-art"><span class="dx-mv"><span class="dx-gold" style="background-image:url(${imgOf(c,'c2')})"></span></span></div>`
   :`<div class="dx-art"><span class="dx-mv">${artBox(d.id).replace(' loading="lazy"','')}${v==='e'?'<i class="dx-holo"></i>':''}</span></div>`;
  D.className=`disc on dx v-${v} k-${k}${RBG[d.id]?'':' neu'}`;D.style.setProperty('--bg',v==='r'?'#0d0a05':col);
- D.innerHTML=`${art}<div class="dx-fade"></div>
+ D.innerHTML=`${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
   <div class="dx-top"><span>${String(idx+1).padStart(2,'0')} / 05</span><button id="dcSkip">Saltar</button></div>
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>
    <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div></div>
