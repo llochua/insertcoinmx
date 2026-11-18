@@ -825,6 +825,32 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 @keyframes dxBack{50%{transform:translateY(-8px) rotate(-1.5deg)}}
 .dx-cta{position:absolute;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));z-index:3;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center}
 .dx-cta b{font:10px PX;letter-spacing:.1em;color:#FFD400}.dx-cta span{font:700 22px AV}
+
+/* ===== resumen ===== */
+.rs2{max-width:560px;margin:0 auto;padding:0 0 calc(30px + env(safe-area-inset-bottom))}
+.rh{position:relative;height:min(62vh,520px);overflow:hidden;border-radius:0 0 22px 22px;background:var(--bg)}
+.rh .dx-art{top:10px;height:70%}.rh .dx-info{bottom:22px}.rh .dx-card{bottom:96px!important;width:40%!important}
+.rh .dx-info h2{font-size:34px;margin:8px 0 12px}
+.rh-vs{display:flex;gap:6px;flex-wrap:wrap}.rh-c{font:700 11px AV;letter-spacing:.08em;padding:5px 9px;border-radius:5px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5);color:rgba(255,255,255,.6)}.rh-c.on{background:#fff;color:#111;box-shadow:none}
+.rs-act2{display:grid;grid-template-columns:3fr 2fr;gap:10px;padding:16px 20px 6px}
+.rs-main,.rs-sec2{all:unset;cursor:pointer;text-align:center;height:46px;border-radius:10px;font:700 14px AV;display:flex;align-items:center;justify-content:center}
+.rs-main{background:#FFD400;color:#120F1A}.rs-sec2{background:rgba(255,255,255,.08);color:#fff}
+.rb{padding:22px 20px 0}
+.rb h3{display:flex;align-items:center;gap:8px;font:9px PX;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:14px;text-transform:uppercase}
+.rb h3 span{font:700 11px AV;color:#120F1A;background:rgba(255,255,255,.85);border-radius:9px;padding:1px 7px}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:18px 14px}
+.rc{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:8px}
+.rc .fx{--rad:10px;display:block;width:100%;aspect-ratio:480/670;box-shadow:0 14px 26px rgba(0,0,0,.5)}
+.rc.nw .fx{box-shadow:0 0 0 2px #fff,0 14px 26px rgba(0,0,0,.5)}
+.rc b{font:700 15px AV;color:#fff;margin-top:2px}
+.rc-t{display:flex;gap:6px;flex-wrap:wrap}.rc-t span{font:700 10px AV;letter-spacing:.1em;padding:4px 7px 3px;border-radius:4px}
+.rc-n{box-shadow:inset 0 0 0 1.5px #fff;color:#fff}.rc-r{color:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3)}
+.rb-p{font:600 13px AV;color:rgba(255,255,255,.6);margin-top:14px}
+.rs-trade{all:unset;cursor:pointer;display:block;text-align:center;margin-top:14px;width:100%;box-sizing:border-box;padding:13px;border-radius:10px;font:700 13px AV;color:#FFD400;box-shadow:inset 0 0 0 1.5px rgba(255,212,0,.6)}
+.rs-pg{margin:28px 20px 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);font:600 12px AV;color:rgba(255,255,255,.45);text-align:center}
+.rs2 .rs-out{display:block;margin:10px auto 0}
+.dx-v.v-b{background:#fff;color:#111}.dx-v.v-e{background:linear-gradient(90deg,#8fe9ff,#ffb3e6);color:#111}.dx-v.v-r{background:#e8b923;color:#111}.dx-v.v-f{background:#ff8fd8;color:#111}
+.rh .dx-card{bottom:128px!important;width:36%!important}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1313,30 +1339,35 @@ ST.addEventListener('mousedown',e=>{mdown=true;gStart(e.clientX,e.clientY,e.targ
 window.addEventListener('mousemove',e=>{if(mdown)gMove(e.clientX,e.clientY)});
 window.addEventListener('mouseup',()=>{if(mdown){mdown=false;gEnd(false)}});
 /* ===== RESUMEN: qué cambió en tu colección, agrupado por significado ===== */
+/* ===== RESUMEN (lista de Jos): protagonista con el logro integrado · compartir junto a ella · bloques: completas, diseños nuevos, versiones nuevas, repetidas · progreso chico ===== */
 function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');s.classList.add('on');s.scrollTop=0;
- const G={comp:[],dnew:[],vnew:[]},used=new Set();
- for(const k of ['comp','dnew','vnew'])for(const c of hand)if(c._new&&caseOf(c)===k&&!used.has(c.d)){used.add(c.d);G[k].push(c)}
- for(const c of hand)if(c._new&&!used.has(c.d)){used.add(c.d);G.vnew.push(c)}
- const R=hand.filter(c=>!c._new),n=dups(),PD=DESIGNS.filter(d=>!d.bx),disc=PD.filter(d=>dState(d).own).length;
- const art=(id,cls='')=>`<span class="rs-art ${cls}">${artBox(id)}</span>`,tone=id=>`style="--bg:${dcol(id)}" data-t="${lum(dcol(id))<.55?'dk':'lt'}"`;
- const vs=c=>{const st=dState(DB[c.d]);return st.vs.filter(x=>x.st!=='soon').map(x=>`<span class="dc-v v-${x.v}${x.h?' on':''}${x.c.k===c.k?' now':''}"><i></i>${VN[x.v]}</span>`).join('')};
- const sec=(t,n,body)=>n?`<section class="rs-sec"><h3>${t}<span>${n}</span></h3>${body}</section>`:'';
- s.innerHTML=`<div class="rs">
-  <h2 class="rs-h">Qué cambió en tu colección</h2>
-  ${sec('Colección completa',G.comp.length,G.comp.map(c=>`<button class="rs-row comp" data-d="${c.d}" ${tone(c.d)}>${art(c.d)}<span class="rs-i"><b>${esc(DB[c.d].n)}</b><span class="rs-vs">${vs(c)}</span><small>Juntaste todas sus versiones disponibles</small></span></button>`).join(''))}
-  ${sec('Diseños nuevos',G.dnew.length,`<div class="rs-grid">${G.dnew.map(c=>`<button class="rs-tile" data-d="${c.d}" ${tone(c.d)}>${art(c.d)}<b>${esc(DB[c.d].n)}</b><small>${DB[c.d].no?'#'+String(DB[c.d].no).padStart(3,'0')+' · ':''}<span class="dc-ver v-${c.v}"><i></i>${VN[c.v]}</span></small></button>`).join('')}</div>`)}
-  ${sec('Versiones nuevas',G.vnew.length,G.vnew.map(c=>`<button class="rs-row" data-d="${c.d}" ${tone(c.d)}>${art(c.d,'sm')}<span class="rs-i"><b>${esc(DB[c.d].n)}</b><span class="rs-vs">${vs(c)}</span><small>Ya tenías ${c._prev.map(v=>VN[v]).join(' y ')||'este diseño'} · nueva: ${VN[c.v]}</small></span></button>`).join(''))}
-  ${sec('Repetidas',R.length,`<div class="rs-rep"><div class="rs-th">${R.map(c=>`<img src="${imgOf(c,'c')}" alt="${esc(c.n)}" data-k="${c.k}">`).join('')}</div>
-   <p>Tienes <b>${n}</b> repetidas en total. Cada 5 se cambian por un sobre extra.</p>${n>=5?'<button class="btn rs-trade" id="sTrade">Cambiar 5 por un sobre extra</button>':`<div class="dc-trade"><span class="m">${[0,1,2,3,4].map(i=>`<i class="${i<n%5?'on':''}"></i>`).join('')}</span><span>Te faltan ${5-n%5} para el siguiente</span></div>`}</div>`)}
-  <div class="rs-col"><span>Tu colección</span><b>${disc}</b> de ${PD.length} diseños<span class="rs-dot">·</span><b>${AV.filter(c=>S.have[c.k]).length}</b> de ${NAV} cartas</div>
-  <div class="rs-act"><button class="rs-main" id="sAlb">Ver en el álbum</button><button class="rs-sec2" id="sShare">Compartir</button></div>
+ const comp=hand.filter(c=>c._comp),rank=c=>(c._comp?-10:0)+VORD[c.v]+(c._new?0:5);
+ const H=hand.slice().sort((a,b)=>rank(a)-rank(b))[0],d=DB[H.d],v=H.v,st=dState(d);
+ const fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':null;
+ const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
+  :v==='r'&&H.img?`<div class="dx-art"><span class="dx-mv"><span class="dx-gold" style="background-image:url(${imgOf(H,'c2')})"></span></span></div>`
+  :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:.8"><img src="${artOf(d.id)}" alt=""></span>`}${v==='e'?'<i class="dx-holo"></i>':''}</span></div>`;
+ const lab=H._comp?'COLECCIÓN COMPLETA':'LO MEJOR DE TU SOBRE';
+ const vchips=st.vs.filter(x=>x.st!=='soon').map(x=>`<span class="rh-c${x.h?' on':''}">${x.h?'✓ ':''}${VN[x.v]}</span>`).join('');
+ const tag=c=>`<span class="rc-t"><span class="dx-v v-${c.v}">${VN[c.v].toUpperCase()}</span>${c._new?'<span class="rc-n">NUEVA</span>':`<span class="rc-r">REPETIDA ×${S.have[c.k]}</span>`}</span>`;
+ const card=c=>`<button class="rc ${c._new?'nw':'rp'}" data-k="${c.k}"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><b>${esc(c.n)}</b>${tag(c)}</button>`;
+ const rest=hand.filter(c=>c!==H),G={comp:rest.filter(c=>c._comp),dnew:rest.filter(c=>c._new&&!c._comp&&c._dnew),vnew:rest.filter(c=>c._new&&!c._comp&&!c._dnew),rep:rest.filter(c=>!c._new)};
+ const sec=(t,L,extra='')=>L.length?`<section class="rb"><h3>${t}<span>${L.length}</span></h3><div class="rg">${L.map(card).join('')}</div>${extra}</section>`:'';
+ const n=dups(),PD=DESIGNS.filter(x=>!x.bx),disc=PD.filter(x=>dState(x).own).length;
+ const tradeH=n>=5?'<button class="rs-trade" id="sTrade">Cambiar 5 repetidas por un sobre extra</button>':`<p class="rb-p">Llevas ${n%5} de 5 repetidas para un sobre extra</p>`;
+ s.innerHTML=`<div class="rs2">
+  <div class="rh dx v-${v}${hasCol(d.id)?'':' neu'}" style="--bg:${v==='r'?'#0d0a05':dcol(d.id)}">${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
+   <button class="dx-card" data-k="${H.k}" aria-label="Ver la carta en grande"><span class="fx idle r-${H.img?H.r:'comun'}"><img src="${imgOf(H,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span></button>
+   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${H._comp?`<div class="rh-vs">${vchips}</div>`:tag(H)}</div></div>
+  <div class="rs-act2"><button class="rs-main" id="sShare">Compartir mi sobre</button><button class="rs-sec2" id="sAlb">Ver álbum</button></div>
+  ${sec('Colección completa',G.comp)}${sec('Diseños nuevos',G.dnew)}${sec('Versiones nuevas',G.vnew)}${sec('Repetidas',G.rep,tradeH)}
+  <div class="rs-pg">${disc} de ${PD.length} diseños · ${AV.filter(c=>S.have[c.k]).length} de ${NAV} cartas</div>
   <button class="rs-out" id="sOtro">Volver al menú</button>
  </div>`;
- s.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{go('album');openFicha(b.dataset.d)});
- s.querySelectorAll('.rs-th img').forEach(b=>b.onclick=()=>openCard(b.dataset.k));
+ s.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>openCard(b.dataset.k));
  if($('sTrade'))$('sTrade').onclick=()=>trade(showSum);
  $('sAlb').onclick=()=>go('album');$('sOtro').onclick=()=>go('home');
- $('sShare').onclick=()=>shareGrid('ME SALIO EN MI SOBRE',hand.map(c=>c.k),'sobre-insertcoinmx.png')}
+ $('sShare').onclick=()=>shareGrid(H._comp?'COMPLETE '+d.n.toUpperCase():'ME SALIO EN MI SOBRE',hand.map(c=>c.k),'sobre-insertcoinmx.png')}
 
 /* robustez en celular: evitar que el navegador se robe el gesto y no quedarse trabado */
 ['tearZone'].forEach(id=>{const el=$(id);el.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});el.addEventListener('touchstart',e=>{if(id==='tearZone')e.preventDefault()},{passive:false})});
