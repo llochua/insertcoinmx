@@ -133,5 +133,5 @@
  .winner-name{font-size:27px}
 }
 @media(prefers-reduced-motion:reduce){
- .intro{animation:introOut 1.6s ease-in-out forwards!important}
+ .intro{animation:none!important;display:none}
 }
