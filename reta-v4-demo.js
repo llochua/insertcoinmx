@@ -188,8 +188,11 @@ function select(side){
 function end(side){
  // La pantalla de victoria no es una ficha ni un resumen: solo la
  // playera ganadora, WINNER IS y la siguiente acción.
+ const titleDefended=previousChampion===champion;
  previousChampion=champion;
  $('winnerName').textContent=safeName(champion);
+ $('winnerStatus').textContent=titleDefended?'TÍTULO DEFENDIDO':'TU NUEVA CAMPEONA';
+ $('winnerFuture').textContent='Mañana podrás defenderla.';
  const fallen=slots[side==='top'?'bottom':'top'];
  const earlier=PAIRS.filter(id=>id!==champion&&id!==fallen).slice(-1)[0]||fallen;
  $('winnerShirt').innerHTML=shirt(champion,'finish');
@@ -230,9 +233,17 @@ document.addEventListener("keydown",e=>{
 });
 /* Atajo exclusivo de revisión: simula que ya ocurrieron los seis
    primeros encuentros. Una elección permite evaluar el K.O. y el Stage Clear. */
-if(new URLSearchParams(location.search).get('preview')==='final'){
+const preview=new URLSearchParams(location.search);
+if(preview.get('preview')==='final'){
  round=TOTAL-1;
  slots={top:champion,bottom:challengers[round]};
 }
+if(preview.get('preview')==='winner'){
+ const chosen=preview.get('design');
+ if(chosen&&Object.prototype.hasOwnProperty.call(DESIGNS,chosen))champion=chosen;
+ slots={top:champion,bottom:PAIRS.find(id=>id!==champion)};
+ round=TOTAL;
+}
 render(true);
+if(preview.get('preview')==='winner')end('top');
 })();
