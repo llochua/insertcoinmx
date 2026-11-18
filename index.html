@@ -1445,7 +1445,7 @@ function goty(k){const v=STORE.docs.map(d=>d.rate&&d.rate[k]).filter(x=>x!==unde
 /* ---------- sonido / avisos ---------- */
 let AC;function beep(f,d=.07){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
 const jingle=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.11),i*90));
-function toast(t){const e=$('toast');e.innerHTML=t;e.classList.remove('go');void e.offsetWidth;e.classList.add('go')}
+function toast(t){const e=$('toast');clearTimeout(e._uxTimer);e.innerHTML=t;e.classList.remove('go');void e.offsetWidth;e.classList.add('go');e._uxTimer=setTimeout(()=>e.classList.remove('go'),3000)}
 /* Estado sin sobres y confirmación de salida: las cartas se guardan al abrir, no al revelar. */
 let uxReturnFocus=null,uxClockTimer=null;
 function uxClose(){
@@ -1485,7 +1485,7 @@ function uxEmptyPacks(otherTab=false){
  uxShow({
   kicker:'SOBRES · ESTADO DIARIO',
   title:otherTab?'Tu sobre se abrió en otra pestaña':'¡Por hoy, sin sobres!',
-  desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Tus próximos 2 sobres llegan cuando comience el siguiente día disponible.',
+  desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Recibirás 2 sobres nuevos al comenzar el próximo día disponible.',
   note:canTrade?'Tienes al menos 5 repetidas para conseguir un sobre extra.':'Puedes seguir explorando tu colección mientras esperas.',
   countdown:true,
   primary:canTrade?'CAMBIAR 5 REPETIDAS':'VER MI ÁLBUM',
