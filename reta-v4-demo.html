@@ -12,6 +12,7 @@
  <link rel="stylesheet" href="reta-v4-refine.css">
  <link rel="stylesheet" href="reta-v4-winner.css">
  <link rel="stylesheet" href="reta-v4-contrast.css">
+ <link rel="stylesheet" href="reta-v4-winner-result.css">
 </head>
 <body>
  <main class="app" id="app">
@@ -50,19 +51,24 @@
    <strong>NEW<br>CHALLENGER!</strong>
   </div>
 
-  <section class="winner-screen" id="finish" aria-hidden="true" aria-label="Ganador de la Reta" role="dialog" aria-modal="true" data-origin="top">
+  <section class="winner-screen" id="finish" aria-hidden="true" aria-label="Resultado de la Reta" role="dialog" aria-modal="true" data-origin="top">
    <div class="winner-bg" id="winnerBg" aria-hidden="true"></div>
+   <div class="winner-status"><span>07 / 07</span><span class="status-rule"></span><span>RETA COMPLETADA</span></div>
+   <button type="button" class="winner-retry" id="again" aria-label="Repetir demo" title="Repetir">↻</button>
    <div class="winner-scene">
-    <button type="button" class="winner-retry" id="again" aria-label="Repetir demo" title="Repetir">↻</button>
-    <div class="winner-announcement">WINNER IS<span>...</span></div>
-    <div class="winner-tableau" aria-hidden="true">
-     <div class="winner-halo"></div>
-     <div class="winner-echo echo-left" id="winnerEchoLeft"></div>
-     <div class="winner-echo echo-right" id="winnerEchoRight"></div>
-     <div class="winner-shirt" id="winnerShirt"></div>
+    <div class="winner-tableau">
+     <div class="winner-type" aria-label="Winner is"><span class="winner-type-main">WINNER</span><span class="winner-type-sticker">IS...</span></div>
+     <div class="winner-halo" aria-hidden="true"></div>
+     <div class="winner-echo echo-left" id="winnerEchoLeft" aria-hidden="true"></div>
+     <div class="winner-echo echo-right" id="winnerEchoRight" aria-hidden="true"></div>
+     <div class="winner-shirt" id="winnerShirt" aria-hidden="true"></div>
     </div>
     <div class="winner-caption">
      <h2 class="winner-name" id="winnerName">Gato Samurái</h2>
+     <div class="winner-result">
+      <span id="winnerStatus">TU NUEVA CAMPEONA</span>
+      <p id="winnerFuture">Mañana podrás defenderla.</p>
+     </div>
     </div>
    </div>
    <a class="winner-next" href="https://insertcoinmx.com/">DESCUBRE MÁS DISEÑOS EN SOBRES</a>
