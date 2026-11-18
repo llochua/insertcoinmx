@@ -174,8 +174,6 @@ function end(){
  $('winnerName').textContent=safeName(champion);
  $('winnerShirt').innerHTML=shirt(champion,'finish');
  bgSample(champion);
- $('finBackdrop').style.backgroundImage='url("d/'+champion+'.jpg")';
- $('finRounds').textContent=TOTAL+' ENCUENTROS · '+PAIRS.length+' DISEÑOS ENFRENTADOS';
  $('finish').classList.remove('on');void $('finish').offsetWidth;$('finish').classList.add('on');
  $('finish').setAttribute('aria-hidden','false');
  locked=true;sound('win');
