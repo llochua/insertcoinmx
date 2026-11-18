@@ -1061,6 +1061,31 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  display:block;flex:1 1 auto;width:100%;height:100%;
  min-height:0;border:0;background:#0c0b2a;
 }
+
+/* UX crítico · avisos persistentes, salida de sobres y legibilidad */
+.ux-backdrop{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;background:rgba(4,3,16,.88);padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.ux-backdrop.on{display:flex}
+.ux-panel{width:min(100%,440px);max-height:100%;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;align-items:center;gap:13px;padding:clamp(22px,5vw,32px) clamp(18px,5vw,30px);background:linear-gradient(155deg,#252054,#101024 75%);border:1px solid rgba(255,255,255,.27);border-radius:18px;box-shadow:0 24px 65px rgba(0,0,0,.65);text-align:center}
+.ux-kicker{font:700 10px/1.5 AV,system-ui,sans-serif;letter-spacing:.14em;color:#FFD400}
+.ux-panel h2{margin:0;color:#fff;font:800 clamp(24px,6vw,32px)/1.13 AV,system-ui,sans-serif;letter-spacing:-.035em;text-wrap:balance}
+.ux-panel p{margin:0;color:#e7e4f3;font:500 15px/1.5 AV,system-ui,sans-serif;max-width:350px;text-wrap:pretty}
+.ux-countdown{width:100%;padding:16px 12px;background:rgba(0,0,0,.28);border:1px solid rgba(255,212,0,.25);border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.ux-countdown span{font:700 11px AV,system-ui,sans-serif;color:#e2ddee;letter-spacing:.075em}
+.ux-countdown strong{font:800 clamp(27px,8vw,36px)/1.1 AV,system-ui,sans-serif;color:#FFD400;letter-spacing:.08em;font-variant-numeric:tabular-nums}
+.ux-panel .ux-note{color:#c9c4df;font-size:13px}
+.ux-countdown[hidden],.ux-note[hidden]{display:none!important}
+.ux-actions{width:100%;display:flex;flex-direction:column;gap:9px;margin-top:7px}
+.ux-actions button{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;padding:11px 16px;border-radius:10px;font:800 13px/1.3 AV,system-ui,sans-serif;letter-spacing:.035em;text-align:center;touch-action:manipulation}
+.ux-actions .ux-primary{background:#FFD400;color:#141026}
+.ux-actions .ux-secondary{background:rgba(255,255,255,.11);color:#fff;border:1px solid rgba(255,255,255,.2)}
+.ux-actions button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.mgo.off{background:rgba(255,212,0,.12)!important;color:#FFD400!important;box-shadow:inset 0 0 0 1px rgba(255,212,0,.65)!important;cursor:pointer}
+.toast{top:max(68px,calc(55px + env(safe-area-inset-top)))!important;width:min(calc(100vw - 42px),390px);padding:12px 16px;border:1px solid rgba(255,212,0,.42);border-radius:12px;background:#19152e;box-shadow:0 12px 38px rgba(0,0,0,.55);transform:translateX(-50%)!important;font:700 13px/1.45 AV,system-ui,sans-serif!important;letter-spacing:.01em;color:#fff;text-shadow:none;white-space:normal}
+.toast.go{animation:uxToast 3s ease both!important}
+@keyframes uxToast{0%,100%{opacity:0}8%,83%{opacity:1}}
+@media(max-height:550px){.ux-panel{gap:9px;padding:17px 18px}.ux-panel p{font-size:14px;line-height:1.35}.ux-countdown{padding:10px 12px}.ux-actions{gap:7px;margin-top:3px}.ux-actions button{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.toast.go{animation:none!important;opacity:1}}
+
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1157,6 +1182,13 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="on-actions"><button type="button" class="on-back" id="onBack" hidden>ATRÁS</button><button type="button" class="big on-next" id="onNext">SIGUIENTE</button></div>
 </div>
 <div class="toast" id="toast"></div>
+<div class="ux-backdrop" id="uxOverlay" role="dialog" aria-modal="true" aria-labelledby="uxTitle" aria-describedby="uxDesc" aria-hidden="true">
+ <div class="ux-panel"><div class="ux-kicker" id="uxKicker"></div><h2 id="uxTitle"></h2><p id="uxDesc"></p>
+ <div class="ux-countdown" id="uxCountdown" hidden><span>PRÓXIMOS 2 SOBRES EN</span><strong id="uxClock"></strong></div>
+ <p class="ux-note" id="uxNote" hidden></p>
+ <div class="ux-actions"><button type="button" class="ux-primary" id="uxPrimary"></button><button type="button" class="ux-secondary" id="uxSecondary"></button></div></div>
+</div>
+
 <div class="bkm" id="bkm" role="dialog" aria-modal="true" aria-label="Respaldo del progreso" aria-hidden="true"><div class="bk-frame"><button type="button" class="ic-close" id="bkX" aria-label="Cerrar respaldo" title="Cerrar respaldo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button><div class="bkin"></div></div></div>
 <button class="savew" id="saveW" hidden>NO SE PUDO GUARDAR TU PROGRESO · TOCA PARA EXPORTARLO</button>
 
@@ -1414,12 +1446,82 @@ function goty(k){const v=STORE.docs.map(d=>d.rate&&d.rate[k]).filter(x=>x!==unde
 let AC;function beep(f,d=.07){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
 const jingle=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.11),i*90));
 function toast(t){const e=$('toast');e.innerHTML=t;e.classList.remove('go');void e.offsetWidth;e.classList.add('go')}
+/* Estado sin sobres y confirmación de salida: las cartas se guardan al abrir, no al revelar. */
+let uxReturnFocus=null,uxClockTimer=null;
+function uxClose(){
+ const overlay=$('uxOverlay');if(!overlay.classList.contains('on'))return;
+ overlay.classList.remove('on');overlay.setAttribute('aria-hidden','true');
+ clearInterval(uxClockTimer);uxClockTimer=null;
+ const target=uxReturnFocus;uxReturnFocus=null;
+ if(target&&target.isConnected)target.focus({preventScroll:true});
+}
+function uxShow(o){
+ uxClose();
+ uxReturnFocus=document.activeElement;
+ $('uxKicker').textContent=o.kicker;$('uxTitle').textContent=o.title;$('uxDesc').textContent=o.desc;
+ $('uxNote').hidden=!o.note;$('uxNote').textContent=o.note||'';
+ $('uxCountdown').hidden=!o.countdown;
+ const a=$('uxPrimary'),b=$('uxSecondary');
+ a.textContent=o.primary;b.textContent=o.secondary||'VOLVER';
+ a.onclick=()=>{uxClose();if(o.onPrimary)o.onPrimary()};
+ b.onclick=()=>{uxClose();if(o.onSecondary)o.onSecondary()};
+ const overlay=$('uxOverlay');overlay.classList.add('on');overlay.setAttribute('aria-hidden','false');
+ if(o.countdown){
+  const update=()=>{if(packReady()){uxClose();refresh();return}$('uxClock').textContent=nextPackCountdown()};
+  update();uxClockTimer=setInterval(update,1000);
+ }
+ a.focus({preventScroll:true});
+}
+function nextPackCountdown(){
+ const now=new Date(),lastDay=[today(),S.freeDay||'',S.last||''].sort().pop();
+ const [y,m,d]=lastDay.split('-').map(Number),next=new Date(y,m-1,d+1);
+ const mins=Math.max(0,Math.ceil((next-now)/60000)),days=Math.floor(mins/1440);
+ return (days?days+'d ':'')+String(Math.floor(mins%1440/60)).padStart(2,'0')+':'+String(mins%60).padStart(2,'0');
+}
+function uxEmptyPacks(otherTab=false){
+ syncIn();if(packReady()){go('pack');return}
+ const canTrade=dups()>=5;
+ ga('sobres_agotados',{origen:cur,canje_disponible:canTrade?1:0});
+ uxShow({
+  kicker:'SOBRES · ESTADO DIARIO',
+  title:otherTab?'Tu sobre se abrió en otra pestaña':'¡Por hoy, sin sobres!',
+  desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Tus próximos 2 sobres llegan cuando comience el siguiente día disponible.',
+  note:canTrade?'Tienes al menos 5 repetidas para conseguir un sobre extra.':'Puedes seguir explorando tu colección mientras esperas.',
+  countdown:true,
+  primary:canTrade?'CAMBIAR 5 REPETIDAS':'VER MI ÁLBUM',
+  secondary:'VOLVER',
+  onPrimary:canTrade?()=>trade(()=>go('pack')):()=>go('album')
+ });
+}
+function uxPackInProgress(){
+ return cur==='pack'&&!$('sum').classList.contains('on')&&
+  ($('env').classList.contains('cut')||$('disc').classList.contains('on'));
+}
+function uxConfirmPackExit(){
+ ga('salida_revelacion',{carta_actual:idx+1});
+ uxShow({kicker:'SOBRE YA ABIERTO',title:'Tus 5 cartas están guardadas',
+  desc:'Si sales ahora, terminará la revelación de este sobre. No perderás ninguna carta.',
+  note:'Puedes continuar y ver el resumen completo antes de salir.',
+  primary:'SEGUIR REVELANDO',secondary:'SALIR AL MENÚ',
+  onSecondary:()=>go('home')});
+}
+$('uxOverlay').addEventListener('pointerdown',e=>{if(e.target===$('uxOverlay'))uxClose()});
+document.addEventListener('keydown',e=>{
+ const el=$('uxOverlay');if(!el.classList.contains('on'))return;
+ if(e.key==='Escape'){e.preventDefault();uxClose();return}
+ if(e.key==='Tab'){
+  const a=$('uxPrimary'),b=$('uxSecondary');
+  if(e.shiftKey&&document.activeElement===a){e.preventDefault();b.focus()}
+  else if(!e.shiftKey&&document.activeElement===b){e.preventDefault();a.focus()}
+ }
+});
+
 /* ---------- navegación ---------- */
 let cur='home';
-function go(id){if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
+function go(id){if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
-document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);go('home')}});
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
 /* ---------- bienvenida ---------- */
 const ON=[
  {k:'EL ÁLBUM · 01 / 03',t:'Las playeras que hemos hecho, ahora tienen una carta.',p:'Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección.'},
@@ -1452,7 +1554,7 @@ function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
 let mi=0;const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Full garantizada en tu bienvenida':'5 cartas por sobre · una Especial o mejor'):'Próximos 2 sobres en '+countdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':countdown(),off:!r},
+ {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Full garantizada en tu bienvenida':'5 cartas por sobre · una Especial o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -1469,7 +1571,7 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES();
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
- if(m.id==='pack'&&m.off){beep(150,.2);toast('MAÑANA TIENES 2 SOBRES<br>O CAMBIA REPETIDAS');return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
+ if(m.id==='pack'&&m.off){beep(440,.05);uxEmptyPacks();return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
 let mMoved=false,msx=null,msy=null;
 $('mGo').onclick=mEnter;
 $('mTabs').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;mi=+b.dataset.i;beep(660,.03);renderHome()};
@@ -1522,7 +1624,7 @@ $('openBtn').onclick=openPack;
 /* abrir sobre: en un solo bloque, dentro del candado, se adopta lo guardado, se revisa que haya sobre,
    se suman las cartas, se gasta el sobre y se guarda. La animación empieza después. */
 let opening=false;function openPack(){if(opening)return;opening=true;clearTimeout(hintT);
- withLock(()=>{syncIn();if(!packReady()){opening=false;toast('YA LO ABRISTE<br>EN OTRA PESTAÑA');go('home');return}
+ withLock(()=>{syncIn();if(!packReady()){opening=false;go('home');uxEmptyPacks(true);return}
   const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,welcome:0,daily:0,dailyDay:'',saved:false,t:0};
   if(!S.test&&!PRUEBA){
    if(S.welcomeLeft>0){p.welcome=1;p.last=today()}
@@ -1880,7 +1982,7 @@ function startTorneo(){
 function retaInitFrame(f){
  const pool=retaPool();
  if(!retaValid(S.reta2,pool)){startTorneo();return}
- f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool},location.origin);
+ f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,packsAvailable:packReady(),canTrade:dups()>=5},location.origin);
 }
 function retaElegir(f,msg){
  withLock(()=>{
@@ -1917,7 +2019,12 @@ window.addEventListener('message',e=>{
  if(!m||typeof m!=='object')return;
  if(m.type==='icmx-reta-ready')retaInitFrame(f);
  if(m.type==='icmx-reta-choice')retaElegir(f,m);
- if(m.type==='icmx-reta-pack'&&S.reta2&&m.day===S.reta2.day)go('pack');
+ if(m.type==='icmx-reta-pack'&&S.reta2&&m.day===S.reta2.day){
+  syncIn();
+  if(m.action==='album')go('album');
+  else if(m.action==='trade')uxEmptyPacks();
+  else go('pack');
+ }
 });
 /* ---------- récords ---------- */
 function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STORE.docs.length&&S.ini)m.push({ini:S.ini,score:uniq()});return m.filter(r=>r.ini).sort((a,b)=>b.score-a.score)}
