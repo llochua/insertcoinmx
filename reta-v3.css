@@ -1,0 +1,68 @@
+/* RETA v3 · Una campeona que enfrenta retadores de tu colección.
+   La iconografía son playeras con diseños del catálogo; no se introducen personajes ni assets ajenos. */
+#torneo .stage.r3-stage{
+  min-height:0;flex:1;display:flex;flex-direction:column;align-items:stretch;
+  justify-content:flex-start!important;gap:0!important;padding:0!important;
+  position:relative;overflow:hidden;
+  background:radial-gradient(95% 64% at 50% 25%,#282056 0%,#15112f 58%,#0a091b 100%)
+}
+#torneo .stage.r3-stage::after{opacity:.36;z-index:1;pointer-events:none}
+#torneo .r3-stage>*{position:relative;z-index:2}
+#torneo #vRound{min-height:20px;display:flex;gap:8px;justify-content:center;align-items:center;padding:2px 16px 7px!important;font:700 11px AV,system-ui,sans-serif!important;color:rgba(255,255,255,.77)}
+#torneo #vRound .r3-pips{display:inline-flex;gap:4px}
+#torneo #vRound .r3-pips i{display:block;width:15px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);opacity:1}
+#torneo #vRound .r3-pips i.done{background:#FFD400}
+#torneo #vRound .r3-pips i.now{outline:1px solid #FFD400;outline-offset:2px}
+.r3-heading{flex:none;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;padding:clamp(9px,2vh,20px) 12px 9px}
+.r3-eyebrow{font:8px PX,monospace;line-height:1.45;letter-spacing:.055em;color:#FFD400}
+.r3-heading h2{font:800 clamp(23px,5.6vw,34px)/1.03 AV,system-ui,sans-serif;letter-spacing:-.04em;color:#fff;margin:0}
+.r3-heading p{font:600 clamp(11px,2.8vw,13px)/1.3 AV,system-ui,sans-serif;color:rgba(255,255,255,.66);max-width:350px}
+.r3-arena{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;padding:7px 12px 12px;position:relative}
+.r3-arena::before{content:"";position:absolute;inset:10% 8px 5%;background:linear-gradient(90deg,transparent calc(50% - 1px),rgba(255,255,255,.09) 50%,transparent calc(50% + 1px));pointer-events:none}
+.r3-fighter{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px;padding:14px 8px 13px;min-height:0;min-width:0;border-radius:15px;cursor:pointer;overflow:hidden;text-align:center;color:#fff;border:1px solid rgba(255,255,255,.15);background:linear-gradient(180deg,#2b2454 0%,#16132e 78%,#120d24 100%);box-shadow:0 14px 26px rgba(0,0,0,.33);transition:transform .2s,border-color .2s,box-shadow .2s}
+.r3-fighter::before{content:"";position:absolute;width:170%;height:64%;top:11%;left:-35%;border-radius:50%;background:radial-gradient(ellipse,rgba(255,221,102,.17),transparent 66%);pointer-events:none}
+.r3-fighter.challenger{background:linear-gradient(180deg,#262747 0%,#151931 80%,#111227 100%);border-color:rgba(192,202,255,.26)}
+.r3-fighter.challenger::before{background:radial-gradient(ellipse,rgba(174,187,253,.2),transparent 65%)}
+.r3-fighter:hover{border-color:rgba(255,212,0,.85);transform:translateY(-3px);box-shadow:0 18px 33px rgba(0,0,0,.4)}
+.r3-fighter:active{transform:scale(.98)}
+.r3-fighter:focus-visible{outline:3px solid #FFD400;outline-offset:2px}
+.r3-role{flex:none;display:flex;flex-direction:column;gap:6px;align-items:center;font:700 9px AV,system-ui,sans-serif;letter-spacing:.09em;color:#FFD400}
+.r3-role small{font:7px PX,monospace;color:rgba(255,255,255,.55)}
+.r3-fighter.challenger .r3-role{color:#DEE2FF}
+.r3-shirt-wrap{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.r3-shirt{position:relative;display:block;width:min(100%,190px);max-height:100%;aspect-ratio:1;filter:drop-shadow(0 15px 12px rgba(0,0,0,.42));transform:rotate(-3deg);transition:transform .24s}
+.r3-fighter.challenger .r3-shirt{transform:rotate(3deg);animation:r3Enter .5s ease-out both}
+@keyframes r3Enter{from{opacity:.1;transform:translate(25px,9px) rotate(12deg) scale(.82)}to{opacity:1;transform:translate(0,0) rotate(3deg) scale(1)}}
+.r3-fighter:hover .r3-shirt{transform:rotate(0) translateY(-5px) scale(1.035)}
+.r3-shirt-body{position:absolute;inset:0;background:var(--shirt,#23263c);clip-path:polygon(30% 8%,40% 3%,45% 9%,55% 9%,60% 3%,70% 8%,97% 26%,86% 45%,76% 40%,77% 96%,23% 96%,24% 40%,14% 45%,3% 26%);box-shadow:inset 0 0 19px rgba(0,0,0,.3)}
+.r3-shirt-body::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(0,0,0,.25),transparent 29%,rgba(255,255,255,.12) 51%,transparent 69%,rgba(0,0,0,.34));pointer-events:none}
+.r3-shirt-art{position:absolute;left:50%;top:27%;width:42%;height:44%;transform:translateX(-50%);object-fit:contain;mix-blend-mode:normal}
+.r3-name{flex:none;font:800 clamp(12px,3.4vw,17px)/1.12 AV,system-ui,sans-serif;letter-spacing:-.02em;max-width:100%;overflow-wrap:break-word;text-wrap:balance}
+.r3-pick{flex:none;width:100%;max-width:185px;margin-top:2px;border-radius:8px;padding:9px 5px;font:800 clamp(9px,2.4vw,12px)/1.1 AV,system-ui,sans-serif;letter-spacing:.045em;color:#201A24;background:#FFD400}
+.r3-fighter.challenger .r3-pick{color:#fff;background:#494B81}
+.r3-vs{position:absolute;left:50%;top:52%;z-index:4;transform:translate(-50%,-50%) rotate(-9deg);pointer-events:none;padding:7px 9px;background:#090815;border:2px solid #FFD400;border-radius:7px;color:#FFD400;font:900 clamp(21px,5.4vw,29px) AV,system-ui,sans-serif;font-style:italic;text-shadow:2px 2px 0 #8A2238;box-shadow:0 6px 12px rgba(0,0,0,.55)}
+.r3-footer{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:0 15px clamp(14px,3vh,24px)}
+.r3-footer p{font:600 12px/1.35 AV,system-ui,sans-serif;color:rgba(255,255,255,.68)}
+.r3-turn{font:8px PX,monospace;color:#FFD400;letter-spacing:.08em}
+.r3-result,.r3-finale,.r3-locked{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:18px 22px 28px}
+.r3-result .r3-heading,.r3-finale .r3-heading{padding:0}
+.r3-result h2,.r3-finale h2{font:900 clamp(25px,6.5vw,37px)/1 AV,system-ui,sans-serif;letter-spacing:-.035em;color:#fff}
+.r3-result p,.r3-finale p,.r3-locked p{font:500 13px/1.45 AV,system-ui,sans-serif;color:rgba(255,255,255,.69);max-width:330px}
+.r3-winner-art{flex:1;min-height:95px;max-height:270px;width:min(58vw,250px);display:flex;justify-content:center;align-items:center;position:relative}
+.r3-winner-art::before{content:"";position:absolute;width:110%;height:100%;border-radius:50%;background:radial-gradient(circle,rgba(255,212,0,.19),transparent 68%);pointer-events:none}
+.r3-winner-art .r3-shirt{width:min(100%,235px);transform:rotate(-4deg);filter:drop-shadow(0 18px 15px rgba(0,0,0,.6))}
+.r3-winner-name{font:800 clamp(17px,4.4vw,23px)/1.2 AV,system-ui,sans-serif;color:#FFD400;text-wrap:balance}
+.r3-main{flex:none;max-width:340px;width:100%;padding:15px 14px;border-radius:10px;background:#FFD400;color:#141125;font:800 12px AV,system-ui,sans-serif;letter-spacing:.08em;box-shadow:0 5px 0 #a68b1b,0 11px 20px rgba(255,212,0,.14)}
+.r3-main:active{transform:translateY(3px);box-shadow:0 2px 0 #a68b1b}
+.r3-secondary{flex:none;font:700 12px AV,system-ui,sans-serif;color:rgba(255,255,255,.75);padding:10px 15px}
+.r3-main:focus-visible,.r3-secondary:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+.r3-hold{font:9px PX,monospace;line-height:1.65;color:#FFD400;letter-spacing:.05em}
+.r3-thanks{font:11px/1.6 PX,monospace;color:#FFD400;letter-spacing:.06em;text-shadow:0 0 12px rgba(255,212,0,.28)}
+.r3-end-note{font:700 12px AV,system-ui,sans-serif;color:rgba(255,255,255,.6)}
+.r3-finale .r3-winner-art{max-height:230px}
+.r3-finale .r3-main{margin-top:5px}
+.r3-locked h2{font:800 clamp(25px,6vw,33px) AV,system-ui,sans-serif;color:#fff}
+.r3-locked .r3-count{font:11px PX,monospace;color:#FFD400}
+@media(max-width:350px){.r3-arena{gap:6px;padding:5px 8px 9px}.r3-fighter{padding:11px 5px 11px}.r3-role{font-size:8px}.r3-pick{padding:8px 3px}.r3-heading{padding-top:7px}}
+@media(max-height:640px){.r3-heading{gap:4px;padding:6px 10px}.r3-heading h2{font-size:22px}.r3-fighter{padding-top:10px;padding-bottom:9px}.r3-role{gap:3px}.r3-pick{padding:7px 4px}.r3-footer{padding-bottom:10px}.r3-result,.r3-finale{gap:7px;padding-top:8px;padding-bottom:12px}}
+@media(prefers-reduced-motion:reduce){.r3-shirt,.r3-fighter{animation:none!important;transition:none!important}}
