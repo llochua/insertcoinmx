@@ -17,6 +17,7 @@ let PAIRS=["gatosamurai","x","fatality","shenzalcoatl","arcade","controls","samu
 let TOTAL=PAIRS.length-1;
 const $=id=>document.getElementById(id);
 const isEmbedded=new URLSearchParams(location.search).get('embedded')==='1';
+if(isEmbedded)document.documentElement.classList.add('embedded');
 let dailyDay='',dailyState=null;
 const artSrc=id=>DESIGNS[id]?.art||'d/'+id+'.jpg';
 const ambientSrc=id=>DESIGNS[id]?.ambient||'c2/'+id+'.jpg';
