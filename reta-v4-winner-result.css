@@ -156,3 +156,9 @@
  .winner-screen.on .winner-type-sticker,
  .winner-screen.on .winner-status{animation:none!important}
 }
+
+/* UX crítico · CTA de Reta honesta con disponibilidad de sobres */
+.winner-result .winner-pack-note{max-width:340px;margin:0;color:#d3cfe5;font:600 12px/1.4 AV,Arial,sans-serif}
+.winner-pack-note[hidden]{display:none!important}
+.winner-next{min-height:48px;font:800 13px/1.25 AV,Arial,sans-serif;letter-spacing:.055em}
+@media(max-height:575px){.winner-result .winner-pack-note{font-size:12px;line-height:1.25}.winner-next{font-size:12px;min-height:44px}}
