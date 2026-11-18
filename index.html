@@ -906,6 +906,19 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .zoom #zRate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
 .zoom #zRate .rb{min-width:0}
 @media(prefers-reduced-motion:reduce){.dx.cov .dx-back.dx-opening span,.dx.cov .dx-back.dx-opening::after,.dx-revealed .dx-art,.dx-revealed .dx-scene,.dx-revealed .dx-card,.dx-revealed .dx-info{animation:none!important}}
+
+/* Refinamiento del menú existente: una sola navegación, sin tarjetas adicionales */
+#home .mh{padding-top:max(18px,env(safe-area-inset-top))}
+#home .mc .lab{padding:0 20px 20px;background:linear-gradient(180deg,transparent 0%,rgba(7,6,42,.55) 28%,rgba(7,6,42,.96) 65%,#07062a 100%)}
+#home .mc .lab small{font-size:8px;letter-spacing:.08em;line-height:1.5}
+#home .mc .lab b{font-size:clamp(25px,6vw,32px);line-height:1.08;text-wrap:balance}
+#home .mc .lab span{line-height:1.35;max-width:24ch}
+#home .mtabs button{min-height:38px;transition:background .18s,color .18s}
+#home .mtabs button.on{background:#fff;color:#120F1A}
+#home .mtabs button:focus-visible,#home .mgo:focus-visible,#home .mc:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+#home .mgo{min-height:50px;min-width:min(250px,85vw);letter-spacing:.09em}
+@media(max-width:380px){#home .mtabs{gap:0;padding-left:4px;padding-right:4px}#home .mtabs button{padding:7px 6px;font-size:10px}#home .mc .lab{padding:0 16px 16px}#home .mc .lab span{font-size:12px}}
+@media(prefers-reduced-motion:reduce){#home .mc,#home .mtabs button{transition:none!important}}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1224,13 +1237,13 @@ let mi=0;const MODES=()=>{const u=uniq(),N=NAV,r=packReady();const docs=(STORE.d
  {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Pon tus iniciales',img:'F_samus',rr:'full',go:'VER'}]};
 function renderHome(){const u=uniq(),N=NAV,M=MODES();
  $('hCount').textContent=u+' / '+N;
- const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="c2/${m.img}.jpg"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
-  [...fan.children].forEach((el,i)=>el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()})}
- [...fan.children].forEach((el,i)=>{const m=M[i];el.classList.toggle('lock',!!m.lock);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
+ const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc" role="button" tabindex="${i===mi?0:-1}" aria-label="${m.t}: ${m.s}" aria-current="${i===mi?'true':'false'}"><div class="fx idle r-${m.rr}"><img src="c2/${m.img}.jpg"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
+  [...fan.children].forEach((el,i)=>{el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()};el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click()}else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();mi=(mi+(e.key==='ArrowRight'?1:4))%5;renderHome();fan.children[mi].focus()}}})}
+ [...fan.children].forEach((el,i)=>{const m=M[i];el.classList.toggle('lock',!!m.lock);el.tabIndex=i===mi?0:-1;el.setAttribute('aria-current',i===mi?'true':'false');el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
   let d=i-mi;if(d>2)d-=5;if(d<-2)d+=5;const a=Math.abs(d);
   el.style.transform=`translate(-50%,-50%) translateX(${d*60}%) rotate(${d*11}deg) translateY(${a*6}%) scale(${1-a*.16})`;el.style.zIndex=10-a;el.style.filter=a?`brightness(${1-a*.3})`:'';el.style.opacity=a>1?0:1;el.style.pointerEvents=a>1?'none':''});
  $('mTabs').innerHTML=M.map((m,i)=>`<button class="${i===mi?'on':''} ${m.lock?'lock':''}" data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
- const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(c/${m.img}.jpg)`;
+ const m=M[mi];$('mGo').textContent=m.id==='pack'&&!m.off?'ABRIR SOBRE':m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(c/${m.img}.jpg)`;
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
