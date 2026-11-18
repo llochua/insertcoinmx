@@ -787,6 +787,44 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .dx.v-f .dx-card{animation-delay:1s!important}
 .dx-info{right:20px!important;z-index:3}
 .dx-card{z-index:2}
+
+/* ===== sobre del día: objeto protagonista con luz y piso ===== */
+#pack .stage{background:radial-gradient(ellipse 70% 55% at 50% 38%,rgba(255,255,255,.10),rgba(255,255,255,0) 70%)}
+#pack .env{position:relative}
+#pack .env::after{content:"";position:absolute;left:50%;bottom:72px;width:72%;height:28px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.65),rgba(0,0,0,0));z-index:-1;animation:pkFloor 2.6s ease-in-out infinite}
+@keyframes pkFloor{50%{transform:translateX(-50%) scale(.86);opacity:.7}}
+#pack .pk{--w:min(84vw,350px)!important}
+#pack .pkhint{font:600 13px AV!important;color:rgba(255,255,255,.75)!important;margin-top:26px!important;letter-spacing:.01em}
+.pkmeta{font:9px PX;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-top:10px;text-transform:uppercase}
+#openBtn{font:700 13px AV!important;letter-spacing:.14em!important;padding:12px 28px!important;border-radius:22px!important;box-shadow:none!important;background:rgba(255,255,255,.1)!important;color:#fff!important}
+/* destello del corte */
+.leak{position:fixed;inset:0;z-index:35;pointer-events:none;opacity:0}
+.leak.on{animation:leak .95s ease-out forwards}
+.leak.v-b{background:radial-gradient(ellipse 80% 40% at 50% 30%,#fff,rgba(255,255,255,.6) 40%,rgba(255,255,255,0) 75%)}
+.leak.v-e{background:radial-gradient(ellipse 80% 40% at 50% 30%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),conic-gradient(from 0deg at 50% 30%,#ff2d6f,#ffd400,#3dff9a,#2fd6ff,#b05cff,#ff2d6f);animation-duration:1.3s}
+.leak.v-r{background:radial-gradient(ellipse 85% 45% at 50% 30%,#fff6d0,#ffc83d 35%,#a86c00 65%,rgba(60,35,0,0) 90%);animation-duration:1.4s}
+.leak.v-f{background:radial-gradient(ellipse 90% 50% at 50% 30%,#fff,#ffb3e6 30%,#ff5fc8 55%,rgba(120,0,90,0) 90%);animation-duration:1.6s}
+@keyframes leak{0%{opacity:0;transform:scaleY(.15)}25%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1.2)}}
+@media (prefers-reduced-motion:reduce){.leak.on{animation-duration:.3s}}
+
+/* navegación: segmentos, flecha, cómo avanzar */
+.dx-top{gap:12px}.dx-seg{flex:1;display:flex;gap:4px}.dx-seg i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.28)}.dx-seg i.ok{background:rgba(255,255,255,.75)}.dx-seg i.cur{background:#fff}
+.dx-n{font:9px PX}
+.dx-next{all:unset;cursor:pointer;position:absolute;z-index:4;right:10px;top:42%;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.28);color:#fff;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.dx-next svg{width:16px;height:16px}
+.dx-how{margin-top:12px;font:600 12px AV;opacity:.6}
+/* especial cubierta */
+.dx.cov{background:#0c0a14!important}
+.dx-mat.pink{background:radial-gradient(ellipse at 50% 40%,rgba(255,111,208,.55),rgba(255,111,208,0) 70%)}
+.dx-back{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-bottom:90px;z-index:2}
+.dx-back span{width:58%;max-width:280px;aspect-ratio:480/670;border-radius:14px;background:#120F2a;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,.35),0 30px 60px rgba(0,0,0,.6);animation:dxBack 1.8s ease-in-out infinite}
+.dx-back img{width:34%}
+.v-e .dx-back span{box-shadow:0 0 0 2px #8fe9ff,0 0 40px rgba(143,233,255,.45),0 30px 60px rgba(0,0,0,.6)}
+.v-r .dx-back span{box-shadow:0 0 0 2px #e8b923,0 0 40px rgba(232,185,35,.5),0 30px 60px rgba(0,0,0,.6)}
+.v-f .dx-back span{box-shadow:0 0 0 2px #ff8fd8,0 0 40px rgba(255,111,208,.5),0 30px 60px rgba(0,0,0,.6)}
+@keyframes dxBack{50%{transform:translateY(-8px) rotate(-1.5deg)}}
+.dx-cta{position:absolute;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));z-index:3;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center}
+.dx-cta b{font:10px PX;letter-spacing:.1em;color:#FFD400}.dx-cta span{font:700 22px AV}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -816,11 +854,12 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
     <i class="pkshine"></i>
     <div class="pk-top" id="tearZone"><div class="cutl"></div><div class="cutp" id="cutp"></div><div class="hand" id="hand">👆</div></div>
    </div>
-   <div class="pkhint">Rasga la orilla con el dedo</div>
+   <div class="pkhint">Rasga la orilla con el dedo</div><div class="pkmeta" id="pkMeta"></div>
    <button class="big" id="openBtn" style="visibility:hidden;margin:14px auto 0">ABRIR</button>
   </div>
   <div class="stack" id="stack"></div>
   <div class="disc" id="disc" aria-live="polite"></div>
+  <div class="leak" id="leak"></div>
   <div class="px" id="stHint" style="display:none;position:absolute;bottom:20px;left:0;right:0;text-align:center;font-size:9px;color:var(--dim)"></div>
   <div class="sum" id="sum"></div>
  </div>
@@ -1147,7 +1186,11 @@ const firstPack=()=>!S.fg&&!veteran();
 function makeHand(first){return [pickBase(),pickBase(),pickBase(),Math.random()<SURP?pickSpecial():pickBase(),first&&POOL.full.length?pickFrom('full'):pickSpecial()]}
 const GLOW={holo:'#9ff3ff',dorada:'#FFD400',full:'#ff6fd0'};
 let hand=[],idx=0,hintT;
-function resetPack(){$('disc').classList.remove('on');{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.jpg)`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
+const VORD={f:0,r:1,e:2,b:3}; // de mejor a peor
+/* al rasgar, la luz que sale del sobre es la de su mejor carta: blanca (Base), arcoíris (Especial), oro (Rara), rosa (Full) */
+function leak(v){const L=$('leak');L.className='leak';void L.offsetWidth;L.className='leak on v-'+v;
+ if(v==='b')beep(300,.2);else{beep(220,.12);setTimeout(()=>[523,659,784,1047,1319].slice(0,v==='e'?3:v==='r'?4:5).forEach((f,i)=>setTimeout(()=>beep(f,.09),i*90)),180)}}
+function resetPack(){$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.jpg)`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
  $('stack').classList.remove('on');$('sum').classList.remove('on');$('stHint').style.display='none';$('openBtn').style.visibility='visible'}
 let tx=null;
 $('tearZone').addEventListener('pointerdown',e=>{tx=e.clientX;$('hand').style.display='none';try{$('tearZone').setPointerCapture(e.pointerId)}catch(_){}});
@@ -1166,7 +1209,7 @@ let opening=false;function openPack(){if(opening)return;opening=true;clearTimeou
   hand.forEach(c=>{c._new=!S.have[c.k]&&!seen[c.k];seen[c.k]=1;p.have[c.k]=(p.have[c.k]||0)+1;
    c._prev=VL.filter(v=>S.have[c.d+'_'+v]);c._dnew=c._new&&!c._prev.length&&!seenD[c.d];seenD[c.d]=1;c._doneB=doneB.has(c.d)});
   applyPack(p);markLogros();MINE.push(p);save();
-  setTimeout(()=>opening=false,900);$('env').classList.add('cut');beep(300,.2);idx=0;setTimeout(()=>{$('env').style.display='none';buildStack()},420)})}
+  setTimeout(()=>opening=false,900);$('env').classList.add('cut');const bv=hand.reduce((a,c)=>VORD[c.v]<VORD[a]?c.v:a,'b');leak(bv);idx=0;setTimeout(()=>{$('env').style.display='none';buildStack()},bv==='b'?450:1000)})}
 /* ===== DESCUBRIMIENTO: una carta a la vez; la playera original es el escenario, la carta la complementa =====
    Cada caso tiene su respuesta: diseño nuevo, versión nueva de un diseño que ya tenías, repetida (útil para canje),
    versión especial (sale boca abajo) y colección completada (solo diseños con 2+ versiones disponibles). */
@@ -1184,7 +1227,7 @@ function artBox(id,cls=''){const src=artOf(id),b=src.startsWith('d/')&&ABOX[id];
  return `<span class="ab ${cls}${hasCol(id)?'':' neu'}" style="--ar:${ratio.toFixed(3)}"><img src="${src}" alt="" loading="lazy" style="width:${(100/cw).toFixed(2)}%;left:${(-x0/cw*100).toFixed(2)}%;top:${(-y0/ch*100).toFixed(2)}%"></span>`}
 const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255};
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
-function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;
+function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();
  for(const c of hand)c._comp=!c._doneB&&dState(DB[c.d]).done&&hand.filter(x=>x.d===c.d).pop()===c; // completó en este sobre
  lastPack=new Set(hand.filter(c=>c._new).map(c=>c.d));showCard()}
 function caseOf(c){return !c._new?'rep':c._comp?'comp':c._dnew?'dnew':'vnew'}
@@ -1196,7 +1239,21 @@ function chips(c,anim){const st=dState(DB[c.d]);return st.vs.filter(x=>x.st!=='s
 const STAGE=id=>{const d=DB[id];if(d&&d.cm)return d.cm;const b=ABOX[id];if(!b||!artOf(id).startsWith('d/'))return 'pos';const ar=(b[2]-b[0])*640/((b[3]-b[1])*800);return ar>1.35?'pan':ar<.78?'sil':'pos'}; // cm:'pan'|'pos'|'sil' en DESIGNS lo fija a mano
 let pi=0,PHS=[];
 function phasesOf(c){const L=[];if(c._dnew)L.push('design');if(c._new&&c.v!=='b')L.push('back');L.push('card');return L}
+let REV=new Set();
+const dxTop=()=>`<div class="dx-top"><span class="dx-seg">${hand.map((_,i)=>`<i class="${i<idx?'ok':i===idx?'cur':''}"></i>`).join('')}</span><span class="dx-n">${String(idx+1).padStart(2,'0')}/05</span><button id="dcSkip">Saltar</button></div>`;
+function dxNav(D){ /* tocar = siguiente · tocar a la izquierda o deslizar a la derecha = anterior · deslizar a la izquierda = siguiente */
+ D.onclick=e=>{if(e.clientX<innerWidth*.25&&idx>0){idx--;showCard()}else{idx++;showCard()}};
+ const n=D.querySelector('.dx-next');if(n)n.onclick=e=>{e.stopPropagation();idx++;showCard()};
+ $('dcSkip').onclick=e=>{e.stopPropagation();idx=5;D.classList.remove('on');showSum()}}
+if(!window._dxSw){window._dxSw=1;let x0=null;const D0=document.getElementById('disc');
+ D0.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
+ D0.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)<50||D0.classList.contains('cov'))return;e.preventDefault();if(dx<0){idx++;showCard()}else if(idx>0){idx--;showCard()}},{passive:false})}
 function showCard(){const D=$('disc'),c=hand[idx];if(!c){D.classList.remove('on');showSum();return}
+ if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
+  D.className=`disc on dx cov v-${c.v}`;D.style.setProperty('--bg','#0c0a14');
+  D.innerHTML=`${c.v==='e'?'<i class="dx-mat holo"></i>':c.v==='r'?'<i class="dx-mat gold"></i>':'<i class="dx-mat pink"></i>'}${dxTop()}
+   <div class="dx-back"><span><img src="coin.png" alt=""></span></div><div class="dx-cta"><b>ALGO ESPECIAL</b><span>Toca para revelar</span></div>`;
+  D.onclick=()=>{REV.add(idx);showCard()};$('dcSkip').onclick=e=>{e.stopPropagation();idx=5;D.classList.remove('on');showSum()};return}
  const d=DB[c.d],col=dcol(d.id),k=caseOf(c),v=c.v,fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':null;
  const lab={dnew:'DISEÑO NUEVO',vnew:'NUEVA VERSIÓN',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
  /* la ilustración es la de esta versión: Base/Especial = estampa original · Rara = su arte en oro · Full = su escena completa */
@@ -1205,13 +1262,12 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c){D.classList.remove('on'
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:${artOf(d.id).startsWith('d/')?.8:.667}"><img src="${artOf(d.id)}" alt=""></span>`}${v==='e'?'<i class="dx-holo"></i>':''}</span></div>`;
  D.className=`disc on dx v-${v} k-${k}${hasCol(d.id)?'':' neu'}`;D.style.setProperty('--bg',v==='r'?'#0d0a05':col);
  D.innerHTML=`${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
-  <div class="dx-top"><span>${String(idx+1).padStart(2,'0')} / 05</span><button id="dcSkip">Saltar</button></div>
+  ${dxTop()}<button class="dx-next" aria-label="Siguiente"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button>
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>
-   <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div></div>
+   <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${idx===0?'<div class="dx-how">Toca o desliza para ver la siguiente</div>':''}</div>
   <button class="dx-card" id="dcCard" aria-label="Ver la carta en grande"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span></button>`;
- $('dcSkip').onclick=e=>{e.stopPropagation();idx=5;D.classList.remove('on');showSum()};
  $('dcCard').onclick=e=>{e.stopPropagation();openCard(c.k)};
- D.onclick=()=>{idx++;showCard()};
+ dxNav(D);
  if(k==='rep')beep(440,.05);else if(v==='b')beep(988,.07);else jingle();
  if(k==='comp')setTimeout(()=>[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.1),i*120)),500)}
 $('stack').addEventListener('click',e=>{});
