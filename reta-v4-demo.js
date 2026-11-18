@@ -18,6 +18,7 @@ const TOTAL=PAIRS.length-1;
 const $=id=>document.getElementById(id);
 const prefersReduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 let round=0,champion=PAIRS[0],slots={top:PAIRS[0],bottom:PAIRS[1]},locked=false,run=0,muted=false,soundCtx=null;
+let previousChampion=null,challengers=PAIRS.slice(1);
 /* RETA V4.2: fondo de la playera = color real de la plasta del diseño.
    El JPG original se enmascara suavemente dentro de la silueta, SIN borrar
    píxeles del estampado. Se evita el parche rectangular sin inventar arte. */
@@ -159,29 +160,65 @@ function select(side){
   $("app").classList.remove("impact");$("shock").classList.remove("show");
   winner.classList.remove("win");
   champion=id;round++;
-  if(round>=TOTAL){end();return}
+  if(round>=TOTAL){
+   $('app').classList.add('victory-hold');winner.classList.add('last-one');
+   setTimeout(()=>{if(n===run)end(side)},prefersReduce?15:420);
+   return;
+  }
   // La ganadora nunca cambia de posición. Solo entra otro retador
   // en la ranura que quedó libre tras el impacto.
-  slots[lostSide]=PAIRS[round+1];
+  slots[lostSide]=challengers[round];
   progress();
   paintSlot(lostSide,true);
   refreshRoles();
   locked=false;
  },prefersReduce?10:480);
 }
-function end(){
- progress();
+function end(side){
+ const prior=previousChampion,status=prior===null?"TU PRIMERA CAMPEONA":prior===champion?"¡LA CAMPEONA SIGUE EN PIE!":"¡NUEVA CAMPEONA!";
+ previousChampion=champion;
  $('winnerName').textContent=safeName(champion);
+ $('egStatus').textContent=status;
+ $('egCount').textContent=TOTAL+" ENCUENTROS · "+PAIRS.length+" DISEÑOS ENFRENTADOS";
+ $('egContext').textContent=prior===null
+  ?"Tu favorita por ahora. Las playeras que descubras en Sobres podrían destronarla."
+  :prior===champion
+  ?"Sigue siendo tu favorita. Abre sobres para descubrir quién podría destronarla."
+  :"Cambiaste de favorita. Nuevos diseños en Sobres pueden volver a retarla.";
  $('winnerShirt').innerHTML=shirt(champion,'finish');
  bgSample(champion);
- $('finish').classList.remove('on');void $('finish').offsetWidth;$('finish').classList.add('on');
- $('finish').setAttribute('aria-hidden','false');
- locked=true;sound('win');
+ const modal=$('finish');
+ modal.classList.remove('on');modal.dataset.phase='entry';
+ modal.classList.toggle('from-bottom',side==='bottom');modal.classList.toggle('from-top',side==='top');
+ void modal.offsetWidth;
+ modal.classList.add('on');modal.setAttribute('aria-hidden','false');
+ locked=true;
+ const token=run;
+ // De Sobres recuperamos el timing: primero impacto, después protagonista
+ // y al final qué significa el resultado y qué puedes hacer con él.
+ const after=(ms,phase)=>setTimeout(()=>{
+  if(token!==run||!modal.classList.contains('on'))return;
+  modal.dataset.phase=phase;
+  if(phase==='future'){
+   const action=modal.querySelector('.eg-cta');
+   if(action)action.focus({preventScroll:true});
+  }
+ },prefersReduce?1:ms);
+ after(200,'hero');
+ after(920,'identity');
+ after(1480,'future');
+ sound('win');
 }
 function reset(){
- run++;round=0;champion=PAIRS[0];slots={top:PAIRS[0],bottom:PAIRS[1]};locked=false;
- $("finish").classList.remove("on");$("finish").setAttribute("aria-hidden","true");
- render(true);sound("start");
+ run++;round=0;
+ champion=previousChampion||PAIRS[0];
+ challengers=PAIRS.filter(id=>id!==champion);
+ slots={top:champion,bottom:challengers[0]};
+ locked=false;
+ $('app').classList.remove('victory-hold');
+ $('finish').classList.remove('on');$('finish').dataset.phase='entry';
+ $('finish').setAttribute('aria-hidden','true');
+ render(true);sound('start');
 }
 $("reset").onclick=reset;
 $("again").onclick=reset;
