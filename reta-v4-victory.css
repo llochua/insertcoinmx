@@ -1,0 +1,123 @@
+/* Reta v4.4 · La última decisión se celebra como un acontecimiento.
+   Lo aprendimos de Sobres: impacto, revelación, reconocimiento y siguiente paso.
+   No hay una carta escondida ni un premio inventado: la protagonista es la playera. */
+
+/* Final del combate: el diseño elegido sigue en su sitio durante el último golpe. */
+.app.victory-hold .brandbar,
+.app.victory-hold .hud,
+.app.victory-hold .prompt,
+.app.victory-hold .screen-bottom{opacity:.3;transition:opacity .28s ease}
+.app.victory-hold .vs-divider{opacity:0;transition:opacity .18s}
+.app.victory-hold .arena{background:#100d19;transition:background .25s}
+.app.victory-hold .arena::after{
+ content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+ background:radial-gradient(ellipse at 50% 50%,transparent 13%,rgba(7,5,16,.65) 74%);
+ animation:victoryFocus .45s both;
+}
+@keyframes victoryFocus{from{opacity:0}to{opacity:1}}
+.app.victory-hold .fighter.last-one{z-index:4;transform:scale(1.035);filter:brightness(1.27) drop-shadow(0 0 24px rgba(255,212,0,.21));transition:transform .35s,filter .35s}
+
+/* Pausa de impacto → playera protagonista → reconocimiento → propósito. */
+.endgame{
+ --eg-enter-y:18vh;
+ overflow:hidden;
+}
+.endgame.from-top{--eg-enter-y:-19vh}
+.endgame.from-bottom{--eg-enter-y:19vh}
+.endgame.on{animation:victoryCurtain .32s ease-out both}
+@keyframes victoryCurtain{0%{opacity:0}100%{opacity:1}}
+.endgame .eg-head{z-index:3}
+.endgame .eg-flash{
+ position:absolute;inset:0;z-index:7;pointer-events:none;opacity:0;
+ background:radial-gradient(ellipse at 50% 48%,#fffbd1 0%,#ffdc53 24%,rgba(255,212,0,.2) 57%,transparent 85%);
+}
+.endgame[data-phase="entry"] .eg-flash,
+.endgame[data-phase="hero"] .eg-flash{animation:victoryFlash .48s ease-out both}
+@keyframes victoryFlash{
+ 0%{opacity:.9;transform:scale(.83)}
+ 34%{opacity:.72;transform:scale(1.04)}
+ 100%{opacity:0;transform:scale(1.25)}
+}
+.endgame .eg-banner{
+ transition:transform .52s cubic-bezier(.19,.8,.32,1),filter .52s ease;
+ transform:skewX(-8deg);
+}
+.endgame[data-phase="entry"] .eg-banner{
+ transform:translateY(25vh) scale(1.36) skewX(-8deg);
+ filter:brightness(1.4);
+}
+.endgame .eg-shirt{opacity:0;transform:translateY(var(--eg-enter-y)) scale(.76) rotate(-10deg);animation:none}
+.endgame:not([data-phase="entry"]) .eg-shirt{
+ opacity:1;animation:egArrival .88s cubic-bezier(.13,.86,.25,1.08) both;
+}
+@keyframes egArrival{
+ 0%{opacity:0;transform:translateY(var(--eg-enter-y)) scale(.74) rotate(-10deg);filter:brightness(2.1) drop-shadow(0 0 15px #ffd400aa)}
+ 52%{opacity:1;transform:translateY(-10px) scale(1.07) rotate(3deg);filter:brightness(1.38) drop-shadow(0 0 18px #ffd40055)}
+ 100%{opacity:1;transform:translateY(0) scale(1) rotate(0);filter:brightness(1)}
+}
+.endgame .eg-ring{opacity:.4;transition:opacity .6s ease}
+.endgame[data-phase="entry"] .eg-ring{opacity:0}
+.endgame .eg-spark{
+ position:absolute;inset:0;pointer-events:none;opacity:0;
+ background:conic-gradient(from 14deg at 50% 49%,transparent 0 35deg,#fff9bf 36deg 38deg,transparent 39deg 87deg,#ffdb52 88deg 92deg,transparent 93deg 160deg,#fff8c0 161deg 163deg,transparent 164deg 242deg,#ffe069 243deg 246deg,transparent 247deg 311deg,#fff9bf 312deg 314deg,transparent 315deg);
+ mix-blend-mode:screen;
+}
+.endgame:not([data-phase="entry"]) .eg-spark-a{animation:egRay .75s ease-out both}
+.endgame:not([data-phase="entry"]) .eg-spark-b{animation:egRay 1s .12s ease-out both;transform:rotate(24deg)}
+@keyframes egRay{0%{opacity:0;scale:.7}22%{opacity:.24;scale:1}100%{opacity:0;scale:1.32}}
+.endgame .eg-identity{
+ display:flex;flex-direction:column;align-items:center;gap:4px;
+ max-height:0;opacity:0;overflow:hidden;transform:translateY(14px);
+ transition:max-height .45s cubic-bezier(.2,.7,.3,1),opacity .35s ease,transform .45s ease;
+}
+.endgame[data-phase="identity"] .eg-identity,
+.endgame[data-phase="future"] .eg-identity{
+ max-height:135px;opacity:1;transform:none;
+}
+.endgame .eg-bottom{justify-content:flex-end}
+.endgame .eg-label{font:8px/1.35 PX,monospace;letter-spacing:.06em;margin:0;color:#FFD400}
+.endgame .eg-name{font-size:clamp(27px,7.5vw,39px);line-height:1.02;margin:0}
+.endgame .eg-future{
+ max-height:0;opacity:0;overflow:hidden;transform:translateY(15px);visibility:hidden;pointer-events:none;
+ width:100%;display:flex;align-items:center;flex-direction:column;gap:0;
+ transition:max-height .6s cubic-bezier(.18,.8,.25,1),opacity .42s .12s ease,transform .48s ease,visibility 0s .4s;
+}
+.endgame[data-phase="future"] .eg-future{
+ max-height:300px;opacity:1;transform:none;visibility:visible;pointer-events:auto;
+ transition:max-height .6s cubic-bezier(.18,.8,.25,1),opacity .42s .12s ease,transform .48s ease,visibility 0s 0s;
+}
+.endgame .eg-progress{display:flex;align-items:center;gap:9px;justify-content:center;width:100%;margin:11px 0 2px;white-space:nowrap}
+.endgame .eg-progress i{display:block;flex:1;height:1px;max-width:54px;background:rgba(255,212,0,.27);transform:skewX(-20deg)}
+.endgame .eg-progress span{font:7px/1.6 PX,monospace;color:rgba(255,255,255,.57);letter-spacing:.03em}
+.endgame .eg-why{
+ max-width:320px;margin:8px 0 13px;text-wrap:balance;
+ font:500 clamp(12px,3.2vw,14px)/1.4 Arial,system-ui,sans-serif;color:rgba(255,255,255,.82);
+}
+.endgame .eg-cta{gap:10px}
+.endgame .eg-cta span{font-size:19px;font-weight:700;line-height:.6;display:inline-block;transform:translateY(-1px)}
+.endgame .eg-thanks{margin-top:14px;color:rgba(255,212,0,.85);font-size:8px}
+.endgame .eg-shirt-space{margin:0 -24px}
+@media(max-height:690px){
+ .endgame .eg-progress{margin:7px 0 0}
+ .endgame .eg-why{margin:5px 0 8px;font-size:11px}
+ .endgame .eg-thanks{margin-top:8px;font-size:7px}
+ .endgame .eg-cta{padding:9px 12px;min-height:42px;font-size:12px}
+ .endgame .eg-name{font-size:clamp(22px,6.5vw,32px)}
+}
+@media(max-height:560px){
+ .endgame[data-phase="entry"] .eg-banner{transform:translateY(18vh) scale(1.23) skewX(-8deg)}
+ .endgame .eg-progress{margin-top:4px}
+ .endgame .eg-why{margin:3px 0 5px;font-size:10px}
+ .endgame .eg-thanks{margin-top:5px}
+ .endgame .eg-cta{min-height:37px}
+}
+@media(prefers-reduced-motion:reduce){
+ .app.victory-hold .fighter.last-one,
+ .endgame .eg-banner,
+ .endgame .eg-identity,
+ .endgame .eg-future{transition:none!important}
+ .endgame.on,.endgame .eg-flash,.endgame .eg-shirt,
+ .endgame .eg-spark,.endgame .eg-halo{animation:none!important}
+ .endgame[data-phase="entry"] .eg-banner{transform:skewX(-8deg);filter:none}
+ .endgame:not([data-phase="entry"]) .eg-shirt{opacity:1;transform:none}
+}
