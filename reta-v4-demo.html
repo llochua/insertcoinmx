@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+ <meta name="theme-color" content="#0b0a11">
+ <title>Insert Coin MX — Reta v4.4 · Revelación de campeona</title>
+ <meta name="description" content="Prueba de experiencia Reta v4: una campeona, nuevos retadores, una pelea continua.">
+ <link rel="preload" as="image" href="d/gatosamurai.jpg">
+ <link rel="preload" as="image" href="d/x.jpg">
+ <link rel="stylesheet" href="reta-v4-demo.css">
+ <link rel="stylesheet" href="reta-v4-clear.css">
+ <link rel="stylesheet" href="reta-v4-victory.css">
+</head>
+<body>
+ <main class="app" id="app">
+  <header class="brandbar">
+   <div class="brand">
+    <img src="coin.png" alt="">
+    <span class="brandword">INSERT COIN MX<small>RETA · LABORATORIO V4</small></span>
+   </div>
+   <div class="minictrls">
+    <button type="button" class="tinybtn" id="mute" aria-label="Silenciar sonido" aria-pressed="false" title="Sonido">♫</button>
+    <button type="button" class="tinybtn" id="reset" aria-label="Reiniciar la prueba" title="Reiniciar">↻</button>
+   </div>
+  </header>
+
+  <section class="hud" aria-label="Progreso">
+   <div class="hud-line">
+    <div class="hud-title">STAGE <b>01</b></div>
+    <div class="hud-meta"><span id="roundNum">01</span> / 07<br>ENCUENTROS</div>
+   </div>
+   <div class="progress" id="pips" aria-hidden="true"></div>
+  </section>
+
+  <div class="prompt"><strong>¿CON CUÁL FARMEAS MÁS AURA?</strong></div>
+
+  <section class="arena" id="arena" aria-label="Enfrentamiento de playeras">
+   <div class="slot" id="topWrap"></div>
+   <div class="vs-divider" aria-hidden="true"><b>VS</b></div>
+   <div class="slot" id="bottomWrap"></div>
+  </section>
+
+  <footer class="screen-bottom">
+   <span>UNA PLAYERA SIGUE EN PIE.</span>
+   <b>INSERT COIN MX</b>
+  </footer>
+
+  <div class="shock" id="shock" aria-hidden="true"><span id="impactText">HIT!</span></div>
+
+  <div class="intro" aria-hidden="true">
+   <small>HERE COMES A</small>
+   <strong>NEW<br>CHALLENGER!</strong>
+  </div>
+
+  <section class="endgame" id="finish" aria-hidden="true" aria-label="Resultado de Reta" role="dialog" aria-modal="true" data-phase="entry">
+   <div class="eg-flash" aria-hidden="true"></div>
+   <header class="eg-head">
+    <div class="eg-brand"><img src="coin.png" alt=""><span>INSERT COIN MX</span></div>
+    <button type="button" class="eg-replay" id="again" aria-label="Repetir demo de Reta" title="Repetir demo">↻</button>
+    <div class="eg-banner"><span class="eg-stage">STAGE 01</span><h2>CLEAR<strong>!</strong></h2></div>
+   </header>
+   <div class="eg-shirt-space">
+    <div class="eg-halo" aria-hidden="true"></div>
+    <div class="eg-ring" aria-hidden="true"></div>
+    <div class="eg-shirt" id="winnerShirt" aria-hidden="true"></div>
+    <div class="eg-spark eg-spark-a" aria-hidden="true"></div>
+    <div class="eg-spark eg-spark-b" aria-hidden="true"></div>
+   </div>
+   <div class="eg-bottom">
+    <div class="eg-identity">
+     <span class="eg-label" id="egStatus">TU CAMPEONA</span>
+     <h3 class="eg-name" id="winnerName">Gato Samurái</h3>
+    </div>
+    <div class="eg-future">
+     <div class="eg-progress"><i></i><span id="egCount">7 ENCUENTROS · 8 DISEÑOS</span><i></i></div>
+     <p class="eg-why" id="egContext">Esta es tu favorita por ahora. Nuevas playeras podrán destronarla.</p>
+     <a class="eg-cta" href="https://insertcoinmx.com/">DESCUBRIR MÁS EN SOBRES <span aria-hidden="true">→</span></a>
+     <span class="eg-thanks">THANK YOU FOR PLAYING</span>
+    </div>
+   </div>
+  </section>
+ </main>
+
+ <aside class="debug">VISTA DE PRUEBA · Diseño y ritmo únicamente. No utiliza ni modifica tus cartas, no guarda resultados y no está publicado en el juego.</aside>
+ <script src="reta-v4-demo.js"></script>
+</body>
+</html>
