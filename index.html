@@ -904,6 +904,47 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .zoom #zRate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
 .zoom #zRate .rb{min-width:0}
 @media(prefers-reduced-motion:reduce){.dx.cov .dx-back.dx-opening span,.dx.cov .dx-back.dx-opening::after,.dx-revealed .dx-art,.dx-revealed .dx-scene,.dx-revealed .dx-card,.dx-revealed .dx-info{animation:none!important}}
+
+/* IC-01 · Refinamiento de descubrimiento: no altera la composición aprobada */
+.disc.dx.cov #dcBack{touch-action:pan-y}
+.disc.dx:not(.cov){touch-action:pan-y}
+.disc.dx.dx-settled .dx-card{
+ animation:none!important;opacity:1;transform:rotate(5deg);
+ transition:opacity .26s ease,transform .3s cubic-bezier(.18,.85,.25,1)!important
+}
+.disc.dx.dx-art-only .dx-card{
+ opacity:0;transform:translateY(14px) rotate(1deg) scale(.93);pointer-events:none
+}
+.dx-art-flash{
+ position:absolute;z-index:3;right:20px;top:48%;
+ max-width:52%;padding:9px 12px;border:1px solid rgba(255,255,255,.3);
+ border-radius:8px;background:rgba(14,12,23,.75);color:#fff;
+ box-shadow:0 10px 25px rgba(0,0,0,.18);
+ font:700 11px AV;line-height:1.3;text-align:center;
+ opacity:0;transform:translateY(12px);pointer-events:none
+}
+.dx-art-flash.on{animation:dxArtFeedback 1.35s ease-out both}
+@keyframes dxArtFeedback{
+ 0%{opacity:0;transform:translateY(12px)}
+ 18%,67%{opacity:1;transform:translateY(0)}
+ 100%{opacity:0;transform:translateY(-6px)}
+}
+.disc.dx:not(.cov) .dx-controls{gap:8px}
+.disc.dx:not(.cov) .dx-controls button{
+ border:1px solid rgba(255,255,255,.22);
+ background:rgba(18,16,29,.54);color:rgba(255,255,255,.88);
+ box-shadow:0 4px 14px rgba(0,0,0,.12);backdrop-filter:blur(7px);
+ -webkit-backdrop-filter:blur(7px)
+}
+.disc.dx:not(.cov) .dx-controls .dx-primary{
+ background:rgba(255,212,0,.16);border-color:rgba(255,212,0,.5);color:#fff2a6
+}
+.disc.dx:not(.cov) .dx-controls button:disabled{opacity:.35}
+.disc.dx:not(.cov) .dx-controls button:active{transform:scale(.985)}
+@media(prefers-reduced-motion:reduce){
+ .disc.dx.dx-settled .dx-card{transition:none!important}
+ .dx-art-flash.on{animation:none;opacity:1}
+}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1363,25 +1404,51 @@ function finishDiscovery(){
  $('sum').focus({preventScroll:true});
 }
 function dxNav(){
+ const D=$('disc');
  const move=step=>e=>{
+  if(step<0&&idx===0)return;
+  if(step>0&&D.classList.contains('cov'))return; // La carta especial necesita revelarse
   idx+=step;
   if(idx===hand.length){finishDiscovery();return}
   showCard();
-  if(e.detail===0){
+  if(e&&e.detail===0){
    const dest=$('dcReveal')||(step<0&&!$('dcPrev').disabled?$('dcPrev'):$('dcNext'));
-   dest.focus();
+   if(dest)dest.focus();
   }
  };
  $('dcPrev').onclick=move(-1);
  if($('dcNext'))$('dcNext').onclick=move(1);
  $('dcSkip').onclick=finishDiscovery;
+ // Gestos únicamente en el escenario: no interceptar botones ni la carta ampliable.
+ D._dxPointer=null;
+ D.onpointerdown=e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  const control=e.target.closest('button, .dx-top, .dx-info, .dx-controls');
+  if(control&&control.id!=='dcBack')return;
+  D._dxPointer={id:e.pointerId,x:e.clientX,y:e.clientY};
+ };
+ D.onpointercancel=()=>{D._dxPointer=null};
+ D.onpointerup=e=>{
+  const p=D._dxPointer;D._dxPointer=null;
+  if(!p||p.id!==e.pointerId)return;
+  const dx=e.clientX-p.x,dy=e.clientY-p.y;
+  if(Math.abs(dx)<58||Math.abs(dx)<Math.abs(dy)*1.3)return;
+  if(dx>0&&idx===0)return;
+  D._dxSwipedAt=Date.now(); // Evita que el click posterior cambie la carta flotante
+  beep(660,.035);
+  if(dx>0)move(-1)({detail:1});
+  else if(D.classList.contains('cov')){if(D._dxReveal)D._dxReveal({detail:1,_dxFromSwipe:true})}
+  else move(1)({detail:1});
+ };
 }
 function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
+ D.onclick=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._dxToastTimer);
  if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
   D.className=`disc on dx cov v-${c.v}`;D.style.setProperty('--bg','#0c0a14');
   D.innerHTML=`${c.v==='e'?'<i class="dx-mat holo"></i>':c.v==='r'?'<i class="dx-mat gold"></i>':'<i class="dx-mat pink"></i>'}${dxTop()}
    <button type="button" class="dx-back" id="dcBack" aria-label="Tocar para revelar la carta"><span><img src="coin.png" alt=""></span></button><div class="dx-cta"><b>ALGO ESPECIAL</b></div>${dxControls(true)}`;
-  const revealCard=e=>{if(REV.has(idx))return;const cover=$('dcBack');if(cover){cover.classList.add('dx-opening');cover.disabled=true}const btn=$('dcReveal');if(btn)btn.disabled=true;beep(c.v==='r'?1175:c.v==='f'?1568:988,.12);setTimeout(()=>{REV.add(idx);showCard();const stage=$('disc');stage.classList.add('dx-revealed');setTimeout(()=>stage.classList.remove('dx-revealed'),1000);if(e.detail===0&&$('dcNext'))$('dcNext').focus()},430)}; $('dcReveal').onclick=revealCard;$('dcBack').onclick=revealCard;
+  let revealing=false;
+  const revealCard=e=>{if(revealing||REV.has(idx)||(Date.now()-(D._dxSwipedAt||0)<450&&!e._dxFromSwipe))return;revealing=true;const cover=$('dcBack');if(cover){cover.classList.add('dx-opening');cover.disabled=true}const btn=$('dcReveal');if(btn)btn.disabled=true;beep(c.v==='r'?1175:c.v==='f'?1568:988,.12);setTimeout(()=>{REV.add(idx);showCard();const stage=$('disc');stage.classList.add('dx-revealed');setTimeout(()=>stage.classList.remove('dx-revealed'),1000);if(e.detail===0&&$('dcNext'))$('dcNext').focus()},430)}; D._dxReveal=revealCard;$('dcReveal').onclick=revealCard;$('dcBack').onclick=revealCard;
   dxNav();
   return}
 
@@ -1396,9 +1463,20 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   ${dxTop()}${dxControls()}
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>
    <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div></div>
-  <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read">Ampliar carta</span></button>`;
+  <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read">Ampliar carta</span></button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
  $('dcCard').onclick=()=>openCard(c.k);
  dxNav();
+ D.onclick=e=>{
+  if(Date.now()-(D._dxSwipedAt||0)<450)return;
+  if(e.target.closest('button, .dx-top, .dx-info, .dx-controls'))return;
+  D.classList.add('dx-settled');
+  const hidden=D.classList.toggle('dx-art-only');
+  const status=$('dcArtStatus');
+  status.textContent=hidden?'Ilustración completa · toca para volver':'Carta visible';
+  status.classList.remove('on');void status.offsetWidth;status.classList.add('on');
+  clearTimeout(D._dxToastTimer);
+  D._dxToastTimer=setTimeout(()=>{if(status.isConnected)status.classList.remove('on')},1400);
+ };
  if(k==='rep')beep(440,.05);else if(v==='b')beep(988,.07);else jingle();
  if(k==='comp')setTimeout(()=>[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.1),i*120)),500)}
 $('stack').addEventListener('click',e=>{});
