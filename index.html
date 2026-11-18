@@ -991,6 +991,59 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .bk-frame .bkin{width:100%;max-height:100%;min-height:0}
 .bk-frame>.ic-close{position:absolute;top:0;right:0;z-index:2}
 @media(prefers-reduced-motion:reduce){.ic-close{transition:none}}
+
+/* IC-06 · Onboarding: arte real de Insert Coin; sin imágenes inventadas. */
+.onb{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;justify-content:flex-start;align-items:stretch;gap:0;overflow:hidden;text-align:center;padding:clamp(16px,3vh,28px) clamp(16px,5vw,30px) clamp(20px,3vh,30px);background:radial-gradient(70% 45% at 50% 32%,rgba(70,61,147,.52),transparent 92%),linear-gradient(155deg,#11103b 0%,#0b0a2b 60%,#08071b 100%)}
+.onb.on{display:flex}
+.onb::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 22%,transparent 80%,rgba(0,0,0,.2))}
+.onb>*{position:relative;z-index:1}
+.on-head{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:34px}
+.on-brand{display:flex;align-items:center;gap:9px;text-align:left}
+.on-brand img{width:28px;height:28px;object-fit:contain;box-shadow:none;border-radius:0}
+.on-brand span{display:flex;flex-direction:column;gap:3px}
+.on-brand b{font:800 11px/1 AV,system-ui,sans-serif;letter-spacing:.1em;color:#fff}
+.on-brand small{font:7px PX,monospace;color:#FFD400;letter-spacing:.04em}
+.on-skip{font:700 11px AV,system-ui,sans-serif;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.2);border-radius:15px;padding:7px 11px;letter-spacing:.06em}
+.on-skip:hover{color:#fff;border-color:rgba(255,255,255,.6)}
+.on-visual{flex:1 1 auto;width:100%;min-height:165px;max-height:410px;position:relative;isolation:isolate;margin:4px auto 0}
+.on-scene{display:none;position:absolute;inset:0;align-items:center;justify-content:center;animation:onReveal .33s ease-out both}
+.on-visual[data-step="0"] .on-fan,.on-visual[data-step="1"] .on-pack,.on-visual[data-step="2"] .on-play{display:flex}
+@keyframes onReveal{from{opacity:.25;transform:translateY(12px) scale(.975)}to{opacity:1;transform:none}}
+.on-scene::before{content:"";position:absolute;width:min(94vw,470px);height:90%;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(255,212,0,.1),rgba(98,81,186,.11) 42%,transparent 75%);pointer-events:none}
+.on-fan img{position:absolute;left:50%;top:50%;width:min(40vw,185px);height:auto;aspect-ratio:480/670;object-fit:cover;border:1.5px solid rgba(255,255,255,.4);border-radius:12px;box-shadow:0 24px 42px rgba(0,0,0,.6);user-select:none;pointer-events:none}
+.on-fan .on-card-left{transform:translate(-50%,-50%) translate(-42%,5%) rotate(-17deg) scale(.91);z-index:1;filter:brightness(.83)}
+.on-fan .on-card-right{transform:translate(-50%,-50%) translate(43%,5%) rotate(17deg) scale(.91);z-index:2;filter:brightness(.88)}
+.on-fan .on-card-main{transform:translate(-50%,-50%) translateY(-5%);z-index:3;box-shadow:0 26px 46px rgba(0,0,0,.7),0 0 26px rgba(255,212,0,.14)}
+.on-pack::before{background:radial-gradient(ellipse,rgba(255,212,0,.17),rgba(125,105,215,.13) 44%,transparent 75%)}
+.on-pack img{display:block;position:relative;max-width:min(58vw,240px);max-height:94%;width:auto;height:auto;object-fit:contain;transform:rotate(-5deg);border-radius:0;box-shadow:none;filter:drop-shadow(0 25px 30px rgba(0,0,0,.68)) drop-shadow(0 0 20px rgba(255,212,0,.2))}
+.on-play-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;align-items:center;width:min(100%,390px);position:relative;padding:0 4px}
+.on-feature{height:clamp(156px,31vh,220px);min-width:0;border:1px solid rgba(255,255,255,.19);border-radius:13px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:12px;background:linear-gradient(155deg,#211e54,#0d102f);box-shadow:0 18px 30px rgba(0,0,0,.35);overflow:hidden}
+.on-feature:nth-child(1){transform:rotate(-5deg) translateY(7px)}.on-feature:nth-child(3){transform:rotate(5deg) translateY(7px)}
+.on-feature .on-label{font:700 9px PX,monospace;color:#FFD400}
+.on-feature .on-mini-card{max-width:82%;max-height:75%;width:auto;height:auto;aspect-ratio:480/670;object-fit:contain;border-radius:7px;box-shadow:0 9px 14px rgba(0,0,0,.5)}
+.on-ranks{width:100%;display:flex;flex-direction:column;gap:7px}
+.on-rank{height:43px;display:flex;align-items:center;gap:7px;padding:3px 6px;border-radius:5px;background:rgba(255,255,255,.07)}
+.on-rank strong{font:800 16px AV,system-ui,sans-serif;color:#101027;display:grid;place-items:center;width:28px;height:100%;border-radius:3px;background:#F7D25F}
+.on-rank:nth-child(2) strong{background:#D28DE0}
+.on-rank img{max-height:100%;height:100%;width:auto;border-radius:3px;box-shadow:none}
+.on-duel{height:100%;width:100%;display:flex;align-items:center;justify-content:center;gap:2px;position:relative}
+.on-duel img{width:45%;height:auto;max-height:71%;object-fit:contain;filter:drop-shadow(0 8px 7px rgba(0,0,0,.4));border-radius:3px;box-shadow:none}
+.on-duel b{position:absolute;left:50%;top:39%;transform:translate(-50%,-50%) rotate(-9deg);z-index:2;font:900 24px AV,system-ui,sans-serif;font-style:italic;color:#FFD400;text-shadow:0 3px 0 #201132,0 0 10px #1A134A}
+.on-copy{width:100%;max-width:430px;align-self:center;flex:none;padding:6px 0 0;display:flex;flex-direction:column;align-items:center}
+.on-kicker{font:8px PX,monospace;color:#FFD400;line-height:1.5;letter-spacing:.06em;margin-bottom:10px}
+.onb h2{font:800 clamp(24px,5.2vw,38px)/1.1 AV,system-ui,sans-serif;color:#fff;letter-spacing:-.035em;max-width:410px;text-wrap:balance}
+.onb p{font:500 clamp(13px,3.5vw,15px)/1.5 AV,system-ui,sans-serif;max-width:365px;margin:13px auto 0;color:rgba(244,242,255,.74);text-wrap:balance}
+.on-progress{display:flex;justify-content:center;align-items:center;gap:7px;min-height:38px;margin-top:10px}
+.on-progress i{display:block;width:20px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);transition:background .2s,width .2s}
+.on-progress i.on{width:35px;background:#FFD400}
+.on-actions{width:100%;max-width:415px;margin:0 auto;display:flex;gap:10px;flex:none;align-items:stretch}
+.on-actions .on-back{flex:0 0 86px;font:700 11px AV,system-ui,sans-serif;color:#fff;background:rgba(255,255,255,.11);border-radius:11px;border:1px solid rgba(255,255,255,.2)}
+.on-actions .on-back[hidden]{display:none}
+.on-actions .on-next{min-width:0;flex:1;padding:17px 10px!important;margin:0;font:800 clamp(11px,2.8vw,13px) AV,system-ui,sans-serif!important;letter-spacing:.055em!important;line-height:1.1!important;box-shadow:0 5px 0 #aa8900,0 13px 24px rgba(255,212,0,.18)!important}
+.onb button:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+@media(max-height:640px){.onb{padding-top:13px;padding-bottom:16px}.on-visual{min-height:130px}.onb h2{font-size:clamp(21px,5vw,30px)}.onb p{margin-top:8px;font-size:12px}.on-kicker{margin-bottom:7px}.on-progress{margin-top:3px;min-height:28px}.on-actions .on-next{padding:13px 10px!important}}
+@media(prefers-reduced-motion:reduce){.on-scene{animation:none}.on-progress i{transition:none}}
+
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
@@ -1065,7 +1118,27 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
  <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
 </dialog>
-<div class="onb" id="onb"><img id="onImg"><h2 id="onT"></h2><p id="onP"></p><div class="d" id="onDots"></div><button class="big" id="onNext"></button></div>
+<div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onT" aria-hidden="true">
+ <div class="on-head"><div class="on-brand"><img src="coin.png" alt=""><span><b>INSERT COIN MX</b><small>EL ÁLBUM</small></span></div><button type="button" class="on-skip" id="onSkip">SALTAR</button></div>
+ <div class="on-visual" id="onVisual" data-step="0" aria-hidden="true">
+  <div class="on-scene on-fan">
+   <img class="on-card-left" src="c/F_hyrule.jpg" alt="" draggable="false">
+   <img class="on-card-right" src="c/F_shenzalcoatl.jpg" alt="" draggable="false">
+   <img class="on-card-main" src="c/F_gatosamurai.jpg" alt="" draggable="false">
+  </div>
+  <div class="on-scene on-pack"><img src="sobre.png" alt="" draggable="false"></div>
+  <div class="on-scene on-play">
+   <div class="on-play-grid">
+    <div class="on-feature"><span class="on-label">ÁLBUM</span><img class="on-mini-card" src="c/F_gatosamurai.jpg" alt=""></div>
+    <div class="on-feature"><span class="on-label">TIER</span><div class="on-ranks"><div class="on-rank"><strong>S</strong><img src="c/F_hyrule.jpg" alt=""></div><div class="on-rank"><strong>A</strong><img src="c/fatality.jpg" alt=""></div></div></div>
+    <div class="on-feature"><span class="on-label">RETA</span><div class="on-duel"><img src="c/fatality.jpg" alt=""><b>VS</b><img src="c/F_shenzalcoatl.jpg" alt=""></div></div>
+   </div>
+  </div>
+ </div>
+ <div class="on-copy"><div class="on-kicker" id="onK"></div><h2 id="onT"></h2><p id="onP"></p></div>
+ <div class="on-progress" id="onDots" aria-label="Paso 1 de 3"></div>
+ <div class="on-actions"><button type="button" class="on-back" id="onBack" hidden>ATRÁS</button><button type="button" class="big on-next" id="onNext">SIGUIENTE</button></div>
+</div>
 <div class="toast" id="toast"></div>
 <div class="bkm" id="bkm" role="dialog" aria-modal="true" aria-label="Respaldo del progreso" aria-hidden="true"><div class="bk-frame"><button type="button" class="ic-close" id="bkX" aria-label="Cerrar respaldo" title="Cerrar respaldo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button><div class="bkin"></div></div></div>
 <button class="savew" id="saveW" hidden>NO SE PUDO GUARDAR TU PROGRESO · TOCA PARA EXPORTARLO</button>
@@ -1318,10 +1391,32 @@ function go(id){if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(ma
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);go('home')}});
 /* ---------- bienvenida ---------- */
-const ON=[['JUNTA LAS '+NAV,'Cada playera de Insert Coin MX es una carta. Llénalas todas en tu álbum.','c/gatosamurai.jpg'],['5 SOBRES PARA EMPEZAR','Recibe 5 sobres de bienvenida. Después, 2 sobres gratis diarios. Cada sobre tiene 5 cartas.','c/F_gatosamurai.jpg'],['JUEGA CON ELLAS','Califícalas, arma tu tier y haz torneos. Las repetidas valen sobres extra.','c/fatality.jpg']];
+const ON=[
+ {k:'EL ÁLBUM · 01 / 03',t:'Las playeras que hemos hecho, ahora tienen una carta.',p:'Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección.'},
+ {k:'TUS PRIMEROS SOBRES · 02 / 03',t:'¡Tienes 5 sobres para empezar!',p:'Cada sobre trae 5 cartas. Después de la bienvenida, recibirás 2 sobres diarios a partir del día siguiente.'},
+ {k:'TU COLECCIÓN · 03 / 03',t:'Tu colección, tus reglas.',p:'Descubre diseños, califica tus favoritas, arma tu Tier y compáralas en Reta.'}
+];
+const ON_PREVIEW=new URLSearchParams(location.search).get('preview')==='onboarding';
 let onI=0;
-function showOn(){$('onb').classList.add('on');const o=ON[onI];$('onImg').src=o[2];$('onT').textContent=o[0];$('onP').textContent=o[1];$('onDots').innerHTML=ON.map((_,i)=>`<i class="${i===onI?'on':''}"></i>`).join('');$('onNext').textContent=onI<2?'SIGUIENTE':'A JUGAR'}
-$('onNext').onclick=()=>{beep(880);if(onI<2){onI++;showOn()}else{$('onb').classList.remove('on');syncIn();S.seen=1;save()}};
+function showOn(){
+ const o=ON[onI],modal=$('onb');modal.classList.add('on');modal.setAttribute('aria-hidden','false');
+ $('onVisual').dataset.step=String(onI);$('onK').textContent=o.k;$('onT').textContent=o.t;$('onP').textContent=o.p;
+ $('onDots').innerHTML=ON.map((_,i)=>'<i class="'+(i===onI?'on':'')+'"></i>').join('');
+ $('onDots').setAttribute('aria-label','Paso '+(onI+1)+' de '+ON.length);
+ $('onBack').hidden=onI===0;$('onNext').textContent=onI<2?'SIGUIENTE':'ABRIR MI PRIMER SOBRE';
+ $('onNext').focus({preventScroll:true})
+}
+function closeOn(openPack){
+ $('onb').classList.remove('on');$('onb').setAttribute('aria-hidden','true');
+ syncIn();if(!S.seen&&!ON_PREVIEW){S.seen=1;save()}
+ if(openPack&&packReady())go('pack');else{go('home');$('mGo').focus({preventScroll:true})}
+}
+$('onBack').onclick=()=>{if(onI>0){beep(440,.04);onI--;showOn()}};
+$('onSkip').onclick=()=>{beep(440,.04);closeOn(false)};
+$('onNext').onclick=()=>{beep(880);if(onI<ON.length-1){onI++;showOn()}else closeOn(true)};
+document.addEventListener('keydown',e=>{if(!$('onb').classList.contains('on'))return;
+ if(e.key==='Escape'){e.preventDefault();closeOn(false)}else if(e.key==='ArrowLeft'&&onI>0){e.preventDefault();onI--;showOn()}
+});
 /* ---------- inicio ---------- */
 function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
@@ -1900,4 +1995,5 @@ async function shareTier(){await document.fonts.ready;const W=1080,cw=96,ch=120,
 /* ---------- arranque ---------- */
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
 claimPend();go('home');STORE.init();
+if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
 </script></body></html>
