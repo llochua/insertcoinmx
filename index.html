@@ -1271,6 +1271,33 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  .crt:has(> #onb.on){width:min(800px,calc(100vw - 64px))}
 }
 
+
+/* Final del sobre: cierre explícito y próxima acción antes del listado completo. */
+.rs2 .rs-finish{padding:17px 20px 12px;background:linear-gradient(180deg,rgba(255,212,0,.065),transparent)}
+.rs-finish-top{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#FFD400;font:8px/1.4 PX,monospace;letter-spacing:.05em}
+.rs-finish-top span:last-child{border:1px solid rgba(255,212,0,.45);border-radius:6px;padding:5px 8px;white-space:nowrap}
+.rs-finish h2{margin:8px 0 4px;font:800 clamp(20px,4.1vw,27px)/1.16 AV,system-ui,sans-serif;letter-spacing:-.025em;color:#fff;text-wrap:balance}
+.rs-finish p{font:500 13px/1.4 AV,system-ui,sans-serif;color:rgba(255,255,255,.75)}
+.rs2 .rh{height:clamp(210px,39dvh,360px)}
+.rs2 .rh .dx-card{top:auto!important;bottom:clamp(26px,8%,45px)!important;right:16px!important;width:clamp(86px,25%,140px)!important;max-width:140px!important}
+.rs2 .rh .dx-info{bottom:23px;right:calc(clamp(86px,25%,140px) + 30px)!important}
+.rs2 .rh .dx-info h2{font-size:clamp(22px,4.2vw,31px);line-height:1.03}
+.rs-follow{padding:14px 20px 4px}
+.rs-follow .rs-act2{padding:0;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:9px}
+.rs-follow .rs-main,.rs-follow .rs-sec2{box-sizing:border-box;min-height:50px;height:auto;padding:10px 8px;line-height:1.25;text-wrap:balance;touch-action:manipulation;font-size:clamp(12px,2.8vw,14px)}
+.rs-follow .rs-main{box-shadow:0 4px 0 #ad8f00,0 10px 22px rgba(255,212,0,.12)}
+.rs-wait{margin-bottom:12px;padding:14px 16px;border:1px solid rgba(255,212,0,.27);border-radius:12px;background:rgba(255,212,0,.08);text-align:center}
+.rs-wait[hidden]{display:none!important}
+.rs-wait>span{display:block;font:9px/1.3 PX,monospace;letter-spacing:.075em;color:#FFD400;margin-bottom:7px}
+.rs-wait strong{display:block;font:700 20px/1.25 AV,system-ui,sans-serif;color:#fff}
+.rs-wait time{font-variant-numeric:tabular-nums;color:#FFD400}
+.rs-wait p{font:500 12px/1.4 AV,system-ui,sans-serif;color:rgba(255,255,255,.72);margin-top:5px}
+.rs-share-wrap{padding:12px 20px 0;text-align:center}
+.rs-share{min-height:44px;padding:10px 16px;border:1px solid rgba(255,255,255,.21);border-radius:10px;background:rgba(255,255,255,.07);font:600 12px AV,system-ui,sans-serif;color:rgba(255,255,255,.83)}
+.rs-share:hover{border-color:rgba(255,255,255,.5)}
+.rs2 button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-height:640px){.rs2 .rs-finish{padding-top:12px;padding-bottom:9px}.rs2 .rh{height:clamp(188px,35dvh,285px)}.rs-follow{padding-top:11px}}
+@media(max-width:360px){.rs2 .rs-finish,.rs-follow{padding-left:14px;padding-right:14px}.rs2 .rh .dx-info{left:14px}.rs2 .rh .dx-card{right:12px!important}.rs-finish h2{font-size:20px}.rs-follow .rs-act2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1906,7 +1933,7 @@ const veteran=()=>Object.keys(S.have).length>0||!!S.last||(Array.isArray(S.pk)&&
 const firstPack=()=>!S.fg&&!veteran();
 function makeHand(first){return [pickBase(),pickBase(),pickBase(),Math.random()<SURP?pickSpecial():pickBase(),first&&POOL.full.length?pickFrom('full'):pickSpecial()]}
 const GLOW={holo:'#9ff3ff',dorada:'#FFD400',full:'#ff6fd0'};
-let hand=[],idx=0,hintT;
+let hand=[],idx=0,hintT,lastOpenedPack=null;
 const VORD={f:0,r:1,e:2,b:3}; // de mejor a peor
 /* al rasgar, la luz que sale del sobre es la de su mejor carta: blanca (Base), arcoíris (Especial), oro (Rara), rosa (Full) */
 function leak(v){const L=$('leak');L.className='leak';void L.offsetWidth;L.className='leak on v-'+v;
@@ -1932,7 +1959,12 @@ let opening=false;function openPack(){if(opening)return;opening=true;clearTimeou
   const doneB=new Set(DESIGNS.filter(d=>dState(d).done).map(d=>d.id));
   hand.forEach(c=>{c._new=!S.have[c.k]&&!seen[c.k];seen[c.k]=1;p.have[c.k]=(p.have[c.k]||0)+1;
    c._prev=VL.filter(v=>S.have[c.d+'_'+v]);c._dnew=c._new&&!c._prev.length&&!seenD[c.d];seenD[c.d]=1;c._doneB=doneB.has(c.d)});
-  const u0=uniq();applyPack(p);markLogros();MINE.push(p);save();
+  const u0=uniq();applyPack(p);
+   // Se guarda el lugar de ESTE sobre, antes de agotar la cuota o cruzar medianoche.
+   lastOpenedPack=p.welcome?{kind:'welcome',number:5-S.welcomeLeft}
+    :p.daily?{kind:'daily',number:S.freeUsed}
+    :p.extra?{kind:'extra',number:0}:{kind:'test',number:0};
+   markLogros();MINE.push(p);save();
   ga('abrir_sobre',{tipo:p.welcome?'bienvenida':p.daily?'diario':p.extra?'extra':'prueba',primero:fp0?1:0});
   hand.forEach(c=>ga('carta_obtenida',{diseno:c.d,rareza:VC[c.v],nueva:c._new?1:0}));
   {const u1=uniq();GOALS.forEach(g=>{if(u0<g[0]&&u1>=g[0])ga('hito',{hito:g[1],cartas:u1})})}
@@ -2137,6 +2169,35 @@ window.addEventListener('mousemove',e=>{if(mdown)gMove(e.clientX,e.clientY)});
 window.addEventListener('mouseup',()=>{if(mdown){mdown=false;gEnd(false)}});
 /* ===== RESUMEN: qué cambió en tu colección, agrupado por significado ===== */
 /* ===== RESUMEN (lista de Jos): protagonista con el logro integrado · compartir junto a ella · bloques: completas, diseños nuevos, versiones nuevas, repetidas · progreso chico ===== */
+/* Resumen: continuidad según el sobre abierto y las cuotas actuales.
+   El estado del sobre se conserva en esta sesión; no se agregan datos persistentes. */
+function summaryStatus(){
+ const p=lastOpenedPack||{kind:'extra',number:0};
+ if(p.kind==='welcome')return {kicker:'SOBRES DE BIENVENIDA',step:p.number+' DE 5',title:p.number===5?'¡Completaste tus 5 sobres!':'¡Sobre '+p.number+' de 5 completado!'};
+ if(p.kind==='daily')return {kicker:'SOBRES DE HOY',step:p.number+' DE 2',title:p.number===2?'¡Abriste tus 2 sobres de hoy!':'¡Sobre 1 de 2 completado!'};
+ return {kicker:p.kind==='test'?'MODO PRUEBA':'SOBRE EXTRA',step:'COMPLETADO',title:'¡Sobre completado!'};
+}
+function nextSummaryPackLabel(){
+ if(PRUEBA||S.test)return 'ABRIR OTRO SOBRE';
+ if(S.welcomeLeft>0)return 'ABRIR SOBRE '+(6-S.welcomeLeft)+' DE 5';
+ const free=freePacksLeft();
+ if(free>0)return 'ABRIR SOBRE '+(3-free)+' DE 2';
+ if(S.extra>0)return S.extra===1?'ABRIR SOBRE EXTRA':'ABRIR SOBRE EXTRA · '+S.extra+' DISPONIBLES';
+ return '';
+}
+function refreshSummaryActions(){
+ const primary=$('sOtro'),secondary=$('sAlb'),wait=$('sWait'),timer=$('sNextTime');
+ if(!primary||!secondary)return;
+ const available=!!packReady();
+ primary.textContent=available?nextSummaryPackLabel():'VER MI ÁLBUM';
+ secondary.textContent=available?'VER MI ÁLBUM':'VOLVER AL MENÚ';
+ if(wait)wait.hidden=available;
+ if(!available&&timer)timer.textContent=nextPackCountdown();
+}
+/* Si cambia el día o llegan datos de otra pestaña, actualizamos el CTA sin reiniciar el resumen. */
+setInterval(()=>{
+ if(cur==='pack'&&$('sum').classList.contains('on')){syncIn();refreshSummaryActions()}
+},30000);
 function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');const entering=!s.classList.contains('on');s.classList.add('on');
  const comp=hand.filter(c=>c._comp),rank=c=>(c._comp?-10:0)+VORD[c.v]+(c._new?0:5);
  const H=hand.slice().sort((a,b)=>rank(a)-rank(b))[0],d=DB[H.d],v=H.v,st=dState(d);
@@ -2152,20 +2213,33 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
  const sec=(t,L)=>L.length?`<section class="rs-group"><h3>${t}<span>${L.length}</span></h3><div class="rg">${L.map(card).join('')}</div></section>`:'';
  const n=dups(),PD=DESIGNS.filter(x=>!x.bx),disc=PD.filter(x=>dState(x).own).length;
  const tradeH=n>=5?'<button class="rs-trade" id="sTrade">Cambiar 5 repetidas por un sobre extra</button>':`<p class="rb-p">Llevas ${n%5} de 5 repetidas para un sobre extra</p>`;
+ const finish=summaryStatus();
  s.innerHTML=`<div class="rs2${entering?' rs-enter':''}">
+  <header class="rs-finish" role="status">
+   <div class="rs-finish-top"><span>${finish.kicker}</span><span>${finish.step}</span></div>
+   <h2>${finish.title}</h2><p>Tus 5 cartas ya están en tu colección.</p>
+  </header>
   <div class="rh dx v-${v}${hasCol(d.id)?'':' neu'}" style="--bg:${dcol(d.id)}">${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
    <button class="dx-card" data-k="${H.k}" aria-label="Ver la carta en grande"><span class="fx idle r-${H.img?H.r:'comun'}"><img src="${imgOf(H,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span></button>
    <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${H._comp?`<div class="rh-vs">${vchips}</div>`:tag(H)}</div></div>
-  <div class="rs-act2"><button class="rs-main" id="sShare">Compartir mi sobre</button><button class="rs-sec2" id="sAlb">Ver álbum</button></div>
+  <section class="rs-follow" aria-label="Qué sigue después de este sobre">
+   <div class="rs-wait" id="sWait" ${packReady()?'hidden':''}>
+    <span>PRÓXIMOS 2 SOBRES</span><strong>En <time id="sNextTime">${nextPackCountdown()}</time></strong>
+    <p>Recibirás dos sobres nuevos al comenzar el próximo día disponible.</p>
+   </div>
+   <div class="rs-act2"><button type="button" class="rs-main" id="sOtro">ABRIR OTRO SOBRE</button><button type="button" class="rs-sec2" id="sAlb">VER MI ÁLBUM</button></div>
+  </section>
   ${sec('Colección completa',G.comp)}${sec('Diseños nuevos',G.dnew)}${sec('Versiones nuevas',G.vnew)}${sec('Repetidas',G.rep)}
   <div class="rs-group rs-redeem">${tradeH}</div>
   <div class="rs-pg">${disc} de ${PD.length} diseños · ${AV.filter(c=>S.have[c.k]).length} de ${NAV} cartas</div>
-  <button class="rs-out" id="sOtro">${packReady()?'ABRIR SIGUIENTE SOBRE'+((S.test||PRUEBA)?'':' · '+(freePacksLeft()+(S.extra||0))+' RESTANTES'):'Volver al menú'}</button>
+  <div class="rs-share-wrap"><button type="button" class="rs-share" id="sShare">Compartir este sobre</button></div>
  </div>`;
- if(entering)s.scrollTop=0;
+ if(entering){s.scrollTop=0;ga('resumen_sobre_visto',{tipo:lastOpenedPack?.kind||'extra',paso:lastOpenedPack?.number||0})}
+ refreshSummaryActions();
  s.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>openCard(b.dataset.k));
- if($('sTrade'))$('sTrade').onclick=()=>trade(()=>{showSum();($('sTrade')||$('sAlb')).focus({preventScroll:true})});
- $('sAlb').onclick=()=>go('album');$('sOtro').onclick=()=>go(packReady()?'pack':'home');
+ if($('sTrade'))$('sTrade').onclick=()=>trade(()=>{showSum();$('sOtro').focus({preventScroll:false})});
+ $('sOtro').onclick=()=>{syncIn();const more=packReady();ga('resumen_sobre_accion',{accion:more?'abrir_siguiente':'ver_album'});go(more?'pack':'album')};
+ $('sAlb').onclick=()=>{syncIn();const more=packReady();ga('resumen_sobre_accion',{accion:more?'ver_album':'volver_menu'});go(more?'album':'home')};
  $('sShare').onclick=()=>shareGrid(H._comp?'COMPLETE '+d.n.toUpperCase():'ME SALIO EN MI SOBRE',hand.map(c=>c.k),'sobre-insertcoinmx.png')}
 
 /* robustez en celular: evitar que el navegador se robe el gesto y no quedarse trabado */
