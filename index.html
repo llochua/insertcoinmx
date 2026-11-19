@@ -1320,6 +1320,41 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .rs-follow .rs-share{border:1px solid rgba(255,255,255,.27);background:rgba(255,255,255,.09);color:#fff}
 .rs-follow .rs-share svg{display:block;width:17px;height:17px;flex:none}
 .rs-follow .rs-share:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.55)}
+
+/* Revelación: navegación mínima, reacción directa y arte sin recorte. */
+.dx-top{gap:clamp(7px,2vw,13px);padding-inline:16px}
+.dx-top .dx-leave{flex:0 0 30px;width:30px;height:36px;min-height:36px;padding:0;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(12,11,25,.5);color:#fff;opacity:.65}
+.dx-top .dx-leave svg{width:16px;height:16px}
+.dx-top .dx-seg{min-width:34px}
+.dx-top .sound-toggle{background:#171228;border:1px solid #FFD400;color:#FFD400;box-shadow:0 2px 12px rgba(0,0,0,.36)}
+.dx-top .sound-toggle.is-muted{background:#171228;border-color:rgba(255,255,255,.65);color:#fff}
+.dx-top .sound-toggle svg{width:21px;height:21px}
+.disc.dx .dx-controls{left:50%;right:auto;width:min(340px,calc(100% - 32px));transform:translateX(-50%);grid-template-columns:50px minmax(0,1fr) 50px;gap:9px}
+.disc.dx.cov .dx-controls{grid-template-columns:50px minmax(0,1fr)}
+.disc.dx .dx-controls .dx-arrow{width:50px;min-width:50px;display:grid;place-items:center;padding:0}
+.disc.dx .dx-controls .dx-arrow svg{width:25px;height:25px}
+.disc.dx:not(.cov) .dx-controls{grid-template-columns:50px minmax(0,1fr) 50px}
+.disc.dx:not(.cov) .dx-controls .dx-view-art{display:flex;align-items:center;justify-content:center;gap:9px;padding:0 14px;border-color:rgba(255,255,255,.4);color:#fff}
+.disc.dx:not(.cov) .dx-controls .dx-view-art svg{width:20px;height:20px}
+.disc.dx:not(.cov) .dx-controls .dx-view-art span{font-size:13px}
+.disc.dx:not(.cov) .dx-controls .dx-arrow.dx-primary{background:#FFD400;border:1px solid #FFD400;color:#120F1A;box-shadow:0 3px 0 #a48b05}
+.dx-reactions{position:absolute;z-index:4;left:50%;bottom:calc(68px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:5px;padding:4px 6px;border:1px solid rgba(255,255,255,.24);border-radius:16px;background:rgba(15,12,31,.84);box-shadow:0 7px 20px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.dx-reaction{min-width:44px;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;border:1px solid transparent;background:rgba(255,255,255,.07);font:27px/1 system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif;touch-action:manipulation;transition:background .16s,border .16s,transform .16s}
+.dx-reaction.on{background:rgba(255,212,0,.16);border-color:#FFD400;box-shadow:inset 0 0 0 1px rgba(255,212,0,.35)}
+.dx-reaction:active{transform:scale(.94)}
+.dx-reaction:focus-visible,.dx-art-back:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+.disc.dx:not(.cov) .dx-info,.disc.dx.has-base-copy .dx-info,.disc.dx.has-narrative .dx-info{bottom:calc(148px + env(safe-area-inset-bottom))!important;max-height:calc(100% - 205px);overscroll-behavior:contain}
+.dx-full-view{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;background:var(--bg);overflow:hidden}
+.dx-full-view[hidden],.dx-art-back[hidden]{display:none!important}
+.dx-full-view img{display:block;width:100%;height:100%;object-fit:contain;object-position:center center;pointer-events:none}
+.dx-art-back{position:absolute;z-index:6;top:calc(19px + env(safe-area-inset-top));left:16px;min-height:40px;padding:9px 12px;display:flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.32);border-radius:22px;background:rgba(15,12,30,.88);color:#fff;font:700 12px/1.2 AV,system-ui,sans-serif;box-shadow:0 8px 18px rgba(0,0,0,.3)}
+.dx-art-back svg{width:17px;height:17px}
+.disc.dx-art-only .dx-top .dx-seg,.disc.dx-art-only .dx-top .dx-n,.disc.dx-art-only .dx-top .dx-leave{visibility:hidden}
+.disc.dx-art-only .dx-top .sound-toggle{position:relative;z-index:7}
+.disc.dx-art-only .dx-controls,.disc.dx-art-only .dx-reactions,.disc.dx-art-only .dx-info,.disc.dx-art-only .dx-fade,.disc.dx-art-only .dx-card{visibility:hidden!important;pointer-events:none!important}
+@media(max-height:620px){.disc.dx:not(.cov) .dx-info,.disc.dx.has-base-copy .dx-info,.disc.dx.has-narrative .dx-info{max-height:calc(100% - 191px)}.dx-reactions{bottom:calc(62px + env(safe-area-inset-bottom))}.dx-reaction{width:40px;min-width:40px;height:40px;font-size:24px}}
+@media(max-width:350px){.dx-top{padding-inline:12px;gap:5px}.dx-reactions{gap:3px;padding:4px}.dx-reaction{min-width:40px;width:40px;height:40px;font-size:25px}.disc.dx .dx-controls{width:calc(100% - 24px);gap:7px}}
+@media(prefers-reduced-motion:reduce){.dx-reaction{transition:none}}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -2021,29 +2056,38 @@ const STAGE=id=>{const d=DB[id];if(d&&d.cm)return d.cm;const b=ABOX[id];if(!b||!
 let pi=0,PHS=[];
 function phasesOf(c){const L=[];if(c._dnew)L.push('design');if(c._new&&c.v!=='b')L.push('back');L.push('card');return L}
 let REV=new Set();
-const dxTop=()=>`<div class="dx-top"><span class="dx-seg">${hand.map((_,i)=>`<i class="${i<idx?'ok':i===idx?'cur':''}"></i>`).join('')}</span><span class="dx-n">${String(idx+1).padStart(2,'0')}/05</span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" id="dcSkip">Saltar</button></div>`;
-const dxControls=(covered=false)=>`<nav class="dx-controls" aria-label="Cartas del sobre">
- <button id="dcPrev"${idx===0?' disabled':''}>Anterior</button>
- ${covered?'<button id="dcReveal" class="dx-primary">Revelar carta</button>':`<button type="button" id="dcArt" class="dx-view-art" aria-pressed="false" aria-label="Ver ilustración completa" title="Ver ilustración completa"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2"/><circle cx="9" cy="9.5" r="1.5"/><path d="m4 17 5-5 4 4 3-3 4 4"/></svg><span class="dx-art-label">Ver arte</span></button><button id="dcNext" class="dx-primary">${idx===hand.length-1?'Ver resumen':'Siguiente'}</button>`}
- </nav>`;
+const dxTop=()=>`<div class="dx-top"><button type="button" id="dcLeave" class="dx-leave" aria-label="Salir del sobre" title="Salir del sobre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"/></svg></button><span class="dx-seg" aria-label="Carta ${idx+1} de 5">${hand.map((_,i)=>`<i class="${i<idx?'ok':i===idx?'cur':''}"></i>`).join('')}</span><span class="dx-n">${String(idx+1).padStart(2,'0')}/05</span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>`;
+const dxArrow=dir=>dir==='left'?'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 5-7 7 7 7"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 5 7 7-7 7"/></svg>';
+const REACTION_EMOJI=['🤯','😍','😐','😒'];
+const dxReactions=c=>`<div class="dx-reactions" id="dcReactions" role="group" aria-label="Tu reacción a este diseño">${REACTION_EMOJI.map((emoji,i)=>`<button type="button" class="dx-reaction${S.rate[c.d]===i?' on':''}" data-reaction="${i}" aria-label="${TN[i]}" aria-pressed="${S.rate[c.d]===i}" title="${TN[i]}">${emoji}</button>`).join('')}</div>`;
+const dxControls=(covered=false)=>`<nav class="dx-controls" aria-label="Navegación de cartas">
+ <button type="button" id="dcPrev" class="dx-arrow" aria-label="Carta anterior" title="Anterior"${idx===0?' disabled':''}>${dxArrow('left')}</button>
+ ${covered?'<button type="button" id="dcReveal" class="dx-primary">Revelar carta</button>':`<button type="button" id="dcArt" class="dx-view-art" aria-label="Ver ilustración completa" title="Ver ilustración completa"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg><span>Ver arte</span></button><button type="button" id="dcNext" class="dx-arrow dx-primary" aria-label="${idx===hand.length-1?'Ver resumen':'Siguiente carta'}" title="${idx===hand.length-1?'Ver resumen':'Siguiente'}">${dxArrow('right')}</button>`}
+</nav>`;
 function finishDiscovery(){
  $('disc').classList.remove('on');
  showSum();
  $('sum').focus({preventScroll:true});
 }
-/* El control 'Ver arte' enseña haciendo: conserva el gesto de tocar la ilustración. */
-function setArtworkView(artOnly){
- const D=$('disc');D.classList.add('dx-settled');D.classList.toggle('dx-art-only',!!artOnly);
- const btn=$('dcArt');
- if(btn){
-  btn.setAttribute('aria-pressed',String(!!artOnly));
-  btn.setAttribute('aria-label',artOnly?'Volver a mostrar la carta':'Ver ilustración completa');
-  btn.title=artOnly?'Volver a mostrar la carta':'Ver ilustración completa';
-  const label=btn.querySelector('.dx-art-label');
-  if(label)label.textContent=artOnly?'Ver carta':'Ver arte';
- }
- const status=$('dcArtStatus');
- if(status){status.textContent=artOnly?'Ilustración completa':'Carta visible';status.classList.remove('on')}
+/* La pantalla completa muestra el arte de la variante de esta carta, no otra. */
+function setArtworkView(on){
+ const D=$('disc');D.classList.add('dx-settled');D.classList.toggle('dx-art-only',!!on);
+ const full=$('dcFullView'),back=$('dcArtBack');
+ if(full){full.hidden=!on;full.setAttribute('aria-hidden',String(!on))}
+ if(back)back.hidden=!on;
+ const status=$('dcArtStatus');if(status){status.textContent=on?'Ilustración completa':'Carta visible';status.classList.remove('on')}
+}
+function bindReactions(c){
+ const el=$('dcReactions');if(!el)return;
+ el.onclick=e=>{
+  const b=e.target.closest('[data-reaction]');if(!b)return;
+  const tier=Number(b.dataset.reaction);
+  if(!Number.isInteger(tier)||tier<0||tier>=TN.length)return;
+  syncIn();S.rate[c.d]=tier;save();
+  el.querySelectorAll('[data-reaction]').forEach(x=>{const sel=Number(x.dataset.reaction)===tier;x.classList.toggle('on',sel);x.setAttribute('aria-pressed',String(sel))});
+  beep([1319,1047,784,523][tier],.08);
+  ga('reaccion_carta',{diseno:c.d,version:c.v,tier:TN[tier]});
+ };
 }
 function dxNav(){
  const D=$('disc');
@@ -2060,13 +2104,13 @@ function dxNav(){
  };
  $('dcPrev').onclick=move(-1);
  if($('dcNext'))$('dcNext').onclick=move(1);
- $('dcSkip').onclick=finishDiscovery;
+ $('dcLeave').onclick=uxConfirmPackExit;
  showSoundState(); // Actualizar la bocina creada al mostrar cada carta.
  // Gestos únicamente en el escenario: no interceptar botones ni la carta ampliable.
  D._dxPointer=null;
  D.onpointerdown=e=>{
   if(e.pointerType==='mouse'&&e.button!==0)return;
-  const control=e.target.closest('button, .dx-top, .dx-info, .dx-controls, .dx-guide');
+  const control=e.target.closest('button, .dx-top, .dx-info, .dx-controls, .dx-reactions');
   if(control&&control.id!=='dcBack')return;
   D._dxPointer={id:e.pointerId,x:e.clientX,y:e.clientY};
  };
@@ -2120,23 +2164,28 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
  const d=DB[c.d],col=dcol(d.id),k=caseOf(c),v=c.v,fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':null;
  const lab={dnew:'DISEÑO NUEVO',vnew:'NUEVA VERSIÓN',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
  /* la ilustración es la de esta versión: Base/Especial = estampa original · Rara = su arte en oro · Full = su escena completa */
+ const fullSrc=fa||artOf(d.id);
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
   :(v==='e'||v==='r')?`<div class="dx-art dx-flat-art" style="background-color:${col}"><img src="${artOf(d.id)}" alt="" decoding="async"></div>`
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:${artOf(d.id).startsWith('d/')?.8:.667}"><img src="${artOf(d.id)}" alt=""></span>`}</span></div>`;
  D.className=`disc on dx v-${v} k-${k}${storyFor(c)?' has-narrative':''}${v==='b'&&CARD_TEXTS[d.id]?' has-base-copy':''}${hasCol(d.id)?'':' neu'}${lum(col)>.72?' bg-light':''}`;D.style.setProperty('--bg',col);
- D.innerHTML=`${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
-  ${dxTop()}${dxControls()}
+ D.innerHTML=`${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}
+  <div class="dx-full-view" id="dcFullView" hidden aria-hidden="true"><img src="${fullSrc}" alt="Ilustración completa de ${esc(d.n)}" decoding="async"></div>
+  <button type="button" id="dcArtBack" class="dx-art-back" hidden aria-label="Volver a la carta"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m14.5 5-7 7 7 7"/></svg><span>Volver a carta</span></button>
+  <div class="dx-fade"></div>
+  ${dxTop()}${dxReactions(c)}${dxControls()}
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${baseHtml(c)}
    <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
   <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span></button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
  $('dcCard').onclick=()=>openCard(c.k);
- dxNav();
- $('dcArt').onclick=()=>{const show=!D.classList.contains('dx-art-only');setArtworkView(show);ga('vista_ilustracion',{origen:'boton',accion:show?'ver_arte':'ver_carta'})};
+ dxNav();bindReactions(c);
+ $('dcArt').onclick=()=>{setArtworkView(true);$('dcArtBack').focus({preventScroll:true});ga('vista_ilustracion',{origen:'boton',accion:'ver_arte'})};
+ $('dcArtBack').onclick=()=>{setArtworkView(false);$('dcArt').focus({preventScroll:true});ga('vista_ilustracion',{origen:'regresar',accion:'ver_carta'})};
+ D.onkeydown=e=>{if(e.key==='Escape'&&D.classList.contains('dx-art-only')){e.preventDefault();setArtworkView(false);$('dcArt').focus({preventScroll:true})}};
  D.onclick=e=>{
   if(Date.now()-(D._dxSwipedAt||0)<450)return;
-  if(e.target.closest('button, .dx-top, .dx-info, .dx-controls'))return;
-  const show=!D.classList.contains('dx-art-only');
-  setArtworkView(show);
+  if(e.target.closest('button, .dx-top, .dx-info, .dx-controls, .dx-reactions'))return;
+  const show=!D.classList.contains('dx-art-only');setArtworkView(show);
   ga('vista_ilustracion',{origen:'fondo',accion:show?'ver_arte':'ver_carta'});
  };
  if(k==='rep')beep(440,.05);else if(v==='b')beep(988,.07);else jingle();
