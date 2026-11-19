@@ -18,7 +18,9 @@ test('QA page is hidden from indexing and does not change the main game', () => 
   assert.match(page, /src="\/logo\.png"/);
   assert.match(page, /href="\/favicon\.png"/);
   assert.match(page, /url\("\/ps2p\.ttf"\)/);
-  assert.doesNotMatch(source, /icmx-album2|localStorage\.(getItem|setItem|removeItem)/);
+  // El diagnóstico voluntario SOLO lee el progreso local; nunca lo modifica.
+  assert.match(source, /localStorage\.getItem\("icmx-album2"\)/);
+  assert.doesNotMatch(source, /localStorage\.(setItem|removeItem|clear)/);
   assert.doesNotMatch(source, /\.from\(["'](collection_cards|player_snapshots|collection_events)/);
 });
 
@@ -45,4 +47,13 @@ test('status announcements and basic form accessibility are present', () => {
   assert.match(page, /<label for="password">Contraseña<\/label>/);
   assert.match(page, /type="password"/);
   assert.match(page, /minlength="8"/);
+});
+
+test('local collection inspection requires a user click and does not upload progress', () => {
+  assert.match(page, /id="inspectProgress"/);
+  assert.match(page, /id="localSummary"/);
+  assert.match(source, /addEventListener\("click",inspectLocalProgress\)/);
+  assert.doesNotMatch(source, /\.from\(["'](?:player_snapshots|collection_cards|collection_events)["']\)/);
+  assert.doesNotMatch(source, /localStorage\.(?:setItem|removeItem|clear)/);
+  assert.match(source, /\^\[a-z0-9\]/);
 });
