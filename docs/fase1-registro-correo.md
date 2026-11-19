@@ -1,47 +1,49 @@
-# Insert Coin MX — Fase 1 · Registro por correo
+# Insert Coin MX — Fase 1 · Cuentas y avance hacia respaldo de colección
 
-**Estado (19 nov 2026):** interfaz y conexión a Supabase preparadas en rama; **no publicada en main, sin prueba de extremo a extremo**.
+**Actualizado el 19 de noviembre de 2026.** Las pruebas de correo y acceso se completaron con una cuenta real, mediante la página de QA alojada en GitHub Pages. La integración completa de Mi perfil permanece en el PR [#61](https://github.com/llochua/insertcoinmx/pull/61), en borrador.
 
-## Entregado
+## Comprobado
 
-- Acceso a **Mi perfil** desde el encabezado del Home, reutilizando la identidad del juego.
-- Resumen de colección, porcentaje de avance y respaldo manual (sin cambiar el formato de los datos).
-- Módulos **Crear cuenta / Iniciar sesión / Cerrar sesión** con correo y contraseña.
-- Registro con `supabase.auth.signUp`, redirección a `https://insertcoinmx.com/` y plantilla **Confirm signup**.
-- Inicio con `signInWithPassword`, persistencia de sesión, `onAuthStateChange`, reconocimiento del regreso desde el correo y cierre de sesión local.
-- SDK CDN de `@supabase/supabase-js` fijado a `2.95.3`, public key exclusivamente.
-- Fallo aislado: si no carga el SDK o Supabase, la navegación al juego y el progreso local siguen funcionando.
+- Resend + Supabase envían el correo **Confirm signup** de Insert Coin MX.
+- El usuario confirmó el registro y el regreso de autenticación a `/qa/registro/`, con sesión activa y correo confirmado.
+- El usuario informó que pudo **cerrar e iniciar sesión de nuevo**.
+- Las pruebas automatizadas de GitHub cubren el formulario y su aislamiento del progreso local; sus resultados no reemplazan las pruebas de navegador.
+- La ruta **`/qa/registro/`** está publicada en `main` como herramienta aislada de QA. **No se ha publicado el nuevo `index.html` de Mi perfil.**
+- Existe una función de diagnóstico **voluntario y de solo lectura** en QA para contar variantes y copias en `localStorage['icmx-album2']`. No envía ni modifica el progreso.
 
-## Estado de servicios
+## Auditoría del guardado antes de habilitar sincronización
 
-- Proyecto Supabase: `insertcoinmx-tcg`, activo, con tablas de perfiles y colección y RLS habilitado (consulta de noviembre).
-- El usuario confirmó haber verificado `insertcoinmx.com` en Resend, configurado SMTP, pegado el HTML de confirmación y actualizado Site URL / Redirect URLs.
-- **No se ha probado desde la app** el envío real, confirmación de correo, devolución al sitio ni persistencia de sesión.
-- No almacenar API keys privadas de Resend ni `service_role` en el repositorio.
-- Aviso Supabase Security Advisor: `auth_leaked_password_protection` (WARN). Revisar si se puede habilitar protección de contraseñas filtradas antes de abrir registros al público.
+**App actual (main):**
 
-## Límites deliberados
+- La partida viva se almacena como JSON en `localStorage['icmx-album2']`.
+- La clave `icmx-album2.ext` conserva cartas y datos no reconocidos por la versión actual del catálogo.
+- La exportación existente usa `buildBackup()`, cuyo JSON contiene `app:'insertcoinmx-album'`, `format:2`, `exportedAt`, `data` y opcionalmente `ext`.
+- `validateBackup()` impone validaciones, incluyendo límite de un megabyte.
+- La importación actual **reemplaza** el progreso, con copia previa en `icmx-album2.bak` y reversión local ante error. **No** debe invocarse automáticamente al iniciar sesión.
 
-- **NO** se sincronizan `S`, `localStorage['icmx-album2']`, cartas, sobres, calificaciones ni histórico.
-- Un inicio de sesión **NO** equivale a respaldo en la nube. Los jugadores pueden seguir como invitados.
-- Cerrar sesión **NO** borra el progreso local; en dispositivo compartido seguirá disponible. Será necesario diseñar la separación y migración segura de colecciones antes de lanzar esta función públicamente.
-- No hemos modificado la base de datos ni sus políticas en este paso.
-- Falta implementar la recuperación de contraseña y preparar su correo de recuperación con la identidad Insert Coin MX.
+**Supabase (consultado en el mismo proyecto):**
 
-## Verificación previa al lanzamiento
+- Tablas `player_profiles`, `player_snapshots`, `collection_cards`, `collection_events`, `import_receipts` creadas con RLS.
+- Por ahora, `authenticated` tiene acceso **SELECT** a `player_snapshots`, `collection_cards`, `collection_events` e `import_receipts` y solo puede insertar/actualizar `player_profiles`.
+- **Todavía no hay permiso de escritura de progreso, ni se ha realizado una carga real de colección.** No cambiar políticas sin una estrategia de seguridad y una prueba de recuperación.
 
-1. Revisar que **Email provider** y **Confirm email** estén habilitados en Authentication.
-2. En una copia desplegada segura, probar registro nuevo con contraseña de al menos ocho caracteres.
-3. Verificar que Resend envíe **Confirm signup** desde `acceso@insertcoinmx.com` y que el logotipo se muestre en Gmail/Outlook.
-4. Pulsar el botón del correo y revisar sesión redirigida a `https://insertcoinmx.com/`.
-5. Probar login, logout y retorno de sesión tras recargar.
-6. Antes/después de cada prueba, validar que las cartas y el backup local no cambian.
-7. Repetir desde un segundo dispositivo y documentar que no hay sincronización todavía.
-8. Probar diseño móvil y errores de conexión/rate limits.
-9. Implementar migración y aislamiento de progreso por usuario, después pruebas de seguridad y regresión.
-10. Solo con validación, fusionar a `main` y activar públicamente las cuentas.
+## Política de importación inicial que se recomienda implementar después
 
-Referencias:
-- [Plantilla de confirmación](../emails/confirm-signup.html)
-- [Documentación de registro por contraseña de Supabase](https://supabase.com/docs/guides/auth/passwords)
-- [Plantillas de correo de Supabase](https://supabase.com/docs/guides/auth/auth-email-templates)
+1. Seguir permitiendo jugar como invitado; vincular la cuenta no debe iniciar la importación por sí solo.
+2. Identificar al usuario con Supabase Auth y mostrar al jugador un **resumen local, cuenta de destino y estado de nube**.
+3. Antes de subir, generar y conservar un respaldo **local descargable** usando el formato oficial de `buildBackup()`. Un error de exportación bloquea el intento; el usuario puede recuperarlo sin depender del servidor.
+4. **Primera subida solamente**: si la cuenta no tiene snapshot, insertar uno bajo el `user_id` autenticado con RLS `WITH CHECK ((select auth.uid()) = user_id)`. No conceder permisos generales de `UPDATE` en esta etapa.
+5. Si hay snapshot existente, **detenerse y comparar**; nunca ejecutar `upsert` ni reemplazarlo en automático. El mismo criterio aplica al regresar con otro dispositivo o cuenta.
+6. Confirmar la escritura con lectura posterior de la misma fila, validando el contenido. Solo entonces mostrar **respaldo guardado**.
+7. Preservar `icmx-album2` y `icmx-album2.ext` exactamente como están; nunca borrar ni reescribir al enviar el respaldo.
+8. Antes de habilitar restauraciones o sincronización bidireccional: diseñar conflictos, cantidades repetidas, packs, reloj, logros, datos desconocidos y protección entre usuarios/dispositivos; probarlo con datos artificiales y después con una cuenta de prueba.
+
+## Estado real
+
+- **Cuentas / confirmación / login:** comprobados.
+- **Inspección de colección local:** disponible en QA, sin subir datos.
+- **Copia en Supabase:** todavía NO implementada.
+- **Sincronización entre dispositivos:** todavía NO implementada.
+- **Mi perfil integrado en el juego:** aislado en PR #61, todavía NO publicado.
+
+Infraestructura: solo GitHub Pages + Supabase + Resend. No Cloudflare ni otras cuentas.
