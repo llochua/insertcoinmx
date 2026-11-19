@@ -1076,6 +1076,11 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(prefers-reduced-motion:reduce){.on-scene{animation:none}.on-progress i{transition:none}}
 
 
+.reta-unlock{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 22px;text-align:center;color:#fff}
+.reta-unlock strong{font:700 19px AV;color:#FFD400}
+.reta-unlock p{max-width:330px;font:600 13px/1.5 AV;color:rgba(255,255,255,.77)}
+.reta-unlock b{color:#FFD400}
+.reta-unlock button{margin-top:8px;min-height:44px}
 /* ===== RETA DIARIA INTEGRADA (el CRT exterior y la navegación son del Álbum) ===== */
 #torneo #vRound{display:none!important}
 #torneo #vStage{
@@ -1991,10 +1996,12 @@ const RETAS=[["fatality", "gameover", "Fin del juego"], ["challenger", "theworld
 function retaVotes(i){const v=(STORE.docs||[]).map(d=>d.duel&&d.duel[i]).filter(Boolean);const mine=S.duel&&S.duel[i];if(mine&&!(STORE.docs||[]).some(d=>d.ini===S.ini&&d.duel&&d.duel[i]===mine))v.push(mine);return v}
 /* Reta diaria integrada · siete elecciones, campeona persistente.
    Conservar RETAS y S.duel anteriores para importar respaldos históricos.
-   Catálogo: DESIGNS actual, sin bonus ni diseños todavía sin cartas. */
+   Catálogo: SOLO diseños que el jugador ya descubrió en su álbum (cualquier
+   versión obtenida cuenta una sola vez), sin bonus ni diseños sin carta.
+   El roster diario existente se conserva mientras sus diseños sigan disponibles. */
 const RDIA=1;
 function retaPool(){
- return DESIGNS.filter(d=>!d.bx&&d.img&&Object.values(d.img).some(Boolean))
+ return DESIGNS.filter(d=>!d.bx&&d.img&&Object.values(d.img).some(Boolean)&&dState(d).own)
  .map(d=>({id:d.id,name:d.n,art:artOf(d.id),ambient:artOf(d.id),base:RBG[d.id]||'#1b2148'}));
 }
 function retaHash(txt){
@@ -2026,7 +2033,8 @@ function retaNueva(pool){
 function startTorneo(){
  syncIn();const pool=retaPool();
  if(pool.length<8){
-  $('vStage').innerHTML='<div style="padding:24px;text-align:center;color:#FFD400;font:11px/2 PX">LA RETA NECESITA MÁS DISEÑOS ACTIVOS</div>';
+  const missing=8-pool.length;
+  $('vStage').innerHTML='<div class="reta-unlock" role="status"><strong>RETA AÚN NO DISPONIBLE</strong><p>Necesitas 8 diseños distintos en tu álbum para enfrentar 7 retadores.</p><p>Ya descubriste <b>'+pool.length+' de 8</b> · faltan '+missing+'.</p><button type="button" class="btn y" data-go="album">VER MI ÁLBUM</button></div>';
   return;
  }
  if(!retaValid(S.reta2,pool)){
