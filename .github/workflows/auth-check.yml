@@ -8,6 +8,7 @@ on:
       - 'emails/confirm-signup.html'
       - 'tests/auth-account.test.mjs'
       - 'tests/qa-registration.test.mjs'
+      - 'tests/qa-cloud-backup.test.mjs'
       - 'qa/registro/**'
       - '.github/workflows/auth-check.yml'
   workflow_dispatch:
@@ -29,7 +30,7 @@ jobs:
       - name: Validar sintaxis del módulo
         run: node --check content/auth-account.js
       - name: Probar registro, login, callback y conservación del progreso
-        run: node --test tests/auth-account.test.mjs tests/qa-registration.test.mjs
+        run: node --test tests/auth-account.test.mjs tests/qa-registration.test.mjs tests/qa-cloud-backup.test.mjs
       - name: Comprobar que la versión fija del SDK existe
         run: |
           curl --fail --silent --show-error --location --retry 2 --retry-delay 2 \
