@@ -70,10 +70,21 @@ a{color:var(--yellow)}
  <p id="signedEmail"></p>
  <button type="button" class="action secondary" id="inspectProgress">REVISAR MI COLECCIÓN LOCAL</button>
  <p id="localSummary" class="subtle" role="status" aria-live="polite">Este diagnóstico solo lee el progreso del navegador. No guarda ni envía cartas a la nube.</p>
+ <div id="backupPanel" style="margin-top:24px;padding-top:17px;border-top:1px solid rgba(255,255,255,.16)">
+  <p class="subtle" style="margin:0 0 6px;color:#ffd400;font-weight:800">RESPALDO DE PRUEBA · SOLO PRIMERA VEZ</p>
+  <p class="subtle">Primero descargaremos un archivo con tu progreso completo. Después, si lo autorizas, guardaremos una copia en tu cuenta de Supabase. Ninguna carta se borra o reemplaza.</p>
+  <button type="button" class="action secondary" id="backupDownload">1 · DESCARGAR MI RESPALDO</button>
+  <label style="display:flex;align-items:flex-start;gap:10px;margin:16px 0 12px">
+    <input id="backupConsent" type="checkbox" disabled style="width:19px;height:19px;flex:0 0 19px;margin:3px 0">
+    <span>Confirmo que descargué mi respaldo y autorizo guardar esta copia en mi cuenta.</span>
+  </label>
+  <button type="button" class="action" id="backupUpload" disabled>2 · GUARDAR EN SUPABASE</button>
+  <p id="backupStatus" role="status" aria-live="polite" class="subtle">No se ha subido ninguna carta desde esta página.</p>
+ </div>
  <button type="button" class="action secondary" id="logout">CERRAR SESIÓN DE PRUEBA</button>
 </section>
 <p id="message" role="status" aria-live="polite">Conectando con Supabase…</p>
-<p class="foot"><strong>Solo pruebas.</strong> Esta página no abre sobres ni modifica tu colección. La cuenta se crea realmente en Supabase, pero tu progreso del juego sigue separado.</p>
+<p class="foot"><strong>Solo pruebas.</strong> Esta página no abre sobres ni modifica tu colección. Tu cuenta es real. El progreso solo se guarda en la nube cuando autorizas el primer respaldo; todavía no hay sincronización entre dispositivos.</p>
 </main>
 <script type="module">
 const URL_SUPABASE = "https://ynugqxbtszhsupadqdkz.supabase.co";
@@ -132,6 +143,122 @@ function inspectLocalProgress(){
  }catch(e){output.textContent="No pude comprobar la colección local. No modifiqué ningún dato."}
 }
 el("inspectProgress").addEventListener("click",inspectLocalProgress);
+
+/* Respaldo voluntario, primera inserción únicamente. NO restaura ni borra. */
+let pendingBackup=null,backupBusy=false;
+const backupMainKey="icmx-album2",backupExtKey="icmx-album2.ext";
+function backupMessage(text,tone="info"){
+ const node=el("backupStatus");node.textContent=text;node.dataset.tone=tone;
+}
+function clearPreparedBackup(){
+ pendingBackup=null;
+ el("backupConsent").checked=false;
+ el("backupConsent").disabled=true;
+ el("backupUpload").disabled=true;
+}
+function parseSafeJSON(raw){
+ const bad=new Set(["__proto__","prototype","constructor"]);
+ return JSON.parse(raw,(k,v)=>{if(bad.has(k))throw Error("Clave insegura");return v});
+}
+function prepareBackup(){
+ const raw=localStorage.getItem(backupMainKey);
+ const rawExt=localStorage.getItem(backupExtKey);
+ if(!raw||raw.length>1048576)throw Error("No hay una colección válida");
+ const data=parseSafeJSON(raw);
+ if(!data||Array.isArray(data)||typeof data!=="object"||!data.have||Array.isArray(data.have)||typeof data.have!=="object"||
+    !data.rate||Array.isArray(data.rate)||typeof data.rate!=="object")throw Error("Formato local no válido");
+ const cards=Object.entries(data.have);
+ if(!cards.length||cards.length>20000||cards.some(([id,n])=>!/^[a-z0-9]{1,40}_[berf]$/.test(id)||!Number.isInteger(n)||n<1||n>9999))throw Error("El catálogo local necesita revisión");
+ if(Object.entries(data.rate).some(([id,n])=>!/^[a-z0-9]{1,40}$/.test(id)||!Number.isInteger(n)||n<0||n>3))throw Error("Calificaciones inválidas");
+ let ext;
+ if(rawExt!==null){
+   if(rawExt.length>1048576)throw Error("Extensión muy grande");
+   ext=parseSafeJSON(rawExt);
+   if(!ext||Array.isArray(ext)||typeof ext!=="object")throw Error("Datos extra inválidos");
+ }
+ const state={app:"insertcoinmx-album",format:2,exportedAt:new Date().toISOString(),data};
+ if(ext!==undefined)state.ext=ext;
+ const exportText=JSON.stringify(state,null,1);
+ if(new TextEncoder().encode(JSON.stringify(state)).length>1048576)throw Error("El respaldo supera el límite seguro");
+ return {raw,rawExt,state,exportText,count:cards.length};
+}
+function stableJSON(value){
+ if(Array.isArray(value))return "["+value.map(stableJSON).join(",")+"]";
+ if(value!==null&&typeof value==="object")return "{"+Object.keys(value).sort().map(k=>JSON.stringify(k)+":"+stableJSON(value[k])).join(",")+"}";
+ return JSON.stringify(value);
+}
+function downloadBackup(text){
+ const blob=new Blob([text],{type:"application/json"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;a.download="insertcoinmx-respaldo-antes-de-nube.json";
+ document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),10000);
+}
+async function getBackupUser(){
+ if(!client)throw Error("Sin conexión");
+ const {data,error}=await client.auth.getUser();
+ if(error||!data?.user?.id)throw Error("Sesión no verificada");
+ return data.user;
+}
+async function existingSnapshot(userId){
+ const {data,error}=await client.from("player_snapshots").select("user_id,state,revision,game_format").eq("user_id",userId).maybeSingle();
+ if(error)throw error;
+ return data;
+}
+el("backupDownload").addEventListener("click",async()=>{
+ if(backupBusy)return;
+ backupBusy=true;clearPreparedBackup();el("backupDownload").disabled=true;
+ backupMessage("Comprobando cuenta y progreso…");
+ try{
+  const user=await getBackupUser();
+  if(await existingSnapshot(user.id)){
+    backupMessage("Esta cuenta ya tiene un respaldo en la nube. No se reemplazará ni se sumará nada.","success");return;
+  }
+  const candidate=prepareBackup();
+  downloadBackup(candidate.exportText);
+  pendingBackup={...candidate,userId:user.id};
+  el("backupConsent").disabled=false;
+  backupMessage("Se preparó el archivo con "+candidate.count+" variantes. Confirma que quedó guardado en tu dispositivo antes de continuar.");
+ }catch(e){backupMessage("No se pudo preparar el respaldo. No se cambió ningún dato local. "+(e?.code==="42501"?"Revisa permisos de lectura.":""),"error");}
+ finally{backupBusy=false;el("backupDownload").disabled=false}
+});
+el("backupConsent").addEventListener("change",()=>{
+ el("backupUpload").disabled=!el("backupConsent").checked||!pendingBackup||backupBusy;
+});
+el("backupUpload").addEventListener("click",async()=>{
+ if(backupBusy||!pendingBackup||!el("backupConsent").checked)return;
+ backupBusy=true;el("backupUpload").disabled=true;el("backupDownload").disabled=true;
+ backupMessage("Verificando que el respaldo sigue intacto…");
+ try{
+  const user=await getBackupUser();
+  if(user.id!==pendingBackup.userId)throw Error("La cuenta cambió");
+  if(localStorage.getItem(backupMainKey)!==pendingBackup.raw ||
+     localStorage.getItem(backupExtKey)!==pendingBackup.rawExt)throw Error("El progreso cambió");
+  if(await existingSnapshot(user.id)){
+    clearPreparedBackup();backupMessage("Ya existe un respaldo de esta cuenta. No se reemplazó ningún dato.","success");return;
+  }
+  // INSERT, nunca UPSERT ni UPDATE. La PK y RLS impiden sustituir otro respaldo.
+  const {error}=await client.from("player_snapshots").insert({
+    user_id:user.id,game_format:2,revision:1,state:pendingBackup.state
+  });
+  if(error){
+    if(error.code==="23505"){
+      clearPreparedBackup();backupMessage("Esta cuenta ya tiene un respaldo. No se reemplazó.","success");return;
+    }
+    throw error;
+  }
+  const saved=await existingSnapshot(user.id);
+  if(!saved || saved.game_format!==2 || saved.revision!==1 ||
+     stableJSON(saved.state)!==stableJSON(pendingBackup.state))throw Error("La lectura de verificación no coincide");
+  clearPreparedBackup();
+  backupMessage("¡Respaldo confirmado en Supabase! Tu colección local permanece intacta.","success");
+ }catch(_error){
+  clearPreparedBackup();
+  backupMessage("No pudimos verificar el respaldo. Tu colección local no cambió. Antes de repetir, revisaremos si quedó guardado en la cuenta.","error");
+ }finally{backupBusy=false;el("backupDownload").disabled=false}
+});
+
 el("tabSignup").addEventListener("click",()=>setMode("signup"));
 el("tabLogin").addEventListener("click",()=>setMode("login"));
 el("authForm").addEventListener("submit",async e=>{
