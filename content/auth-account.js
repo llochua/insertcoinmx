@@ -5,7 +5,7 @@ const SUPABASE_URL = 'https://ynugqxbtszhsupadqdkz.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_3wyMm9dwLqSb9GiYTh245Q_9TukyCLK';
 /* Versión fija para el sitio sin build ni dependencias locales. */
 const SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm';
-const REDIRECT_URL = 'https://insertcoinmx.com/';
+const REDIRECT_URL = location.origin + '/'; // vuelve al mismo dominio: staging o producción (allowlist Supabase)
 const $auth = id => document.getElementById(id);
 let authClient = null;
 let authMode = 'signup';
