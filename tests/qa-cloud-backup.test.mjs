@@ -13,9 +13,9 @@ function fixture({existing=null,localState=null,localExt=null}={}){
  const mainRaw=JSON.stringify(state);
  const files=new Map([['icmx-album2',mainRaw]]);
  if(localExt)files.set('icmx-album2.ext',JSON.stringify(localExt));
- const writes=[],downloads=[],uploads=[],reads=[],user={id:'55555555-5555-4555-8555-555555555555',email:'qa@example.test'};
+ const writes=[],downloads=[],uploads=[],reads=[],blobs=[],user={id:'55555555-5555-4555-8555-555555555555',email:'qa@example.test'};
  const elements={};
- for(const id of ['guest','signed','signedEmail','tabSignup','tabLogin','password','modeHint','submit','message','logout','authForm','email','backupDownload','backupConsent','backupConsentLabel','backupUpload','backupStatus','localSummary','inspectProgress','inspectCloud','cloudSummary']){
+ for(const id of ['guest','signed','signedEmail','tabSignup','tabLogin','password','modeHint','submit','message','logout','authForm','email','backupDownload','backupConsent','backupConsentLabel','backupUpload','backupStatus','localSummary','inspectProgress','inspectCloud','cloudSummary','downloadCloud']){
   elements[id]={
    listeners:{},attrs:{},hidden:false,disabled:false,checked:false,value:'',textContent:'',dataset:{},
    addEventListener(type,handler){this.listeners[type]=handler;},
@@ -58,7 +58,7 @@ function fixture({existing=null,localState=null,localExt=null}={}){
    clear(){writes.push(['clear']);}
   },
   location:{origin:'https://insertcoinmx.com',pathname:'/qa/registro/',hash:'',search:''},
-  URL:{createObjectURL(){return 'blob:mock'},revokeObjectURL(){}},
+  URL:{createObjectURL(blob){blobs.push(blob);return 'blob:mock'},revokeObjectURL(){}},
   TextEncoder,
   Blob,
   setTimeout(){},
@@ -69,7 +69,7 @@ function fixture({existing=null,localState=null,localExt=null}={}){
  assert.notEqual(executable,source);
  vm.runInNewContext(executable,context,{timeout:2000});
  const ready=async()=>{for(let i=0;i<7;i++)await new Promise(resolve=>setImmediate(resolve));};
- return {elements,files,writes,downloads,uploads,reads,ready,get stored(){return stored}};
+ return {elements,files,writes,downloads,uploads,reads,blobs,ready,get stored(){return stored}};
 }
 
 test('cloud backup does nothing without explicit user action',async()=>{
@@ -175,4 +175,48 @@ test('cloud inspector refuses a mismatched owner even if backend returns row',as
  assert.match(h.elements.cloudSummary.textContent,/No pudimos consultar el respaldo/);
  assert.equal(h.uploads.length,0);
  assert.equal(h.writes.length,0);
+});
+
+test('cloud download produces the original JSON backup without touching a blank device',async()=>{
+ const cloud={
+  user_id:'55555555-5555-4555-8555-555555555555',
+  state:{app:'insertcoinmx-album',format:2,exportedAt:'2026-11-19T23:23:11.579Z',
+    data:{have:{arcade_f:1,x_b:2},rate:{arcade:1},rev:74,pk:['old-pack-id']},
+    ext:{pend:{unreleased_b:1}}},
+  revision:1,game_format:2
+ };
+ const h=fixture({existing:cloud});await h.ready();
+ h.files.delete('icmx-album2');
+ const readsBefore=h.reads.length;
+ await h.elements.downloadCloud.listeners.click();
+ assert.equal(h.downloads.length,1);
+ assert.equal(h.downloads[0].filename,'insertcoinmx-respaldo-desde-supabase.json');
+ const text=await h.blobs[0].text();
+ assert.deepEqual(JSON.parse(text),cloud.state);
+ assert.equal(h.reads.length,readsBefore);
+ assert.equal(h.uploads.length,0);
+ assert.equal(h.writes.length,0);
+ assert.match(h.elements.cloudSummary.textContent,/Copia descargada desde Supabase/);
+});
+
+test('cloud download refuses a backup owned by another account',async()=>{
+ const cloud={user_id:'11111111-1111-4111-8111-111111111111',
+  state:{app:'insertcoinmx-album',format:2,data:{have:{x_b:1},rate:{}}},
+  revision:1,game_format:2};
+ const h=fixture({existing:cloud});await h.ready();
+ await h.elements.downloadCloud.listeners.click();
+ assert.equal(h.downloads.length,0);
+ assert.equal(h.uploads.length,0);
+ assert.equal(h.writes.length,0);
+ assert.match(h.elements.cloudSummary.textContent,/No se pudo descargar/);
+});
+
+test('download has no automatic action and does not insert a new snapshot',async()=>{
+ const h=fixture();await h.ready();
+ assert.equal(h.downloads.length,0);
+ await h.elements.downloadCloud.listeners.click();
+ assert.equal(h.downloads.length,0);
+ assert.equal(h.uploads.length,0);
+ assert.equal(h.writes.length,0);
+ assert.match(h.elements.cloudSummary.textContent,/no tiene respaldo/);
 });
