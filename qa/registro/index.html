@@ -71,6 +71,7 @@ a{color:var(--yellow)}
  <p class="subtle">SESIÓN CONFIRMADA</p>
  <p id="signedEmail"></p>
  <button type="button" class="action secondary" id="inspectCloud">VER MI RESPALDO EN LA NUBE</button>
+ <button type="button" class="action secondary" id="downloadCloud">DESCARGAR COPIA DESDE LA NUBE</button>
  <p id="cloudSummary" class="subtle" role="status" aria-live="polite">Consulta tu respaldo en Supabase sin descargarlo ni reemplazar cartas en este dispositivo.</p>
  <button type="button" class="action secondary" id="inspectProgress">REVISAR MI COLECCIÓN LOCAL</button>
  <p id="localSummary" class="subtle" role="status" aria-live="polite">Este diagnóstico solo lee el progreso del navegador. No guarda ni envía cartas a la nube.</p>
@@ -221,11 +222,11 @@ function stableJSON(value){
  if(value!==null&&typeof value==="object")return "{"+Object.keys(value).sort().map(k=>JSON.stringify(k)+":"+stableJSON(value[k])).join(",")+"}";
  return JSON.stringify(value);
 }
-function downloadBackup(text){
+function downloadBackup(text,filename="insertcoinmx-respaldo-antes-de-nube.json"){
  const blob=new Blob([text],{type:"application/json"});
  const url=URL.createObjectURL(blob);
  const a=document.createElement("a");
- a.href=url;a.download="insertcoinmx-respaldo-antes-de-nube.json";
+ a.href=url;a.download=filename;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
@@ -268,6 +269,34 @@ async function inspectCloudBackup(){
  }finally{button.disabled=false}
 }
 el("inspectCloud").addEventListener("click",inspectCloudBackup);
+
+/* Recuperación fase 1: descargar copia remota para guardarla fuera de la app.
+   Nunca modifica el progreso que existe en este navegador. */
+el("downloadCloud").addEventListener("click",async()=>{
+ const button=el("downloadCloud"),status=el("cloudSummary");
+ if(!client||busy||backupBusy||button.disabled)return;
+ button.disabled=true;
+ status.textContent="Preparando copia del respaldo en la nube…";
+ try{
+  const user=await getBackupUser();
+  const snapshot=await existingSnapshot(user.id);
+  if(!snapshot){status.textContent="Esta cuenta no tiene respaldo para descargar.";return}
+  if(snapshot.user_id!==user.id||snapshot.game_format!==2||snapshot.revision!==1)throw Error("Cuenta o formato inesperado");
+  const state=snapshot.state;
+  if(state?.app!=="insertcoinmx-album"||state?.format!==2||!state.data||
+     !state.data.have||typeof state.data.have!=="object"||Array.isArray(state.data.have)||
+     !state.data.rate||typeof state.data.rate!=="object"||Array.isArray(state.data.rate))
+     throw Error("Respaldo no compatible");
+  const text=JSON.stringify(state,null,1);
+  if(new TextEncoder().encode(text).length>1048576)throw Error("Tamaño no compatible");
+  // Detecta claves inseguras en todos los niveles antes de crear un archivo de importación.
+  parseSafeJSON(text);
+  downloadBackup(text,"insertcoinmx-respaldo-desde-supabase.json");
+  status.textContent="Copia descargada desde Supabase. Tu colección local no cambió. La restauración será un paso separado.";
+ }catch(_error){
+  status.textContent="No se pudo descargar una copia verificable. Tu colección local permanece intacta.";
+ }finally{button.disabled=false}
+});
 
 el("backupDownload").addEventListener("click",async()=>{
  if(backupBusy)return;
