@@ -84,18 +84,43 @@ su `marco_*.png` y se regenera todo.
 - `index.html`: reescribe `DESIGNS` (nombre, categoría, número, `r`, `ex`, `bx`, `f`) y agrega a `ABOX`
   los diseños nuevos. Lo demás del juego no se toca.
 
-## 5. Agregar un diseño nuevo (3 pasos)
+## 5. Agregar un diseño nuevo
 
-1. Pon el arte en `E:\icmx\fichas\diseños\` (o `nunca salieron\`) y cópialo a `cartas/arte/<id>.png`.
-   Fondo plano y parejo en las orillas: de ahí se toma el color para rellenar la ventana.
-2. Agrega su fila en la hoja (id nuevo, minúsculas y números) y pasa la hoja al catálogo:
-   exporta la pestaña a CSV y corre `python3 cartas/hoja_a_catalogo.py archivo.csv`
-   (o pídele a Claude que sincronice la hoja).
-3. `python3 cartas/generar.py --muestra` y revisa `cartas/muestra.jpg`.
+**Proceso fijo** (Jos lo definió el 19 nov). Cuando dice "subí diseños nuevos" (a
+`E:\icmx\fichas\diseños\` o `nunca salieron\`):
 
-Cambiar un texto: corregir la hoja → paso 2 → `python3 cartas/generar.py --solo <id>`.
+**A. Detectar**
+1. Listar la carpeta y comparar contra `catalogo.json` (y mtime) para ver diseños nuevos y diseños
+   existentes con arte reemplazado. Revisar los diseños en una hoja de contacto antes de escribir.
 
-Agregar un diseño cambia el total (`/076`): corre el generador completo para renumerar todas.
+**B. Cartas (repo)**
+2. Copiar el arte a `cartas/arte/<id>.png`. Arte reemplazado: borrar `d/<id>.jpg` y su entrada en `ABOX`
+   de index.html antes de regenerar (el generador solo crea `d/` si falta).
+3. Si el diseño no tiene fila en la hoja, Claude redacta nombre, categoría, referencia, línea y frase a
+   partir del diseño (sin inventar datos históricos) y los agrega al catálogo; también `habilidad` y
+   `frase` en `content/card-texts.js` (el validador exige que coincida con DESIGNS) y sube el `?v=` del script.
+4. `python3 cartas/generar.py` completo (cambia el total `/NNN` y renumera todo) y `node content/validate.mjs`.
+5. Rama aparte + PR. **No fusionar a main sin autorización de Jos** (este flujo no está autorizado como el de las Full).
+6. Mostrar a Jos la hoja de contacto de las cartas nuevas.
+
+**C. Hoja "Narrativas TCG" (Drive)** — las filas nuevas deben quedar idénticas a las existentes:
+7. Escribir cada fila: Diseño, miniatura (B), K id, L categoría, M número, N/O referencia, P línea,
+   Q frase, R tipo, T arte, U `Propuesta · revisar`. **Sin notas en la columna J** ni ninguna marca que
+   las distinga de las demás.
+8. Miniatura (B): `=IMAGE("https://raw.githubusercontent.com/llochua/insertcoinmx/<rama>/d/"&K<fila>&".jpg")`
+   apuntando a la rama donde ya existe `d/<id>.jpg` (comprobar que responde 200). Al publicar en main,
+   cambiarla a la ruta normal. Arte reemplazado: actualizar también su miniatura.
+9. Formato: copiar el formato de una fila normal del **álbum** (no de una bonus: esas tienen fondo
+   rosa en A:C). Alto de fila **120 px** como todas.
+10. Listas desplegables (el formato copiado NO las trae): aplicar `setDataValidation` a C (Diseñado por:
+    Jos / Mago) y H:I (Estado dorada / holo: Pendiente / En revisión / Aprobado) en las filas del álbum.
+11. Reescribir la columna M (Número) de todas las filas con la nueva numeración.
+12. Ordenar A2:AA por Número y luego por ID: el álbum queda 001→NNN (alfabético por ID, igual que las
+    cartas) y las "nunca salieron" (Bonus) al fondo, también alfabéticas. Verificar que las miniaturas
+    sigan correspondiendo a su fila.
+13. Lo que sale de Jos se deja vacío y se le pide: Diseñado por, relato original y concepto (D, F).
+
+Cambiar un texto: corregir la hoja → catálogo → `python3 cartas/generar.py --solo <id>`.
 
 ## 5b. Full (ilustración completa)
 
