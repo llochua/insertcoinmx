@@ -1680,14 +1680,16 @@ try{if(S.last&&S.last<today())ga('regreso',{dias_desde_ultimo_sobre:Math.round((
 const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
 const PRUEBA=false; // quitar al lanzar: sobres ilimitados para revisar
-/* Regla pactada: 5 sobres de bienvenida, luego 2 por día.
-   La bienvenida se conserva hasta gastarla; los 2 diarios comienzan al día
-   siguiente del último sobre de bienvenida. Canjes extra van aparte. */
-const freePacksLeft=()=>{const t=today();
+/* Regla pactada: 5 sobres de bienvenida, luego 2 cada 6 horas.
+   La bienvenida se conserva hasta gastarla; los ciclos de 6 horas
+   se calculan por reloj. Los canjes extra van aparte. */
+const PACK_INTERVAL=6*60*60*1000;
+const packCycle=()=>Math.floor(Date.now()/PACK_INTERVAL);
+const freePacksLeft=()=>{
  if(S.welcomeLeft>0)return S.welcomeLeft;
- if(S.freeDay&&after(S.freeDay,t))return 0;
- if(S.last&&after(S.last,t))return 0;
- return S.freeDay===t?Math.max(0,2-(S.freeUsed||0)):2};
+ const cycle=packCycle();
+ return S.freeCycle===cycle?Math.max(0,2-(S.freeUsed||0)):2;
+};
 const packReady=()=>PRUEBA||S.test||freePacksLeft()>0||S.extra>0;
 /* ---------- datos compartidos ---------- */
 const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude)return;this.db=await claude.use('db');const u=await claude.use('user');this.uid=u?await u.id():null;try{this.dl=await claude.use('downloads')}catch(e){}
@@ -1709,8 +1711,12 @@ function applyPack(p){S.pk=Array.isArray(S.pk)?S.pk:[];if(S.pk.includes(p.id))re
  if(p.fg)S.fg=1;
  if(p.welcome){S.welcomeLeft=Math.max(0,(S.welcomeLeft||0)-p.welcome);
   if(S.welcomeLeft===0){S.freeDay=p.last;S.freeUsed=2}}
- if(p.daily&&p.dailyDay){if(after(p.dailyDay,S.freeDay)){S.freeDay=p.dailyDay;S.freeUsed=0}
-  if(S.freeDay===p.dailyDay)S.freeUsed=Math.min(2,(S.freeUsed||0)+p.daily)}
+ if(p.daily&&p.dailyDay){
+  const cycle=p.dailyCycle??packCycle();
+  if(!Number.isInteger(S.freeCycle)||cycle>S.freeCycle){S.freeCycle=cycle;S.freeUsed=0}
+  if(S.freeCycle===cycle)S.freeUsed=Math.min(2,(S.freeUsed||0)+p.daily);
+  if(after(p.dailyDay,S.freeDay))S.freeDay=p.dailyDay;
+ }
  if(p.last&&after(p.last,S.last))S.last=p.last;
  if(p.extra)S.extra=Math.max(0,(S.extra||0)-p.extra);
  S.pk.push(p.id);if(S.pk.length>30)S.pk=S.pk.slice(-30);return true}
@@ -1852,19 +1858,18 @@ function uxShow(o){
  a.focus({preventScroll:true});
 }
 function nextPackCountdown(){
- const now=new Date(),lastDay=[today(),S.freeDay||'',S.last||''].sort().pop();
- const [y,m,d]=lastDay.split('-').map(Number),next=new Date(y,m-1,d+1);
- const mins=Math.max(0,Math.ceil((next-now)/60000)),days=Math.floor(mins/1440);
- return (days?days+'d ':'')+String(Math.floor(mins%1440/60)).padStart(2,'0')+':'+String(mins%60).padStart(2,'0');
+ const remaining=PACK_INTERVAL-(Date.now()%PACK_INTERVAL);
+ const seconds=Math.max(0,Math.ceil(remaining/1000));
+ return String(Math.floor(seconds/3600)).padStart(2,'0')+':'+String(Math.floor(seconds%3600/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
 }
 function uxEmptyPacks(otherTab=false){
  syncIn();if(packReady()){go('pack');return}
  const canTrade=dups()>=5;
  ga('sobres_agotados',{origen:cur,canje_disponible:canTrade?1:0});
  uxShow({
-  kicker:'SOBRES · ESTADO DIARIO',
-  title:otherTab?'Tu sobre se abrió en otra pestaña':'¡Por hoy, sin sobres!',
-  desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Recibirás 2 sobres nuevos al comenzar el próximo día disponible.',
+  kicker:'SOBRES · CADA 6 HORAS',
+  title:otherTab?'Tu sobre se abrió en otra pestaña':'¡Por ahora, sin sobres!',
+  desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Recibirás 2 sobres nuevos en el siguiente ciclo de 6 horas.',
   note:canTrade?'Tienes al menos 5 repetidas para conseguir un sobre extra.':'Puedes seguir explorando tu colección mientras esperas.',
   countdown:true,
   primary:canTrade?'CAMBIAR 5 REPETIDAS':'VER MI ÁLBUM',
@@ -1904,7 +1909,7 @@ document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g
 /* ---------- bienvenida ---------- */
 const ON=[
  {k:'EL ÁLBUM · 01 / 03',t:'Las playeras que hemos hecho, ahora tienen una carta.',p:'Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección.'},
- {k:'TUS PRIMEROS SOBRES · 02 / 03',t:'¡Tienes 5 sobres para empezar!',p:'Cada sobre trae 5 cartas. Después de la bienvenida, recibirás 2 sobres diarios a partir del día siguiente.'},
+ {k:'TUS PRIMEROS SOBRES · 02 / 03',t:'¡Tienes 5 sobres para empezar!',p:'Cada sobre trae 5 cartas. Después de la bienvenida, recibirás 2 sobres cada 6 horas.'},
  {k:'TU COLECCIÓN · 03 / 03',t:'Tu colección, tus reglas.',p:'Descubre diseños, califica tus favoritas, arma tu Tier y compáralas en Reta.'}
 ];
 const ON_PREVIEW=new URLSearchParams(location.search).get('preview')==='onboarding';
@@ -2022,10 +2027,10 @@ $('openBtn').onclick=openPack;
    se suman las cartas, se gasta el sobre y se guarda. La animación empieza después. */
 let opening=false;function openPack(){if(opening)return;opening=true;clearTimeout(hintT);
  withLock(()=>{syncIn();if(!packReady()){opening=false;go('home');uxEmptyPacks(true);return}
-  const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,welcome:0,daily:0,dailyDay:'',saved:false,t:0};
+  const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,welcome:0,daily:0,dailyDay:'',dailyCycle:null,saved:false,t:0};
   if(!S.test&&!PRUEBA){
    if(S.welcomeLeft>0){p.welcome=1;p.last=today()}
-   else if(freePacksLeft()>0){p.daily=1;p.dailyDay=today();p.last=p.dailyDay}
+   else if(freePacksLeft()>0){p.daily=1;p.dailyDay=today();p.dailyCycle=packCycle();p.last=p.dailyDay}
    else p.extra=1}
   const fp0=firstPack();hand=makeHand(fp0);p.fg=1;const seen={},seenD={};
   const doneB=new Set(DESIGNS.filter(d=>dState(d).done).map(d=>d.id));
