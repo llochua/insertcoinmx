@@ -1368,7 +1368,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-initials{font:600 12px AV;color:#bdb8d1;margin-top:5px}
 #profile .profile-progress{padding:19px 17px 18px;background:linear-gradient(120deg,rgba(255,212,0,.13),rgba(255,212,0,.035) 75%);border:1px solid rgba(255,212,0,.32);border-radius:15px}
 #profile .profile-progress-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-#profile .profile-progress-top span{font:700 11px AV;letter-spacing:.08em;color:#ffe287}
+#profile .profile-progress-top > span{font:700 11px AV;letter-spacing:.08em;color:#ffe287}
 #profile .profile-progress-top strong{font:800 21px AV;color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
 #profile .profile-progress-track{height:8px;border-radius:9px;background:rgba(255,255,255,.14);overflow:hidden}
 #profile .profile-progress-track i{display:block;width:0;height:100%;background:#FFD400;border-radius:inherit;transition:width .2s ease}
@@ -1386,7 +1386,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-action.secondary{border:1px solid rgba(255,255,255,.3);color:#fff;background:rgba(255,255,255,.06)}
 #profile .profile-action:focus-visible{outline:3px solid #fff;outline-offset:2px}
 #profile .profile-account{border-color:rgba(255,212,0,.25)}
-#profile .profile-footnote{font:500 12px/1.5 AV;color:rgba(255,255,255,.56)}
+#profile .profile-panel p.profile-footnote{font:500 12px/1.5 AV;color:rgba(255,255,255,.56)}
 @media(max-width:380px){.mh .hb span{font-size:9px;letter-spacing:.13em}.mh .hc small{display:none}#profile .profile-scroll{padding-inline:14px}#profile .profile-metrics div{padding:12px 8px}}
 @media(min-width:540px){#profile .profile-scroll{width:min(100%,520px);align-self:center}}
 </style></head><body>
@@ -1931,7 +1931,7 @@ function uxEmptyPacks(otherTab=false){
  uxShow({
   kicker:'SOBRES',
   title:otherTab?'Tu sobre se abrió en otra pestaña':'¡Por ahora, sin sobres!',
-  desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Tus próximos 2 sobres estarán listos en:',
+  desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Pronto tendrás otros dos sobres para abrir.',
   note:canTrade?'También puedes conseguir un sobre ahora usando 5 repetidas.':'Mientras tanto, tu álbum sigue disponible.',
   countdown:true,
   primary:canTrade?'CAMBIAR 5 REPETIDAS':'VER MI ÁLBUM',
