@@ -356,9 +356,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @property --my{syntax:'<percentage>';inherits:true;initial-value:50%}
 @keyframes fxIdle{0%{--mx:15%;--my:20%}50%{--mx:80%;--my:45%}100%{--mx:35%;--my:85%}}
 /* Holo: el brillo reacciona suavemente, no salta con un pequeño giro. */
-.fx.r-holo{transition:--mx .22s ease-out,--my .22s ease-out}
+.fx.r-holo,.fx.r-dorada{transition:--mx .22s ease-out,--my .22s ease-out}
 .fx.r-holo.idle{animation:fxHoloIdle 9s ease-in-out infinite alternate}
+.fx.r-dorada.idle{animation:fxGoldIdle 9s ease-in-out infinite alternate}
 @keyframes fxHoloIdle{0%{--mx:43%;--my:45%}50%{--mx:58%;--my:47%}100%{--mx:48%;--my:57%}}
+@keyframes fxGoldIdle{0%{--mx:42%;--my:46%}50%{--mx:56%;--my:47%}100%{--mx:49%;--my:56%}}
 .sc .fx{--rad:16px;width:100%;height:100%;box-shadow:0 20px 40px rgba(0,0,0,.6)}
 .sc:not(.top) .fx{visibility:hidden}
 .zoom .fx{--rad:16px;max-height:60vh;aspect-ratio:480/670;height:60vh}
@@ -783,7 +785,7 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .dx-art{position:absolute;left:0;right:0;top:56px;height:64%;container-type:size;display:flex;align-items:center;justify-content:center;animation:dxIn .6s cubic-bezier(.2,.9,.3,1) both}
 .dx-art .ab{width:min(100cqw,96cqh*var(--ar));filter:drop-shadow(0 18px 30px rgba(0,0,0,.28))}
 .neu .dx-art .ab{width:min(88cqw,90cqh*var(--ar));border-radius:6px;box-shadow:0 24px 50px rgba(0,0,0,.5)}
-.dx-gold{display:block;width:100cqw;aspect-ratio:840/570;max-height:96cqh;background-size:114.3% auto;background-position:50% 32.7%;box-shadow:0 0 0 1px rgba(255,214,110,.35),0 30px 60px rgba(0,0,0,.6)}
+.dx-gold{display:block;width:100cqw;aspect-ratio:840/570;max-height:96cqh;background-size:125% auto;background-position:50% 30%;box-shadow:0 0 0 1px rgba(255,214,110,.35),0 30px 60px rgba(0,0,0,.6)}
 .dx-holo{position:absolute;inset:0;background:linear-gradient(112deg,rgba(255,92,160,.42),rgba(255,215,95,.5) 24%,rgba(125,242,217,.48) 43%,rgba(113,185,255,.54) 62%,rgba(210,136,255,.47) 84%,rgba(255,92,160,.4)) 0 0/220% 220%;mix-blend-mode:screen;opacity:.32;animation:dxHolo 7s ease-in-out infinite alternate;pointer-events:none}
 @keyframes dxHolo{to{background-position:100% 100%}}
 .dx-scene{position:absolute;inset:0;background:center 30%/cover no-repeat;animation:dxScene 1.6s cubic-bezier(.2,.8,.2,1) both}
@@ -860,7 +862,9 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .dx-controls .dx-primary{background:#FFD400;color:#120F1A}
 .disc.dx .dx-info{bottom:calc(72px + env(safe-area-inset-bottom))}
 .disc.dx .dx-card{bottom:calc(170px + env(safe-area-inset-bottom))!important;width:min(44%, 34dvh)!important}
-.dx-read{display:block;width:max-content;max-width:100%;margin:8px auto 0;padding:5px 8px;border-radius:5px;background:#120f2a;color:#fff;font:700 12px AV;transform:rotate(-5deg)}
+.dx-read{position:absolute;right:-8px;bottom:-8px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;pointer-events:none;background:#FFD400;color:#120F1A;box-shadow:0 3px 0 #a58700,0 6px 14px rgba(0,0,0,.5);transform:rotate(-5deg)}
+.dx-read svg{width:21px;height:21px}
+.dx-card:focus-visible .dx-read{outline:2px solid #fff;outline-offset:3px}
 .dx-top button{min-height:44px;padding-inline:6px;color:#fff;opacity:1;background:#181524;border-radius:7px}
 .dx-controls button:focus-visible,.dx-top button:focus-visible,.dx-card:focus-visible,.rs2 button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 /* especial cubierta */
@@ -1788,7 +1792,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   ${dxTop()}${dxControls()}
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>
    <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div></div>
-  <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read">Ampliar carta</span></button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
+  <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span></button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
  $('dcCard').onclick=()=>openCard(c.k);
  dxNav();
  D.onclick=e=>{
@@ -1839,9 +1843,10 @@ window.addEventListener('deviceorientation',e=>{if(!$('title').classList.contain
 
 /* foil sigue al dedo / al giro del teléfono */
 function fxAim(fx,x,y){
- // Solo Holo: limitar la amplitud al 48% y amortiguar cambios bruscos del sensor/touch.
- if(fx.classList.contains('r-holo')){
-  const cx=.5+(Math.max(0,Math.min(1,x))-.5)*.48,cy=.5+(Math.max(0,Math.min(1,y))-.5)*.48;
+ // Holo y Dorada: recorrido limitado y filtro suave del movimiento.
+ const soft=fx.classList.contains('r-holo')?.48:fx.classList.contains('r-dorada')?.55:0;
+ if(soft){
+  const cx=.5+(Math.max(0,Math.min(1,x))-.5)*soft,cy=.5+(Math.max(0,Math.min(1,y))-.5)*soft;
   fx._holoX=(fx._holoX??.5)+(cx-(fx._holoX??.5))*.3;
   fx._holoY=(fx._holoY??.5)+(cy-(fx._holoY??.5))*.3;
   x=fx._holoX;y=fx._holoY;
