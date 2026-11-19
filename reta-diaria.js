@@ -24,7 +24,7 @@ const ambientSrc=id=>DESIGNS[id]?.ambient||'c2/'+id+'.jpg';
 const htmlEscape=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const tellParent=data=>{if(isEmbedded)window.parent.postMessage(data,location.origin)};
 const prefersReduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-let round=0,champion=PAIRS[0],slots={top:PAIRS[0],bottom:PAIRS[1]},locked=false,run=0,muted=false,soundCtx=null;
+let round=0,champion=PAIRS[0],slots={top:PAIRS[0],bottom:PAIRS[1]},locked=false,run=0,muted=isEmbedded,soundCtx=null;
 let previousChampion=null,challengers=PAIRS.slice(1),streak=0;
 /* RETA V4.2: fondo de la playera = color real de la plasta del diseño.
    El JPG original se enmascara suavemente dentro de la silueta, SIN borrar
@@ -257,6 +257,8 @@ function hydrate(config){
  const state=config.state;
  if(!state||!Array.isArray(state.roster)||state.roster.length!==8||state.roster.some(id=>!DESIGNS[id]))return;
  dailyState=state;dailyDay=state.day;
+ // El sitio principal gobierna el audio: no hay segundo mute independiente.
+ if(isEmbedded)muted=!!config.audioMuted;
   if(isEmbedded&&sobres){
    const action=config.packsAvailable?'pack':config.canTrade?'trade':'album';
    sobres.dataset.action=action;
@@ -279,6 +281,7 @@ if(isEmbedded){
  window.addEventListener('message',event=>{
   if(event.source!==window.parent||event.origin!==location.origin)return;
   const data=event.data;
+  if(data?.type==='icmx-audio-state')muted=!!data.muted;
   if(data?.type==='icmx-reta-init')hydrate(data);
  });
  window.parent.postMessage({type:'icmx-reta-ready'},location.origin);
