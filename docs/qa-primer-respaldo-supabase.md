@@ -49,3 +49,14 @@ Se añadieron en QA:
 6. Comprobar que al intentar repetir se bloquee el segundo respaldo.
 
 **No publicar `index.html` del PR #61 ni abrir la sincronización al público todavía.**
+
+## Prueba 2: consultar respaldo desde otro navegador
+
+- Se agregó **VER MI RESPALDO EN LA NUBE** a `/qa/registro/`.
+- Para probar en el segundo dispositivo, iniciar sesión con **la misma cuenta**. No es necesario ni recomendable crear otra cuenta.
+- Al pulsar el botón, se verifica la identidad con `auth.getUser()`, se consulta `player_snapshots` sujeto a RLS y se valida `user_id`, versión y estructura.
+- La pantalla muestra cantidad de **variantes, cartas y calificaciones** directamente desde Supabase.
+- El código de consulta no lee ni escribe `localStorage`, no descarga archivos, no restaura ni modifica una sola carta. **La consulta no es todavía una recuperación de progreso.**
+- Verificar el caso de un dispositivo sin colección local: debe mostrar el respaldo remoto, pero el juego local continuará vacío hasta que exista restauración manual.
+- La prueba con cliente y DOM simulados pasó el caso de respaldo existente, ausencia de respaldo y propietario distinto; sin lecturas ni escrituras locales.
+- La restauración vendrá después con confirmación, respaldo previo y reversión segura.
