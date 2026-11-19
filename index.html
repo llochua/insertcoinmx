@@ -1355,6 +1355,33 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #zoom #zRate .rb.zr-emoji{min-height:52px;padding:6px 2px!important;font:27px/1 system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif!important}
 #zoom #zRate .rb.zr-emoji.on::after{top:2px;right:5px;font:800 12px AV,system-ui,sans-serif}
 @media(max-width:350px){.dx-top{padding-inline:12px;gap:5px}.disc.dx .dx-controls,.disc.dx:not(.cov) .dx-controls{width:calc(100% - 24px)}}
+
+/* Fase 1 · Perfil de invitado */
+.mh .profile-entry{display:flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;border:1px solid rgba(255,255,255,.26);border-radius:50%;background:rgba(255,255,255,.08);color:#fff}
+.mh .profile-entry svg{width:20px;height:20px;display:block}
+.mh .profile-entry:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+#profile .profile-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px 20px max(30px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:17px}
+#profile .profile-head{display:flex;align-items:center;gap:13px;padding:8px 0 4px}
+#profile .profile-avatar{display:grid;place-items:center;flex:0 0 58px;width:58px;height:58px;border-radius:16px;background:rgba(255,212,0,.12);border:1px solid rgba(255,212,0,.54);font:700 18px PX;color:#FFD400}
+#profile .profile-kicker{font:700 10px AV;letter-spacing:.12em;color:#FFD400;margin:0 0 4px}
+#profile .profile-head h2{font:800 23px/1.1 AV;color:#fff;margin:0}
+#profile .profile-sub{font:500 13px/1.45 AV;color:rgba(255,255,255,.7);margin:7px 0 0}
+#profile .profile-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#profile .profile-metrics div{display:flex;flex-direction:column;gap:5px;padding:15px 13px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11)}
+#profile .profile-metrics strong{font:800 24px AV;color:#fff;font-variant-numeric:tabular-nums}
+#profile .profile-metrics span{font:600 12px/1.3 AV;color:rgba(255,255,255,.68)}
+#profile .profile-panel{padding:17px 15px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;gap:10px}
+#profile .profile-panel h3{font:800 15px AV;color:#fff;margin:0}
+#profile .profile-panel p{font:500 13px/1.5 AV;color:rgba(255,255,255,.76);margin:0}
+#profile .profile-panel p.profile-kicker{font:700 10px AV;letter-spacing:.12em;color:#FFD400}
+#profile .profile-panel .profile-action{min-height:45px;border-radius:10px;padding:11px 15px;font:800 12px AV;letter-spacing:.015em;text-align:center}
+#profile .profile-action.primary{background:#FFD400;color:#141026}
+#profile .profile-action.secondary{border:1px solid rgba(255,255,255,.3);color:#fff;background:rgba(255,255,255,.06)}
+#profile .profile-action:focus-visible{outline:3px solid #fff;outline-offset:2px}
+#profile .profile-account{border-color:rgba(255,212,0,.25)}
+#profile .profile-footnote{font:500 12px/1.5 AV;color:rgba(255,255,255,.56)}
+@media(max-width:380px){.mh .hb span{font-size:9px;letter-spacing:.13em}.mh .hc small{display:none}}
+@media(min-width:540px){#profile .profile-scroll{width:min(100%,520px);align-self:center}}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1369,7 +1396,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </section>
 <section class="view on" id="home">
  <div class="amb" id="mAmb"></div>
- <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
+ <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="profile-entry" data-go="profile" aria-label="Ver mi perfil de jugador" title="Mi perfil"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-4.3 3.4-6 7.5-6s6.7 1.7 7.5 6"/></svg></button><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
  <span id="test" class="htest"></span>
  <div class="mfan" id="mFan"></div>
  <div class="mtabs" id="mTabs"></div>
@@ -1420,6 +1447,32 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <button class="btn y" id="sSave">GUARDAR</button>
   <div class="tbl" id="tbl"></div>
   <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden></div>
+ </div>
+</section>
+
+<section class="view" id="profile" aria-label="Mi perfil de jugador">
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Mi perfil</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
+ <div class="profile-scroll">
+  <div class="profile-head"><div class="profile-avatar" aria-hidden="true">1UP</div><div><p class="profile-kicker">JUGADOR INVITADO</p><h2 id="profileName">Invitado</h2><p class="profile-sub">Tu colección está en este dispositivo.</p></div></div>
+  <div class="profile-metrics" aria-label="Resumen de mi colección">
+   <div><strong id="profileCards">0</strong><span>Cartas distintas</span></div>
+   <div><strong id="profileDesigns">0</strong><span>Diseños descubiertos</span></div>
+   <div><strong id="profileDuplicates">0</strong><span>Repetidas</span></div>
+   <div><strong id="profileRatings">0</strong><span>Diseños calificados</span></div>
+  </div>
+  <section class="profile-panel" aria-labelledby="profileBackupTitle">
+   <h3 id="profileBackupTitle">Protege tu colección</h3>
+   <p>El progreso se guarda en este navegador. Si cambias de dispositivo o se borran sus datos, podrías perderlo. Puedes guardar una copia ahora.</p>
+   <button type="button" class="profile-action primary" id="profileExport">EXPORTAR MI PROGRESO</button>
+   <button type="button" class="profile-action secondary" id="profileImport">IMPORTAR UN RESPALDO</button>
+  </section>
+  <section class="profile-panel profile-account" aria-labelledby="profileAccountTitle">
+   <p class="profile-kicker">CUENTAS EN PREPARACIÓN</p>
+   <h3 id="profileAccountTitle">Más adelante, tu colección en cualquier dispositivo</h3>
+   <p>Con una cuenta podrás sincronizar tus cartas, mostrar tu Top Score con tu perfil y participar en promociones cuando estén disponibles.</p>
+   <p>Por ahora puedes abrir sobres, jugar Reta, crear Tier Lists y calificar cartas como invitado.</p>
+  </section>
+  <p class="profile-footnote">El respaldo manual no crea una cuenta ni sincroniza automáticamente tus datos.</p>
  </div>
 </section>
 <div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onT" aria-hidden="true">
@@ -1904,7 +1957,7 @@ document.addEventListener('keydown',e=>{
 let cur='home';
 function go(id){if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
-function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
+function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores,profile:renderProfile}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
 /* ---------- bienvenida ---------- */
 const ON=[
@@ -2613,6 +2666,17 @@ window.addEventListener('message',e=>{
   else go('pack');
  }
 });
+/* Fase 1: perfil local del invitado; no crea cuentas ni modifica el progreso. */
+function renderProfile(){
+ syncIn();
+ $('profileName').textContent=S.ini?'Invitado · '+S.ini:'Invitado';
+ $('profileCards').textContent=uniq();
+ $('profileDesigns').textContent=DESIGNS.filter(d=>!d.bx&&dState(d).own).length;
+ $('profileDuplicates').textContent=dups();
+ $('profileRatings').textContent=Object.keys(S.rate||{}).length;
+}
+$('profileExport').onclick=()=>$('bkExp').click();
+$('profileImport').onclick=()=>$('bkImp').click();
 /* ---------- récords ---------- */
 function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STORE.docs.length&&S.ini)m.push({ini:S.ini,score:uniq()});return m.filter(r=>r.ini).sort((a,b)=>b.score-a.score)}
 function renderScores(){$('sMine').textContent=uniq();$('iniIn').value=S.ini;const b=board();const pos=b.findIndex(r=>r.ini===S.ini);
