@@ -1089,6 +1089,11 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .reta-unlock p{max-width:330px;font:600 13px/1.5 AV;color:rgba(255,255,255,.77)}
 .reta-unlock b{color:#FFD400}
 .reta-unlock button{margin-top:8px;min-height:44px}
+/* Reta: tres cambios diarios sin una segunda fila. */
+#torneo .reta-reroll{height:36px;min-width:59px;padding:0 9px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(255,212,0,.5);border-radius:10px;background:rgba(255,212,0,.11);color:#FFD400;font:700 13px AV;touch-action:manipulation}
+#torneo .reta-reroll svg{width:18px;height:18px;flex:none}
+#torneo .reta-reroll:disabled{opacity:.38;cursor:default}
+#torneo .reta-reroll:focus-visible{outline:2px solid #FFD400;outline-offset:2px}
 /* ===== RETA DIARIA INTEGRADA (el CRT exterior y la navegación son del Álbum) ===== */
 /* Compactar SOLO Reta en pantallas pequeñas: navegación accesible, más arena. */
 @media(max-width:700px){
@@ -1188,7 +1193,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="tray"><div class="h" id="tHint"></div><div class="z" id="tTray"></div></div>
 </section>
 <section class="view" id="torneo">
- <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Reta</h1><span class="sp"></span></div><div id="vRound" style="justify-content:center;padding:0 12px 6px"></div>
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Reta</h1><span class="sp"></span><button type="button" id="retaReroll" class="reta-reroll" aria-label="Cambiar retadores" title="Cambiar retadores"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg><b id="retaLeft">3</b></button></div><div id="vRound" style="justify-content:center;padding:0 12px 6px"></div>
  <div class="stage" id="vStage"></div>
 </section>
 <section class="view" id="scores">
@@ -2054,29 +2059,64 @@ function retaValid(r,pool){
  if(!r.roster.includes(r.champion)||!r.roster.includes(r.top)||!r.roster.includes(r.bottom)||r.top===r.bottom)return false;
  return true;
 }
-function retaNueva(pool){
- const prev=S.reta2||{},day=today();
- const seed=Number.isInteger(prev.seed)&&prev.seed>0?prev.seed:Math.floor(Math.random()*0x7fffffff)+1;
- const sorted=pool.slice().sort((a,b)=>retaHash(seed+':'+day+':'+a.id)-retaHash(seed+':'+day+':'+b.id)||a.id.localeCompare(b.id));
- const prior=S.champ&&sorted.some(d=>d.id===S.champ)?S.champ:null;
- const first=prior||sorted[0].id;
- const roster=[first,...sorted.filter(d=>d.id!==first).slice(0,7).map(d=>d.id)];
+const RETA_REROLLS=3;
+function retaNueva(pool,reroll=false){
+ const prev=S.reta2||{},day=today(),used=prev.day===day?Math.max(0,Math.min(RETA_REROLLS,prev.rerolls|0)):0;
+ let seed=reroll?Math.floor(Math.random()*0x7fffffff)+1:(Number.isInteger(prev.seed)&&prev.seed>0?prev.seed:Math.floor(Math.random()*0x7fffffff)+1);
+ const prior=S.champ&&pool.some(d=>d.id===S.champ)?S.champ:null;
+ const rosterFor=n=>{
+  const sorted=pool.slice().sort((a,b)=>retaHash(n+':'+day+':'+a.id)-retaHash(n+':'+day+':'+b.id)||a.id.localeCompare(b.id));
+  const first=prior||sorted[0].id;
+  return [first,...sorted.filter(d=>d.id!==first).slice(0,7).map(d=>d.id)];
+ };
+ let roster=rosterFor(seed);
+ if(reroll&&Array.isArray(prev.roster)){
+  for(let i=0;i<10&&roster.join('|')===prev.roster.join('|');i++){
+   seed=(seed+7919)%0x7fffffff||1;roster=rosterFor(seed);
+  }
+ }
+ const first=roster[0];
  return {day,seed,roster,round:0,champion:first,top:roster[0],bottom:roster[1],
   streak:0,lastChampion:prior,startingChampion:first,lastSide:'top',
+  rerolls:used+(reroll?1:0),
   done:false,titleDefended:false,defenses:Math.max(0,prev.defenses|0),
   history:Array.isArray(prev.history)?prev.history.slice(-30):[]};
 }
+function retaRerollUI(pool){
+ const r=S.reta2,active=!!r&&r.day===today()&&retaValid(r,pool);
+ const used=active?Math.max(0,Math.min(RETA_REROLLS,r.rerolls|0)):0;
+ const left=RETA_REROLLS-used,btn=$('retaReroll');
+ $('retaLeft').textContent=String(left);
+ btn.disabled=!active||r.done||left===0;
+ btn.title=r&&r.done?'Reta completada por hoy':left?'Cambiar retadores: '+left+' cambios disponibles':'Sin cambios disponibles por hoy';
+ btn.setAttribute('aria-label',btn.title);
+}
+$('retaReroll').onclick=()=>{
+ syncIn();const r=S.reta2,pool=retaPool();
+ if(!retaValid(r,pool)||r.done||(r.rerolls|0)>=RETA_REROLLS){retaRerollUI(pool);return}
+ const restart=()=>withLock(()=>{
+  syncIn();const current=S.reta2,available=retaPool();
+  if(!retaValid(current,available)||current.done||(current.rerolls|0)>=RETA_REROLLS){retaRerollUI(available);return}
+  const next=retaNueva(available,true);S.reta2=next;
+  if(!save())toast('CAMBIO PENDIENTE DE GUARDAR');
+  ga('reta_cambio_retadores',{usados:next.rerolls,restantes:RETA_REROLLS-next.rerolls});
+  startTorneo();
+ });
+ if(r.round>0)uxShow({kicker:'RETA · CAMBIAR RETADORES',title:'¿Cambiar los enfrentamientos?',desc:'Se reiniciarán tus elecciones de esta Reta. Tus cartas y sobres siguen intactos.',note:'Te quedan '+(RETA_REROLLS-(r.rerolls|0))+' cambios hoy.',primary:'CAMBIAR PLAYERAS',secondary:'SEGUIR JUGANDO',onPrimary:restart});
+ else restart();
+};
 function startTorneo(){
  syncIn();const pool=retaPool();
  if(pool.length<8){
   const missing=8-pool.length;
   $('vStage').innerHTML='<div class="reta-unlock" role="status"><strong>RETA AÚN NO DISPONIBLE</strong><p>Necesitas 8 diseños distintos en tu álbum para enfrentar 7 retadores.</p><p>Ya descubriste <b>'+pool.length+' de 8</b> · faltan '+missing+'.</p><button type="button" class="btn y" data-go="album">VER MI ÁLBUM</button></div>';
-  return;
+  retaRerollUI(pool);return;
  }
  if(!retaValid(S.reta2,pool)){
   S.reta2=retaNueva(pool);
   if(save())ga('reta_iniciada',{dia:S.reta2.day,retadores:7});
  }
+ retaRerollUI(pool);
  retaOver=!!S.reta2.done;
  $('vStage').innerHTML='<iframe id="retaLive" class="reta-iframe" src="reta-diaria.html?embedded=1" title="Reta de playeras · 7 encuentros" loading="eager"></iframe>';
 }
@@ -2110,6 +2150,7 @@ function retaElegir(f,msg){
   }else{r[lost]=r.roster[r.round+1]}
   const ok=save();
   if(!ok)toast('RETA: GUARDADO PENDIENTE');
+  retaRerollUI(retaPool());
   ga('reta_eleccion',{ronda:r.round,diseno:msg.winner,campeona:r.champion});
  });
 }
