@@ -32,7 +32,11 @@ async function initAuth() {
       showAuth(session?.user || null);
     });
     const { data, error } = await authClient.auth.getUser();
-    if (error) notice('No se pudo verificar la sesión. Puedes volver a solicitar un enlace.', true);
+    if (error && error.name !== 'AuthSessionMissingError') {
+      notice('No se pudo verificar la sesión. Puedes volver a solicitar un enlace.', true);
+    } else if (!data?.user) {
+      notice('Ingresa un correo autorizado para solicitar el enlace de acceso.');
+    }
     showAuth(data?.user || null);
     if (new URLSearchParams(location.search).get('auth') === 'callback') {
       if (typeof window.go === 'function') window.go('profile');
