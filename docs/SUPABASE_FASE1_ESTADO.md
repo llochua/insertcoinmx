@@ -48,3 +48,19 @@ La migración arriba identificada está registrada **en Supabase**; este archivo
 - Documento de continuidad: `docs/CONTINUIDAD_Y_TRASPASO_CUENTA.md` está pendiente en una rama separada/PR #56.
 
 No afirmar que hay login funcional, nube sincronizada o votos públicos: la base está creada, pero falta la integración y validación de negocio.
+
+## Prueba reversible de aislamiento RLS — 19/11/2026
+
+Se probó el esquema conectado con dos identidades UUID ficticias y cartas de cantidad distinta (2 y 7), utilizando roles PostgreSQL `authenticated` y `anon` con un `request.jwt.claim.sub` simulado. La prueba completa corrió dentro de `BEGIN ... ROLLBACK` y el resultado arrojó **9/9 validaciones aprobadas**:
+
+- Jugador A solamente visualiza sus cartas, perfil y respaldo (3 pruebas).
+- Jugador A no puede modificar el perfil de B ni crear el perfil de un tercero (2 pruebas).
+- Jugador A no puede insertar cartas arbitrarias (1 prueba).
+- Jugador B solamente visualiza sus cartas y perfil (2 pruebas).
+- Invitado `anon` no puede consultar cartas privadas (1 prueba).
+
+**Verificación de limpieza posterior:** `auth.users`, `player_profiles`, `collection_cards`, `player_snapshots`, `collection_events` e `import_receipts` quedaron con **0 filas** cada una. El análisis de seguridad retornó **0 advertencias**.
+
+Alcance: prueba de permisos a nivel SQL y RLS con contexto JWT simulado; **no es una prueba de autenticación real desde el navegador**, ni demuestra que los flujos de inicio de sesión, redirect, sincronización de colecciones o protección ante abuso estén terminados.
+
+Siguiente punto técnico: configurar la autenticación opcional, revisar URL de redirección de Supabase y realizar la misma validación con dos sesiones reales. Fuente: https://supabase.com/docs/guides/auth/redirect-urls
