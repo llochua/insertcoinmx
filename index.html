@@ -330,8 +330,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hprog .bar{position:relative;height:4px;border-radius:2px;background:rgba(255,255,255,.12)}
 .hprog .bar i{display:block;height:100%;border-radius:2px;background:#FFD400;box-shadow:0 0 10px rgba(255,212,0,.5)}
 .hprog .bar s{position:absolute;inset:0}.hprog .bar s em{position:absolute;top:-3px;width:2px;height:10px;background:rgba(255,255,255,.45)}
-.dupbar{display:none;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:rgba(255,212,0,.12);box-shadow:inset 0 0 0 1px rgba(255,212,0,.4);font:600 12px AV;color:#fff}
-.dupbar.on{display:flex}.dupbar.progress{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}.dupbar button{font:700 11px AV;letter-spacing:.12em;background:#FFD400;color:#120f3a;border-radius:8px;padding:8px 12px}.dupbar button:disabled{opacity:.65;cursor:not-allowed;background:rgba(255,255,255,.11);color:#e2ddee}
 .hnav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .hnav button{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 4px 11px;border-radius:12px;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);color:#fff}
 .hnav .tile{border:0;text-align:center;padding:13px 4px 11px;gap:5px;opacity:1}
@@ -415,7 +413,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .mtabs button{font:600 11px AV;color:rgba(255,255,255,.45);padding:6px 9px;border-radius:14px;white-space:nowrap}
 .mtabs button.on{background:rgba(255,255,255,.12);color:#fff;font-weight:700}
 .mtabs button.lock{color:rgba(255,255,255,.25)}
-#home .dupbar{margin:0 18px 12px}
 .mgo{align-self:center;margin:0 0 22px;min-width:210px;padding:16px 26px;border-radius:12px;background:#FFD400;color:#120F1A;font:700 14px AV;letter-spacing:.18em;box-shadow:0 6px 0 #b08f00,0 14px 30px rgba(255,212,0,.25)}
 .mgo:active{transform:translateY(4px);box-shadow:0 2px 0 #b08f00}
 .mgo.off{background:rgba(255,255,255,.1);color:rgba(255,255,255,.65);box-shadow:none;letter-spacing:.1em}
@@ -1400,7 +1397,6 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <span id="test" class="htest"></span>
  <div class="mfan" id="mFan"></div>
  <div class="mtabs" id="mTabs"></div>
- <div class="dupbar" id="dupBar"><span id="tDup"></span><button id="tDupB">CAMBIAR</button></div>
  <button class="mgo" id="mGo"></button>
 </section>
 <section class="view" id="pack">
@@ -1920,10 +1916,10 @@ function uxEmptyPacks(otherTab=false){
  const canTrade=dups()>=5;
  ga('sobres_agotados',{origen:cur,canje_disponible:canTrade?1:0});
  uxShow({
-  kicker:'SOBRES · CADA 6 HORAS',
+  kicker:'SOBRES',
   title:otherTab?'Tu sobre se abrió en otra pestaña':'¡Por ahora, sin sobres!',
-  desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Recibirás 2 sobres nuevos en el siguiente ciclo de 6 horas.',
-  note:canTrade?'Tienes al menos 5 repetidas para conseguir un sobre extra.':'Puedes seguir explorando tu colección mientras esperas.',
+  desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Tus próximos 2 sobres estarán listos en:',
+  note:canTrade?'También puedes conseguir un sobre ahora usando 5 repetidas.':'Mientras tanto, tu álbum sigue disponible.',
   countdown:true,
   primary:canTrade?'CAMBIAR 5 REPETIDAS':'VER MI ÁLBUM',
   secondary:'VOLVER',
@@ -2006,7 +2002,7 @@ function menuArtLoad(img,m,dir){
 }
 const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'CICLO · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'SIN SOBRES POR AHORA',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
+ {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'TIENES '+f+' SOBRES'):'SOBRES EXTRA · '+S.extra):'SIN SOBRES POR AHORA',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -2022,7 +2018,6 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,i
  if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
  [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
  const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.jpg'})`;
- const d=dups();$('dupBar').classList.toggle('on',d>0);$('dupBar').classList.toggle('progress',d<5);$('tDup').textContent=d>=5?'¡Tienes '+d+' repetidas! Canjea 5 por un sobre extra':d+' de 5 repetidas · junta 5 para un sobre extra';$('tDupB').textContent=d>=5?'CANJEAR':'FALTAN '+(5-d);$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
  if(m.id==='pack'&&m.off){beep(440,.05);uxEmptyPacks();return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
@@ -2075,7 +2070,6 @@ function trade(after){
   })
  })
 }
-$('tDupB').onclick=()=>trade(()=>go('pack'));
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
 /* Sobre (Etapa 4): 3 Base + 1 sorpresa (30% de ser Especial o mejor) + 1 Especial o mejor segura.
@@ -2386,7 +2380,10 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
  const rest=hand.filter(c=>c!==H),G={comp:rest.filter(c=>c._comp),dnew:rest.filter(c=>c._new&&!c._comp&&c._dnew),vnew:rest.filter(c=>c._new&&!c._comp&&!c._dnew),rep:rest.filter(c=>!c._new)};
  const sec=(t,L)=>L.length?`<section class="rs-group"><h3>${t}<span>${L.length}</span></h3><div class="rg">${L.map(card).join('')}</div></section>`:'';
  const n=dups(),PD=DESIGNS.filter(x=>!x.bx),disc=PD.filter(x=>dState(x).own).length;
- const tradeH=n>=5?'<p class="rb-p">Tus repetidas sirven para conseguir sobres. Siempre conservas una de cada carta.</p><button class="rs-trade" id="sTrade">CANJEAR 5 REPETIDAS POR 1 SOBRE</button>':`<p class="rb-p">${n} de 5 repetidas para un sobre extra. Cada repetida cuenta y siempre conservas una de cada carta.</p>`;
+ const receivedDuplicate=hand.some(c=>!c._new);
+ const tradeH=n>=5?'<p class="rb-p">Tienes 5 repetidas para conseguir un sobre extra. Siempre conservarás una copia de cada carta.</p><button class="rs-trade" id="sTrade">CANJEAR 5 REPETIDAS</button>':
+  n>=3&&receivedDuplicate?`<p class="rb-p">¡Ojo! Tus repetidas también sirven: llevas ${n} de 5 para conseguir un sobre extra.</p>`:'';
+
  const finish=summaryStatus();
  s.innerHTML=`<div class="rs2${entering?' rs-enter':''}">
   <header class="rs-finish" role="status">
@@ -2398,8 +2395,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
    <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${H._comp?`<div class="rh-vs">${vchips}</div>`:tag(H)}</div></div>
   <section class="rs-follow" aria-label="Qué sigue después de este sobre">
    <div class="rs-wait" id="sWait" ${packReady()?'hidden':''}>
-    <span>PRÓXIMOS 2 SOBRES</span><strong>En <time id="sNextTime">${nextPackCountdown()}</time></strong>
-    <p>Recibirás 2 sobres al comenzar el próximo ciclo de 6 horas.</p>
+    <span>TUS PRÓXIMOS 2 SOBRES</span><strong>En <time id="sNextTime">${nextPackCountdown()}</time></strong>
    </div>
    <div class="rs-act2">
     <button type="button" class="rs-main" id="sOtro">ABRIR OTRO SOBRE</button>
@@ -2408,7 +2404,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
    </div>
   </section>
   ${sec('Colección completa',G.comp)}${sec('Diseños nuevos',G.dnew)}${sec('Versiones nuevas',G.vnew)}${sec('Repetidas',G.rep)}
-  <div class="rs-group rs-redeem">${tradeH}</div>
+  ${tradeH?`<div class="rs-group rs-redeem">${tradeH}</div>`:""}
   <div class="rs-pg">${disc} de ${PD.length} diseños · ${AV.filter(c=>S.have[c.k]).length} de ${NAV} cartas</div>
  </div>`;
  if(entering){s.scrollTop=0;ga('resumen_sobre_visto',{tipo:lastOpenedPack?.kind||'extra',paso:lastOpenedPack?.number||0})}
