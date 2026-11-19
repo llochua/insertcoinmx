@@ -29,7 +29,7 @@ Hoja de Google: **Insert Coin MX — Narrativas TCG**, pestaña *Narrativas TCG*
 | Arte | Archivo en `E:\icmx\fichas\` | `diseños/` o `nunca salieron/` |
 | Estado carta | Propuesta · revisar / Aprobada | Control editorial |
 
-Voz de los textos: la **línea** describe (qué ves y qué tiene de especial); la **frase** guiña
+Voz de los textos: la **línea** es la habilidad: lo que la carta hace, como efecto de juego de cartas de mentira, empieza con verbo y no repite el chiste de la frase; la **frase** guiña
 (nostalgia, humor mexicano). Sin datos históricos inventados: si no estamos seguros, no va.
 Las columnas de narrativa (Dorada = curiosidad, Holo = concepto) son para la vista de lectura del
 juego, no para el frente de la carta.
@@ -50,10 +50,10 @@ juego, no para el frente de la carta.
 │ ┌──────────────────────────────────────┐ │
 │ │ (✦) HABILIDAD ESPECIAL            —  │ │  ícono centro 125.5,929.5 · etiqueta 186,884
 │ │     Referencia                   GOTY│ │  ref x193, tope 926, Avenir Next Bold 49.2
-│ │ Línea descriptiva                    │ │  línea x86, tope 999, Lato (Carlito) 29.8
+│ │ Habilidad (efecto de juego)          │ │  línea x86, tope 999, Lato (Carlito) 37.2; si no cabe, 2 renglones (interlínea 1.2)
 │ └──────────────────────────────────────┘ │  con referencia de 2 renglones: 2º renglón tope 982,
-│ ┌──────────────────────────────┬───────┐ │  línea tope 1053, ícono y GOTY bajan 28 px
-│ │ Frase en itálica             │ ▚▚▚▚  │ │  frase x75, tope 1132, Lato Italic 25.8, máx 620 px
+│ ┌──────────────────────────────┬───────┐ │  línea tope 1045 (1 renglón), ícono y GOTY bajan 28 px
+│ │ Frase en itálica             │ ▚▚▚▚  │ │  frase x75, tope 1132, Lato Italic 29.7, máx 620 px
 │ └──────────────────────────────┴───────┘ │
 │ [Carta 001/076 │ ● Común │ Valor –]      │  número x148, tope 1250, Avenir Next Bold 23.4
 └──────────────────────────────────────────┘
