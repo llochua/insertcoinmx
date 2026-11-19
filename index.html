@@ -1149,11 +1149,21 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-height:550px){.ux-panel{gap:9px;padding:17px 18px}.ux-panel p{font-size:14px;line-height:1.35}.ux-countdown{padding:10px 12px}.ux-actions{gap:7px;margin-top:3px}.ux-actions button{min-height:44px}}
 @media(prefers-reduced-motion:reduce){.toast.go{animation:none!important;opacity:1}}
 
+/* Control global: compacto y consistente en las cabeceras; no roba una fila. */
+.sound-toggle{display:inline-flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;border:1px solid rgba(255,212,0,.43);border-radius:50%;background:rgba(255,212,0,.1);color:#FFD400;cursor:pointer;touch-action:manipulation}
+.sound-toggle svg{width:19px;height:19px;display:block}
+.sound-toggle.is-muted{border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.07);color:#aaa5c3}
+.sound-toggle:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+#title .title-sound{position:absolute;top:55px;right:17px;z-index:50}
+.mh{gap:10px}.mh .hc{margin-left:auto}
+.z-bar .sound-toggle{margin-left:auto}
+.z-bar #zClose{margin-left:0}
+@media(max-width:480px){#torneo>.top{gap:7px!important}#torneo>.top .sound-toggle{flex-basis:34px;width:34px;height:34px}.mh{gap:7px}.mh .hb{letter-spacing:.25em}}
 </style></head><body>
 <div class="crt">
 <section id="title" class="on">
  <div class="tbg"></div><div class="tbg2"></div>
- <div class="thud"><span>1UP <b id="tiOne">0</b></span><span>HI <b id="tiHi">---</b></span></div>
+ <div class="thud"><span>1UP <b id="tiOne">0</b></span><span>HI <b id="tiHi">---</b></span></div><button type="button" class="sound-toggle title-sound" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button>
  <div class="tlogo"><img src="logo.png" alt="Insert Coin MX"><div class="tal">EL ÁLBUM</div></div>
  <div class="tfan"><div class="tc l"><div class="fx idle r-dorada" style="--rad:10px;height:100%"><img src="c/fatality.jpg"><i class="foil"></i><i class="glare"></i></div></div><div class="tc r"><div class="fx idle r-full" style="--rad:10px;height:100%"><img src="c/F_shenzalcoatl.jpg"><i class="foil"></i><i class="glare"></i></div></div><div class="tc m" id="tiHero"><div class="fx idle r-full" style="--rad:10px;height:100%"><img src="c/F_gatosamurai.jpg"><i class="foil"></i><i class="glare"></i></div></div></div>
  <div class="tstart">PRESIONA START</div>
@@ -1162,7 +1172,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </section>
 <section class="view on" id="home">
  <div class="amb" id="mAmb"></div>
- <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div></header>
+ <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
  <span id="test" class="htest"></span>
  <div class="mfan" id="mFan"></div>
  <div class="mtabs" id="mTabs"></div>
@@ -1170,7 +1180,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <button class="mgo" id="mGo"></button>
 </section>
 <section class="view" id="pack">
- <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Sobres</h1><span class="sp"></span></div>
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Sobres</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="stage" id="pStage">
   <div class="env" id="env">
    <div class="pk idle" id="pk">
@@ -1189,23 +1199,23 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  </div>
 </section>
 <section class="view" id="album">
- <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Álbum</h1><span class="sp"></span><span id="aCount"></span></div>
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Álbum</h1><span class="sp"></span><span id="aCount"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div id="pTabs"></div>
  <div class="prog"><i id="aProg"></i></div>
  <div class="aSub" id="aSub"></div>
  <div class="wrap"><div class="dgrid" id="grid"></div></div>
 </section>
 <section class="view" id="tier">
- <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Tier</h1><span class="sp"></span><button class="btn y" id="tShare">Compartir</button></div>
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Tier</h1><span class="sp"></span><button class="btn y" id="tShare">Compartir</button><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="board" id="tBoard"></div>
  <div class="tray"><div class="h" id="tHint"></div><div class="z" id="tTray"></div></div>
 </section>
 <section class="view" id="torneo">
- <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Reta</h1><span class="sp"></span><button type="button" id="retaReroll" class="reta-reroll" aria-label="Cambiar retadores" title="Cambiar retadores"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg><b id="retaLeft">3</b></button></div><div id="vRound" style="justify-content:center;padding:0 12px 6px"></div>
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Reta</h1><span class="sp"></span><button type="button" id="retaReroll" class="reta-reroll" aria-label="Cambiar retadores" title="Cambiar retadores"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg><b id="retaLeft">3</b></button><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div><div id="vRound" style="justify-content:center;padding:0 12px 6px"></div>
  <div class="stage" id="vStage"></div>
 </section>
 <section class="view" id="scores">
- <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Récords</h1><span class="sp"></span></div>
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Récords</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="wrap">
   <div class="px" style="font-size:9px;color:var(--dim);text-align:center;line-height:1.8">TU PUNTAJE: CARTAS DISTINTAS<br><span style="color:var(--y);font-size:26px" id="sMine">0</span></div>
   <div class="px" id="sPos" style="font-size:9px;color:var(--y)"></div>
@@ -1218,7 +1228,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </div>
 <div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
 <dialog class="zoom" id="zoom" aria-labelledby="zName">
- <header class="z-bar"><h2 id="zName"></h2><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
+ <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
  <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
@@ -1505,8 +1515,93 @@ function withLock(fn){let ran=false;const run=()=>{ran=true;fn()};
  if(navigator.locks&&navigator.locks.request){return navigator.locks.request(KEY+'.lock',()=>{run();return new Promise(r=>setTimeout(r,150))}).catch(()=>{if(!ran)run()})}
  run();return Promise.resolve()}
 function goty(k){const v=STORE.docs.map(d=>d.rate&&d.rate[k]).filter(x=>x!==undefined);if(S.rate[k]!==undefined&&!STORE.docs.length)v.push(S.rate[k]);if(!v.length)return null;return Math.round(v.filter(x=>x===0).length/v.length*100)}
-/* ---------- sonido / avisos ---------- */
-let AC;function beep(f,d=.07){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
+/* ---------- música de Insert Coin MX y efectos ---------- */
+/* El navegador habilita la reproducción con una interacción real; no forzamos autoplay. */
+const AUDIO_PREF_KEY='icmx-sound-muted-v1';
+let soundMuted=LS.get(AUDIO_PREF_KEY)==='1';
+const MUSIC_VOLUME=.12,FADE_MS=900;
+const MUSIC_FILES={general:'audio/vinyl-dreams.mp3',reta:'audio/pixel-showdown.mp3'};
+const MUSIC={general:new Audio(MUSIC_FILES.general),reta:new Audio(MUSIC_FILES.reta)};
+for(const audio of Object.values(MUSIC)){audio.loop=true;audio.preload='none';audio.volume=0}
+let musicAllowed=false,musicFade=0,musicWanted=null;
+const AUDIO_ICON_ON='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 9a5 5 0 0 1 0 6M18 6a9 9 0 0 1 0 12"/></svg>';
+const AUDIO_ICON_OFF='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6m0-6-5 6"/></svg>';
+function showSoundState(){
+ document.querySelectorAll('[data-sound-toggle]').forEach(btn=>{
+  btn.classList.toggle('is-muted',soundMuted);
+  btn.setAttribute('aria-label',soundMuted?'Activar música y efectos':'Silenciar música y efectos');
+  btn.setAttribute('aria-pressed',String(!soundMuted));
+  btn.title=soundMuted?'Activar sonido':'Silenciar sonido';
+  btn.innerHTML=soundMuted?AUDIO_ICON_OFF:AUDIO_ICON_ON;
+ });
+}
+function notifyRetaSound(){
+ const f=$('retaLive');
+ if(f&&f.contentWindow)f.contentWindow.postMessage({type:'icmx-audio-state',muted:soundMuted},location.origin);
+}
+function musicStop(){
+ musicFade++;musicWanted=null;
+ for(const a of Object.values(MUSIC)){a.pause();a.volume=0}
+}
+function musicForScreen(){
+ if(soundMuted||!musicAllowed||document.hidden){musicStop();return}
+ const target=cur==='torneo'?'reta':'general',next=MUSIC[target];
+ if(musicWanted===target&&!next.paused)return;
+ const previousVolumes={general:MUSIC.general.volume,reta:MUSIC.reta.volume};
+ musicWanted=target;
+ const frame=++musicFade;
+ // El play se solicita en el gesto del usuario o tras una interacción habilitada.
+ try{
+  const result=next.play();
+  if(result&&result.catch)result.catch(()=>{
+   if(frame!==musicFade)return;
+   musicAllowed=false;musicStop(); // reintentar al siguiente gesto, sin avisos invasivos
+  });
+ }catch(e){musicAllowed=false;musicStop();return}
+ const start=performance.now();
+ function blend(now){
+  if(frame!==musicFade)return;
+  const p=Math.min(1,Math.max(0,(now-start)/FADE_MS));
+  for(const key of Object.keys(MUSIC)){
+   const a=MUSIC[key],end=key===target?MUSIC_VOLUME:0;
+   a.volume=Math.min(1,Math.max(0,previousVolumes[key]+(end-previousVolumes[key])*p));
+   if(p>=1&&key!==target)a.pause();
+  }
+  if(p<1)requestAnimationFrame(blend);
+ }
+ requestAnimationFrame(blend);
+}
+function beginMusic(){
+ if(soundMuted||musicAllowed)return;
+ musicAllowed=true;musicForScreen();
+}
+function setSoundMuted(muted){
+ soundMuted=!!muted;
+ try{localStorage.setItem(AUDIO_PREF_KEY,soundMuted?'1':'0')}catch(e){}
+ showSoundState();notifyRetaSound();
+ if(soundMuted)musicStop();else{musicAllowed=true;musicForScreen()}
+}
+function initSound(){
+ showSoundState();
+ document.addEventListener('pointerdown',e=>{
+  if(e.target.closest&&e.target.closest('[data-sound-toggle]'))return;
+  beginMusic();
+ },{passive:true,capture:true});
+ document.addEventListener('keydown',e=>{if(!e.repeat&&e.key!=='Tab')beginMusic()});
+ document.addEventListener('click',e=>{
+  const btn=e.target.closest&&e.target.closest('[data-sound-toggle]');
+  if(btn){e.preventDefault();setSoundMuted(!soundMuted)}
+ });
+ window.addEventListener('storage',e=>{
+  if(e.key!==AUDIO_PREF_KEY)return;
+  soundMuted=e.newValue==='1';showSoundState();notifyRetaSound();
+  if(soundMuted)musicStop();else if(musicAllowed)musicForScreen();
+ });
+ document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)musicStop();else if(musicAllowed&&!soundMuted)musicForScreen();
+ });
+}
+let AC;function beep(f,d=.07){if(soundMuted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
 const jingle=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.11),i*90));
 function toast(t){const e=$('toast');clearTimeout(e._uxTimer);e.innerHTML=t;e.classList.remove('go');void e.offsetWidth;e.classList.add('go');e._uxTimer=setTimeout(()=>e.classList.remove('go'),3000)}
 /* Estado sin sobres y confirmación de salida: las cartas se guardan al abrir, no al revelar. */
@@ -1581,7 +1676,7 @@ document.addEventListener('keydown',e=>{
 
 /* ---------- navegación ---------- */
 let cur='home';
-function go(id){if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
+function go(id){if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
@@ -1850,7 +1945,7 @@ function renderTitle(){$('tiOne').textContent=uniq();const docs=(STORE.docs||[])
  const list=docs.slice(0,5).map((d,i)=>`<i>${i+1}.</i> ${d.ini||'???'} ${d.score||0}`).join('   ·   ');
  $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'5 SOBRES DE BIENVENIDA · 2 DIARIOS   ·   JUNTA '+NAV+' CARTAS   ·   INSERTCOINMX.COM'}
 renderTitle();
-$('title').addEventListener('click',()=>{beep(880,.06);setTimeout(()=>beep(1320,.08),70);$('title').classList.remove('on');renderHome();if(!S.seen)showOn()});
+$('title').addEventListener('click',e=>{if(e.target.closest('[data-sound-toggle]'))return;beep(880,.06);setTimeout(()=>beep(1320,.08),70);$('title').classList.remove('on');renderHome();if(!S.seen)showOn()});
 document.addEventListener('pointermove',e=>{if(!$('title').classList.contains('on'))return;const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;$('tiHero').style.transform=`rotateY(${x*14}deg) rotateX(${-y*10}deg)`});
 window.addEventListener('deviceorientation',e=>{if(!$('title').classList.contains('on')||e.gamma==null)return;const x=Math.max(-1,Math.min(1,e.gamma/30)),y=Math.max(-1,Math.min(1,(e.beta-45)/30));$('tiHero').style.transform=`rotateY(${x*12}deg) rotateX(${-y*8}deg)`});
 
@@ -2143,7 +2238,7 @@ function startTorneo(){
 function retaInitFrame(f){
  const pool=retaPool();
  if(!retaValid(S.reta2,pool)){startTorneo();return}
- f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,packsAvailable:packReady(),canTrade:dups()>=5},location.origin);
+ f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,packsAvailable:packReady(),canTrade:dups()>=5,audioMuted:soundMuted},location.origin);
 }
 function retaElegir(f,msg){
  withLock(()=>{
@@ -2399,6 +2494,6 @@ async function shareTier(){toast('PREPARANDO IMAGEN...');await document.fonts.re
  deliver(cv,'mi-tier-insertcoinmx.png')}
 /* ---------- arranque ---------- */
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
-claimPend();go('home');STORE.init();
+claimPend();initSound();go('home');STORE.init();
 if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
 </script></body></html>
