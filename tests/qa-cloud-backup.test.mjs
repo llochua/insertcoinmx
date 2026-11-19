@@ -13,9 +13,9 @@ function fixture({existing=null,localState=null,localExt=null}={}){
  const mainRaw=JSON.stringify(state);
  const files=new Map([['icmx-album2',mainRaw]]);
  if(localExt)files.set('icmx-album2.ext',JSON.stringify(localExt));
- const writes=[],downloads=[],uploads=[],user={id:'55555555-5555-4555-8555-555555555555',email:'qa@example.test'};
+ const writes=[],downloads=[],uploads=[],reads=[],user={id:'55555555-5555-4555-8555-555555555555',email:'qa@example.test'};
  const elements={};
- for(const id of ['guest','signed','signedEmail','tabSignup','tabLogin','password','modeHint','submit','message','logout','authForm','email','backupDownload','backupConsent','backupConsentLabel','backupUpload','backupStatus','localSummary','inspectProgress']){
+ for(const id of ['guest','signed','signedEmail','tabSignup','tabLogin','password','modeHint','submit','message','logout','authForm','email','backupDownload','backupConsent','backupConsentLabel','backupUpload','backupStatus','localSummary','inspectProgress','inspectCloud','cloudSummary']){
   elements[id]={
    listeners:{},attrs:{},hidden:false,disabled:false,checked:false,value:'',textContent:'',dataset:{},
    addEventListener(type,handler){this.listeners[type]=handler;},
@@ -52,7 +52,7 @@ function fixture({existing=null,localState=null,localExt=null}={}){
     body:{appendChild(){}}
   },
   localStorage:{
-   getItem(k){return files.has(k)?files.get(k):null;},
+   getItem(k){reads.push(k);return files.has(k)?files.get(k):null;},
    setItem(...args){writes.push(['set',...args]);},
    removeItem(...args){writes.push(['remove',...args]);},
    clear(){writes.push(['clear']);}
@@ -69,7 +69,7 @@ function fixture({existing=null,localState=null,localExt=null}={}){
  assert.notEqual(executable,source);
  vm.runInNewContext(executable,context,{timeout:2000});
  const ready=async()=>{for(let i=0;i<7;i++)await new Promise(resolve=>setImmediate(resolve));};
- return {elements,files,writes,downloads,uploads,ready,get stored(){return stored}};
+ return {elements,files,writes,downloads,uploads,reads,ready,get stored(){return stored}};
 }
 
 test('cloud backup does nothing without explicit user action',async()=>{
@@ -133,6 +133,46 @@ test('existing backup on login is identified without uploading or modifying data
  assert.equal(h.elements.backupUpload.disabled,true);
  assert.equal(h.elements.backupDownload.disabled,true);
  assert.equal(h.elements.backupConsentLabel.hidden,true);
+ assert.equal(h.uploads.length,0);
+ assert.equal(h.writes.length,0);
+});
+
+test('second device can see cloud backup counts without reading local storage or uploading',async()=>{
+ const cloud={
+  user_id:'55555555-5555-4555-8555-555555555555',
+  state:{app:'insertcoinmx-album',format:2,data:{have:{arcade_f:1,x_b:2,fatality_b:1},rate:{arcade:2,x:1}}},
+  revision:1,game_format:2
+ };
+ const h=fixture({existing:cloud});await h.ready();
+ h.files.delete('icmx-album2');
+ const readsBefore=h.reads.length;
+ await h.elements.inspectCloud.listeners.click();
+ assert.match(h.elements.cloudSummary.textContent,/3 variantes, 4 cartas y 2 calificaciones/);
+ assert.match(h.elements.cloudSummary.textContent,/no recibió ni modificó cartas/);
+ assert.equal(h.reads.length,readsBefore);
+ assert.equal(h.uploads.length,0);
+ assert.equal(h.writes.length,0);
+});
+
+test('cloud inspector handles absent backup, and never reads or writes local progress',async()=>{
+ const h=fixture();await h.ready();
+ const readsBefore=h.reads.length;
+ await h.elements.inspectCloud.listeners.click();
+ assert.match(h.elements.cloudSummary.textContent,/todavía no tiene una colección respaldada/);
+ assert.equal(h.reads.length,readsBefore);
+ assert.equal(h.uploads.length,0);
+ assert.equal(h.writes.length,0);
+});
+
+test('cloud inspector refuses a mismatched owner even if backend returns row',async()=>{
+ const cloud={
+  user_id:'11111111-1111-4111-8111-111111111111',
+  state:{app:'insertcoinmx-album',format:2,data:{have:{x_b:1},rate:{}}},
+  revision:1,game_format:2
+ };
+ const h=fixture({existing:cloud});await h.ready();
+ await h.elements.inspectCloud.listeners.click();
+ assert.match(h.elements.cloudSummary.textContent,/No pudimos consultar el respaldo/);
  assert.equal(h.uploads.length,0);
  assert.equal(h.writes.length,0);
 });
