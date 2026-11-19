@@ -1355,6 +1355,41 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #zoom #zRate .rb.zr-emoji{min-height:52px;padding:6px 2px!important;font:27px/1 system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif!important}
 #zoom #zRate .rb.zr-emoji.on::after{top:2px;right:5px;font:800 12px AV,system-ui,sans-serif}
 @media(max-width:350px){.dx-top{padding-inline:12px;gap:5px}.disc.dx .dx-controls,.disc.dx:not(.cov) .dx-controls{width:calc(100% - 24px)}}
+/* Sello coleccionable de revelación, junto a la carta y fuera del arte de fondo. */
+.ic-award{
+ --ic-gold:#ffdc4e;--ic-shadow:#6e4105;
+ position:absolute;z-index:6;left:-32px;top:-30px;
+ display:block;width:clamp(74px,22vw,96px);aspect-ratio:1;
+ pointer-events:none;opacity:0;filter:drop-shadow(0 6px 4px rgba(0,0,0,.54));
+ transform-origin:center;animation:icBadgePop 1.9s .55s cubic-bezier(.16,.9,.26,1) both;
+}
+.ic-award-seal{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ width:100%;height:100%;padding:11px 7px 10px;
+ background:radial-gradient(circle at 34% 19%,#fff5c0 0%,var(--ic-gold) 45%,#dc9e14 100%);
+ color:#231526;clip-path:polygon(50.00% 1.30%,51.80% 1.83%,53.50% 3.28%,55.04% 5.28%,56.43% 7.33%,57.77% 8.93%,59.19% 9.74%,60.82% 9.63%,62.72% 8.77%,64.86% 7.53%,67.12% 6.39%,69.28% 5.82%,71.13% 6.12%,72.52% 7.38%,73.42% 9.43%,73.94% 11.90%,74.31% 14.35%,74.82% 16.37%,75.75% 17.71%,77.26% 18.32%,79.35% 18.37%,81.82% 18.18%,84.34% 18.13%,86.54% 18.56%,88.08% 19.64%,88.79% 21.38%,88.71% 23.61%,88.10% 26.06%,87.37% 28.42%,86.95% 30.47%,87.21% 32.08%,88.31% 33.29%,90.17% 34.24%,92.47% 35.14%,94.77% 36.19%,96.56% 37.52%,97.48% 39.16%,97.36% 41.04%,96.33% 43.02%,94.72% 44.96%,93.03% 46.78%,91.77% 48.44%,91.30% 50.00%,91.77% 51.56%,93.03% 53.22%,94.72% 55.04%,96.33% 56.98%,97.36% 58.96%,97.48% 60.84%,96.56% 62.48%,94.77% 63.81%,92.47% 64.86%,90.17% 65.76%,88.31% 66.71%,87.21% 67.92%,86.95% 69.53%,87.37% 71.57%,88.10% 73.94%,88.71% 76.39%,88.79% 78.62%,88.08% 80.36%,86.54% 81.44%,84.34% 81.87%,81.82% 81.82%,79.35% 81.63%,77.26% 81.68%,75.75% 82.29%,74.82% 83.63%,74.31% 85.65%,73.94% 88.10%,73.43% 90.57%,72.52% 92.62%,71.13% 93.88%,69.28% 94.18%,67.12% 93.61%,64.86% 92.47%,62.72% 91.23%,60.82% 90.37%,59.19% 90.26%,57.77% 91.07%,56.43% 92.67%,55.04% 94.72%,53.50% 96.72%,51.80% 98.17%,50.00% 98.70%,48.20% 98.17%,46.50% 96.72%,44.96% 94.72%,43.57% 92.67%,42.23% 91.07%,40.81% 90.26%,39.18% 90.37%,37.28% 91.23%,35.14% 92.47%,32.88% 93.61%,30.72% 94.18%,28.87% 93.88%,27.48% 92.62%,26.58% 90.57%,26.06% 88.10%,25.69% 85.65%,25.18% 83.63%,24.25% 82.29%,22.74% 81.68%,20.65% 81.63%,18.18% 81.82%,15.66% 81.87%,13.46% 81.44%,11.92% 80.36%,11.21% 78.62%,11.29% 76.39%,11.90% 73.94%,12.63% 71.58%,13.05% 69.53%,12.79% 67.92%,11.69% 66.71%,9.83% 65.76%,7.53% 64.86%,5.23% 63.81%,3.44% 62.48%,2.52% 60.84%,2.64% 58.96%,3.67% 56.98%,5.28% 55.04%,6.97% 53.22%,8.23% 51.56%,8.70% 50.00%,8.23% 48.44%,6.97% 46.78%,5.28% 44.96%,3.67% 43.02%,2.64% 41.04%,2.52% 39.16%,3.44% 37.52%,5.23% 36.19%,7.53% 35.14%,9.83% 34.24%,11.69% 33.29%,12.79% 32.08%,13.05% 30.47%,12.63% 28.43%,11.90% 26.06%,11.29% 23.61%,11.21% 21.38%,11.92% 19.64%,13.46% 18.56%,15.66% 18.13%,18.18% 18.18%,20.65% 18.37%,22.74% 18.32%,24.25% 17.71%,25.18% 16.37%,25.69% 14.35%,26.06% 11.90%,26.57% 9.43%,27.48% 7.38%,28.87% 6.12%,30.72% 5.82%,32.88% 6.39%,35.14% 7.53%,37.28% 8.77%,39.18% 9.63%,40.81% 9.74%,42.23% 8.93%,43.57% 7.33%,44.96% 5.28%,46.50% 3.28%,48.20% 1.83%);
+ text-align:center;line-height:1;
+}
+.ic-award-symbol{font:900 13px/1 AV,system-ui,sans-serif;margin-bottom:3px}
+.ic-award strong{display:block;font:900 clamp(13px,3.8vw,17px)/.94 AV,system-ui,sans-serif;letter-spacing:-.06em;white-space:nowrap;text-shadow:0 1px rgba(255,255,255,.3)}
+.ic-award.is-variant strong{font-size:clamp(10px,3vw,13px);line-height:1;white-space:normal}
+.ic-award small{display:block;margin-top:4px;font:800 clamp(7px,1.9vw,9px)/1 AV,system-ui,sans-serif;letter-spacing:.02em;opacity:.8}
+.dx.v-e .ic-award{--ic-gold:#a9e9fa}
+.dx.v-e .ic-award-seal{background:radial-gradient(circle at 35% 20%,#fff 0%,#acf0fc 45%,#8b9de9 100%)}
+.dx.v-r .ic-award{--ic-gold:#ffe082}
+.dx.v-f .ic-award{--ic-gold:#ffb4e5}
+.dx.v-f .ic-award-seal{background:radial-gradient(circle at 35% 20%,#fff2fd 0%,#ffb5e8 45%,#eb64ae 100%)}
+@keyframes icBadgePop{
+ 0%{opacity:0;transform:scale(.42) rotate(-33deg)}
+ 18%{opacity:1;transform:scale(1.18) rotate(8deg)}
+ 32%,76%{opacity:1;transform:scale(1) rotate(-9deg)}
+ 100%{opacity:0;transform:scale(.93) rotate(-9deg)}
+}
+/* La variante ilustración completa aparece más tarde: sincronizar el sello con la carta. */
+.dx.v-f .ic-award{animation-delay:1.1s}
+@media(max-width:380px){.ic-award{left:-25px;top:-24px;width:74px}.ic-award strong{font-size:13px}.ic-award.is-variant strong{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.ic-award{animation:icBadgeReduced 2.8s .1s linear both}}
+@keyframes icBadgeReduced{0%,85%{opacity:1;transform:rotate(-9deg)}100%{opacity:0;transform:rotate(-9deg)}}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -2062,11 +2097,19 @@ function artBox(id,cls=''){const src=artOf(id),b=src.startsWith('d/')&&ABOX[id];
  const cw=x1-x0,ch=y1-y0,ratio=(cw*(src.startsWith('d/')?640:600))/(ch*(src.startsWith('d/')?800:900));
  return `<span class="ab ${cls}${hasCol(id)?'':' neu'}" style="--ar:${ratio.toFixed(3)}"><img src="${src}" alt="" loading="lazy" style="width:${(100/cw).toFixed(2)}%;left:${(-x0/cw*100).toFixed(2)}%;top:${(-y0/ch*100).toFixed(2)}%"></span>`}
 const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255};
+const icAwardsSeen=new Set(); // sellos vistos en el sobre actual
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
-function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();
+function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();icAwardsSeen.clear();
  for(const c of hand)c._comp=!c._doneB&&dState(DB[c.d]).done&&hand.filter(x=>x.d===c.d).pop()===c; // completó en este sobre
  lastPack=new Set(hand.filter(c=>c._new).map(c=>c.d));showCard()}
 function caseOf(c){return !c._new?'rep':c._comp?'comp':c._dnew?'dnew':'vnew'}
+/* Solo hay dos mensajes de logro; duplicados sin celebración. */
+function icAward(c){
+ if(!c._new||icAwardsSeen.has(idx))return '';
+ icAwardsSeen.add(idx);
+ const first=!!c._dnew,variant={b:'BASE',e:'HOLO',r:'DORADA',f:'ESPECIAL'}[c.v];
+ return '<span class="ic-award'+(first?'':' is-variant')+'" aria-hidden="true"><span class="ic-award-seal"><span class="ic-award-symbol">✦</span><strong>'+(first?'¡NUEVA!':'¡NUEVA<br>VARIANTE!')+'</strong><small>'+variant+'</small></span></span>';
+}
 function chips(c,anim){const st=dState(DB[c.d]);return st.vs.filter(x=>x.st!=='soon').map((x,i)=>{const now=x.c.k===c.k&&c._new;
  return `<span class="dc-v v-${x.v}${x.h?' on':''}${now?' now':''}" style="--i:${i}"><i></i>${VSHORT[x.v]}${now?' <b>nueva</b>':''}</span>`}).join('')}
 /* Cada carta tiene hasta tres momentos, solo los que corresponden:
@@ -2173,7 +2216,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   return}
 
  const d=DB[c.d],col=dcol(d.id),k=caseOf(c),v=c.v,fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':null;
- const lab={dnew:'DISEÑO NUEVO',vnew:'NUEVA VERSIÓN',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
+ const lab={dnew:'NUEVA',vnew:'NUEVA VARIANTE',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
  /* la ilustración es la de esta versión: Base/Especial = estampa original · Rara = su arte en oro · Full = su escena completa */
  const fullSrc=fa||artOf(d.id);
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
@@ -2186,8 +2229,8 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   <div class="dx-fade"></div>
   ${dxTop()}${dxControls()}
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${baseHtml(c)}
-   <div class="dx-tags"><span class="dx-v">${VSHORT[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
-  <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span></button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
+   <div class="dx-tags"><span class="dx-v">${VSHORT[v].toUpperCase()}</span>${c._new?`<span class="dx-s">${c._dnew?'NUEVA':'NUEVA VARIANTE'}</span>`:`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
+  <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span>${icAward(c)}</button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
  $('dcCard').onclick=()=>openCard(c.k);
  dxNav();
  $('dcArtBack').onclick=()=>{setArtworkView(false);$('dcNext').focus({preventScroll:true});ga('vista_ilustracion',{origen:'regresar',accion:'ver_carta'})};
