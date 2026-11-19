@@ -17,7 +17,7 @@ test('QA page is hidden from indexing and does not change the main game', () => 
   assert.match(page, /name="robots" content="noindex,nofollow,noarchive"/);
   assert.match(page, /src="\/logo\.png"/);
   assert.match(page, /href="\/favicon\.png"/);
-  assert.match(page, /href="\/ps2p\.ttf"/);
+  assert.match(page, /url\("\/ps2p\.ttf"\)/);
   assert.doesNotMatch(source, /icmx-album2|localStorage\.(getItem|setItem|removeItem)/);
   assert.doesNotMatch(source, /\.from\(["'](collection_cards|player_snapshots|collection_events)/);
 });
