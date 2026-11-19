@@ -331,7 +331,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hprog .bar i{display:block;height:100%;border-radius:2px;background:#FFD400;box-shadow:0 0 10px rgba(255,212,0,.5)}
 .hprog .bar s{position:absolute;inset:0}.hprog .bar s em{position:absolute;top:-3px;width:2px;height:10px;background:rgba(255,255,255,.45)}
 .dupbar{display:none;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:rgba(255,212,0,.12);box-shadow:inset 0 0 0 1px rgba(255,212,0,.4);font:600 12px AV;color:#fff}
-.dupbar.on{display:flex}.dupbar button{font:700 11px AV;letter-spacing:.12em;background:#FFD400;color:#120f3a;border-radius:8px;padding:8px 12px}
+.dupbar.on{display:flex}.dupbar.progress{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}.dupbar button{font:700 11px AV;letter-spacing:.12em;background:#FFD400;color:#120f3a;border-radius:8px;padding:8px 12px}.dupbar button:disabled{opacity:.65;cursor:not-allowed;background:rgba(255,255,255,.11);color:#e2ddee}
 .hnav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .hnav button{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 4px 11px;border-radius:12px;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);color:#fff}
 .hnav .tile{border:0;text-align:center;padding:13px 4px 11px;gap:5px;opacity:1}
@@ -931,7 +931,7 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .rs2 .rs-out{display:block;margin:10px auto 0}
 .dx-v.v-b{background:#fff;color:#111}.dx-v.v-e{background:linear-gradient(90deg,#8fe9ff,#ffb3e6);color:#111}.dx-v.v-r{background:#e8b923;color:#111}.dx-v.v-f{background:#ff8fd8;color:#111}
 .rh .dx-card{bottom:128px!important;width:36%!important}
-.rs-redeem{padding-top:8px}
+.rs-redeem{padding-top:8px}.rs-redeem .rb-p{line-height:1.5}
 .rs-enter{animation:rsEnter .35s ease-out both}
 @keyframes rsEnter{from{opacity:0;transform:translateY(10px)}}
 .zoom[open]{display:flex;align-items:center}
@@ -1953,7 +1953,7 @@ function menuArtLoad(img,m,dir){
 }
 const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Full garantizada en tu bienvenida':'5 cartas por sobre · una Especial o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
+ {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'CICLO · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'SIN SOBRES POR AHORA',s:r?(firstPack()?'5 cartas · Full garantizada en tu bienvenida':'5 cartas por sobre · una Especial o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -1969,7 +1969,7 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,i
  if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
  [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
  const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.jpg'})`;
- const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
+ const d=dups();$('dupBar').classList.toggle('on',d>0);$('dupBar').classList.toggle('progress',d<5);$('tDup').textContent=d>=5?'¡Tienes '+d+' repetidas! Canjea 5 por un sobre extra':d+' de 5 repetidas · junta 5 para un sobre extra';$('tDupB').textContent=d>=5?'CANJEAR':'FALTAN '+(5-d);$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
  if(m.id==='pack'&&m.off){beep(440,.05);uxEmptyPacks();return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
@@ -1993,8 +1993,36 @@ armDay();setInterval(dayTick,30000);
  document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake)}
 setInterval(()=>{if(saveFailed)save()},30000);
 if(NOWRITE){saveFailed=true;setWarn(true)}
-function trade(after){withLock(()=>{syncIn();if(dups()<5){after&&after();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})}
-$('tDupB').onclick=()=>trade(renderHome);
+function trade(after){
+ syncIn();
+ const available=dups();
+ if(available<5){toast('FALTAN '+(5-available)+' REPETIDAS PARA CANJEAR');return}
+ uxShow({
+  kicker:'REPETIDAS · CANJE',
+  title:'¿Canjear 5 repetidas?',
+  desc:'Usarás 5 copias repetidas para conseguir 1 sobre extra.',
+  note:'Siempre conservarás al menos una copia de cada carta.',
+  primary:'SÍ, CONSEGUIR SOBRE',
+  secondary:'CONSERVAR MIS CARTAS',
+  onPrimary:()=>withLock(()=>{
+   syncIn();
+   if(dups()<5){toast('YA NO TIENES 5 REPETIDAS');refresh();return}
+   const previousHave={...S.have},previousExtra=S.extra;
+   let need=5;
+   for(const k in S.have)while(S.have[k]>1&&need>0){S.have[k]--;need--}
+   S.extra=(S.extra||0)+1;
+   if(!save()){
+    S.have=previousHave;S.extra=previousExtra;
+    toast('NO SE PUDO GUARDAR EL CANJE');
+    refresh();return
+   }
+   ga('canje_repetidas',{repetidas:5,sobres:1});
+   jingle();toast('¡SOBRE EXTRA LISTO!');
+   if(after)after();else refresh()
+  })
+ })
+}
+$('tDupB').onclick=()=>trade(()=>go('pack'));
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
 /* Sobre (Etapa 4): 3 Base + 1 sorpresa (30% de ser Especial o mejor) + 1 Especial o mejor segura.
@@ -2305,7 +2333,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
  const rest=hand.filter(c=>c!==H),G={comp:rest.filter(c=>c._comp),dnew:rest.filter(c=>c._new&&!c._comp&&c._dnew),vnew:rest.filter(c=>c._new&&!c._comp&&!c._dnew),rep:rest.filter(c=>!c._new)};
  const sec=(t,L)=>L.length?`<section class="rs-group"><h3>${t}<span>${L.length}</span></h3><div class="rg">${L.map(card).join('')}</div></section>`:'';
  const n=dups(),PD=DESIGNS.filter(x=>!x.bx),disc=PD.filter(x=>dState(x).own).length;
- const tradeH=n>=5?'<button class="rs-trade" id="sTrade">Cambiar 5 repetidas por un sobre extra</button>':`<p class="rb-p">Llevas ${n%5} de 5 repetidas para un sobre extra</p>`;
+ const tradeH=n>=5?'<p class="rb-p">Tus repetidas sirven para conseguir sobres. Siempre conservas una de cada carta.</p><button class="rs-trade" id="sTrade">CANJEAR 5 REPETIDAS POR 1 SOBRE</button>':`<p class="rb-p">${n} de 5 repetidas para un sobre extra. Cada repetida cuenta y siempre conservas una de cada carta.</p>`;
  const finish=summaryStatus();
  s.innerHTML=`<div class="rs2${entering?' rs-enter':''}">
   <header class="rs-finish" role="status">
@@ -2318,7 +2346,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
   <section class="rs-follow" aria-label="Qué sigue después de este sobre">
    <div class="rs-wait" id="sWait" ${packReady()?'hidden':''}>
     <span>PRÓXIMOS 2 SOBRES</span><strong>En <time id="sNextTime">${nextPackCountdown()}</time></strong>
-    <p>Recibirás dos sobres nuevos al comenzar el próximo día disponible.</p>
+    <p>Recibirás 2 sobres al comenzar el próximo ciclo de 6 horas.</p>
    </div>
    <div class="rs-act2">
     <button type="button" class="rs-main" id="sOtro">ABRIR OTRO SOBRE</button>
