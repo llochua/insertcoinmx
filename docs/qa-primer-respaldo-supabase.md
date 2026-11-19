@@ -60,3 +60,13 @@ Se añadieron en QA:
 - Verificar el caso de un dispositivo sin colección local: debe mostrar el respaldo remoto, pero el juego local continuará vacío hasta que exista restauración manual.
 - La prueba con cliente y DOM simulados pasó el caso de respaldo existente, ausencia de respaldo y propietario distinto; sin lecturas ni escrituras locales.
 - La restauración vendrá después con confirmación, respaldo previo y reversión segura.
+
+## Prueba 3: descargar el respaldo desde Supabase
+
+- Se añadió **DESCARGAR COPIA DESDE LA NUBE** a la misma página de QA.
+- El botón requiere sesión autenticada, consulta `player_snapshots` bajo RLS y verifica que `user_id` de la fila corresponda al de la cuenta.
+- El archivo se llama `insertcoinmx-respaldo-desde-supabase.json` y conserva el objeto original (`app`, `format`, `exportedAt`, `data` y `ext` si existía).
+- Se valida estructura esencial y tamaño máximo de 1 MiB, con revisión de claves peligrosas, antes de ofrecer el archivo.
+- **No se importa ni instala automáticamente.** Ninguna carta del navegador cambia y no se genera una escritura en Supabase.
+- Comprobaciones automatizadas incluyen recuperación en navegador vacío, campos adicionales, cuenta equivocada y ausencia de respaldo.
+- **Siguiente fase:** restaurar manualmente mediante el flujo de importación existente del juego, que pregunta antes de reemplazar y genera `icmx-album2.bak`. Probar primero con un entorno limpio, sin progreso que perder.
