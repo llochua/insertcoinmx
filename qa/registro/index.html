@@ -30,6 +30,8 @@ small,.subtle{color:var(--secondary);font-size:12px}
 .action{width:100%;border:0;border-radius:10px;min-height:46px;background:var(--yellow);color:#110d28;font-weight:900;letter-spacing:.01em;cursor:pointer;margin-top:2px}
 .action.secondary{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff}
 button:disabled{opacity:.58;cursor:wait}
+[hidden]{display:none!important}
+#backupUpload[data-saved="true"]{background:#205d43;color:#fff;border:2px solid #64e2a4;opacity:1;cursor:default}
 #message{min-height:44px;margin:14px 0 0;color:var(--secondary);font-size:13px;overflow-wrap:anywhere}
 #message[data-tone="success"]{color:#aeefc8}
 #message[data-tone="error"]{color:#ffb8be}
@@ -74,7 +76,7 @@ a{color:var(--yellow)}
   <p class="subtle" style="margin:0 0 6px;color:#ffd400;font-weight:800">RESPALDO DE PRUEBA · SOLO PRIMERA VEZ</p>
   <p class="subtle">Primero descargaremos un archivo con tu progreso completo. Después, si lo autorizas, guardaremos una copia en tu cuenta de Supabase. Ninguna carta se borra o reemplaza.</p>
   <button type="button" class="action secondary" id="backupDownload">1 · DESCARGAR MI RESPALDO</button>
-  <label style="display:flex;align-items:flex-start;gap:10px;margin:16px 0 12px">
+  <label id="backupConsentLabel" style="display:flex;align-items:flex-start;gap:10px;margin:16px 0 12px">
     <input id="backupConsent" type="checkbox" disabled style="width:19px;height:19px;flex:0 0 19px;margin:3px 0">
     <span>Confirmo que descargué mi respaldo y autorizo guardar esta copia en mi cuenta.</span>
   </label>
@@ -101,6 +103,7 @@ function display(user){
  el("guest").hidden=active;
  el("signed").setAttribute("aria-hidden",String(!active));
  el("signedEmail").textContent=user?.email||"";
+ if(!active)resetBackupUi();
 }
 function setMode(next){
  if(busy||!["signup","login"].includes(next))return;
@@ -155,6 +158,32 @@ function clearPreparedBackup(){
  el("backupConsent").checked=false;
  el("backupConsent").disabled=true;
  el("backupUpload").disabled=true;
+}
+function markBackupSaved(){
+ clearPreparedBackup();
+ el("backupUpload").textContent="✓ RESPALDO GUARDADO";
+ el("backupUpload").dataset.saved="true";
+ el("backupUpload").disabled=true;
+ el("backupDownload").disabled=true;
+ el("backupConsentLabel").hidden=true;
+}
+function resetBackupUi(){
+ clearPreparedBackup();
+ el("backupUpload").textContent="2 · GUARDAR EN SUPABASE";
+ delete el("backupUpload").dataset.saved;
+ el("backupDownload").disabled=false;
+ el("backupConsentLabel").hidden=false;
+ backupMessage("No se ha subido ninguna carta desde esta página.");
+}
+async function refreshBackupSavedState(userId){
+ try{
+  if(await existingSnapshot(userId)){
+   markBackupSaved();
+   backupMessage("Respaldo en Supabase detectado. No hace falta guardar otra copia.","success");
+  }
+ }catch(_error){
+  backupMessage("No se pudo consultar el respaldo en la nube. No se modificó ninguna carta.","error");
+ }
 }
 function parseSafeJSON(raw){
  const bad=new Set(["__proto__","prototype","constructor"]);
@@ -213,6 +242,7 @@ el("backupDownload").addEventListener("click",async()=>{
  try{
   const user=await getBackupUser();
   if(await existingSnapshot(user.id)){
+    markBackupSaved();
     backupMessage("Esta cuenta ya tiene un respaldo en la nube. No se reemplazará ni se sumará nada.","success");return;
   }
   const candidate=prepareBackup();
@@ -221,7 +251,7 @@ el("backupDownload").addEventListener("click",async()=>{
   el("backupConsent").disabled=false;
   backupMessage("Se preparó el archivo con "+candidate.count+" variantes. Confirma que quedó guardado en tu dispositivo antes de continuar.");
  }catch(e){backupMessage("No se pudo preparar el respaldo. No se cambió ningún dato local. "+(e?.code==="42501"?"Revisa permisos de lectura.":""),"error");}
- finally{backupBusy=false;el("backupDownload").disabled=false}
+ finally{backupBusy=false;if(el("backupUpload").dataset.saved!=="true")el("backupDownload").disabled=false}
 });
 el("backupConsent").addEventListener("change",()=>{
  el("backupUpload").disabled=!el("backupConsent").checked||!pendingBackup||backupBusy;
@@ -236,7 +266,7 @@ el("backupUpload").addEventListener("click",async()=>{
   if(localStorage.getItem(backupMainKey)!==pendingBackup.raw ||
      localStorage.getItem(backupExtKey)!==pendingBackup.rawExt)throw Error("El progreso cambió");
   if(await existingSnapshot(user.id)){
-    clearPreparedBackup();backupMessage("Ya existe un respaldo de esta cuenta. No se reemplazó ningún dato.","success");return;
+    markBackupSaved();backupMessage("Ya existe un respaldo de esta cuenta. No se reemplazó ningún dato.","success");return;
   }
   // INSERT, nunca UPSERT ni UPDATE. La PK y RLS impiden sustituir otro respaldo.
   const {error}=await client.from("player_snapshots").insert({
@@ -244,19 +274,19 @@ el("backupUpload").addEventListener("click",async()=>{
   });
   if(error){
     if(error.code==="23505"){
-      clearPreparedBackup();backupMessage("Esta cuenta ya tiene un respaldo. No se reemplazó.","success");return;
+      markBackupSaved();backupMessage("Esta cuenta ya tiene un respaldo. No se reemplazó.","success");return;
     }
     throw error;
   }
   const saved=await existingSnapshot(user.id);
   if(!saved || saved.game_format!==2 || saved.revision!==1 ||
      stableJSON(saved.state)!==stableJSON(pendingBackup.state))throw Error("La lectura de verificación no coincide");
-  clearPreparedBackup();
+  markBackupSaved();
   backupMessage("¡Respaldo confirmado en Supabase! Tu colección local permanece intacta.","success");
  }catch(_error){
   clearPreparedBackup();
   backupMessage("No pudimos verificar el respaldo. Tu colección local no cambió. Antes de repetir, revisaremos si quedó guardado en la cuenta.","error");
- }finally{backupBusy=false;el("backupDownload").disabled=false}
+ }finally{backupBusy=false;if(el("backupUpload").dataset.saved!=="true")el("backupDownload").disabled=false}
 });
 
 el("tabSignup").addEventListener("click",()=>setMode("signup"));
@@ -280,6 +310,7 @@ el("authForm").addEventListener("submit",async e=>{
    const {data,error}=await client.auth.signInWithPassword({email,password});
    if(error)throw error;
    display(data.user);message("¡Inicio de sesión correcto!","success");
+   await refreshBackupSavedState(data.user.id);
   }
  }catch(err){message(errorText(err),"error")}
  finally{lock(false)}
@@ -307,6 +338,7 @@ async function init(){
    const {data:verified,error:verifyError}=await client.auth.getUser();
    if(verifyError||!verified?.user)throw verifyError||new Error("Session invalid");
    display(verified.user);
+   await refreshBackupSavedState(verified.user.id);
    message(fromConfirmation?"¡Correo confirmado! La cuenta ya está activa.":"Sesión activa. Ya puedes probar cerrar sesión.","success");
   }else{display(null);message("Listo para registrar una cuenta de prueba.")}
  }catch(e){client=null;display(null);message("No pudimos conectar con Supabase. Revisa la conexión.","error")}
