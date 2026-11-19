@@ -39,6 +39,8 @@ test('QA sessions use a separate key from the public game', () => {
   assert.match(source, /autoRefreshToken:true/);
   assert.match(source, /signInWithPassword/);
   assert.match(source, /signOut\(\{scope:"local"\}\)/);
+  assert.match(page, /Si este correo todavía no tiene cuenta/);
+  assert.doesNotMatch(page, /¡Correo enviado!/);
 });
 
 test('status announcements and basic form accessibility are present', () => {
