@@ -1179,15 +1179,15 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-width:480px){#torneo>.top{gap:7px!important}#torneo>.top .sound-toggle{flex-basis:34px;width:34px;height:34px}.mh{gap:7px}.mh .hb{letter-spacing:.25em}}
 /* IC-03 · Narrativas: sobre con ilustración de fondo y texto sobre degradado. */
 .disc.dx.has-narrative .dx-fade{height:80%;background:linear-gradient(to top,rgba(8,7,16,.98) 0%,rgba(8,7,16,.90) 26%,rgba(8,7,16,.66) 52%,rgba(8,7,16,0) 100%)}
-.disc.dx.has-narrative .dx-info{left:20px;right:20px!important;bottom:calc(72px + env(safe-area-inset-bottom));max-height:calc(100dvh - 170px);overflow-y:auto;overscroll-behavior:contain;padding-right:6px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.35) transparent}
-.disc.dx.has-narrative .dx-info h2{font-size:clamp(28px,7vw,43px);line-height:1.04;margin:7px 0 10px;max-width:76%;text-wrap:balance}
-.disc.dx.has-narrative .dx-card{top:calc(70px + env(safe-area-inset-top));bottom:auto!important;right:18px!important;width:min(26vw,116px)!important;max-width:116px!important}
+.disc.dx.has-narrative .dx-info{left:20px;right:calc(var(--dx-copy-card-width) + 34px)!important;bottom:calc(72px + env(safe-area-inset-bottom));max-height:calc(100% - 170px);overflow-y:auto;overscroll-behavior:contain;padding-right:6px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.35) transparent}
+.disc.dx.has-narrative .dx-info h2{font-size:clamp(26px,6vw,43px);line-height:1.04;margin:7px 0 10px;max-width:100%;text-wrap:balance}
+.disc.dx.has-narrative .dx-card{top:auto!important;bottom:calc(170px + env(safe-area-inset-bottom))!important;right:20px!important;width:var(--dx-copy-card-width)!important;max-width:160px!important}
 .dx-narrative{max-width:620px;margin-top:15px;padding-bottom:4px}
 .dx-narrative-label{font:9px/1.4 PX,monospace;letter-spacing:.07em;color:#FFD400;margin-bottom:8px}
 .dx.v-e .dx-narrative-label{color:#baf4fb}
 .dx-narrative p{font:500 clamp(13px,1.65dvh,15px)/1.48 AV,system-ui,sans-serif;color:#f6f3ff;text-shadow:0 1px 8px rgba(0,0,0,.65);white-space:pre-line}
-@media(max-height:620px){.disc.dx.has-narrative .dx-info{max-height:calc(100dvh - 155px)}.disc.dx.has-narrative .dx-card{width:min(23vw,80px)!important}.dx-narrative{margin-top:10px}.dx-narrative p{line-height:1.42}}
-@media(max-width:350px){.disc.dx.has-narrative .dx-info{left:15px;right:15px!important}.disc.dx.has-narrative .dx-info h2{max-width:72%;font-size:27px}.disc.dx.has-narrative .dx-card{right:12px!important;width:26vw!important}}
+@media(max-height:620px){.disc.dx.has-narrative .dx-info{max-height:calc(100% - 155px)}.disc.dx.has-narrative .dx-card{bottom:calc(118px + env(safe-area-inset-bottom))!important}.dx-narrative{margin-top:10px}.dx-narrative p{line-height:1.42}}
+@media(max-width:350px){.disc.dx.has-narrative .dx-info{left:15px;right:calc(var(--dx-copy-card-width) + 22px)!important}.disc.dx.has-narrative .dx-info h2{max-width:100%;font-size:25px}.disc.dx.has-narrative .dx-card{right:12px!important}}
 /* Detalle: lectura editorial debajo de la carta, antes de GOTY. */
 #zoom .z-narrative{width:min(100%,600px);margin:2px auto 8px;padding:16px 2px 10px;border-top:1px solid rgba(255,255,255,.22);text-align:left;flex:none}
 #zoom .z-narrative[hidden]{display:none!important}
@@ -1230,11 +1230,11 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .dx-base-copy p{font:600 14px/1.4 AV,system-ui,sans-serif;color:#fff;text-shadow:0 1px 7px rgba(0,0,0,.65)}
 .dx-base-phrase p{font-style:italic;font-weight:500;color:#f4eefa}
 .disc.dx.has-base-copy .dx-fade{height:70%;background:linear-gradient(to top,rgba(8,7,16,.97) 0%,rgba(8,7,16,.84) 36%,rgba(8,7,16,.18) 85%,transparent 100%)}
-.disc.dx.has-base-copy .dx-info{left:20px;right:20px!important;bottom:calc(72px + env(safe-area-inset-bottom));max-height:calc(100% - 170px);overflow-y:auto;overscroll-behavior:contain;padding-right:5px}
-.disc.dx.has-base-copy .dx-info h2{font-size:clamp(27px,7vw,43px);max-width:77%;line-height:1.05;margin:8px 0 13px;text-wrap:balance}
-.disc.dx.has-base-copy .dx-card{top:calc(70px + env(safe-area-inset-top));bottom:auto!important;right:18px!important;width:min(26vw,116px)!important;max-width:116px!important}
+.disc.dx.has-base-copy .dx-info{left:20px;right:calc(var(--dx-copy-card-width) + 34px)!important;bottom:calc(72px + env(safe-area-inset-bottom));max-height:calc(100% - 170px);overflow-y:auto;overscroll-behavior:contain;padding-right:5px}
+.disc.dx.has-base-copy .dx-info h2{font-size:clamp(26px,6vw,43px);max-width:100%;line-height:1.05;margin:8px 0 13px;text-wrap:balance}
+.disc.dx.has-base-copy .dx-card{top:auto!important;bottom:calc(170px + env(safe-area-inset-bottom))!important;right:20px!important;width:var(--dx-copy-card-width)!important;max-width:160px!important}
 @media(max-height:620px){.dx-base-copy{gap:6px;margin-bottom:8px}.dx-base-copy p{font-size:12px}.disc.dx.has-base-copy .dx-info{max-height:calc(100% - 155px)}}
-@media(max-width:350px){.disc.dx.has-base-copy .dx-info{left:15px;right:15px!important}.disc.dx.has-base-copy .dx-card{width:26vw!important;right:12px!important}}
+@media(max-width:350px){.disc.dx.has-base-copy .dx-info{left:15px;right:calc(var(--dx-copy-card-width) + 22px)!important}.disc.dx.has-base-copy .dx-card{right:12px!important}}
 
 /* Mobile mantiene la composición original. Escritorio usa dos columnas. */
 .on-panel{display:contents}
@@ -1257,6 +1257,20 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  .on-progress{justify-content:flex-start;min-height:28px;margin:0}
  .on-actions{width:100%;max-width:none;margin:0}
 }
+
+/* El onboarding pertenece al mismo CRT que sobres y álbum: sin overlay de viewport. */
+.crt > #onb{position:absolute;inset:0;width:100%;height:100%;z-index:70}
+.crt > #onb.on{isolation:isolate}
+
+/* La miniatura vuelve al lugar original inferior derecho, con columna de lectura reservada. */
+.disc.dx.has-narrative,.disc.dx.has-base-copy{--dx-copy-card-width:clamp(86px,20%,160px)}
+@media(max-height:620px){
+ .disc.dx.has-base-copy .dx-card{bottom:calc(118px + env(safe-area-inset-bottom))!important}
+}
+@media(min-width:1000px){
+ .crt:has(> #onb.on){width:min(800px,calc(100vw - 64px))}
+}
+
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1324,15 +1338,6 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden></div>
  </div>
 </section>
-</div>
-<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
-<dialog class="zoom" id="zoom" aria-labelledby="zName">
- <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
- <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
- <section class="z-narrative" id="zNarrative" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
- <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
- <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
-</dialog>
 <div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onT" aria-hidden="true">
  <div class="on-head"><div class="on-brand"><img src="coin.png" alt=""><span><b>INSERT COIN MX</b><small>EL ÁLBUM</small></span></div><button type="button" class="on-skip" id="onSkip">SALTAR</button></div>
  <div class="on-visual" id="onVisual" data-step="0" aria-hidden="true">
@@ -1356,6 +1361,15 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <div class="on-actions"><button type="button" class="on-back" id="onBack" hidden>ATRÁS</button><button type="button" class="big on-next" id="onNext">SIGUIENTE</button></div>
  </div>
 </div>
+</div>
+<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
+<dialog class="zoom" id="zoom" aria-labelledby="zName">
+ <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
+ <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
+ <section class="z-narrative" id="zNarrative" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
+ <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
+ <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
+</dialog>
 <div class="toast" id="toast"></div>
 <div class="ux-backdrop" id="uxOverlay" role="dialog" aria-modal="true" aria-labelledby="uxTitle" aria-describedby="uxDesc" aria-hidden="true">
  <div class="ux-panel"><div class="ux-kicker" id="uxKicker"></div><h2 id="uxTitle"></h2><p id="uxDesc"></p>
