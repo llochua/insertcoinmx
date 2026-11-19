@@ -5,7 +5,7 @@ Esta rama se basa en `main` y mantiene su navegación y estado de colección. No
 ## Estado editorial
 - `menu/final/sobres.webp`: pendiente de sustituir el sobre inventado por el sobre oficial Insert Coin MX. Composición flotante y brillos aprobada conceptualmente.
 - `menu/final/album.webp`: pendiente de quitar el invader y usar cinco ilustraciones reales seleccionadas sin problemas de copy. Conservar composición.
-- `menu/final/reta.webp`: **rehacer**, no reutilizar las exploraciones fallidas. Dos playeras con estampados reales enfrentadas, gran VS integrado, sin Japón ni decoración temática arbitraria.
+- `menu/final/reta.webp`: **versión elegida por el usuario el 19 nov 2026**, aceptada como mejorable pero suficiente para utilizar. Composición: dos playeras y VS central. El archivo visual exportado está pendiente de subir al repositorio; no sustituirlo por exploraciones previas.
 - `menu/final/tier.webp`: ilustración aprobada en conversación, pendiente de cargar al repositorio.
 - `menu/final/records.webp`: ilustración aprobada en conversación, pendiente de cargar al repositorio.
 
