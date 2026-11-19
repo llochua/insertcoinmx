@@ -2188,7 +2188,7 @@ function nextSummaryPackLabel(){
 function refreshSummaryActions(){
  const primary=$('sOtro'),secondary=$('sAlb'),wait=$('sWait'),timer=$('sNextTime');
  if(!primary||!secondary)return;
- const available=packReady();
+ const available=!!packReady();
  primary.textContent=available?nextSummaryPackLabel():'VER MI ÁLBUM';
  secondary.textContent=available?'VER MI ÁLBUM':'VOLVER AL MENÚ';
  if(wait)wait.hidden=available;
