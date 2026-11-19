@@ -347,6 +347,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
  -webkit-mask:radial-gradient(circle at var(--mx) var(--my),#000 0,transparent 38%);mask:radial-gradient(circle at var(--mx) var(--my),#000 0,transparent 38%)}
 .fx.r-full .foil{opacity:.75}
 .fx.r-comun .foil{display:none}
+/* Base: reflejo leve, con desplazamiento corto y sin movimientos bruscos. */
+.fx.r-comun .glare{opacity:.40}
+.fx.r-comun{transition:--mx .22s ease-out,--my .22s ease-out}
 /* el foil baja sobre la zona de texto para que se lea */
 .fx.r-holo .foil{-webkit-mask:linear-gradient(#000 0,#000 52%,rgba(0,0,0,.58) 64%,rgba(0,0,0,.58) 100%);mask:linear-gradient(#000 0,#000 52%,rgba(0,0,0,.58) 64%,rgba(0,0,0,.58) 100%)}
 .fx .glare{-webkit-mask:linear-gradient(#000 0,#000 55%,rgba(0,0,0,.4) 68%);mask:linear-gradient(#000 0,#000 55%,rgba(0,0,0,.4) 68%)}
@@ -359,8 +362,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .fx.r-holo,.fx.r-dorada{transition:--mx .22s ease-out,--my .22s ease-out}
 .fx.r-holo.idle{animation:fxHoloIdle 9s ease-in-out infinite alternate}
 .fx.r-dorada.idle{animation:fxGoldIdle 9s ease-in-out infinite alternate}
+.fx.r-comun.idle{animation:fxBaseIdle 10s ease-in-out infinite alternate}
 @keyframes fxHoloIdle{0%{--mx:43%;--my:45%}50%{--mx:58%;--my:47%}100%{--mx:48%;--my:57%}}
 @keyframes fxGoldIdle{0%{--mx:42%;--my:46%}50%{--mx:56%;--my:47%}100%{--mx:49%;--my:56%}}
+@keyframes fxBaseIdle{0%{--mx:45%;--my:47%}50%{--mx:54%;--my:49%}100%{--mx:48%;--my:54%}}
 .sc .fx{--rad:16px;width:100%;height:100%;box-shadow:0 20px 40px rgba(0,0,0,.6)}
 .sc:not(.top) .fx{visibility:hidden}
 .zoom .fx{--rad:16px;max-height:60vh;aspect-ratio:480/670;height:60vh}
@@ -918,6 +923,9 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .zoom::backdrop{background:#07062a}
 .z-bar{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;width:min(100%,600px);padding:8px 0;background:#07062a}
 .z-bar h2{font:700 16px AV;margin:0}
+/* Abrir: lupa + sobre la miniatura. Cerrar: lupa - en el mismo sistema. */
+#zClose{background:#FFD400;color:#120F1A;border-color:#FFD400}
+#zClose:hover{background:#ffe566;border-color:#ffe566}
 .z-bar .btn,#zToggle{min-height:44px}
 #zoom .fx{width:min(100%,600px)!important;touch-action:pan-y pinch-zoom}
 #zVoting{width:min(100%,480px);scroll-margin-bottom:12px}
@@ -1210,7 +1218,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </div>
 <div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
 <dialog class="zoom" id="zoom" aria-labelledby="zName">
- <header class="z-bar"><h2 id="zName"></h2><button type="button" class="ic-close" id="zClose" aria-label="Cerrar carta" title="Cerrar carta" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></header>
+ <header class="z-bar"><h2 id="zName"></h2><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
  <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
@@ -1848,8 +1856,8 @@ window.addEventListener('deviceorientation',e=>{if(!$('title').classList.contain
 
 /* foil sigue al dedo / al giro del teléfono */
 function fxAim(fx,x,y){
- // Holo y Dorada: recorrido limitado y filtro suave del movimiento.
- const soft=fx.classList.contains('r-holo')?.48:fx.classList.contains('r-dorada')?.55:0;
+ // Base, Holo y Dorada: recorrido limitado y filtro suave del movimiento.
+ const soft=fx.classList.contains('r-holo')?.48:fx.classList.contains('r-dorada')?.55:fx.classList.contains('r-comun')?.44:0;
  if(soft){
   const cx=.5+(Math.max(0,Math.min(1,x))-.5)*soft,cy=.5+(Math.max(0,Math.min(1,y))-.5)*soft;
   fx._holoX=(fx._holoX??.5)+(cx-(fx._holoX??.5))*.3;
