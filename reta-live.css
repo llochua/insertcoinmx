@@ -23,3 +23,27 @@ html.embedded .screen-bottom{display:none!important}
 html.embedded .debug{display:none!important}
 html.embedded .winner-screen{padding-bottom:max(9px,env(safe-area-inset-bottom))}
 html.embedded .winner-next{cursor:pointer}
+
+/* Reta integrada móvil: el sonido vive junto al progreso, sin segunda cabecera.
+   El espacio liberado se devuelve a las dos playeras. */
+@media(max-width:600px), (max-height:740px){
+ html.embedded .brandbar{
+  position:absolute!important;top:0;right:0;left:auto;
+  width:42px;height:36px!important;min-height:0!important;
+  padding:3px 8px 0 0!important;background:transparent!important;
+  z-index:12;border:0!important;
+ }
+ html.embedded .brandbar .minictrls{height:30px!important}
+ html.embedded .hud{
+  padding:7px 12px 6px!important;gap:5px!important;
+ }
+ html.embedded .hud-line{align-items:center}
+ html.embedded .hud-meta{padding-right:36px}
+ html.embedded .prompt{
+  min-height:40px!important;padding:7px 12px!important;
+ }
+ html.embedded .prompt strong{
+  font-size:clamp(15px,4vw,17px)!important;line-height:1.15!important;
+ }
+ html.embedded .fighter .shirt{height:95%!important}
+}

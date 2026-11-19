@@ -355,6 +355,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @property --mx{syntax:'<percentage>';inherits:true;initial-value:50%}
 @property --my{syntax:'<percentage>';inherits:true;initial-value:50%}
 @keyframes fxIdle{0%{--mx:15%;--my:20%}50%{--mx:80%;--my:45%}100%{--mx:35%;--my:85%}}
+/* Holo: el brillo reacciona suavemente, no salta con un pequeño giro. */
+.fx.r-holo{transition:--mx .22s ease-out,--my .22s ease-out}
+.fx.r-holo.idle{animation:fxHoloIdle 9s ease-in-out infinite alternate}
+@keyframes fxHoloIdle{0%{--mx:43%;--my:45%}50%{--mx:58%;--my:47%}100%{--mx:48%;--my:57%}}
 .sc .fx{--rad:16px;width:100%;height:100%;box-shadow:0 20px 40px rgba(0,0,0,.6)}
 .sc:not(.top) .fx{visibility:hidden}
 .zoom .fx{--rad:16px;max-height:60vh;aspect-ratio:480/670;height:60vh}
@@ -1082,6 +1086,16 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .reta-unlock b{color:#FFD400}
 .reta-unlock button{margin-top:8px;min-height:44px}
 /* ===== RETA DIARIA INTEGRADA (el CRT exterior y la navegación son del Álbum) ===== */
+/* Compactar SOLO Reta en pantallas pequeñas: navegación accesible, más arena. */
+@media(max-width:700px){
+ #torneo>.top{
+  flex:0 0 44px;height:44px;min-height:44px;box-sizing:border-box;
+  padding:3px 12px!important;gap:8px!important;
+  background:rgba(7,6,42,.96)
+ }
+ #torneo>.top .vback{width:36px;height:36px}
+ #torneo>.top .vt{font-size:18px}
+}
 #torneo #vRound{display:none!important}
 #torneo #vStage{
  flex:1 1 auto!important;min-height:0!important;
@@ -1824,7 +1838,24 @@ document.addEventListener('pointermove',e=>{if(!$('title').classList.contains('o
 window.addEventListener('deviceorientation',e=>{if(!$('title').classList.contains('on')||e.gamma==null)return;const x=Math.max(-1,Math.min(1,e.gamma/30)),y=Math.max(-1,Math.min(1,(e.beta-45)/30));$('tiHero').style.transform=`rotateY(${x*12}deg) rotateX(${-y*8}deg)`});
 
 /* foil sigue al dedo / al giro del teléfono */
-function fxAim(fx,x,y){fx.classList.remove('idle');fx.style.setProperty('--mx',(x*100).toFixed(1)+'%');fx.style.setProperty('--my',(y*100).toFixed(1)+'%');clearTimeout(fx._t);fx._t=setTimeout(()=>{fx.classList.add('idle');fx.style.removeProperty('--mx');fx.style.removeProperty('--my')},2500)}
+function fxAim(fx,x,y){
+ // Solo Holo: limitar la amplitud al 48% y amortiguar cambios bruscos del sensor/touch.
+ if(fx.classList.contains('r-holo')){
+  const cx=.5+(Math.max(0,Math.min(1,x))-.5)*.48,cy=.5+(Math.max(0,Math.min(1,y))-.5)*.48;
+  fx._holoX=(fx._holoX??.5)+(cx-(fx._holoX??.5))*.3;
+  fx._holoY=(fx._holoY??.5)+(cy-(fx._holoY??.5))*.3;
+  x=fx._holoX;y=fx._holoY;
+ }
+ fx.classList.remove('idle');
+ fx.style.setProperty('--mx',(x*100).toFixed(1)+'%');
+ fx.style.setProperty('--my',(y*100).toFixed(1)+'%');
+ clearTimeout(fx._t);
+ fx._t=setTimeout(()=>{
+  fx.classList.add('idle');
+  fx.style.removeProperty('--mx');fx.style.removeProperty('--my');
+  fx._holoX=fx._holoY=null;
+ },2500)
+}
 document.addEventListener('pointermove',e=>{const fx=e.target.closest&&e.target.closest('.fx');if(!fx)return;const r=fx.getBoundingClientRect();fxAim(fx,(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height)},{passive:true});
 document.addEventListener('touchmove',e=>{const p=e.touches[0];if(!p)return;const el=document.elementFromPoint(p.clientX,p.clientY);const fx=el&&el.closest&&el.closest('.fx');if(!fx)return;const r=fx.getBoundingClientRect();fxAim(fx,Math.min(1,Math.max(0,(p.clientX-r.left)/r.width)),Math.min(1,Math.max(0,(p.clientY-r.top)/r.height)))},{passive:true});
 window.addEventListener('deviceorientation',e=>{if(e.gamma==null)return;const x=Math.max(0,Math.min(1,.5+e.gamma/50)),y=Math.max(0,Math.min(1,.5+(e.beta-45)/50));document.querySelectorAll('.sc.top .fx,.zoom[open] .fx,#title.on .tc.m .fx').forEach(fx=>fxAim(fx,x,y))});
