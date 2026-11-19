@@ -901,6 +901,11 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .rs-enter{animation:rsEnter .35s ease-out both}
 @keyframes rsEnter{from{opacity:0;transform:translateY(10px)}}
 .zoom[open]{display:flex;align-items:center}
+/* Al cargar una carta nueva jamás debe quedar visible el arte anterior. */
+#zoom #zFx.is-loading,#zoom #zFx.is-error{background:linear-gradient(155deg,#201b4f,#0c0b2a);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+#zoom #zFx.is-loading>img,#zoom #zFx.is-loading>i,#zoom #zFx.is-error>img,#zoom #zFx.is-error>i{visibility:hidden}
+#zoom #zFx .z-load{display:none;position:absolute;inset:0;align-items:center;justify-content:center;padding:20px;text-align:center;font:700 11px AV;letter-spacing:.07em;color:rgba(255,255,255,.72)}
+#zoom #zFx.is-loading .z-load,#zoom #zFx.is-error .z-load{display:flex}
 dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;color:#fff;padding:0 12px 20px!important;overscroll-behavior:contain}
 .zoom::backdrop{background:#07062a}
 .z-bar{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;width:min(100%,600px);padding:8px 0;background:#07062a}
@@ -1163,7 +1168,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
 <dialog class="zoom" id="zoom" aria-labelledby="zName">
  <header class="z-bar"><h2 id="zName"></h2><button type="button" class="ic-close" id="zClose" aria-label="Cerrar carta" title="Cerrar carta" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></header>
- <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i></div>
+ <div class="fx idle" id="zFx"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
  <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate"></div></div>
 </dialog>
@@ -1891,21 +1896,43 @@ $('fVers').onclick=e=>{const b=e.target.closest('.vc.have');if(b)openCard(b.data
 $('fClose').onclick=closeFicha;
 $('ficha').onclick=e=>{if(e.target.id==='ficha')closeFicha()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('zoom').open&&fd)closeFicha()});
-let zk=null;
+let zk=null,zLoadToken=0;
 /* acepta una clave de carta o un id de diseño (desde el Tier): muestra la versión que tienes; si no, la que ya tiene imagen */
 function cardFor(k){if(CB[k])return CB[k];const d=designId(k);if(!d)return null;const L=VL.map(v=>CB[d+'_'+v]);return L.find(c=>c.img&&S.have[c.k])||L.find(c=>S.have[c.k])||L.find(c=>c.img)||L[0]}
 const zd=()=>CB[zk]?CB[zk].d:zk; // las calificaciones son por diseño, no por versión
 const zGo=()=>{const p=goty(zd());$('zGoty').textContent=p===null?'AUN NADIE LA CALIFICA':p+'% LA PONE GOTY'};
 function openCard(k){
  const cc=cardFor(k);if(!cc)return;
+ const token=++zLoadToken,zoom=$('zoom'),img=$('zImg'),fx=$('zFx'),status=$('zLoad');
  zk=cc.k;
  $('zName').textContent=cc.n+' · '+VN[cc.v];
- $('zImg').alt=cc.n+' · '+VN[cc.v];
- $('zImg').src=imgOf(cc,'c2');
- $('zFx').className='fx idle r-'+(cc.img?cc.r:'comun');
+ // Ocultar arte anterior ANTES de asignar el src o abrir el diálogo.
+ fx.className='fx is-loading r-'+(cc.img?cc.r:'comun');
+ status.textContent='CARGANDO CARTA';
+ img.alt=cc.n+' · '+VN[cc.v];
+ img.removeAttribute('src');
+ const valid=()=>token===zLoadToken&&zoom.open;
+ const failed=()=>{
+  if(!valid())return;
+  fx.classList.replace('is-loading','is-error');
+  status.textContent='NO SE PUDO CARGAR LA CARTA';
+ };
+ const ready=()=>{
+  if(!valid())return;
+  if(!img.naturalWidth){failed();return}
+  fx.classList.remove('is-loading');
+  fx.classList.add('idle');
+  status.textContent='';
+ };
+ img.onload=()=>{if(typeof img.decode!=='function')ready()};
+ img.onerror=failed;
  setVoting(true);
- $('zoom').showModal();
- $('zoom').scrollTop=0;
+ if(!zoom.open)zoom.showModal();
+ zoom.scrollTop=0;
+ img.src=imgOf(cc,'c2');
+ // decode garantiza que el primer fotograma visible ya pertenece a la carta nueva.
+ if(typeof img.decode==='function')img.decode().then(ready,failed);
+ else if(img.complete)(img.naturalWidth?ready():failed());
 }
 function setVoting(on){
  $('zToggle').setAttribute('aria-expanded',String(on));
@@ -1916,6 +1943,11 @@ $('zToggle').onclick=()=>setVoting($('zVoting').hidden);
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb ${S.rate[zd()]===i?'on':''}" data-r="${i}" style="--c:${TC[i]}">${n}</button>`).join('')}
 $('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zd()]=+b.dataset.r;save();beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();zGo();if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
 $('zClose').onclick=()=>$('zoom').close();
+$('zoom').addEventListener('close',()=>{
+ ++zLoadToken; // invalida cargas previas, también si se cierra con Escape
+ const img=$('zImg');img.onload=null;img.onerror=null;img.removeAttribute('src');
+ $('zFx').className='fx';$('zLoad').textContent='';
+});
 /* ---------- tier ---------- */
 const mine=()=>CARDS.filter(c=>S.have[c.k]);
 const tierKeys=()=>[...new Set(mine().map(c=>c.d))].map(k=>({k}));
