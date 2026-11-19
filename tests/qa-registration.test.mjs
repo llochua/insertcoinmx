@@ -81,3 +81,14 @@ test('cloud backup reads and verifies the same row and handles already-existing 
   assert.match(source, /game_format:2,revision:1/);
   assert.match(source, /backupMessage\("¡Respaldo confirmado en Supabase!/);
 });
+
+test('cloud view is a user-initiated, read-only, authenticated display',()=>{
+ assert.match(page, /id="inspectCloud"/);
+ assert.match(page, /id="cloudSummary"/);
+ assert.match(source, /el\("inspectCloud"\)\.addEventListener\("click",inspectCloudBackup\)/);
+ const section=source.slice(source.indexOf("async function inspectCloudBackup()"),source.indexOf('el("inspectCloud").addEventListener'));
+ assert.match(section, /await getBackupUser\(\)/);
+ assert.match(section, /await existingSnapshot\(user\.id\)/);
+ assert.match(section, /snapshot\.user_id!==user\.id/);
+ assert.doesNotMatch(section, /localStorage|\.insert\(|\.update\(|\.delete\(|\.upsert\(/);
+});
