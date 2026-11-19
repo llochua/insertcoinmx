@@ -12,6 +12,7 @@ function buildHarness({
   signupError = null,
   signinError = null,
   callback = false,
+  origin = 'https://insertcoinmx.com',
 } = {}) {
   const ids = [
     'profileAuthMessage', 'profileAuthGuest', 'profileAuthSigned', 'profileAuthUser',
@@ -51,7 +52,7 @@ function buildHarness({
   };
   const context = {
     document: {getElementById: id => elements[id] || null},
-    location: {hash: callback ? '#access_token=mock-token' : '', search: ''},
+    location: {origin, hash: callback ? '#access_token=mock-token' : '', search: ''},
     window: {go: route => calls.routes.push(route)},
     __sdk: {createClient: () => ({auth})},
     localStorage: {setItem: (...args) => calls.storageWrites.push(args)},
@@ -105,6 +106,17 @@ test('register sends signUp with Confirm signup redirect, without modifying loca
   assert.match(e.profileAuthMessage.textContent, /Revisa tu correo/);
   assert.equal(h.calls.storageWrites.length, 0);
   assert.equal(e.profileAuthSend.disabled, false);
+});
+
+test('preview confirmation redirects to its own origin rather than the public game', async () => {
+  const h = buildHarness({origin: 'https://insertcoinmx-auth-staging.pages.dev'});
+  await h.flush();
+  h.elements.profileAuthEmail.value = 'jugador@example.com';
+  h.elements.profileAuthPassword.value = 'password-for-test-123';
+  await h.elements.profileAuthForm.listeners.submit({preventDefault() {}});
+  assert.equal(h.calls.signup.length, 1);
+  assert.equal(h.calls.signup[0].options.emailRedirectTo, 'https://insertcoinmx-auth-staging.pages.dev/');
+  assert.equal(h.calls.storageWrites.length, 0);
 });
 
 test('login and logout update UI, without deleting cards', async () => {
