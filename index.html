@@ -416,6 +416,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
  .mc.is-selected::after,.mtabs button.on::after{animation:none!important}
  .mtabs button{transition:none!important}
 }
+/* Menú ligero en pantallas pequeñas: conserva abanico y selección, evita rasterización continua. */
+@media(max-width:699px){
+ #home .amb{filter:none;opacity:.36;transition:none}
+ #home .mc{transition:transform .32s cubic-bezier(.2,.9,.25,1.1),opacity .32s}
+ #home .mc .fx.idle{animation:none!important}
+ #home .mc.is-selected::after,#home .mtabs button.on::after{animation:none!important}
+}
 
 /* ===== SISTEMA DE PANTALLAS (mismo lenguaje que inicio y menú) ===== */
 .view:not(#home){isolation:isolate}
@@ -1552,21 +1559,23 @@ document.addEventListener('keydown',e=>{if(!$('onb').classList.contains('on'))re
 /* ---------- inicio ---------- */
 function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
-let mi=0;const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
+let mi=0;const menuCompact=window.matchMedia('(max-width:699px)');const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
  {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Full garantizada en tu bienvenida':'5 cartas por sobre · una Especial o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
  {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Pon tus iniciales',img:'F_samus',rr:'full',go:'VER'}]};
-function renderHome(){const u=uniq(),N=NAV,M=MODES();
+function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,imgDir=light?'c':'c2';
  $('hCount').textContent=u+' / '+N;
- const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="c2/${m.img}.jpg"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
+ const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="${imgDir}/${m.img}.jpg" alt="" decoding="async"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
   [...fan.children].forEach((el,i)=>el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()})}
- [...fan.children].forEach((el,i)=>{const m=M[i];el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
+ [...fan.children].forEach((el,i)=>{const m=M[i],pic=el.querySelector('.fx>img'),src=imgDir+'/'+m.img+'.jpg';if(pic.getAttribute('src')!==src)pic.src=src;el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
   let d=i-mi;if(d>2)d-=5;if(d<-2)d+=5;const a=Math.abs(d);
-  el.style.transform=`translate(-50%,-50%) translateX(${d*60}%) rotate(${d*11}deg) translateY(${a*6}%) scale(${1-a*.16})`;el.style.zIndex=10-a;el.style.filter=a?`brightness(${1-a*.3})`:'';el.style.opacity=a>1?0:1;el.style.pointerEvents=a>1?'none':''});
- $('mTabs').innerHTML=M.map((m,i)=>`<button class="${i===mi?'on':''} ${m.lock?'lock':''}" data-i="${i}" aria-pressed="${i===mi}">${m.t.replace(' del día','')}</button>`).join('');
+  el.style.transform=`translate(-50%,-50%) translateX(${d*60}%) rotate(${d*11}deg) translateY(${a*6}%) scale(${1-a*.16})`;el.style.zIndex=10-a;el.style.filter=light?'':(a?`brightness(${1-a*.3})`:'');el.style.opacity=a>1?0:1;el.style.pointerEvents=a>1?'none':''});
+ const tabs=$('mTabs');
+ if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
+ [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
  const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(c/${m.img}.jpg)`;
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
@@ -1575,6 +1584,7 @@ function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '
 let mMoved=false,msx=null,msy=null;
 $('mGo').onclick=mEnter;
 $('mTabs').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;mi=+b.dataset.i;beep(660,.03);renderHome()};
+menuCompact.addEventListener('change',()=>{if(cur==='home')renderHome()});
 $('home').addEventListener('touchstart',e=>{const p=e.touches[0];msx=p.clientX;msy=p.clientY;mMoved=false},{passive:true});
 $('home').addEventListener('touchmove',e=>{if(msx!==null&&Math.abs(e.touches[0].clientX-msx)>10)e.preventDefault()},{passive:false});
 $('home').addEventListener('touchend',e=>{if(msx===null)return;const dx=e.changedTouches[0].clientX-msx;msx=null;if(Math.abs(dx)>40){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
