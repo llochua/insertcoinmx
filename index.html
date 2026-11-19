@@ -2107,16 +2107,59 @@ let opening=false;function openPack(){if(opening)return;opening=true;clearTimeou
    versión especial (sale boca abajo) y colección completada (solo diseños con 2+ versiones disponibles). */
 const PCT={e:17,r:7,f:2}; // de cada 100 cartas (Etapa 4: Especial 17 · Rara 6.6 · Full 2.4)
 const NEU='#1b1826';
+/* Los diseños del lote 19/nov tienen ABOX pero no color de playera en RBG/ICOL.
+   Se muestra su arte recortado desde el principio y se lee el fondo real del JPG
+   al cargar; así no aparece el rectángulo neutro en Descubrimiento. */
+const AUTO_BG_IDS=new Set('1up blowme booit captor caritele carton continuara continue deathlove friendzone friezainfinito gojira gokuvolution hipstermario jokers karma oneplayer oogie queenpower robogodin tokyo3'.split(' '));
+const AUTO_BG_COLORS=Object.create(null);
 /* zona con dibujo dentro de cada d/id.jpg (fracciones x0,y0,x1,y1): sirve para darles un peso visual parecido sin recortar el arte */
 const ABOX={"9000":[0.109,0.138,0.892,0.615],"abuket":[0.039,0.068,0.959,0.679],"alienonboard":[0.123,0.074,0.878,0.677],"androidsdays":[0.116,0.072,0.886,0.677],"animehero":[0.266,0.071,0.738,0.679],"arcade":[0.083,0.025,0.897,0.969],"arcade2":[0.142,0.0,0.856,1.0],"artemis":[0.2,0.072,0.802,0.677],"blooper":[0.142,0.074,0.831,0.824],"bort":[0.1,0.14,0.897,0.477],"bustfiction":[0.084,0.058,0.891,0.556],"challenger":[0.053,0.051,0.947,0.949],"choochoo":[0.225,0.071,0.78,0.679],"chorriuken":[0.15,0.072,0.852,0.677],"collector":[0.106,0.024,0.88,0.964],"controls":[0.125,0.046,0.848,0.951],"family":[0.247,0.071,0.755,0.679],"fatality":[0.102,0.045,0.872,0.416],"fatman":[0.056,0.036,0.942,0.439],"fck":[0.089,0.048,0.883,0.711],"futbolito":[0.087,0.021,0.886,0.994],"galaxianwars":[0.206,0.08,0.8,0.679],"gameover":[0.075,0.089,0.9,0.636],"gamepop":[0.081,0.018,0.894,0.99],"gatosamurai":[0.159,0.056,0.892,0.922],"gunsncontrols":[0.077,0.037,0.895,0.65],"humangamer":[0.113,0.069,0.887,0.932],"hyrule":[0.07,0.079,0.931,0.657],"imposible":[0.211,0.072,0.819,0.704],"invader":[0.062,0.041,0.938,0.551],"kaiji":[0.153,0.074,0.848,0.677],"kame":[0.275,0.071,0.727,0.679],"karting":[0.198,0.037,0.847,0.713],"keepcalm":[0.087,0.06,0.912,0.94],"killbills":[0.263,0.071,0.738,0.679],"kof":[0.175,0.037,0.822,0.713],"konamicode":[0.123,0.072,0.878,0.677],"linkfloyd":[0.109,0.084,0.892,0.669],"links":[0.136,0.062,0.819,0.966],"luna":[0.2,0.072,0.803,0.677],"mainstream":[0.109,0.145,0.891,0.608],"mapa":[0.037,0.025,0.964,0.662],"mrkarate":[0.016,0.065,0.959,0.915],"n64":[0.05,0.028,0.952,0.761],"navidadgamer":[0.206,0.072,0.794,0.679],"nerv":[0.094,0.037,0.906,0.599],"no":[0.117,0.074,0.894,0.677],"nowloading":[0.109,0.117,0.891,0.634],"ochentas":[0.108,0.089,0.892,0.664],"oldschool":[0.108,0.212,0.892,0.539],"omkami":[0.064,0.056,0.912,0.945],"patronus":[0.202,0.077,0.803,0.67],"pikaball":[0.161,0.072,0.841,0.677],"pizzcipher":[0.081,0.025,0.895,0.713],"poketaco":[0.097,0.028,0.9,0.69],"polystation":[0.086,0.1,0.914,0.757],"portatiles":[0.242,0.059,0.758,0.691],"sailors":[0.13,0.072,0.87,0.677],"sailourss":[0.15,0.074,0.853,0.677],"samus":[0.081,0.06,0.894,0.904],"sensei":[0.075,0.003,0.923,0.996],"shadaloo":[0.109,0.139,0.892,0.614],"shenzalcoatl":[0.044,0.028,0.958,0.748],"snes":[0.094,0.045,0.881,0.733],"sv001":[0.111,0.018,0.889,0.983],"thankyou":[0.083,0.036,0.892,0.629],"thelostgame":[0.109,0.142,0.892,0.608],"theworldwarrior":[0.077,0.086,0.897,0.73],"tmnt":[0.111,0.147,0.887,0.605],"toto":[0.123,0.072,0.88,0.677],"triforce":[0.077,0.064,0.922,0.864],"vamonospest":[0.134,0.074,0.867,0.676],"vidaextra":[0.084,0.018,0.887,0.941],"wirimask":[0.086,0.019,0.889,0.64],"x":[0.089,0.035,0.884,0.892],"yinyang":[0.062,0.043,0.936,0.774],"zero":[0.111,0.034,0.863,0.839],"zodiac":[0.073,0.026,0.903,0.71],"asteroids":[0.147,0.08,0.853,0.92],"docecasas":[0.08,0.2,0.92,0.8],"sonic":[0.109,0.08,0.892,0.92],"chocarreros":[0.078,0.405,0.922,0.594],"god":[0.173,0.08,0.828,0.92],"guardianes":[0.12,0.08,0.881,0.92],"king":[0.173,0.08,0.828,0.92],"levelup":[0.08,0.368,0.92,0.635],"loveyourbits":[0.08,0.172,0.92,0.829],"neo":[0.08,0.309,0.92,0.692],"tetris2":[0.194,0.08,0.806,0.92],"versus":[0.08,0.218,0.92,0.782],"pirata":[0.08,0.296,0.92,0.704],"1up":[0.161,0.08,0.839,0.92],"blowme":[0.08,0.154,0.92,0.846],"booit":[0.12,0.08,0.881,0.92],"captor":[0.153,0.08,0.847,0.92],"caritele":[0.08,0.079,0.92,0.819],"carton":[0.08,0.389,0.92,0.611],"continuara":[0.22,0.08,0.781,0.92],"continue":[0.08,0.294,0.92,0.708],"deathlove":[0.12,0.08,0.881,0.92],"friendzone":[0.109,0.08,0.892,0.911],"friezainfinito":[0.125,0.08,0.875,0.92],"gojira":[0.081,0.162,0.92,0.838],"gokuvolution":[0.08,0.341,0.92,0.659],"hipstermario":[0.078,0.204,0.92,0.798],"jokers":[0.1,0.08,0.9,0.92],"karma":[0.08,0.164,0.922,0.836],"oneplayer":[0.081,0.112,0.92,0.889],"oogie":[0.077,0.125,0.922,0.876],"queenpower":[0.116,0.08,0.886,0.92],"robogodin":[0.12,0.08,0.88,0.92],"tokyo3":[0.08,0.189,0.92,0.811],"evilexes":[0.08,0.139,0.919,0.861]};
 /* color de fondo de la ilustración original de cada diseño sin color registrado (esquinas de d/id.jpg) */
 const ICOL={"9000":"#1154c5","artemis":"#4099ff","thelostgame":"#151412","mainstream":"#595a5c","vamonospest":"#084f23","shadaloo":"#111111","kaiji":"#151412","navidadgamer":"#c90a11","no":"#12354b","sailors":"#e05c98","ochentas":"#ffffff","karting":"#314a68","family":"#258b63","alienonboard":"#ffffff","pikaball":"#fced20","sailourss":"#f81026","kof":"#2c2e2b","evilexes":"#232323","konamicode":"#000000","imposible":"#28386c","kame":"#121212","tmnt":"#0d692a","killbills":"#feff4b","nowloading":"#11228e","animehero":"#ffffff","choochoo":"#d00910","patronus":"#141414","toto":"#060121","chorriuken":"#fa004c","androidsdays":"#1d1d1b","portatiles":"#dbdbdb","luna":"#ff2a94","linkfloyd":"#1d1d1b","oldschool":"#de2e2e","galaxianwars":"#151829","asteroids":"#1e1e1e","chocarreros":"#000000","docecasas":"#000000","god":"#1e1e1e","guardianes":"#000000","king":"#1e1e1e","levelup":"#1e1e1e","loveyourbits":"#e20b32","neo":"#000000","pirata":"#fff1cc","sonic":"#295292","tetris2":"#ffffff","versus":"#111025"};
-const dcol=id=>RBG[id]||ICOL[id]||NEU;const hasCol=id=>!!(RBG[id]||ICOL[id]); // color original de la playera; neutro si no está definido
+const dcol=id=>RBG[id]||ICOL[id]||AUTO_BG_COLORS[id]||NEU;const hasCol=id=>!!(RBG[id]||ICOL[id]||AUTO_BG_IDS.has(id)); // colores existentes intactos; los nuevos obtienen el suyo del arte
 /* ilustración encuadrada a su zona dibujada (+ margen). Con color original el borde no se nota; en neutro queda como muestra de tela */
 function artBox(id,cls=''){const src=artOf(id),b=src.startsWith('d/')&&ABOX[id];const m=hasCol(id)?.04:.07;
  let x0=0,y0=0,x1=1,y1=1;if(b){x0=Math.max(0,b[0]-m);y0=Math.max(0,b[1]-m*.8);x1=Math.min(1,b[2]+m);y1=Math.min(1,b[3]+m*.8)}
  const cw=x1-x0,ch=y1-y0,ratio=(cw*(src.startsWith('d/')?640:600))/(ch*(src.startsWith('d/')?800:900));
  return `<span class="ab ${cls}${hasCol(id)?'':' neu'}" style="--ar:${ratio.toFixed(3)}"><img src="${src}" alt="" loading="lazy" style="width:${(100/cw).toFixed(2)}%;left:${(-x0/cw*100).toFixed(2)}%;top:${(-y0/ch*100).toFixed(2)}%"></span>`}
+/* Color plano de las orillas del arte original. Mismo criterio de fondo_de()
+   usado por cartas/generar.py, a tamaño reducido para no procesar una imagen grande.
+   Solo se llama para los 21 diseños nuevos que no tienen color definido. */
+function bgFromArtwork(img){
+ try{
+  const cv=document.createElement('canvas');cv.width=32;cv.height=40;
+  const ctx=cv.getContext('2d',{willReadFrequently:true});
+  if(!ctx)return null;
+  ctx.drawImage(img,0,0,32,40);
+  const data=ctx.getImageData(0,0,32,40).data,channels=[[],[],[]];
+  for(let y=0;y<40;y++)for(let x=0;x<32;x++){
+   if(x>1&&x<30&&y>1&&y<38)continue;
+   const off=(y*32+x)*4;
+   for(let k=0;k<3;k++)channels[k].push(data[off+k]);
+  }
+  return '#'+channels.map(ch=>{
+   ch.sort((a,b)=>a-b);
+   return ch[ch.length>>1].toString(16).padStart(2,'0');
+  }).join('');
+ }catch(_){return null}
+}
+function resolveArtworkBackground(d,D){
+ if(!AUTO_BG_IDS.has(d.id)||AUTO_BG_COLORS[d.id])return;
+ const im=D.querySelector('.dx-art img');
+ if(!im)return;
+ const update=()=>{
+  const color=bgFromArtwork(im);
+  if(!color)return;
+  AUTO_BG_COLORS[d.id]=color;
+  if(D.dataset.artId!==d.id||D.classList.contains('cov'))return;
+  D.style.setProperty('--bg',color);
+  const flat=D.querySelector('.dx-flat-art');
+  if(flat)flat.style.backgroundColor=color;
+  D.classList.toggle('bg-light',lum(color)>.72);
+ };
+ if(im.complete&&im.naturalWidth)update();
+ else im.addEventListener('load',update,{once:true});
+}
 const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255};
 const icAwardsSeen=new Set(); // sellos vistos en el sobre actual
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
@@ -2206,7 +2249,7 @@ function dxNav(){
 function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
  D.onclick=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._dxToastTimer);
  if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
-  D.className=`disc on dx cov v-${c.v}`;D.style.setProperty('--bg','#0c0a14');
+  D.className=`disc on dx cov v-${c.v}`;D.dataset.artId='';D.style.setProperty('--bg','#0c0a14');
   D.innerHTML=`${c.v==='e'?'<i class="dx-mat holo"></i>':c.v==='r'?'<i class="dx-mat gold"></i>':'<i class="dx-mat pink"></i>'}${dxTop()}
    <button type="button" class="dx-back" id="dcBack" aria-label="Tocar para revelar la carta"><span><img src="coin.png" alt=""></span></button><div class="dx-cta"><b>ALGO ESPECIAL</b></div>${dxControls(true)}`;
   let revealing=false;
@@ -2243,7 +2286,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
   :(v==='e'||v==='r')?`<div class="dx-art dx-flat-art" style="background-color:${col}"><img src="${artOf(d.id)}" alt="" decoding="async"></div>`
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:${artOf(d.id).startsWith('d/')?.8:.667}"><img src="${artOf(d.id)}" alt=""></span>`}</span></div>`;
- D.className=`disc on dx v-${v} k-${k}${storyFor(c)?' has-narrative':''}${v==='b'&&CARD_TEXTS[d.id]?' has-base-copy':''}${hasCol(d.id)?'':' neu'}${lum(col)>.72?' bg-light':''}`;D.style.setProperty('--bg',col);
+ D.className=`disc on dx v-${v} k-${k}${storyFor(c)?' has-narrative':''}${v==='b'&&CARD_TEXTS[d.id]?' has-base-copy':''}${hasCol(d.id)?'':' neu'}${lum(col)>.72?' bg-light':''}`;D.dataset.artId=d.id;D.style.setProperty('--bg',col);
  D.innerHTML=`${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}
   <div class="dx-full-view" id="dcFullView" hidden aria-hidden="true"><img src="${fullSrc}" alt="Ilustración completa de ${esc(d.n)}" decoding="async"></div>
   <button type="button" id="dcArtBack" class="dx-art-back" hidden aria-label="Volver a la carta"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m14.5 5-7 7 7 7"/></svg><span>Volver a carta</span></button>
@@ -2252,6 +2295,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${baseHtml(c)}
    <div class="dx-tags"><span class="dx-v">${VSHORT[v].toUpperCase()}</span>${c._new?`<span class="dx-s">${c._dnew?'NUEVA':'NUEVA VARIANTE'}</span>`:`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
   <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span>${icAward(c)}</button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
+ resolveArtworkBackground(d,D);
  $('dcCard').onclick=()=>openCard(c.k);
  dxNav();
  $('dcArtBack').onclick=()=>{setArtworkView(false);$('dcNext').focus({preventScroll:true});ga('vista_ilustracion',{origen:'regresar',accion:'ver_carta'})};
