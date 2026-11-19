@@ -92,3 +92,18 @@ test('cloud view is a user-initiated, read-only, authenticated display',()=>{
  assert.match(section, /snapshot\.user_id!==user\.id/);
  assert.doesNotMatch(section, /localStorage|\.insert\(|\.update\(|\.delete\(|\.upsert\(/);
 });
+
+test('cloud JSON recovery is manual, scoped to the account and never changes local progress',()=>{
+ assert.match(page,/id="downloadCloud"/);
+ assert.match(source,/el\("downloadCloud"\)\.addEventListener\("click",async/);
+ const start=source.indexOf('el("downloadCloud").addEventListener');
+ const end=source.indexOf('el("backupDownload").addEventListener',start);
+ assert.ok(end>start);
+ const section=source.slice(start,end);
+ assert.match(section,/await getBackupUser\(\)/);
+ assert.match(section,/await existingSnapshot\(user\.id\)/);
+ assert.match(section,/snapshot\.user_id!==user\.id/);
+ assert.match(section,/parseSafeJSON\(text\)/);
+ assert.match(section,/downloadBackup\(text,"insertcoinmx-respaldo-desde-supabase\.json"\)/);
+ assert.doesNotMatch(section,/localStorage|\.insert\(|\.update\(|\.upsert\(|\.delete\(/);
+});
