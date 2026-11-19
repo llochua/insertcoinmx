@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://insertcoinmx.com/sitemap.xml
