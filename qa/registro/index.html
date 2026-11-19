@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#0b0923">
+<title>Prueba de registro · Insert Coin MX</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+@font-face{font-family:ICPixel;src:url("/ps2p.ttf") format("truetype");font-display:swap}
+:root{color-scheme:dark;--yellow:#ffd400;--ink:#f7f4ff;--secondary:#bcb5d1}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:28px 16px;background:radial-gradient(ellipse at 50% 15%,#242073 0%,#0c0a27 62%,#070613 100%);color:var(--ink);font:500 14px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.11) 0 2px,transparent 2px 5px)}
+main{position:relative;width:min(100%,440px);background:linear-gradient(155deg,rgba(36,29,91,.96),rgba(13,10,39,.97));border:2px solid rgba(255,212,0,.35);border-radius:21px;box-shadow:0 0 0 6px #0b0921,0 30px 80px rgba(0,0,0,.55);padding:30px clamp(20px,5vw,36px)}
+.brand{display:flex;justify-content:center;margin:0 0 18px}.brand img{width:130px;max-width:100%;height:auto;display:block}
+.kicker{margin:0 0 8px;text-align:center;font:10px/1.6 ICPixel,monospace;color:var(--yellow);letter-spacing:.04em}
+h1{font-size:26px;line-height:1.14;text-align:center;margin:0 0 9px;letter-spacing:-.02em}
+.intro{color:var(--secondary);text-align:center;margin:0 0 24px;font-size:13px}
+.tablist{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;border-radius:12px;background:rgba(0,0,0,.28);margin-bottom:20px}
+.tablist button{min-height:42px;border:0;border-radius:9px;background:transparent;color:#ded9f3;font-weight:800;cursor:pointer;font-size:12px}
+.tablist button[aria-selected="true"]{background:var(--yellow);color:#141026}
+form{display:grid;gap:14px}
+.field{display:grid;gap:6px}
+label{font-size:12px;font-weight:700}
+input{width:100%;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.28);background:#100c2b;color:var(--ink);font:500 16px system-ui;padding:10px 13px}
+input:focus-visible,button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+small,.subtle{color:var(--secondary);font-size:12px}
+.action{width:100%;border:0;border-radius:10px;min-height:46px;background:var(--yellow);color:#110d28;font-weight:900;letter-spacing:.01em;cursor:pointer;margin-top:2px}
+.action.secondary{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff}
+button:disabled{opacity:.58;cursor:wait}
+#message{min-height:44px;margin:14px 0 0;color:var(--secondary);font-size:13px;overflow-wrap:anywhere}
+#message[data-tone="success"]{color:#aeefc8}
+#message[data-tone="error"]{color:#ffb8be}
+#signed{display:none}
+#signed[aria-hidden="false"]{display:block}
+#signedEmail{font-weight:800;overflow-wrap:anywhere}
+.foot{border-top:1px solid rgba(255,255,255,.15);padding-top:16px;margin:12px 0 0;color:var(--secondary);font-size:12px}
+.foot strong{color:#fff}
+a{color:var(--yellow)}
+</style>
+</head>
+<body>
+<main>
+<div class="brand"><img src="/logo.png" alt="Insert Coin MX"></div>
+<p class="kicker">PLAYER 01 · LABORATORIO</p>
+<h1>Prueba de acceso</h1>
+<p class="intro">Vamos a comprobar el correo de confirmación y el registro antes de lanzar las cuentas en el juego.</p>
+<section id="guest" aria-label="Registro e inicio de sesión">
+ <div class="tablist" role="tablist" aria-label="Acceso">
+  <button type="button" role="tab" id="tabSignup" aria-selected="true" aria-controls="authForm">CREAR CUENTA</button>
+  <button type="button" role="tab" id="tabLogin" aria-selected="false" aria-controls="authForm">INICIAR SESIÓN</button>
+ </div>
+ <form id="authForm" aria-label="Acceso por correo">
+  <div class="field">
+   <label for="email">Correo electrónico</label>
+   <input id="email" type="email" autocomplete="email" name="email" inputmode="email" required maxlength="254" placeholder="tu@correo.com">
+  </div>
+  <div class="field">
+   <label for="password">Contraseña</label>
+   <input id="password" type="password" autocomplete="new-password" name="password" minlength="8" maxlength="128" required placeholder="Mínimo 8 caracteres">
+  </div>
+  <small id="modeHint">Al crear una cuenta recibirás el correo de confirmación de Insert Coin MX.</small>
+  <button class="action" id="submit" type="submit">CREAR MI CUENTA</button>
+ </form>
+</section>
+<section id="signed" aria-label="Sesión iniciada" aria-hidden="true">
+ <p class="subtle">SESIÓN CONFIRMADA</p>
+ <p id="signedEmail"></p>
+ <button type="button" class="action secondary" id="logout">CERRAR SESIÓN DE PRUEBA</button>
+</section>
+<p id="message" role="status" aria-live="polite">Conectando con Supabase…</p>
+<p class="foot"><strong>Solo pruebas.</strong> Esta página no abre sobres ni modifica tu colección. La cuenta se crea realmente en Supabase, pero tu progreso del juego sigue separado.</p>
+</main>
+<script type="module">
+const URL_SUPABASE = "https://ynugqxbtszhsupadqdkz.supabase.co";
+const PUBLIC_KEY = "sb_publishable_3wyMm9dwLqSb9GiYTh245Q_9TukyCLK";
+const SDK_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm";
+const SESSION_KEY = "icmx-auth-qa-nov2026";
+const RETURN_URL = location.origin + location.pathname;
+const fromConfirmation = /(?:^|[?&#])(?:access_token|code)=/.test(location.hash+"&"+location.search);
+const el = id => document.getElementById(id);
+let client, mode = "signup", busy = false;
+function message(copy,tone="info"){el("message").textContent=copy;el("message").dataset.tone=tone}
+function display(user){
+ const active = Boolean(user);
+ el("guest").hidden=active;
+ el("signed").setAttribute("aria-hidden",String(!active));
+ el("signedEmail").textContent=user?.email||"";
+}
+function setMode(next){
+ if(busy||!["signup","login"].includes(next))return;
+ mode=next;
+ el("tabSignup").setAttribute("aria-selected",String(mode==="signup"));
+ el("tabLogin").setAttribute("aria-selected",String(mode==="login"));
+ el("password").autocomplete=mode==="signup"?"new-password":"current-password";
+ el("modeHint").textContent=mode==="signup"
+  ?"Al crear una cuenta recibirás el correo de confirmación de Insert Coin MX."
+  :"Entra con el correo y la contraseña de tu cuenta.";
+ el("submit").textContent=mode==="signup"?"CREAR MI CUENTA":"INICIAR SESIÓN";
+ message("");
+}
+function lock(value){
+ busy=value;
+ for(const id of ["submit","tabSignup","tabLogin"])el(id).disabled=value;
+}
+function errorText(error){
+ const code=String(error?.code||"").toLowerCase();
+ const detail=String(error?.message||"").toLowerCase();
+ if(/email_not_confirmed|email.not.confirmed/.test(code+" "+detail))return "Primero necesitas confirmar tu correo.";
+ if(/invalid_credentials|invalid.login.credentials/.test(code+" "+detail))return "Correo o contraseña incorrectos.";
+ if(/weak.password|password.should|password.is.too/.test(code+" "+detail))return "La contraseña no cumple los requisitos de seguridad.";
+ if(/rate.limit|too.many|over_email/.test(code+" "+detail))return "Se alcanzó el límite de solicitudes. Podrás probar más tarde.";
+ return "No se pudo completar la operación. Revisa tus datos o la conexión.";
+}
+el("tabSignup").addEventListener("click",()=>setMode("signup"));
+el("tabLogin").addEventListener("click",()=>setMode("login"));
+el("authForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ if(!client||busy)return;
+ const emailField=el("email"),passwordField=el("password");
+ if(!emailField.reportValidity()||!passwordField.reportValidity())return;
+ const email=emailField.value.trim(),password=passwordField.value;
+ if(!email||email.length>254||password.length<8){message("Revisa los datos de acceso.","error");return}
+ lock(true);message(mode==="signup"?"Enviando correo de confirmación…":"Verificando sesión…");
+ try{
+  if(mode==="signup"){
+   const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:RETURN_URL}});
+   if(error)throw error;
+   if(data?.session){
+    display(data.session.user);message("Cuenta creada. La sesión está activa.","success");
+   }else message("¡Correo enviado! Revisa tu bandeja y confirma tu cuenta desde el botón de Insert Coin MX.","success");
+  }else{
+   const {data,error}=await client.auth.signInWithPassword({email,password});
+   if(error)throw error;
+   display(data.user);message("¡Inicio de sesión correcto!","success");
+  }
+ }catch(err){message(errorText(err),"error")}
+ finally{lock(false)}
+});
+el("logout").addEventListener("click",async()=>{
+ if(!client||busy)return;
+ el("logout").disabled=true;
+ try{
+  const {error}=await client.auth.signOut({scope:"local"});
+  if(error)throw error;
+  display(null);message("Sesión cerrada. La colección del juego no cambió.","success");
+ }catch(err){message(errorText(err),"error")}
+ finally{el("logout").disabled=false}
+});
+async function init(){
+ try{
+  const sdk=await import(SDK_URL);
+  client=sdk.createClient(URL_SUPABASE,PUBLIC_KEY,{
+   auth:{flowType:"implicit",detectSessionInUrl:true,persistSession:true,autoRefreshToken:true,storageKey:SESSION_KEY}
+  });
+  client.auth.onAuthStateChange((_event,session)=>display(session?.user||null));
+  const {data,error}=await client.auth.getSession();
+  if(error)throw error;
+  if(data.session){
+   const {data:verified,error:verifyError}=await client.auth.getUser();
+   if(verifyError||!verified?.user)throw verifyError||new Error("Session invalid");
+   display(verified.user);
+   message(fromConfirmation?"¡Correo confirmado! La cuenta ya está activa.":"Sesión activa. Ya puedes probar cerrar sesión.","success");
+  }else{display(null);message("Listo para registrar una cuenta de prueba.")}
+ }catch(e){client=null;display(null);message("No pudimos conectar con Supabase. Revisa la conexión.","error")}
+}
+init();
+</script>
+</body></html>
