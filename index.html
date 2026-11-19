@@ -402,6 +402,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .mfan{flex:1;min-height:0}
 .mc{position:absolute;left:50%;top:50%;width:min(68vw,280px);aspect-ratio:480/670;border-radius:14px;box-shadow:0 26px 46px rgba(0,0,0,.6);transition:transform .45s cubic-bezier(.2,.9,.25,1.1),filter .45s,opacity .45s;transform-origin:50% 120%;cursor:pointer}
 .mc .fx{--rad:14px;width:100%;height:100%}.mc .fx>img{object-fit:cover}
+/* IC-05: el arte editorial se muestra sin efectos holográficos superpuestos. */
+.mc .fx.menu-illustration .foil,.mc .fx.menu-illustration .glare{display:none!important}
+.mc .fx.menu-illustration>img{width:100%;height:100%;object-fit:cover}
 .mc .lab{position:absolute;inset:auto 0 0;height:46%;display:flex;flex-direction:column;justify-content:flex-end;padding:0 18px 18px;border-radius:0 0 14px 14px;background:linear-gradient(rgba(7,6,42,0),rgba(7,6,42,.9) 30%,#07062a 55%);z-index:3;text-align:left}
 .mc .lab small{display:block;font:7px PX;color:#FFD400;margin-bottom:8px}
 .mc .lab b{display:block;font:700 30px/1 AV;letter-spacing:-.02em;color:#fff}
@@ -1896,7 +1899,22 @@ document.addEventListener('keydown',e=>{if(!$('onb').classList.contains('on'))re
 /* ---------- inicio ---------- */
 function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
-let mi=0;const menuCompact=window.matchMedia('(max-width:699px)');const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
+let mi=0;const menuCompact=window.matchMedia('(max-width:699px)');/* IC-05 · Ilustraciones editoriales del menú. Si falta un recurso, se conserva la carta actual. */
+const MENU_ART={pack:'menu/final/sobres.webp',album:'menu/final/album.webp',torneo:'menu/final/reta.webp',tier:'menu/final/tier.webp',scores:'menu/final/records.webp'};
+const menuArtOK=new Set();
+const menuArtFailed=new Set();
+function menuArtSrc(m,dir){return menuArtOK.has(m.id)?MENU_ART[m.id]:dir+'/'+m.img+'.jpg'}
+function menuArtLoad(img,m,dir){
+ const art=MENU_ART[m.id],fallback=dir+'/'+m.img+'.jpg';
+ img.onerror=()=>{menuArtFailed.add(m.id);menuArtOK.delete(m.id);if(img.getAttribute('src')!==fallback)img.src=fallback};
+ if(!menuArtOK.has(m.id)&&!menuArtFailed.has(m.id)){
+  const probe=new Image();probe.onload=()=>{menuArtOK.add(m.id);img.src=art;img.closest('.fx')?.classList.add('menu-illustration');if(MODES()[mi]?.id===m.id)$('mAmb').style.backgroundImage='url('+art+')'};
+  probe.onerror=()=>menuArtFailed.add(m.id);probe.src=art;
+ }
+ img.src=menuArtSrc(m,dir);
+ img.closest('.fx')?.classList.toggle('menu-illustration',menuArtOK.has(m.id));
+}
+const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
  {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Full garantizada en tu bienvenida':'5 cartas por sobre · una Especial o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
@@ -1907,13 +1925,13 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,i
  $('hCount').textContent=u+' / '+N;
  const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="${imgDir}/${m.img}.jpg" alt="" decoding="async"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
   [...fan.children].forEach((el,i)=>el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()})}
- [...fan.children].forEach((el,i)=>{const m=M[i],pic=el.querySelector('.fx>img'),src=imgDir+'/'+m.img+'.jpg';if(pic.getAttribute('src')!==src)pic.src=src;el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
+ [...fan.children].forEach((el,i)=>{const m=M[i],pic=el.querySelector('.fx>img'),src=imgDir+'/'+m.img+'.jpg';menuArtLoad(pic,m,imgDir);el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
   let d=i-mi;if(d>2)d-=5;if(d<-2)d+=5;const a=Math.abs(d);
   el.style.transform=`translate(-50%,-50%) translateX(${d*60}%) rotate(${d*11}deg) translateY(${a*6}%) scale(${1-a*.16})`;el.style.zIndex=10-a;el.style.filter=light?'':(a?`brightness(${1-a*.3})`:'');el.style.opacity=a>1?0:1;el.style.pointerEvents=a>1?'none':''});
  const tabs=$('mTabs');
  if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
  [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
- const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(c/${m.img}.jpg)`;
+ const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.jpg'})`;
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
