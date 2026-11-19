@@ -405,15 +405,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
  color:#fff7d5;background:rgba(255,212,0,.13);
  box-shadow:inset 0 0 0 1px rgba(255,212,0,.43)
 }
-.mtabs button.on::after{
- content:"";position:absolute;left:27%;right:27%;height:2px;bottom:-3px;
- border-radius:3px;background:#FFD400;box-shadow:0 0 10px rgba(255,212,0,.6);
- animation:icTabGlow 2.9s ease-in-out infinite
-}
-@keyframes icTabGlow{50%{opacity:.58;box-shadow:0 0 4px rgba(255,212,0,.3)}}
+
 .mtabs button:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){
- .mc.is-selected::after,.mtabs button.on::after{animation:none!important}
+ .mc.is-selected::after{animation:none!important}
  .mtabs button{transition:none!important}
 }
 /* Menú ligero en pantallas pequeñas: conserva abanico y selección, evita rasterización continua. */
@@ -421,7 +416,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
  #home .amb{filter:none;opacity:.36;transition:none}
  #home .mc{transition:transform .32s cubic-bezier(.2,.9,.25,1.1),opacity .32s}
  #home .mc .fx.idle{animation:none!important}
- #home .mc.is-selected::after,#home .mtabs button.on::after{animation:none!important}
+ #home .mc.is-selected::after{animation:none!important}
 }
 
 /* ===== SISTEMA DE PANTALLAS (mismo lenguaje que inicio y menú) ===== */
@@ -848,6 +843,11 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 
 /* navegación: segmentos, flecha, cómo avanzar */
 .dx-top{gap:12px}.dx-seg{flex:1;display:flex;gap:4px}.dx-seg i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.28)}.dx-seg i.ok{background:rgba(255,255,255,.75)}.dx-seg i.cur{background:#fff}
+/* El progreso sigue siendo legible sobre arte original blanco o claro (p.ej. Tetris). */
+.disc.dx.bg-light .dx-seg i{background:rgba(18,15,26,.25)}
+.disc.dx.bg-light .dx-seg i.ok{background:rgba(18,15,26,.68)}
+.disc.dx.bg-light .dx-seg i.cur{background:#120F1A}
+.disc.dx.bg-light .dx-n{color:#120F1A;text-shadow:none}
 .dx-n{font:9px PX}
 .disc.dx{cursor:auto}
 .dx-controls{position:absolute;z-index:4;inset:auto 20px calc(12px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -945,7 +945,22 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .zoom #zVoting{box-sizing:border-box;width:min(100%,480px);margin:16px auto 0;padding:15px;border:1px solid #ffffff29;border-radius:14px;background:#ffffff0e}
 .zoom #zVoting[hidden]{display:none}
 .zoom #zRate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
-.zoom #zRate .rb{min-width:0}
+.zoom #zRate .rb{
+ position:relative;min-width:0;min-height:52px;padding:14px 4px!important;
+ border:2px solid rgba(227,223,251,.65)!important;border-radius:10px!important;
+ background:rgba(255,255,255,.055)!important;box-shadow:none!important;
+ color:#f3f1ff!important;font:700 12px AV!important;
+ transition:background-color .16s,border-color .16s,color .16s;
+}
+.zoom #zRate .rb.on{
+ background:#FFD400!important;border-color:#FFD400!important;color:#120F1A!important;
+}
+.zoom #zRate .rb.on::after{
+ content:"✓";position:absolute;right:5px;top:3px;
+ font:800 11px AV;color:#120F1A;
+}
+.zoom #zRate .rb:focus-visible{outline:2px solid #FFD400;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.zoom #zRate .rb{transition:none}}
 @media(prefers-reduced-motion:reduce){.dx.cov .dx-back.dx-opening span,.dx.cov .dx-back.dx-opening::after,.dx-revealed .dx-art,.dx-revealed .dx-scene,.dx-revealed .dx-card,.dx-revealed .dx-info{animation:none!important}}
 
 /* IC-01 · Refinamiento de descubrimiento: no altera la composición aprobada */
@@ -1662,7 +1677,7 @@ const NEU='#1b1826';
 /* zona con dibujo dentro de cada d/id.jpg (fracciones x0,y0,x1,y1): sirve para darles un peso visual parecido sin recortar el arte */
 const ABOX={"9000":[0.109,0.138,0.892,0.615],"abuket":[0.039,0.068,0.959,0.679],"alienonboard":[0.123,0.074,0.878,0.677],"androidsdays":[0.116,0.072,0.886,0.677],"animehero":[0.266,0.071,0.738,0.679],"arcade":[0.083,0.025,0.897,0.969],"arcade2":[0.142,0.0,0.856,1.0],"artemis":[0.2,0.072,0.802,0.677],"blooper":[0.142,0.074,0.831,0.824],"bort":[0.1,0.14,0.897,0.477],"bustfiction":[0.084,0.058,0.891,0.556],"challenger":[0.053,0.051,0.947,0.949],"choochoo":[0.225,0.071,0.78,0.679],"chorriuken":[0.15,0.072,0.852,0.677],"collector":[0.106,0.024,0.88,0.964],"controls":[0.125,0.046,0.848,0.951],"evilexes":[0.108,0.172,0.892,0.579],"family":[0.247,0.071,0.755,0.679],"fatality":[0.102,0.045,0.872,0.416],"fatman":[0.056,0.036,0.942,0.439],"fck":[0.089,0.048,0.883,0.711],"futbolito":[0.087,0.021,0.886,0.994],"galaxianwars":[0.206,0.08,0.8,0.679],"gameover":[0.075,0.089,0.9,0.636],"gamepop":[0.081,0.018,0.894,0.99],"gatosamurai":[0.159,0.056,0.892,0.922],"gunsncontrols":[0.077,0.037,0.895,0.65],"humangamer":[0.113,0.069,0.887,0.932],"hyrule":[0.07,0.079,0.931,0.657],"imposible":[0.211,0.072,0.819,0.704],"invader":[0.062,0.041,0.938,0.551],"kaiji":[0.153,0.074,0.848,0.677],"kame":[0.275,0.071,0.727,0.679],"karting":[0.198,0.037,0.847,0.713],"keepcalm":[0.087,0.06,0.912,0.94],"killbills":[0.263,0.071,0.738,0.679],"kof":[0.175,0.037,0.822,0.713],"konamicode":[0.123,0.072,0.878,0.677],"linkfloyd":[0.109,0.084,0.892,0.669],"links":[0.136,0.062,0.819,0.966],"luna":[0.2,0.072,0.803,0.677],"mainstream":[0.109,0.145,0.891,0.608],"mapa":[0.037,0.025,0.964,0.662],"mrkarate":[0.016,0.065,0.959,0.915],"n64":[0.05,0.028,0.952,0.761],"navidadgamer":[0.206,0.072,0.794,0.679],"nerv":[0.094,0.037,0.906,0.599],"no":[0.117,0.074,0.894,0.677],"nowloading":[0.109,0.117,0.891,0.634],"ochentas":[0.108,0.089,0.892,0.664],"oldschool":[0.108,0.212,0.892,0.539],"omkami":[0.064,0.056,0.912,0.945],"patronus":[0.202,0.077,0.803,0.67],"pikaball":[0.161,0.072,0.841,0.677],"pizzcipher":[0.081,0.025,0.895,0.713],"poketaco":[0.097,0.028,0.9,0.69],"polystation":[0.086,0.1,0.914,0.757],"portatiles":[0.242,0.059,0.758,0.691],"sailors":[0.13,0.072,0.87,0.677],"sailourss":[0.15,0.074,0.853,0.677],"samus":[0.081,0.06,0.894,0.904],"sensei":[0.075,0.003,0.923,0.996],"shadaloo":[0.109,0.139,0.892,0.614],"shenzalcoatl":[0.044,0.028,0.958,0.748],"snes":[0.094,0.045,0.881,0.733],"sv001":[0.111,0.018,0.889,0.983],"thankyou":[0.083,0.036,0.892,0.629],"thelostgame":[0.109,0.142,0.892,0.608],"theworldwarrior":[0.077,0.086,0.897,0.73],"tmnt":[0.111,0.147,0.887,0.605],"toto":[0.123,0.072,0.88,0.677],"triforce":[0.077,0.064,0.922,0.864],"vamonospest":[0.134,0.074,0.867,0.676],"vidaextra":[0.084,0.018,0.887,0.941],"wirimask":[0.086,0.019,0.889,0.64],"x":[0.089,0.035,0.884,0.892],"yinyang":[0.062,0.043,0.936,0.774],"zero":[0.111,0.034,0.863,0.839],"zodiac":[0.073,0.026,0.903,0.71],"asteroids":[0.147,0.08,0.853,0.92],"docecasas":[0.08,0.2,0.92,0.8],"sonic":[0.109,0.08,0.892,0.92],"chocarreros":[0.078,0.405,0.922,0.594],"god":[0.173,0.08,0.828,0.92],"guardianes":[0.12,0.08,0.881,0.92],"king":[0.173,0.08,0.828,0.92],"levelup":[0.08,0.368,0.92,0.635],"loveyourbits":[0.08,0.172,0.92,0.829],"neo":[0.08,0.309,0.92,0.692],"tetris2":[0.194,0.08,0.806,0.92],"versus":[0.08,0.218,0.92,0.782],"pirata":[0.08,0.296,0.92,0.704]};
 /* color de fondo de la ilustración original de cada diseño sin color registrado (esquinas de d/id.jpg) */
-const ICOL={"artemis":"#4099ff","thelostgame":"#151412","mainstream":"#595a5c","9000":"#1154c5","vamonospest":"#084f23","shadaloo":"#111111","kaiji":"#151412","navidadgamer":"#c90a11","no":"#12354b","sailors":"#e05c98","ochentas":"#ffffff","karting":"#314a68","family":"#258b63","alienonboard":"#ffffff","pikaball":"#fced20","sailourss":"#f81026","kof":"#2c2e2b","evilexes":"#232323","konamicode":"#000000","imposible":"#28386c","kame":"#121212","tmnt":"#0d692a","killbills":"#feff4b","nowloading":"#11228e","animehero":"#ffffff","choochoo":"#d00910","patronus":"#141414","toto":"#060121","chorriuken":"#fa004c","androidsdays":"#1d1d1b","portatiles":"#dbdbdb","luna":"#ff2a94","linkfloyd":"#1d1d1b","oldschool":"#de2e2e","galaxianwars":"#151829"};
+const ICOL={"9000":"#1154c5","artemis":"#4099ff","thelostgame":"#151412","mainstream":"#595a5c","vamonospest":"#084f23","shadaloo":"#111111","kaiji":"#151412","navidadgamer":"#c90a11","no":"#12354b","sailors":"#e05c98","ochentas":"#ffffff","karting":"#314a68","family":"#258b63","alienonboard":"#ffffff","pikaball":"#fced20","sailourss":"#f81026","kof":"#2c2e2b","evilexes":"#232323","konamicode":"#000000","imposible":"#28386c","kame":"#121212","tmnt":"#0d692a","killbills":"#feff4b","nowloading":"#11228e","animehero":"#ffffff","choochoo":"#d00910","patronus":"#141414","toto":"#060121","chorriuken":"#fa004c","androidsdays":"#1d1d1b","portatiles":"#dbdbdb","luna":"#ff2a94","linkfloyd":"#1d1d1b","oldschool":"#de2e2e","galaxianwars":"#151829","asteroids":"#1e1e1e","chocarreros":"#000000","docecasas":"#000000","god":"#1e1e1e","guardianes":"#000000","king":"#1e1e1e","levelup":"#1e1e1e","loveyourbits":"#e20b32","neo":"#000000","pirata":"#fff1cc","sonic":"#295292","tetris2":"#ffffff","versus":"#111025"};
 const dcol=id=>RBG[id]||ICOL[id]||NEU;const hasCol=id=>!!(RBG[id]||ICOL[id]); // color original de la playera; neutro si no está definido
 /* ilustración encuadrada a su zona dibujada (+ margen). Con color original el borde no se nota; en neutro queda como muestra de tela */
 function artBox(id,cls=''){const src=artOf(id),b=src.startsWith('d/')&&ABOX[id];const m=hasCol(id)?.04:.07;
@@ -1749,7 +1764,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
   :v==='r'&&c.img?`<div class="dx-art"><span class="dx-mv"><span class="dx-gold" style="background-image:url(${imgOf(c,'c2')})"></span></span></div>`
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:${artOf(d.id).startsWith('d/')?.8:.667}"><img src="${artOf(d.id)}" alt=""></span>`}${v==='e'?'<i class="dx-holo"></i>':''}</span></div>`;
- D.className=`disc on dx v-${v} k-${k}${hasCol(d.id)?'':' neu'}`;D.style.setProperty('--bg',v==='r'?'#0d0a05':col);
+ D.className=`disc on dx v-${v} k-${k}${hasCol(d.id)?'':' neu'}${(v==='b'||v==='e')&&lum(col)>.72?' bg-light':''}`;D.style.setProperty('--bg',v==='r'?'#0d0a05':col);
  D.innerHTML=`${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
   ${dxTop()}${dxControls()}
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>
@@ -1940,7 +1955,7 @@ function setVoting(on){
  if(on){paintRate();zGo();/* sin desplazamiento automático */}
 }
 $('zToggle').onclick=()=>setVoting($('zVoting').hidden);
-function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb ${S.rate[zd()]===i?'on':''}" data-r="${i}" style="--c:${TC[i]}">${n}</button>`).join('')}
+function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb ${S.rate[zd()]===i?'on':''}" data-r="${i}" type="button" aria-pressed="${S.rate[zd()]===i}">${n}</button>`).join('')}
 $('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zd()]=+b.dataset.r;save();beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();zGo();if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
 $('zClose').onclick=()=>$('zoom').close();
 $('zoom').addEventListener('close',()=>{
