@@ -1299,10 +1299,19 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-height:640px){.rs2 .rs-finish{padding-top:12px;padding-bottom:9px}.rs2 .rh{height:clamp(188px,35dvh,285px)}.rs-follow{padding-top:11px}}
 @media(max-width:360px){.rs2 .rs-finish,.rs-follow{padding-left:14px;padding-right:14px}.rs2 .rh .dx-info{left:14px}.rs2 .rh .dx-card{right:12px!important}.rs-finish h2{font-size:20px}.rs-follow .rs-act2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
 
-/* Guía contextual reabrible: una vez por navegador, sobre la primera carta revelada. */
-.dx-top .dx-help-trigger{flex:none;width:42px;min-width:42px;padding:0;display:grid;place-items:center;border:1px solid rgba(255,255,255,.62);border-radius:50%;font:800 16px AV,system-ui,sans-serif;background:rgba(16,12,38,.75);color:#fff;text-shadow:none;touch-action:manipulation}
-.dx-top .dx-help-trigger[aria-expanded="true"]{background:#FFD400;color:#120F1A;border-color:#FFD400}
-.dx-guide{position:absolute;z-index:7;top:calc(74px + env(safe-area-inset-top));left:16px;right:16px;width:min(390px,calc(100% - 32px));max-height:calc(100% - 160px);margin-inline:auto;overflow-y:auto;overscroll-behavior:contain;padding:16px;border:1px solid rgba(255,212,0,.6);border-radius:14px;background:rgba(14,12,37,.98);box-shadow:0 16px 44px rgba(0,0,0,.6);color:#fff;touch-action:pan-y}
+/* La revelación cubre la cabecera Sobres: la bocina debe estar en su propia capa.
+   El acceso a la guía no interrumpe el progreso de cinco cartas. */
+.dx-top{gap:clamp(6px,2vw,12px);padding-left:16px;padding-right:16px}
+.dx-top .dx-seg{min-width:36px}
+.dx-top .sound-toggle{display:inline-flex;box-sizing:border-box;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;min-height:36px;padding:0;border:1px solid rgba(255,212,0,.43);border-radius:50%;background:rgba(255,212,0,.1);color:#FFD400;opacity:1;cursor:pointer;touch-action:manipulation;text-shadow:none}
+.dx-top .sound-toggle.is-muted{border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.07);color:#aaa5c3}
+.dx-top .sound-toggle svg{width:19px;height:19px;display:block}
+.dx-guide-launch{position:absolute;z-index:6;top:calc(72px + env(safe-area-inset-top));right:16px;min-height:34px;padding:6px 11px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(255,255,255,.32);border-radius:18px;background:rgba(16,13,35,.78);color:rgba(255,255,255,.88);font:700 11px AV,system-ui,sans-serif;letter-spacing:.01em;box-shadow:0 5px 18px rgba(0,0,0,.2);cursor:pointer;touch-action:manipulation}
+.dx-guide-launch svg{width:17px;height:17px;flex:none;color:#FFD400}
+.dx-guide-launch[aria-expanded="true"]{background:#FFD400;color:#151125;border-color:#FFD400}
+.dx-guide-launch[aria-expanded="true"] svg{color:#151125}
+.dx-guide-launch:focus-visible,.dx-top .sound-toggle:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.dx-guide{position:absolute;z-index:7;top:calc(114px + env(safe-area-inset-top));left:16px;right:16px;width:min(390px,calc(100% - 32px));max-height:calc(100% - 192px);margin-inline:auto;overflow-y:auto;overscroll-behavior:contain;padding:16px;border:1px solid rgba(255,212,0,.6);border-radius:14px;background:rgba(14,12,37,.98);box-shadow:0 16px 44px rgba(0,0,0,.6);color:#fff;touch-action:pan-y}
 .dx-guide[hidden]{display:none!important}
 .dx-guide-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .dx-guide h3{margin:0;font:800 17px/1.22 AV,system-ui,sans-serif;letter-spacing:-.02em}
@@ -1313,8 +1322,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .dx-guide-number{width:22px;height:22px;flex:0 0 22px;display:grid;place-items:center;border-radius:6px;background:rgba(255,212,0,.16);color:#FFD400;font:800 11px AV,system-ui,sans-serif}
 .dx-guide-done{width:100%;min-height:44px;border-radius:9px;background:#FFD400;color:#151125;font:800 12px AV,system-ui,sans-serif;letter-spacing:.05em}
 .dx-guide button:focus-visible{outline:2px solid #fff;outline-offset:3px}
-@media(max-height:550px){.dx-guide{top:calc(58px + env(safe-area-inset-top));max-height:calc(100% - 130px);padding:12px}.dx-guide-steps{gap:7px;margin:9px 0}.dx-guide h3{font-size:15px}}
-@media(max-width:350px){.dx-top{gap:7px}.dx-top .dx-help-trigger{width:38px;min-width:38px}}
+@media(max-height:550px){.dx-guide{top:calc(100px + env(safe-area-inset-top));max-height:calc(100% - 155px);padding:12px}.dx-guide-launch{top:calc(65px + env(safe-area-inset-top))}.dx-guide-steps{gap:7px;margin:9px 0}.dx-guide h3{font-size:15px}}
+@media(max-width:350px){.dx-top{gap:5px;padding-left:12px;padding-right:12px}.dx-top .sound-toggle{flex-basis:34px;width:34px;height:34px;min-height:34px}.dx-guide-launch{right:12px}}
 
 /* Continuar sigue primero; compartir y álbum se muestran juntos debajo. */
 .rs-follow .rs-act2{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
@@ -2024,7 +2033,8 @@ const STAGE=id=>{const d=DB[id];if(d&&d.cm)return d.cm;const b=ABOX[id];if(!b||!
 let pi=0,PHS=[];
 function phasesOf(c){const L=[];if(c._dnew)L.push('design');if(c._new&&c.v!=='b')L.push('back');L.push('card');return L}
 let REV=new Set();
-const dxTop=()=>`<div class="dx-top"><span class="dx-seg">${hand.map((_,i)=>`<i class="${i<idx?'ok':i===idx?'cur':''}"></i>`).join('')}</span><span class="dx-n">${String(idx+1).padStart(2,'0')}/05</span><button type="button" id="dcHelp" class="dx-help-trigger" aria-label="Cómo explorar tus cartas" aria-expanded="false" aria-controls="dxGuide" title="Cómo explorar tus cartas">?</button><button type="button" id="dcSkip">Saltar</button></div>
+const dxTop=()=>`<div class="dx-top"><span class="dx-seg">${hand.map((_,i)=>`<i class="${i<idx?'ok':i===idx?'cur':''}"></i>`).join('')}</span><span class="dx-n">${String(idx+1).padStart(2,'0')}/05</span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" id="dcSkip">Saltar</button></div>
+ <button type="button" id="dcHelp" class="dx-guide-launch" aria-label="Cómo explorar tus cartas" aria-expanded="false" aria-controls="dxGuide" title="Cómo explorar tus cartas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/></svg><span>Cómo explorar</span></button>
  <aside class="dx-guide" id="dxGuide" aria-labelledby="dxGuideTitle" hidden>
   <div class="dx-guide-head"><h3 id="dxGuideTitle">Descubre todo lo que tiene tu carta</h3><button type="button" id="dxGuideClose" aria-label="Cerrar guía">×</button></div>
   <ol class="dx-guide-steps">
@@ -2084,6 +2094,7 @@ function dxNav(){
  $('dcPrev').onclick=move(-1);
  if($('dcNext'))$('dcNext').onclick=move(1);
  $('dcSkip').onclick=finishDiscovery;
+ showSoundState(); // Actualizar la bocina creada al mostrar cada carta.
  bindRevealGuide();
  // Gestos únicamente en el escenario: no interceptar botones ni la carta ampliable.
  D._dxPointer=null;
