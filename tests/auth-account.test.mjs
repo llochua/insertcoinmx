@@ -68,7 +68,9 @@ function buildHarness({
 }
 
 test('profile markup has unique IDs, accessible controls and correct script link', () => {
-  const all = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
+  // Solo el HTML real del body: en las plantillas JS hay textos id="..." duplicados legítimamente.
+  const staticMarkup = html.slice(html.indexOf('<body>'), html.indexOf('<script src="content/card-texts.js'));
+  const all = [...staticMarkup.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
   assert.equal(new Set(all).size, all.length, 'duplicate ID in document');
   for (const id of ['profile', 'profileAuthEmail', 'profileAuthPassword', 'profileAuthTabSignup',
                     'profileAuthTabLogin', 'profileAuthForm', 'profileAuthSignOut']) {
@@ -81,9 +83,10 @@ test('profile markup has unique IDs, accessible controls and correct script link
 });
 
 test('classic inline scripts compile without syntax errors', () => {
-  const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)];
+  const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)]
+    .filter(([, attributes]) => !/\bsrc\s*=/.test(attributes) && !/application\/ld\+json/.test(attributes));
   assert.ok(scripts.length >= 2);
-  for (const [, body] of scripts) if (body.trim()) assert.doesNotThrow(() => new vm.Script(body));
+  for (const [, , body] of scripts) if (body.trim()) assert.doesNotThrow(() => new vm.Script(body));
   assert.doesNotThrow(() => new vm.Script(source));
 });
 
