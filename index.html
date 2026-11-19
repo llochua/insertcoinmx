@@ -2071,7 +2071,14 @@ const RETA_REROLLS=3;
 function retaNueva(pool,reroll=false){
  const prev=S.reta2||{},day=today(),used=prev.day===day?Math.max(0,Math.min(RETA_REROLLS,prev.rerolls|0)):0;
  let seed=reroll?Math.floor(Math.random()*0x7fffffff)+1:(Number.isInteger(prev.seed)&&prev.seed>0?prev.seed:Math.floor(Math.random()*0x7fffffff)+1);
- const prior=S.champ&&pool.some(d=>d.id===S.champ)?S.champ:null;
+ // Al reiniciar una Reta terminada, el campeón previo es el de AYER,
+ // no la ganadora provisional de hoy (S.champ).
+ const previousChampion=reroll&&prev.day===day?prev.lastChampion:S.champ;
+ const prior=previousChampion&&pool.some(d=>d.id===previousChampion)?previousChampion:null;
+ const history=Array.isArray(prev.history)?prev.history.filter(h=>h&&(!reroll||h.day!==day)).slice(-30):[];
+ const preDayDefenses=reroll
+  ?(Number.isInteger(prev.startingDefenses)?Math.max(0,prev.startingDefenses):Math.max(0,history.length?(history[history.length-1].defenses|0):0))
+  :Math.max(0,prev.defenses|0);
  const rosterFor=n=>{
   const sorted=pool.slice().sort((a,b)=>retaHash(n+':'+day+':'+a.id)-retaHash(n+':'+day+':'+b.id)||a.id.localeCompare(b.id));
   const first=prior||sorted[0].id;
@@ -2087,30 +2094,35 @@ function retaNueva(pool,reroll=false){
  return {day,seed,roster,round:0,champion:first,top:roster[0],bottom:roster[1],
   streak:0,lastChampion:prior,startingChampion:first,lastSide:'top',
   rerolls:used+(reroll?1:0),
-  done:false,titleDefended:false,defenses:Math.max(0,prev.defenses|0),
-  history:Array.isArray(prev.history)?prev.history.slice(-30):[]};
+  done:false,titleDefended:false,defenses:preDayDefenses,startingDefenses:preDayDefenses,
+  history};
 }
 function retaRerollUI(pool){
  const r=S.reta2,active=!!r&&r.day===today()&&retaValid(r,pool);
  const used=active?Math.max(0,Math.min(RETA_REROLLS,r.rerolls|0)):0;
  const left=RETA_REROLLS-used,btn=$('retaReroll');
  $('retaLeft').textContent=String(left);
- btn.disabled=!active||r.done||left===0;
- btn.title=r&&r.done?'Reta completada por hoy':left?'Cambiar retadores: '+left+' cambios disponibles':'Sin cambios disponibles por hoy';
+ // El resultado de una Reta terminada no consume los cambios sin usar.
+ btn.disabled=!active||left===0;
+ btn.title=left?'Cambiar retadores: '+left+' cambios disponibles':'Sin cambios disponibles por hoy';
  btn.setAttribute('aria-label',btn.title);
 }
 $('retaReroll').onclick=()=>{
  syncIn();const r=S.reta2,pool=retaPool();
- if(!retaValid(r,pool)||r.done||(r.rerolls|0)>=RETA_REROLLS){retaRerollUI(pool);return}
+ if(!retaValid(r,pool)||(r.rerolls|0)>=RETA_REROLLS){retaRerollUI(pool);return}
  const restart=()=>withLock(()=>{
   syncIn();const current=S.reta2,available=retaPool();
-  if(!retaValid(current,available)||current.done||(current.rerolls|0)>=RETA_REROLLS){retaRerollUI(available);return}
-  const next=retaNueva(available,true);S.reta2=next;
+  if(!retaValid(current,available)||(current.rerolls|0)>=RETA_REROLLS){retaRerollUI(available);return}
+  const next=retaNueva(available,true);
+  // Revertir únicamente la campeona provisional de hoy cuando había finalizado.
+  // El registro definitivo se volverá a escribir al completar la nueva Reta.
+  if(current.done)S.champ=current.lastChampion||'';
+  S.reta2=next;
   if(!save())toast('CAMBIO PENDIENTE DE GUARDAR');
   ga('reta_cambio_retadores',{usados:next.rerolls,restantes:RETA_REROLLS-next.rerolls});
   startTorneo();
  });
- if(r.round>0)uxShow({kicker:'RETA · CAMBIAR RETADORES',title:'¿Cambiar los enfrentamientos?',desc:'Se reiniciarán tus elecciones de esta Reta. Tus cartas y sobres siguen intactos.',note:'Te quedan '+(RETA_REROLLS-(r.rerolls|0))+' cambios hoy.',primary:'CAMBIAR PLAYERAS',secondary:'SEGUIR JUGANDO',onPrimary:restart});
+ if(r.round>0)uxShow({kicker:'RETA · CAMBIAR RETADORES',title:r.done?'¿Jugar otra Reta?':'¿Cambiar los enfrentamientos?',desc:r.done?'Tu resultado de hoy será reemplazado por el de la nueva Reta. Tus cartas y sobres siguen intactos.':'Se reiniciarán tus elecciones de esta Reta. Tus cartas y sobres siguen intactos.',note:'Te quedan '+(RETA_REROLLS-(r.rerolls|0))+' cambios hoy.',primary:'CAMBIAR PLAYERAS',secondary:'SEGUIR JUGANDO',onPrimary:restart});
  else restart();
 };
 function startTorneo(){
