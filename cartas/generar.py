@@ -402,8 +402,8 @@ def actualizar_web(cat):
     # Nuevos diseños: publicar también el color real del fondo para el escenario
     # inmersivo. Respeta las paletas de RBG e ICOL ya ajustadas manualmente y
     # deja intactos los diseños antiguos que deliberadamente usan fondo neutro.
-    m_bg = re.search(r'const RBG=(\\{.*?\\});', src)
-    m_icol = re.search(r'const ICOL=(\\{.*?\\});', src)
+    m_bg = re.search(r'const RBG=(\{.*?\});', src)
+    m_icol = re.search(r'const ICOL=(\{.*?\});', src)
     if m_bg:
         fondos = json.loads(m_bg.group(1))
         colores_previos = json.loads(m_icol.group(1)) if m_icol else {}
