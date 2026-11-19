@@ -15,7 +15,7 @@ function fixture({existing=null,localState=null,localExt=null}={}){
  if(localExt)files.set('icmx-album2.ext',JSON.stringify(localExt));
  const writes=[],downloads=[],uploads=[],user={id:'55555555-5555-4555-8555-555555555555',email:'qa@example.test'};
  const elements={};
- for(const id of ['guest','signed','signedEmail','tabSignup','tabLogin','password','modeHint','submit','message','logout','authForm','email','backupDownload','backupConsent','backupUpload','backupStatus','localSummary','inspectProgress']){
+ for(const id of ['guest','signed','signedEmail','tabSignup','tabLogin','password','modeHint','submit','message','logout','authForm','email','backupDownload','backupConsent','backupConsentLabel','backupUpload','backupStatus','localSummary','inspectProgress']){
   elements[id]={
    listeners:{},attrs:{},hidden:false,disabled:false,checked:false,value:'',textContent:'',dataset:{},
    addEventListener(type,handler){this.listeners[type]=handler;},
@@ -98,6 +98,9 @@ test('download and unchecked button never upload; confirmation uploads once and 
  assert.equal(h.stored.state.data.have.fatality_b,2);
  assert.equal(h.stored.state.ext.pend.unreleased_b,1);
  assert.match(h.elements.backupStatus.textContent,/Respaldo confirmado/);
+ assert.equal(h.elements.backupUpload.textContent,'✓ RESPALDO GUARDADO');
+ assert.equal(h.elements.backupUpload.disabled,true);
+ assert.equal(h.elements.backupConsentLabel.hidden,true);
  assert.equal(h.writes.length,0);
  assert.equal(h.files.get('icmx-album2'),JSON.stringify({have:{hyrule_f:1,fatality_b:2},rate:{hyrule:3},rev:12,pk:['some-id'],welcomeLeft:0}));
 });
@@ -121,4 +124,15 @@ test('local progress change after download blocks upload without modifying data'
  assert.equal(h.uploads.length,0);
  assert.equal(h.writes.length,0);
  assert.match(h.elements.backupStatus.textContent,/No pudimos verificar/);
+});
+
+test('existing backup on login is identified without uploading or modifying data',async()=>{
+ const prior={user_id:'55555555-5555-4555-8555-555555555555',state:{app:'insertcoinmx-album',format:2,data:{have:{x_b:1},rate:{}}},revision:1,game_format:2};
+ const h=fixture({existing:prior});await h.ready();
+ assert.equal(h.elements.backupUpload.textContent,'✓ RESPALDO GUARDADO');
+ assert.equal(h.elements.backupUpload.disabled,true);
+ assert.equal(h.elements.backupDownload.disabled,true);
+ assert.equal(h.elements.backupConsentLabel.hidden,true);
+ assert.equal(h.uploads.length,0);
+ assert.equal(h.writes.length,0);
 });
