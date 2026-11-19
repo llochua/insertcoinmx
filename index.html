@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8">
-<!-- Google Analytics 4 (G-1PZ5B99JMH) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1PZ5B99JMH"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-1PZ5B99JMH');</script>
+<!-- Vista de pruebas sin analítica de producción. -->
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Insert Coin MX</title>
+<title>Insert Coin MX — Pruebas de revelación</title>
+<meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección.">
 <link rel="canonical" href="https://insertcoinmx.com/">
 <meta name="theme-color" content="#3b50cd">
@@ -1355,6 +1354,19 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #zoom #zRate .rb.zr-emoji{min-height:52px;padding:6px 2px!important;font:27px/1 system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif!important}
 #zoom #zRate .rb.zr-emoji.on::after{top:2px;right:5px;font:800 12px AV,system-ui,sans-serif}
 @media(max-width:350px){.dx-top{padding-inline:12px;gap:5px}.disc.dx .dx-controls,.disc.dx:not(.cov) .dx-controls{width:calc(100% - 24px)}}
+
+/* PREVIEW ONLY: logros sin bloquear navegación ni reencuadrar cartas. */
+.ic-award{--glow:rgba(255,212,0,.52);--ink:#fff5bc;position:absolute;z-index:5;top:clamp(84px,18%,170px);left:50%;width:min(96%,620px);text-align:center;pointer-events:none;opacity:0;animation:icAward 2.25s cubic-bezier(.2,.8,.25,1) both}
+.ic-award::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:min(100vw,500px);height:180px;transform:translate(-50%,-50%);background:radial-gradient(ellipse,var(--glow),transparent 72%);filter:blur(10px)}
+.ic-award-kicker{display:block;font:8px/1.5 PX,monospace;letter-spacing:.1em;color:#fff;text-shadow:0 2px 9px #000;margin-bottom:11px}
+.ic-award strong{display:block;font:900 clamp(28px,8.8vw,58px)/.98 AV,system-ui,sans-serif;letter-spacing:-.05em;color:var(--ink);text-wrap:balance;-webkit-text-stroke:.5px #ffffff55;text-shadow:0 3px 0 #21131c,0 5px 18px #000,0 0 28px var(--glow)}
+.ic-award-type{display:inline-block;margin-top:13px;padding:7px 14px 6px;background:#0e0c1bd9;border:1px solid currentColor;border-radius:4px;color:var(--ink);font:700 12px AV;letter-spacing:.12em;box-shadow:0 0 16px var(--glow)}
+.dx.v-e .ic-award{--glow:rgba(150,225,255,.65);--ink:#dcf7ff}
+.dx.v-r .ic-award{--glow:rgba(255,184,47,.8);--ink:#ffe49a}
+.dx.v-f .ic-award{--glow:rgba(255,121,207,.67);--ink:#ffd0ef}
+@keyframes icAward{0%{opacity:0;transform:translateY(30px) scale(.68);filter:blur(7px)}17%{opacity:1;transform:translateY(-4px) scale(1.07);filter:blur(0)}27%,68%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-22px) scale(1.04)}}
+@media(max-height:610px){.ic-award{top:70px}.ic-award strong{font-size:clamp(26px,7vw,44px)}.ic-award-type{margin-top:7px}}
+@media(prefers-reduced-motion:reduce){.ic-award{animation:none;opacity:0}}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1628,7 +1640,7 @@ const TN=['GOTY','GENIAL','OK','MMM'],TC=['#FFD400','#f0a830','#a9a3c4','#6e6a85
 const GOALS=[[16,'TORNEO'],[20,'TU TIER'],[NAV,'ALBUM COMPLETO']];
 const $=id=>document.getElementById(id);
 /* ===== progreso local · Etapa 1: fecha local, respaldo, protección entre pestañas ===== */
-const KEY='icmx-album2',KEY_EXT=KEY+'.ext',KEY_BAK=KEY+'.bak',KEY_BAD=KEY+'.corrupt',KEY_PRE=KEY+'.premig',FORMAT=2;
+const KEY='icmx-album2-preview-revelacion',KEY_EXT=KEY+'.ext',KEY_BAK=KEY+'.bak',KEY_BAD=KEY+'.corrupt',KEY_PRE=KEY+'.premig',FORMAT=2;
 const DEF=()=>({have:{},rate:{},ini:'',seen:0,last:'',extra:0,test:0,champ:''});
 const BADK=new Set(['__proto__','constructor','prototype']);
 const pj=t=>JSON.parse(t,(k,v)=>{if(BADK.has(k))throw new Error('clave no permitida');return v});
@@ -1675,11 +1687,11 @@ const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
  normalize(S);
  if(MIGD&&raw!==null){try{if(LS.get(KEY_PRE)===null)localStorage.setItem(KEY_PRE,raw)}catch(e){}}} // copia exacta del progreso anterior, una sola vez
 /* ===== Analytics: eventos propios (nunca rompen el juego si GA no carga) ===== */
-const ga=(n,p)=>{try{if(window.gtag)gtag('event',n,p||{})}catch(e){}};
+const ga=()=>{}; // sin métricas de producción
 try{if(S.last&&S.last<today())ga('regreso',{dias_desde_ultimo_sobre:Math.round((new Date(today())-new Date(S.last))/864e5)})}catch(e){}
 const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
-const PRUEBA=false; // quitar al lanzar: sobres ilimitados para revisar
+const PRUEBA=true; // sobres ilimitados únicamente en esta rama
 /* Regla pactada: 5 sobres de bienvenida, luego 2 cada 6 horas.
    La bienvenida se conserva hasta gastarla; los ciclos de 6 horas
    se calculan por reloj. Los canjes extra van aparte. */
@@ -1744,7 +1756,7 @@ function withLock(fn){let ran=false;const run=()=>{ran=true;fn()};
 function goty(k){const v=STORE.docs.map(d=>d.rate&&d.rate[k]).filter(x=>x!==undefined);if(S.rate[k]!==undefined&&!STORE.docs.length)v.push(S.rate[k]);if(!v.length)return null;return Math.round(v.filter(x=>x===0).length/v.length*100)}
 /* ---------- música de Insert Coin MX y efectos ---------- */
 /* El navegador habilita la reproducción con una interacción real; no forzamos autoplay. */
-const AUDIO_PREF_KEY='icmx-sound-muted-v1';
+const AUDIO_PREF_KEY='icmx-sound-muted-v1-preview-revelacion';
 let soundMuted=LS.get(AUDIO_PREF_KEY)==='1';
 const MUSIC_VOLUME=.12,FADE_MS=900;
 const MUSIC_FILES={general:'audio/vinyl-dreams.mp3',reta:'audio/pixel-showdown.mp3'};
@@ -2062,11 +2074,19 @@ function artBox(id,cls=''){const src=artOf(id),b=src.startsWith('d/')&&ABOX[id];
  const cw=x1-x0,ch=y1-y0,ratio=(cw*(src.startsWith('d/')?640:600))/(ch*(src.startsWith('d/')?800:900));
  return `<span class="ab ${cls}${hasCol(id)?'':' neu'}" style="--ar:${ratio.toFixed(3)}"><img src="${src}" alt="" loading="lazy" style="width:${(100/cw).toFixed(2)}%;left:${(-x0/cw*100).toFixed(2)}%;top:${(-y0/ch*100).toFixed(2)}%"></span>`}
 const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255};
+const icAwardsSeen=new Set(); // no repetir celebraciones al volver atrás
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
-function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();
+function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();icAwardsSeen.clear();
  for(const c of hand)c._comp=!c._doneB&&dState(DB[c.d]).done&&hand.filter(x=>x.d===c.d).pop()===c; // completó en este sobre
  lastPack=new Set(hand.filter(c=>c._new).map(c=>c.d));showCard()}
 function caseOf(c){return !c._new?'rep':c._comp?'comp':c._dnew?'dnew':'vnew'}
+/* Solo hay dos mensajes de logro; duplicados sin celebración. */
+function icAward(c){
+ if(!c._new||icAwardsSeen.has(idx))return '';
+ icAwardsSeen.add(idx);
+ const first=!!c._dnew,variant={b:'BASE',e:'HOLO',r:'DORADA',f:'ESPECIAL'}[c.v];
+ return '<div class="ic-award" aria-hidden="true"><span class="ic-award-kicker">'+(first?'DISEÑO DESCUBIERTO':'TU COLECCIÓN CRECE')+'</span><strong>'+(first?'¡NUEVA!':'¡NUEVA VARIANTE!')+'</strong><span class="ic-award-type">'+variant+'</span></div>';
+}
 function chips(c,anim){const st=dState(DB[c.d]);return st.vs.filter(x=>x.st!=='soon').map((x,i)=>{const now=x.c.k===c.k&&c._new;
  return `<span class="dc-v v-${x.v}${x.h?' on':''}${now?' now':''}" style="--i:${i}"><i></i>${VN[x.v]}${now?' <b>nueva</b>':''}</span>`}).join('')}
 /* Cada carta tiene hasta tres momentos, solo los que corresponden:
@@ -2173,7 +2193,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   return}
 
  const d=DB[c.d],col=dcol(d.id),k=caseOf(c),v=c.v,fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':null;
- const lab={dnew:'DISEÑO NUEVO',vnew:'NUEVA VERSIÓN',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
+ const lab={dnew:'NUEVA',vnew:'NUEVA VARIANTE',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
  /* la ilustración es la de esta versión: Base/Especial = estampa original · Rara = su arte en oro · Full = su escena completa */
  const fullSrc=fa||artOf(d.id);
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
@@ -2184,9 +2204,10 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   <div class="dx-full-view" id="dcFullView" hidden aria-hidden="true"><img src="${fullSrc}" alt="Ilustración completa de ${esc(d.n)}" decoding="async"></div>
   <button type="button" id="dcArtBack" class="dx-art-back" hidden aria-label="Volver a la carta"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m14.5 5-7 7 7 7"/></svg><span>Volver a carta</span></button>
   <div class="dx-fade"></div>
+  ${icAward(c)}
   ${dxTop()}${dxControls()}
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${baseHtml(c)}
-   <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?'<span class="dx-s">NUEVA</span>':`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
+   <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?`<span class="dx-s">${c._dnew?'NUEVA':'NUEVA VARIANTE'}</span>`:`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
   <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span></button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
  $('dcCard').onclick=()=>openCard(c.k);
  dxNav();
