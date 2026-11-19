@@ -103,7 +103,7 @@ test('register sends signUp with Confirm signup redirect, without modifying loca
   assert.equal(h.calls.signup.length, 1);
   assert.equal(h.calls.signup[0].email, 'jugador@example.com');
   assert.equal(h.calls.signup[0].options.emailRedirectTo, 'https://insertcoinmx.com/');
-  assert.match(e.profileAuthMessage.textContent, /Revisa tu correo/);
+  assert.match(e.profileAuthMessage.textContent, /Si este correo todavía no tiene cuenta/);
   assert.equal(h.calls.storageWrites.length, 0);
   assert.equal(e.profileAuthSend.disabled, false);
 });
