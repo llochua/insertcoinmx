@@ -70,6 +70,8 @@ a{color:var(--yellow)}
 <section id="signed" aria-label="Sesión iniciada" aria-hidden="true">
  <p class="subtle">SESIÓN CONFIRMADA</p>
  <p id="signedEmail"></p>
+ <button type="button" class="action secondary" id="inspectCloud">VER MI RESPALDO EN LA NUBE</button>
+ <p id="cloudSummary" class="subtle" role="status" aria-live="polite">Consulta tu respaldo en Supabase sin descargarlo ni reemplazar cartas en este dispositivo.</p>
  <button type="button" class="action secondary" id="inspectProgress">REVISAR MI COLECCIÓN LOCAL</button>
  <p id="localSummary" class="subtle" role="status" aria-live="polite">Este diagnóstico solo lee el progreso del navegador. No guarda ni envía cartas a la nube.</p>
  <div id="backupPanel" style="margin-top:24px;padding-top:17px;border-top:1px solid rgba(255,255,255,.16)">
@@ -103,7 +105,10 @@ function display(user){
  el("guest").hidden=active;
  el("signed").setAttribute("aria-hidden",String(!active));
  el("signedEmail").textContent=user?.email||"";
- if(!active)resetBackupUi();
+ if(!active){
+  resetBackupUi();
+  el("cloudSummary").textContent="Consulta tu respaldo en Supabase sin descargarlo ni reemplazar cartas en este dispositivo.";
+ }
 }
 function setMode(next){
  if(busy||!["signup","login"].includes(next))return;
@@ -235,6 +240,35 @@ async function existingSnapshot(userId){
  if(error)throw error;
  return data;
 }
+
+/* Diagnóstico de la nube: lee SOLO el snapshot de la cuenta autenticada.
+   No importa, fusiona, descarga automáticamente ni toca localStorage. */
+async function inspectCloudBackup(){
+ const button=el("inspectCloud"),output=el("cloudSummary");
+ if(!client||busy||backupBusy)return;
+ button.disabled=true;
+ output.textContent="Consultando el respaldo en Supabase…";
+ try{
+  const user=await getBackupUser();
+  const snapshot=await existingSnapshot(user.id);
+  if(!snapshot){
+   output.textContent="Esta cuenta todavía no tiene una colección respaldada en Supabase.";
+   return;
+  }
+  if(snapshot.user_id!==user.id||snapshot.game_format!==2||snapshot.revision!==1)throw Error("Identidad o formato inesperado");
+  const state=snapshot.state,have=state?.data?.have,ratings=state?.data?.rate;
+  if(state?.app!=="insertcoinmx-album"||state?.format!==2||!have||Array.isArray(have)||typeof have!=="object"||
+    !ratings||Array.isArray(ratings)||typeof ratings!=="object")throw Error("Respaldo sin estructura");
+  const cards=Object.entries(have);
+  if(cards.length>20000 || cards.some(([id,n])=>!/^[a-z0-9]{1,40}_[berf]$/.test(id)||!Number.isInteger(n)||n<1||n>9999))throw Error("Cartas inválidas");
+  const total=cards.reduce((sum,[,n])=>sum+n,0);
+  output.textContent="Tu cuenta tiene "+cards.length+" variantes, "+total+" cartas y "+Object.keys(ratings).length+" calificaciones guardadas en Supabase. Este dispositivo no recibió ni modificó cartas.";
+ }catch(_error){
+  output.textContent="No pudimos consultar el respaldo. Tu colección local sigue intacta.";
+ }finally{button.disabled=false}
+}
+el("inspectCloud").addEventListener("click",inspectCloudBackup);
+
 el("backupDownload").addEventListener("click",async()=>{
  if(backupBusy)return;
  backupBusy=true;clearPreparedBackup();el("backupDownload").disabled=true;
