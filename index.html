@@ -1367,6 +1367,10 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @keyframes icAward{0%{opacity:0;transform:translateY(30px) scale(.68);filter:blur(7px)}17%{opacity:1;transform:translateY(-4px) scale(1.07);filter:blur(0)}27%,68%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-22px) scale(1.04)}}
 @media(max-height:610px){.ic-award{top:70px}.ic-award strong{font-size:clamp(26px,7vw,44px)}.ic-award-type{margin-top:7px}}
 @media(prefers-reduced-motion:reduce){.ic-award{animation:none;opacity:0}}
+
+/* Control solo en preview, fuera de producción */
+#home .ic-demo-btn{align-self:center;flex:none;min-height:38px;padding:9px 15px 8px;margin:4px auto 3px;border:1px solid #ffe268;border-radius:8px;background:#ffd400;color:#171124;font:700 clamp(10px,2.6vw,12px)/1.25 AV,system-ui,sans-serif;box-shadow:0 3px 0 #ac8500,0 5px 18px #0005;z-index:3}
+#home .ic-demo-btn:focus-visible{outline:2px solid white;outline-offset:2px}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1382,7 +1386,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <section class="view on" id="home">
  <div class="amb" id="mAmb"></div>
  <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
- <span id="test" class="htest"></span>
+ <span id="test" class="htest"></span><button type="button" id="icDemo" class="ic-demo-btn">PROBAR REVELACIONES · 5 CARTAS</button>
  <div class="mfan" id="mFan"></div>
  <div class="mtabs" id="mTabs"></div>
  <div class="dupbar" id="dupBar"><span id="tDup"></span><button id="tDupB">CAMBIAR</button></div>
@@ -2008,6 +2012,15 @@ if(NOWRITE){saveFailed=true;setWarn(true)}
 function trade(after){withLock(()=>{syncIn();if(dups()<5){after&&after();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})}
 $('tDupB').onclick=()=>trade(renderHome);
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
+/* La demo usa cartas y pantalla reales, pero no modifica S.have ni el contador de sobres. */
+$('icDemo').onclick=()=>{
+ go('pack');
+ icPreviewDemo=true;lastOpenedPack={kind:'test',number:0};
+ const mkDemo=(v,isNew,isDesignNew,count)=>({...CB['gunsncontrols_'+v],_new:isNew,_dnew:isDesignNew,_prev:isDesignNew?[]:['b'],_doneB:false,_previewCount:count||1});
+ hand=[mkDemo('b',true,true),mkDemo('e',true,false),mkDemo('r',true,false),mkDemo('f',true,false),mkDemo('b',false,false,2)];
+ $('env').style.display='none';
+ buildStack();
+};
 /* ---------- sobre ---------- */
 /* Sobre (Etapa 4): 3 Base + 1 sorpresa (30% de ser Especial o mejor) + 1 Especial o mejor segura.
    Resultado por carta: Base 74% · Especial 17% · Rara 6.6% · Full 2.4%.
@@ -2037,7 +2050,7 @@ $('tearZone').addEventListener('pointerup',()=>{if(tx!==null){tx=null;$('cutp').
 $('openBtn').onclick=openPack;
 /* abrir sobre: en un solo bloque, dentro del candado, se adopta lo guardado, se revisa que haya sobre,
    se suman las cartas, se gasta el sobre y se guarda. La animación empieza después. */
-let opening=false;function openPack(){if(opening)return;opening=true;clearTimeout(hintT);
+let opening=false;function openPack(){if(opening)return;icPreviewDemo=false;opening=true;clearTimeout(hintT);
  withLock(()=>{syncIn();if(!packReady()){opening=false;go('home');uxEmptyPacks(true);return}
   const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,welcome:0,daily:0,dailyDay:'',dailyCycle:null,saved:false,t:0};
   if(!S.test&&!PRUEBA){
@@ -2075,6 +2088,7 @@ function artBox(id,cls=''){const src=artOf(id),b=src.startsWith('d/')&&ABOX[id];
  return `<span class="ab ${cls}${hasCol(id)?'':' neu'}" style="--ar:${ratio.toFixed(3)}"><img src="${src}" alt="" loading="lazy" style="width:${(100/cw).toFixed(2)}%;left:${(-x0/cw*100).toFixed(2)}%;top:${(-y0/ch*100).toFixed(2)}%"></span>`}
 const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255};
 const icAwardsSeen=new Set(); // no repetir celebraciones al volver atrás
+let icPreviewDemo=false; // no guarda ni gasta sobres
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
 function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();icAwardsSeen.clear();
  for(const c of hand)c._comp=!c._doneB&&dState(DB[c.d]).done&&hand.filter(x=>x.d===c.d).pop()===c; // completó en este sobre
@@ -2105,6 +2119,7 @@ const dxControls=(covered=false)=>`<nav class="dx-controls" aria-label="Navegaci
  ${covered?'<button type="button" id="dcReveal" class="dx-primary">Revelar carta</button>':`<button type="button" id="dcNext" class="dx-arrow" aria-label="${idx===hand.length-1?'Ver resumen':'Siguiente carta'}" title="${idx===hand.length-1?'Ver resumen':'Siguiente'}">${dxArrow('right')}</button>`}
 </nav>`;
 function finishDiscovery(){
+ if(icPreviewDemo){icPreviewDemo=false;$('disc').classList.remove('on');go('home');toast('DEMOSTRACIÓN COMPLETADA');return}
  $('disc').classList.remove('on');
  showSum();
  $('sum').focus({preventScroll:true});
@@ -2207,7 +2222,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   ${icAward(c)}
   ${dxTop()}${dxControls()}
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${baseHtml(c)}
-   <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?`<span class="dx-s">${c._dnew?'NUEVA':'NUEVA VARIANTE'}</span>`:`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
+   <div class="dx-tags"><span class="dx-v">${VN[v].toUpperCase()}</span>${c._new?`<span class="dx-s">${c._dnew?'NUEVA':'NUEVA VARIANTE'}</span>`:`<span class="dx-s">×${c._previewCount??S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
   <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span></button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
  $('dcCard').onclick=()=>openCard(c.k);
  dxNav();
