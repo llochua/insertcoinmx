@@ -68,6 +68,8 @@ a{color:var(--yellow)}
 <section id="signed" aria-label="Sesión iniciada" aria-hidden="true">
  <p class="subtle">SESIÓN CONFIRMADA</p>
  <p id="signedEmail"></p>
+ <button type="button" class="action secondary" id="inspectProgress">REVISAR MI COLECCIÓN LOCAL</button>
+ <p id="localSummary" class="subtle" role="status" aria-live="polite">Este diagnóstico solo lee el progreso del navegador. No guarda ni envía cartas a la nube.</p>
  <button type="button" class="action secondary" id="logout">CERRAR SESIÓN DE PRUEBA</button>
 </section>
 <p id="message" role="status" aria-live="polite">Conectando con Supabase…</p>
@@ -114,6 +116,22 @@ function errorText(error){
  if(/rate.limit|too.many|over_email/.test(code+" "+detail))return "Se alcanzó el límite de solicitudes. Podrás probar más tarde.";
  return "No se pudo completar la operación. Revisa tus datos o la conexión.";
 }
+/* Diagnóstico voluntario: solo lectura, sin alterar el juego ni enviar datos. */
+function inspectLocalProgress(){
+ const output=el("localSummary");
+ try{
+  const raw=localStorage.getItem("icmx-album2");
+  if(raw===null){output.textContent="No encontré una colección local en este navegador. Es normal si jugaste desde otro dispositivo.";return}
+  if(raw.length>1048576)throw new Error("Tamaño inesperado");
+  const banned=new Set(["__proto__","prototype","constructor"]);
+  const data=JSON.parse(raw,(name,value)=>{if(banned.has(name))throw new Error("Clave no permitida");return value});
+  if(!data||typeof data!=="object"||Array.isArray(data)||!data.have||typeof data.have!=="object"||Array.isArray(data.have))throw new Error("Datos no válidos");
+  const entries=Object.entries(data.have).filter(([name,qty])=>/^[a-z0-9]{1,40}_[berf]$/.test(name)&&Number.isInteger(qty)&&qty>=1&&qty<=9999);
+  const copies=entries.reduce((sum,[,qty])=>sum+qty,0);
+  output.textContent="Este navegador tiene "+entries.length+" variantes de carta distintas y "+copies+" copias en total. Todavía no se han subido a Supabase.";
+ }catch(e){output.textContent="No pude comprobar la colección local. No modifiqué ningún dato."}
+}
+el("inspectProgress").addEventListener("click",inspectLocalProgress);
 el("tabSignup").addEventListener("click",()=>setMode("signup"));
 el("tabLogin").addEventListener("click",()=>setMode("login"));
 el("authForm").addEventListener("submit",async e=>{
