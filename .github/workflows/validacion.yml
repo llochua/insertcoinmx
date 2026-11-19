@@ -1,0 +1,34 @@
+name: Validación básica
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    name: Cartas y sintaxis JavaScript
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Comprobar sintaxis JavaScript
+        run: |
+          node --check reta-diaria.js
+          node --check content/card-texts.js
+          node --check content/validate.mjs
+
+      - name: Validar catálogo y narrativas
+        run: node content/validate.mjs
