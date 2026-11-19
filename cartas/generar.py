@@ -399,6 +399,25 @@ def actualizar_web(cat):
                 h, w = a.shape[:2]
                 abox[d['id']] = [round(xs.min() / w, 3), round(ys.min() / h, 3), round((xs.max() + 1) / w, 3), round((ys.max() + 1) / h, 3)]
         src = src[:m.start(1)] + json.dumps(abox, separators=(',', ':')) + src[m.end(1):]
+    # Nuevos diseños: publicar también el color real del fondo para el escenario
+    # inmersivo. Respeta las paletas de RBG e ICOL ya ajustadas manualmente y
+    # deja intactos los diseños antiguos que deliberadamente usan fondo neutro.
+    m_bg = re.search(r'const RBG=(\\{.*?\\});', src)
+    m_icol = re.search(r'const ICOL=(\\{.*?\\});', src)
+    if m_bg:
+        fondos = json.loads(m_bg.group(1))
+        colores_previos = json.loads(m_icol.group(1)) if m_icol else {}
+        for d in cat:
+            ident = d['id']
+            if ident in viejas or ident in fondos or ident in colores_previos:
+                continue
+            path_arte = os.path.join(RAIZ, 'd', ident + '.jpg')
+            if not os.path.isfile(path_arte):
+                continue
+            arte = np.asarray(Image.open(path_arte).convert('RGB')).astype(np.float32)
+            color = np.rint(fondo_de(arte)).astype(np.uint8)
+            fondos[ident] = '#' + ''.join(f'{int(c):02x}' for c in color)
+        src = src[:m_bg.start(1)] + json.dumps(fondos, separators=(',', ':')) + src[m_bg.end(1):]
     open(p, 'w', encoding='utf8').write(src)
 
 
