@@ -8,9 +8,9 @@ const context={window:{}};
 vm.runInNewContext(data,context,{timeout:2000});
 const texts=context.window.ICMX_CARD_TEXTS;
 assert.ok(texts&&typeof texts==='object','No hay datos editoriales');
-const match=html.match(/const DESIGNS=\\[([\\s\\S]*?)\\];/);
+const match=html.match(/const DESIGNS=\[([\s\S]*?)\];/);
 assert.ok(match,'No se encontró el catálogo');
-const ids=[...match[1].matchAll(/\\{id:'([a-z0-9]+)'/g)].map(x=>x[1]);
+const ids=[...match[1].matchAll(/\{id:'([a-z0-9]+)'/g)].map(x=>x[1]);
 assert.equal(new Set(ids).size,ids.length,'IDs duplicados en catálogo');
 assert.deepEqual(Object.keys(texts).sort(),ids.slice().sort(),'Los IDs del archivo editorial y el catálogo difieren');
 for(const id of ids){
