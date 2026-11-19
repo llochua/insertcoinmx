@@ -47,3 +47,7 @@ html.embedded .winner-next{cursor:pointer}
  }
  html.embedded .fighter .shirt{height:95%!important}
 }
+
+/* El control global del álbum reemplaza al mute interno solo en Reta embebida. */
+html.embedded .brandbar{display:none!important}
+html.embedded .hud-meta{padding-right:0!important}
