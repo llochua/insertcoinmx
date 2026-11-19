@@ -142,7 +142,7 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
         showAuthUser(data.session.user);
         authMessage('¡Cuenta creada! Ya puedes entrar. Tus cartas aún son locales.', 'success');
       } else {
-        authMessage('Revisa tu correo para confirmar la cuenta. Después podrás iniciar sesión aquí.', 'success');
+        authMessage('Solicitud recibida. Si este correo todavía no tiene cuenta, recibirás un mensaje para confirmarla. Si ya tienes cuenta, elige INICIAR SESIÓN.', 'success');
       }
     } else {
       const {data, error} = await authClient.auth.signInWithPassword({email, password});
