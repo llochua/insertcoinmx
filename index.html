@@ -331,7 +331,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hprog .bar i{display:block;height:100%;border-radius:2px;background:#FFD400;box-shadow:0 0 10px rgba(255,212,0,.5)}
 .hprog .bar s{position:absolute;inset:0}.hprog .bar s em{position:absolute;top:-3px;width:2px;height:10px;background:rgba(255,255,255,.45)}
 .dupbar{display:none;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:rgba(255,212,0,.12);box-shadow:inset 0 0 0 1px rgba(255,212,0,.4);font:600 12px AV;color:#fff}
-.dupbar.on{display:flex}.dupbar button{font:700 11px AV;letter-spacing:.12em;background:#FFD400;color:#120f3a;border-radius:8px;padding:8px 12px}
+.dupbar.on{display:flex}.dupbar.progress{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}.dupbar button{font:700 11px AV;letter-spacing:.12em;background:#FFD400;color:#120f3a;border-radius:8px;padding:8px 12px}.dupbar button:disabled{opacity:.65;cursor:not-allowed;background:rgba(255,255,255,.11);color:#e2ddee}
 .hnav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .hnav button{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 4px 11px;border-radius:12px;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);color:#fff}
 .hnav .tile{border:0;text-align:center;padding:13px 4px 11px;gap:5px;opacity:1}
@@ -931,7 +931,7 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .rs2 .rs-out{display:block;margin:10px auto 0}
 .dx-v.v-b{background:#fff;color:#111}.dx-v.v-e{background:linear-gradient(90deg,#8fe9ff,#ffb3e6);color:#111}.dx-v.v-r{background:#e8b923;color:#111}.dx-v.v-f{background:#ff8fd8;color:#111}
 .rh .dx-card{bottom:128px!important;width:36%!important}
-.rs-redeem{padding-top:8px}
+.rs-redeem{padding-top:8px}.rs-redeem .rb-p{line-height:1.5}
 .rs-enter{animation:rsEnter .35s ease-out both}
 @keyframes rsEnter{from{opacity:0;transform:translateY(10px)}}
 .zoom[open]{display:flex;align-items:center}
@@ -1355,6 +1355,33 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #zoom #zRate .rb.zr-emoji{min-height:52px;padding:6px 2px!important;font:27px/1 system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif!important}
 #zoom #zRate .rb.zr-emoji.on::after{top:2px;right:5px;font:800 12px AV,system-ui,sans-serif}
 @media(max-width:350px){.dx-top{padding-inline:12px;gap:5px}.disc.dx .dx-controls,.disc.dx:not(.cov) .dx-controls{width:calc(100% - 24px)}}
+
+/* Fase 1 · Perfil de invitado */
+.mh .profile-entry{display:flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;border:1px solid rgba(255,255,255,.26);border-radius:50%;background:rgba(255,255,255,.08);color:#fff}
+.mh .profile-entry svg{width:20px;height:20px;display:block}
+.mh .profile-entry:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+#profile .profile-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px 20px max(30px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:17px}
+#profile .profile-head{display:flex;align-items:center;gap:13px;padding:8px 0 4px}
+#profile .profile-avatar{display:grid;place-items:center;flex:0 0 58px;width:58px;height:58px;border-radius:16px;background:rgba(255,212,0,.12);border:1px solid rgba(255,212,0,.54);font:700 18px PX;color:#FFD400}
+#profile .profile-kicker{font:700 10px AV;letter-spacing:.12em;color:#FFD400;margin:0 0 4px}
+#profile .profile-head h2{font:800 23px/1.1 AV;color:#fff;margin:0}
+#profile .profile-sub{font:500 13px/1.45 AV;color:rgba(255,255,255,.7);margin:7px 0 0}
+#profile .profile-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#profile .profile-metrics div{display:flex;flex-direction:column;gap:5px;padding:15px 13px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11)}
+#profile .profile-metrics strong{font:800 24px AV;color:#fff;font-variant-numeric:tabular-nums}
+#profile .profile-metrics span{font:600 12px/1.3 AV;color:rgba(255,255,255,.68)}
+#profile .profile-panel{padding:17px 15px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;gap:10px}
+#profile .profile-panel h3{font:800 15px AV;color:#fff;margin:0}
+#profile .profile-panel p{font:500 13px/1.5 AV;color:rgba(255,255,255,.76);margin:0}
+#profile .profile-panel p.profile-kicker{font:700 10px AV;letter-spacing:.12em;color:#FFD400}
+#profile .profile-panel .profile-action{min-height:45px;border-radius:10px;padding:11px 15px;font:800 12px AV;letter-spacing:.015em;text-align:center}
+#profile .profile-action.primary{background:#FFD400;color:#141026}
+#profile .profile-action.secondary{border:1px solid rgba(255,255,255,.3);color:#fff;background:rgba(255,255,255,.06)}
+#profile .profile-action:focus-visible{outline:3px solid #fff;outline-offset:2px}
+#profile .profile-account{border-color:rgba(255,212,0,.25)}
+#profile .profile-footnote{font:500 12px/1.5 AV;color:rgba(255,255,255,.56)}
+@media(max-width:380px){.mh .hb span{font-size:9px;letter-spacing:.13em}.mh .hc small{display:none}}
+@media(min-width:540px){#profile .profile-scroll{width:min(100%,520px);align-self:center}}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1369,7 +1396,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </section>
 <section class="view on" id="home">
  <div class="amb" id="mAmb"></div>
- <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
+ <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="profile-entry" data-go="profile" aria-label="Ver mi perfil de jugador" title="Mi perfil"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-4.3 3.4-6 7.5-6s6.7 1.7 7.5 6"/></svg></button><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
  <span id="test" class="htest"></span>
  <div class="mfan" id="mFan"></div>
  <div class="mtabs" id="mTabs"></div>
@@ -1420,6 +1447,32 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <button class="btn y" id="sSave">GUARDAR</button>
   <div class="tbl" id="tbl"></div>
   <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden></div>
+ </div>
+</section>
+
+<section class="view" id="profile" aria-label="Mi perfil de jugador">
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Mi perfil</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
+ <div class="profile-scroll">
+  <div class="profile-head"><div class="profile-avatar" aria-hidden="true">1UP</div><div><p class="profile-kicker">JUGADOR INVITADO</p><h2 id="profileName">Invitado</h2><p class="profile-sub">Tu colección está en este dispositivo.</p></div></div>
+  <div class="profile-metrics" aria-label="Resumen de mi colección">
+   <div><strong id="profileCards">0</strong><span>Cartas distintas</span></div>
+   <div><strong id="profileDesigns">0</strong><span>Diseños descubiertos</span></div>
+   <div><strong id="profileDuplicates">0</strong><span>Repetidas</span></div>
+   <div><strong id="profileRatings">0</strong><span>Diseños calificados</span></div>
+  </div>
+  <section class="profile-panel" aria-labelledby="profileBackupTitle">
+   <h3 id="profileBackupTitle">Protege tu colección</h3>
+   <p>El progreso se guarda en este navegador. Si cambias de dispositivo o se borran sus datos, podrías perderlo. Puedes guardar una copia ahora.</p>
+   <button type="button" class="profile-action primary" id="profileExport">EXPORTAR MI PROGRESO</button>
+   <button type="button" class="profile-action secondary" id="profileImport">IMPORTAR UN RESPALDO</button>
+  </section>
+  <section class="profile-panel profile-account" aria-labelledby="profileAccountTitle">
+   <p class="profile-kicker">CUENTAS EN PREPARACIÓN</p>
+   <h3 id="profileAccountTitle">Más adelante, tu colección en cualquier dispositivo</h3>
+   <p>Con una cuenta podrás sincronizar tus cartas, mostrar tu Top Score con tu perfil y participar en promociones cuando estén disponibles.</p>
+   <p>Por ahora puedes abrir sobres, jugar Reta, crear Tier Lists y calificar cartas como invitado.</p>
+  </section>
+  <p class="profile-footnote">El respaldo manual no crea una cuenta ni sincroniza automáticamente tus datos.</p>
  </div>
 </section>
 <div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onT" aria-hidden="true">
@@ -1904,7 +1957,7 @@ document.addEventListener('keydown',e=>{
 let cur='home';
 function go(id){if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
-function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
+function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores,profile:renderProfile}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
 /* ---------- bienvenida ---------- */
 const ON=[
@@ -1953,7 +2006,7 @@ function menuArtLoad(img,m,dir){
 }
 const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
+ {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'CICLO · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'SIN SOBRES POR AHORA',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -1969,7 +2022,7 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,i
  if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
  [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
  const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.jpg'})`;
- const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
+ const d=dups();$('dupBar').classList.toggle('on',d>0);$('dupBar').classList.toggle('progress',d<5);$('tDup').textContent=d>=5?'¡Tienes '+d+' repetidas! Canjea 5 por un sobre extra':d+' de 5 repetidas · junta 5 para un sobre extra';$('tDupB').textContent=d>=5?'CANJEAR':'FALTAN '+(5-d);$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
  if(m.id==='pack'&&m.off){beep(440,.05);uxEmptyPacks();return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
@@ -1993,8 +2046,36 @@ armDay();setInterval(dayTick,30000);
  document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake)}
 setInterval(()=>{if(saveFailed)save()},30000);
 if(NOWRITE){saveFailed=true;setWarn(true)}
-function trade(after){withLock(()=>{syncIn();if(dups()<5){after&&after();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})}
-$('tDupB').onclick=()=>trade(renderHome);
+function trade(after){
+ syncIn();
+ const available=dups();
+ if(available<5){toast('FALTAN '+(5-available)+' REPETIDAS PARA CANJEAR');return}
+ uxShow({
+  kicker:'REPETIDAS · CANJE',
+  title:'¿Canjear 5 repetidas?',
+  desc:'Usarás 5 copias repetidas para conseguir 1 sobre extra.',
+  note:'Siempre conservarás al menos una copia de cada carta.',
+  primary:'SÍ, CONSEGUIR SOBRE',
+  secondary:'CONSERVAR MIS CARTAS',
+  onPrimary:()=>withLock(()=>{
+   syncIn();
+   if(dups()<5){toast('YA NO TIENES 5 REPETIDAS');refresh();return}
+   const previousHave={...S.have},previousExtra=S.extra;
+   let need=5;
+   for(const k in S.have)while(S.have[k]>1&&need>0){S.have[k]--;need--}
+   S.extra=(S.extra||0)+1;
+   if(!save()){
+    S.have=previousHave;S.extra=previousExtra;
+    toast('NO SE PUDO GUARDAR EL CANJE');
+    refresh();return
+   }
+   ga('canje_repetidas',{repetidas:5,sobres:1});
+   jingle();toast('¡SOBRE EXTRA LISTO!');
+   if(after)after();else refresh()
+  })
+ })
+}
+$('tDupB').onclick=()=>trade(()=>go('pack'));
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
 /* Sobre (Etapa 4): 3 Base + 1 sorpresa (30% de ser Especial o mejor) + 1 Especial o mejor segura.
@@ -2305,7 +2386,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
  const rest=hand.filter(c=>c!==H),G={comp:rest.filter(c=>c._comp),dnew:rest.filter(c=>c._new&&!c._comp&&c._dnew),vnew:rest.filter(c=>c._new&&!c._comp&&!c._dnew),rep:rest.filter(c=>!c._new)};
  const sec=(t,L)=>L.length?`<section class="rs-group"><h3>${t}<span>${L.length}</span></h3><div class="rg">${L.map(card).join('')}</div></section>`:'';
  const n=dups(),PD=DESIGNS.filter(x=>!x.bx),disc=PD.filter(x=>dState(x).own).length;
- const tradeH=n>=5?'<button class="rs-trade" id="sTrade">Cambiar 5 repetidas por un sobre extra</button>':`<p class="rb-p">Llevas ${n%5} de 5 repetidas para un sobre extra</p>`;
+ const tradeH=n>=5?'<p class="rb-p">Tus repetidas sirven para conseguir sobres. Siempre conservas una de cada carta.</p><button class="rs-trade" id="sTrade">CANJEAR 5 REPETIDAS POR 1 SOBRE</button>':`<p class="rb-p">${n} de 5 repetidas para un sobre extra. Cada repetida cuenta y siempre conservas una de cada carta.</p>`;
  const finish=summaryStatus();
  s.innerHTML=`<div class="rs2${entering?' rs-enter':''}">
   <header class="rs-finish" role="status">
@@ -2318,7 +2399,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
   <section class="rs-follow" aria-label="Qué sigue después de este sobre">
    <div class="rs-wait" id="sWait" ${packReady()?'hidden':''}>
     <span>PRÓXIMOS 2 SOBRES</span><strong>En <time id="sNextTime">${nextPackCountdown()}</time></strong>
-    <p>Recibirás dos sobres nuevos al comenzar el próximo día disponible.</p>
+    <p>Recibirás 2 sobres al comenzar el próximo ciclo de 6 horas.</p>
    </div>
    <div class="rs-act2">
     <button type="button" class="rs-main" id="sOtro">ABRIR OTRO SOBRE</button>
@@ -2613,6 +2694,17 @@ window.addEventListener('message',e=>{
   else go('pack');
  }
 });
+/* Fase 1: perfil local del invitado; no crea cuentas ni modifica el progreso. */
+function renderProfile(){
+ syncIn();
+ $('profileName').textContent=S.ini?'Invitado · '+S.ini:'Invitado';
+ $('profileCards').textContent=uniq();
+ $('profileDesigns').textContent=DESIGNS.filter(d=>!d.bx&&dState(d).own).length;
+ $('profileDuplicates').textContent=dups();
+ $('profileRatings').textContent=Object.keys(S.rate||{}).length;
+}
+$('profileExport').onclick=()=>$('bkExp').click();
+$('profileImport').onclick=()=>$('bkImp').click();
 /* ---------- récords ---------- */
 function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STORE.docs.length&&S.ini)m.push({ini:S.ini,score:uniq()});return m.filter(r=>r.ini).sort((a,b)=>b.score-a.score)}
 function renderScores(){$('sMine').textContent=uniq();$('iniIn').value=S.ini;const b=board();const pos=b.findIndex(r=>r.ini===S.ini);
