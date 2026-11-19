@@ -1356,17 +1356,18 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-width:350px){.dx-top{padding-inline:12px;gap:5px}.disc.dx .dx-controls,.disc.dx:not(.cov) .dx-controls{width:calc(100% - 24px)}}
 
 /* PREVIEW ONLY: logros sin bloquear navegación ni reencuadrar cartas. */
-.ic-award{--glow:rgba(255,212,0,.52);--ink:#fff5bc;position:absolute;z-index:5;top:clamp(84px,18%,170px);left:50%;width:min(96%,620px);text-align:center;pointer-events:none;opacity:0;animation:icAward 2.25s cubic-bezier(.2,.8,.25,1) both}
-.ic-award::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:min(100vw,500px);height:180px;transform:translate(-50%,-50%);background:radial-gradient(ellipse,var(--glow),transparent 72%);filter:blur(10px)}
-.ic-award-kicker{display:block;font:8px/1.5 PX,monospace;letter-spacing:.1em;color:#fff;text-shadow:0 2px 9px #000;margin-bottom:11px}
-.ic-award strong{display:block;font:900 clamp(28px,8.8vw,58px)/.98 AV,system-ui,sans-serif;letter-spacing:-.05em;color:var(--ink);text-wrap:balance;-webkit-text-stroke:.5px #ffffff55;text-shadow:0 3px 0 #21131c,0 5px 18px #000,0 0 28px var(--glow)}
-.ic-award-type{display:inline-block;margin-top:13px;padding:7px 14px 6px;background:#0e0c1bd9;border:1px solid currentColor;border-radius:4px;color:var(--ink);font:700 12px AV;letter-spacing:.12em;box-shadow:0 0 16px var(--glow)}
-.dx.v-e .ic-award{--glow:rgba(150,225,255,.65);--ink:#dcf7ff}
-.dx.v-r .ic-award{--glow:rgba(255,184,47,.8);--ink:#ffe49a}
-.dx.v-f .ic-award{--glow:rgba(255,121,207,.67);--ink:#ffd0ef}
-@keyframes icAward{0%{opacity:0;transform:translateY(30px) scale(.68);filter:blur(7px)}17%{opacity:1;transform:translateY(-4px) scale(1.07);filter:blur(0)}27%,68%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-22px) scale(1.04)}}
-@media(max-height:610px){.ic-award{top:70px}.ic-award strong{font-size:clamp(26px,7vw,44px)}.ic-award-type{margin-top:7px}}
-@media(prefers-reduced-motion:reduce){.ic-award{animation:none;opacity:0}}
+/* Centrado autónomo: left/right + margin evitan el desplazamiento durante transform. */
+.ic-award{--glow:rgba(255,212,0,.65);--ink:#fff5bc;position:absolute;z-index:5;top:clamp(86px,17%,155px);left:0;right:0;margin-inline:auto;width:min(calc(100% - 32px),480px);padding:18px 14px 17px;text-align:center;pointer-events:none;opacity:0;border-radius:15px;border:1px solid rgba(255,255,255,.65);background:linear-gradient(145deg,rgba(9,8,23,.95),rgba(22,17,41,.92));box-shadow:0 12px 42px rgba(0,0,0,.7),0 0 0 2px rgba(0,0,0,.3),0 0 32px var(--glow);animation:icAward 2.75s cubic-bezier(.2,.8,.25,1) both;isolation:isolate}
+.ic-award::before{content:"";position:absolute;z-index:-1;inset:-3px;border-radius:inherit;background:radial-gradient(ellipse at 50% 0%,var(--glow),transparent 70%);opacity:.55}
+.ic-award-kicker{display:block;font:8px/1.55 PX,monospace;letter-spacing:.06em;color:#fff;margin-bottom:9px;text-shadow:0 1px 5px #000}
+.ic-award strong{display:block;font:900 clamp(28px,8vw,52px)/1.08 AV,system-ui,sans-serif;letter-spacing:-.035em;color:var(--ink);text-wrap:balance;-webkit-text-stroke:.45px rgba(255,255,255,.35);text-shadow:0 2px 0 #120c16,0 4px 12px #000,0 0 20px var(--glow)}
+.ic-award-type{display:inline-block;margin-top:13px;padding:7px 15px 6px;background:rgba(255,255,255,.12);border:1px solid var(--ink);border-radius:5px;color:var(--ink);font:800 12px AV,system-ui,sans-serif;letter-spacing:.14em;text-shadow:0 1px 3px #000}
+.dx.v-e .ic-award{--glow:rgba(150,225,255,.75);--ink:#e2f9ff}
+.dx.v-r .ic-award{--glow:rgba(255,184,47,.85);--ink:#ffe49a}
+.dx.v-f .ic-award{--glow:rgba(255,121,207,.76);--ink:#ffe0f5}
+@keyframes icAward{0%{opacity:0;transform:translateY(22px) scale(.88);filter:blur(4px)}15%{opacity:1;transform:translateY(-3px) scale(1.025);filter:blur(0)}24%,76%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}100%{opacity:0;transform:translateY(-16px) scale(1);filter:blur(0)}}
+@media(max-height:610px){.ic-award{top:64px;padding:11px 12px}.ic-award strong{font-size:clamp(24px,7vw,39px)}.ic-award-kicker{margin-bottom:5px}.ic-award-type{margin-top:7px}}
+@media(prefers-reduced-motion:reduce){.ic-award{animation:icAwardReduced 3s linear both}@keyframes icAwardReduced{0%,85%{opacity:1}100%{opacity:0}}}
 
 /* Control solo en preview, fuera de producción */
 #home .ic-demo-btn{align-self:center;flex:none;min-height:38px;padding:9px 15px 8px;margin:4px auto 3px;border:1px solid #ffe268;border-radius:8px;background:#ffd400;color:#171124;font:700 clamp(10px,2.6vw,12px)/1.25 AV,system-ui,sans-serif;box-shadow:0 3px 0 #ac8500,0 5px 18px #0005;z-index:3}
