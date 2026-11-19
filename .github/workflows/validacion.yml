@@ -30,5 +30,8 @@ jobs:
           node --check content/card-texts.js
           node --check content/validate.mjs
 
+      - name: Probar decisiones de migración sin tocar datos
+        run: node --test content/account-sync-plan.test.mjs
+
       - name: Validar catálogo y narrativas
         run: node content/validate.mjs
