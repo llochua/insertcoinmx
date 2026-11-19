@@ -148,7 +148,7 @@ el("authForm").addEventListener("submit",async e=>{
    if(error)throw error;
    if(data?.session){
     display(data.session.user);message("Cuenta creada. La sesión está activa.","success");
-   }else message("¡Correo enviado! Revisa tu bandeja y confirma tu cuenta desde el botón de Insert Coin MX.","success");
+   }else message("Solicitud recibida. Si este correo todavía no tiene cuenta, recibirás un mensaje para confirmarla. Si ya tienes cuenta, elige INICIAR SESIÓN.","success");
   }else{
    const {data,error}=await client.auth.signInWithPassword({email,password});
    if(error)throw error;
