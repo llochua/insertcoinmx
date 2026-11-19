@@ -29,8 +29,8 @@ MARGEN_ARTE = 0.06                     # aire alrededor del diseño dentro de la
 FUENTES = {
     'nombre': (os.path.join(RAIZ, 'f/AvenirNextLTPro-Bold.otf'), 60.0),
     'ref':    (os.path.join(RAIZ, 'f/AvenirNextLTPro-Bold.otf'), 49.2),
-    'linea':  (os.path.join(C, 'fuentes/Carlito-Regular.ttf'), 29.8),
-    'frase':  (os.path.join(C, 'fuentes/Carlito-Italic.ttf'), 25.8),
+    'linea':  (os.path.join(C, 'fuentes/Carlito-Regular.ttf'), 37.2),   # +25 % (19 nov): se lee en celular
+    'frase':  (os.path.join(C, 'fuentes/Carlito-Italic.ttf'), 29.7),    # +15 % (19 nov)
     'numero': (os.path.join(RAIZ, 'f/AvenirNextLTPro-Bold.otf'), 23.4),
 }
 #            x, tope de mayúsculas, ancho máximo
@@ -39,7 +39,7 @@ CAJA = {
     'ref':    (193, 926, 590),
     'ref2':   (193, 982, 590),
     'linea':  (86, 999, 800),
-    'linea2': (86, 1053, 800),         # cuando la referencia ocupa 2 renglones
+    'linea2': (86, 1045, 800),         # cuando la referencia ocupa 2 renglones
     'frase':  (75, 1132, 620),
     'numero': (148, 1250, 200),
 }
@@ -86,7 +86,7 @@ def ancho(ttf, tam, txt):
     return b[2] - b[0]
 
 
-def texto(img, clave, caja, txt, tinta, tam=None, k=4):
+def texto(img, clave, caja, txt, tinta, tam=None, k=4, dy=0):
     """Escribe txt con la fuente de `clave` en la caja; lo achica si no cabe."""
     if not txt:
         return
@@ -101,9 +101,29 @@ def texto(img, clave, caja, txt, tinta, tam=None, k=4):
     A = Image.new('L', (W, H), 0)
     ImageDraw.Draw(A).text((-b[0] + 8 * k, -cap[1] + 8 * k), txt, font=f, fill=255)
     a = np.asarray(A.resize((W // k, H // k), Image.LANCZOS)).astype(np.float32) / 255
-    x0, y0 = int(round(x)) - 8, int(round(tope)) - 8
+    x0, y0 = int(round(x)) - 8, int(round(tope + dy)) - 8
     a = a[:img.shape[0] - y0, :img.shape[1] - x0]
     pegar_alfa(img, a, x0, y0, tinta)
+
+
+INTERLINEA_LINEA = 1.2                 # habilidad en 2 renglones: separación = tamaño × esto
+
+
+def texto_habilidad(img, caja, txt, tinta):
+    """Habilidad: 1 renglón si cabe; si no, 2 renglones parejos (solo sin referencia de 2 renglones).
+    Si aun así no cabe, se achica como cualquier texto."""
+    ttf, base = FUENTES['linea']
+    maxw = CAJA[caja][2]
+    if not txt or ancho(ttf, base, txt) <= maxw or caja == 'linea2':
+        return texto(img, 'linea', caja, txt, tinta)
+    pal = txt.split()
+    cortes = [(' '.join(pal[:i]), ' '.join(pal[i:])) for i in range(1, len(pal))]
+    a, b = min(cortes, key=lambda c: max(ancho(ttf, base, c[0]), ancho(ttf, base, c[1])))
+    tam = base
+    while max(ancho(ttf, tam, a), ancho(ttf, tam, b)) > maxw and tam > base * 0.55:
+        tam -= 0.5
+    texto(img, 'linea', caja, a, tinta, tam=tam)
+    texto(img, 'linea', caja, b, tinta, tam=tam, dy=tam * INTERLINEA_LINEA)
 
 
 def partir_ref(ref, ref2):
@@ -176,7 +196,7 @@ def carta(T, d, rareza, ventana_arte):
     texto(out, 'ref', 'ref', r1, tinta)
     if r2:
         texto(out, 'ref', 'ref2', r2, tinta, tam=None)
-    texto(out, 'linea', 'linea2' if r2 else 'linea', d['linea'], tinta)
+    texto_habilidad(out, 'linea2' if r2 else 'linea', d['linea'], tinta)
     texto(out, 'frase', 'frase', d['frase'], tinta)
     texto(out, 'numero', 'numero', d['numero'] if d['tipo'] == 'Álbum' else 'BONUS', tinta)
     # arte
