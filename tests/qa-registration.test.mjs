@@ -107,3 +107,9 @@ test('cloud JSON recovery is manual, scoped to the account and never changes loc
  assert.match(section,/downloadBackup\(text,"insertcoinmx-respaldo-desde-supabase\.json"\)/);
  assert.doesNotMatch(section,/localStorage|\.insert\(|\.update\(|\.upsert\(|\.delete\(/);
 });
+
+test('disabled QA controls use neutral cursor instead of an hourglass',()=>{
+ assert.match(page,/button:disabled\{[^}]*cursor:default/);
+ assert.doesNotMatch(page,/cursor:\s*wait/);
+ assert.match(page,/#backupUpload\[data-saved="true"\]\{[^}]*cursor:default/);
+});
