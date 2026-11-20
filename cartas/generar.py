@@ -326,8 +326,8 @@ def carta_full(T, d, total):
     # pie
     num = 'F%02d/%02d' % (int(d['full'][1:]), total) if d['tipo'] == 'Álbum' else 'BONUS'
     escribir(out, 'pie', 'Carta ' + num, 48, 1262, F_BLANCO)
-    wi = ImageFont.truetype(os.path.join(RAIZ, FT['pie'][0]), FT['pie'][1]).getlength('Ilustración')
-    cx = 480 + 28; escribir(out, 'pie', 'Ilustración', cx, 1262, F_BLANCO, align='c')
+    wi = ImageFont.truetype(os.path.join(RAIZ, FT['pie'][0]), FT['pie'][1]).getlength('Arte Especial')
+    cx = 480 + 28; escribir(out, 'pie', 'Arte Especial', cx, 1262, F_BLANCO, align='c')
     for i in range(2):
         estrella(out, cx - wi / 2 - 46 + i * 24, 1274, 11, F_AMARILLO)
     escribir(out, 'pie', 'Valor –', 912, 1262, F_BLANCO, align='r')
