@@ -3241,5 +3241,5 @@ import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCl
  document.addEventListener('icmx:auth-changed',()=>cloudSync?.check());
  cloudSync.check();
 })
-.catch(()=>{const e=$('cloudState');if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}});
+.catch(()=>{for(const id of ['cloudState','profileCloudStatus']){const e=$(id);if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}}});
 </script><script type="module" src="content/auth-account.js?v=20261120perfil"></script></body></html>
