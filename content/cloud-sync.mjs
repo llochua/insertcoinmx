@@ -103,20 +103,22 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
     autoRefreshToken:true,storageKey:'icmx-auth-qa-nov2026'}}
  );
  let stopped=false,busy=false,rerun=false,debounce=null,interval=null;
- let accountUid=null,issuing=false;
+ let accountUid=null,issuing=false,sessionActive=true;
  const status=(code,message)=>{if(!stopped)onStatus(code,message)};
  async function syncOnce(){
   const {data:verified,error:authError}=await client.auth.getUser();
   if(authError){
    const {data:sessionData}=await client.auth.getSession();
-   if(!sessionData?.session)accountUid=null;
+   sessionActive=Boolean(sessionData?.session?.user?.id);
+   if(!sessionActive)accountUid=null;
    status(sessionData?.session?'offline':'guest',
     sessionData?.session?'NUBE SIN CONEXIÓN · EL PROGRESO LOCAL SIGUE A SALVO':'INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');
    return;
   }
   const user=verified?.user;
-  if(!user?.id){accountUid=null;status('guest','INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');return}
+  if(!user?.id){accountUid=null;sessionActive=false;status('guest','INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');return}
   const uid=user.id;
+  sessionActive=true;
   // El progreso local no está particionado por cuenta. Si alguien cambia
   // de usuario en el mismo navegador, bloquear descargas y subidas antes
   // de que una colección pueda sustituir o contaminar a la otra.
@@ -359,7 +361,11 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   clearTimeout(debounce);
   debounce=setTimeout(check,900);
  };
- const {data:listener}=client.auth.onAuthStateChange(()=>setTimeout(check,0));
+ const {data:listener}=client.auth.onAuthStateChange((_event,session)=>{
+  sessionActive=Boolean(session?.user?.id);
+  if(!sessionActive)accountUid=null;
+  setTimeout(check,0);
+ });
  const onFocus=()=>{if(!document.hidden)check()};
  const onStorage=e=>{
   if(e.key==='icmx-auth-qa-nov2026'||e.key==='icmx-album2')check();
@@ -369,7 +375,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  window.addEventListener('storage',onStorage);
  interval=setInterval(()=>{if(!document.hidden)check()},15000);
  check();
- return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),stop(){
+ return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),requiresServer:()=>Boolean(sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)),stop(){
   stopped=true;clearTimeout(debounce);clearInterval(interval);
   listener?.subscription?.unsubscribe();
   window.removeEventListener('focus',onFocus);
