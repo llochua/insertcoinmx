@@ -217,9 +217,10 @@ def guardar(img, d, rareza):
         os.path.join(RAIZ, 'c', n + '.jpg'), quality=JPG_CALIDAD)
 
 
-def guardar_d(arte, cid):
+def guardar_d(arte, cid, regenerar=False):
+    """Regenera la imagen de juego al reemplazar el arte; evita el JPG anterior."""
     p = os.path.join(RAIZ, 'd', cid + '.jpg')
-    if not os.path.exists(p):
+    if regenerar or not os.path.exists(p):
         Image.fromarray(np.clip(acomodar_arte(arte, 640, 800, 0.08), 0, 255).astype(np.uint8)).save(p, quality=90)
 
 
@@ -369,7 +370,9 @@ def guardar_full(img, ilu_path, fk):
 
 
 # ---------------------------------------------------------------- index.html
-def actualizar_web(cat):
+def actualizar_web(cat, actualizados=()):
+    """Sincroniza catálogo, cajas y fondos para los diseños actualizados."""
+    actualizados = set(actualizados)
     p = os.path.join(RAIZ, 'index.html')
     src = open(p, encoding='utf8').read()
     i0 = src.index('const DESIGNS=['); i1 = src.index('];', i0) + 2
@@ -393,11 +396,14 @@ def actualizar_web(cat):
     if m:
         abox = json.loads(m.group(1))
         for d in cat:
-            if d['id'] not in abox:
+            if d['id'] not in abox or d['id'] in actualizados:
                 a = np.asarray(Image.open(os.path.join(RAIZ, 'd', d['id'] + '.jpg')).convert('RGB')).astype(np.float32)
                 ys, xs = np.where(np.linalg.norm(a - fondo_de(a), axis=2) > 30)
                 h, w = a.shape[:2]
-                abox[d['id']] = [round(xs.min() / w, 3), round(ys.min() / h, 3), round((xs.max() + 1) / w, 3), round((ys.max() + 1) / h, 3)]
+                # Arte plano o casi uniforme: usar la caja completa, nunca fallar.
+                abox[d['id']] = ([0, 0, 1, 1] if len(xs) == 0 else
+                    [round(xs.min() / w, 3), round(ys.min() / h, 3),
+                     round((xs.max() + 1) / w, 3), round((ys.max() + 1) / h, 3)])
         src = src[:m.start(1)] + json.dumps(abox, separators=(',', ':')) + src[m.end(1):]
     # Nuevos diseños: publicar también el color real del fondo para el escenario
     # inmersivo. Respeta las paletas de RBG e ICOL ya ajustadas manualmente y
@@ -409,7 +415,9 @@ def actualizar_web(cat):
         colores_previos = json.loads(m_icol.group(1)) if m_icol else {}
         for d in cat:
             ident = d['id']
-            if ident in viejas or ident in fondos or ident in colores_previos:
+            # Diseños existentes: al reemplazar la imagen, recalcular la paleta;
+            # los demás conservan los ajustes curatoriales previamente aprobados.
+            if ident not in actualizados and (ident in viejas or ident in fondos or ident in colores_previos):
                 continue
             path_arte = os.path.join(RAIZ, 'd', ident + '.jpg')
             if not os.path.isfile(path_arte):
@@ -440,9 +448,16 @@ def main():
     ap.add_argument('--sin-web', action='store_true')
     ap.add_argument('--muestra', action='store_true')
     ap.add_argument('--fulls', action='store_true', help='solo las Full')
+    ap.add_argument('--regenerar-arte', action='store_true',
+                    help='recalcula d/, ABOX y el fondo de los IDs indicados en --solo')
     a = ap.parse_args()
     cat = json.load(open(os.path.join(C, 'catalogo.json'), encoding='utf8'))
     T = cargar_plantillas()
+    desconocidos = set(a.solo or []) - {d['id'] for d in cat}
+    if desconocidos:
+        ap.error('IDs ausentes del catálogo: ' + ', '.join(sorted(desconocidos)))
+    if a.regenerar_arte and not a.solo:
+        ap.error('--regenerar-arte necesita --solo con IDs explícitos')
     sel = [d for d in cat if not a.solo or d['id'] in a.solo]
     x0, y0, x1, y1 = VENTANA
     nuevos = numerar_fulls(cat)
@@ -464,10 +479,10 @@ def main():
         w = acomodar_arte(arte, x1 - x0, y1 - y0, MARGEN_ARTE)
         for r in RAREZAS:
             guardar(carta(T, d, r, w), d, r)
-        guardar_d(arte, d['id'])
+        guardar_d(arte, d['id'], regenerar=a.regenerar_arte)
         print('ok', d['id'])
     if not a.sin_web:
-        actualizar_web(cat)
+        actualizar_web(cat, actualizados=a.solo if a.regenerar_arte else ())
     if a.muestra:
         muestra(cat)
 
