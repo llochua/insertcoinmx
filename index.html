@@ -2059,7 +2059,7 @@ setInterval(()=>{if(saveFailed)save()},30000);
 if(NOWRITE){saveFailed=true;setWarn(true)}
 let serverTradeBusy=false;
 function trade(after){
- if(cloudSync?.isAccount?.()){
+ if(cloudSync?.requiresServer?.()){
   if(serverTradeBusy)return;
   serverTradeBusy=true;
   cloudSync.exchangeDuplicates().then(result=>{
@@ -2155,7 +2155,7 @@ function openServerPack(){
 }
 function openPack(){
  if(opening||serverPackBusy)return;
- if(cloudSync?.isAccount?.()){openServerPack();return}
+ if(cloudSync?.requiresServer?.()){openServerPack();return}
  opening=true;clearTimeout(hintT);
  withLock(()=>{syncIn();if(!packReady()){opening=false;go('home');uxEmptyPacks(true);return}
   const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,welcome:0,daily:0,dailyDay:'',dailyCycle:null,saved:false,t:0};
