@@ -25,6 +25,7 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 
 - Existe prueba manual `qa/live-auth-two-browsers.mjs` y workflow `.github/workflows/qa-live-auth-manual.yml`.
 - **Por defecto no modifica inventario.** Requiere credenciales de **cuenta exclusiva de laboratorio** guardadas como secretos `ICMX_QA_EMAIL` y `ICMX_QA_PASSWORD` en GitHub.
+- En la rama, la prueba autenticada de PR **se marca pendiente/saltada** hasta que la variable de repositorio `ICMX_QA_AUTH_TEST_READY=true` habilite su ejecución. Sin esa variable no debe contarse como prueba real superada.
 - Emisión opcional de **un sobre de prueba**, solo con autorización separada del operador, flag manual y la marca `ICMX_QA_CONFIRM_TEST_ACCOUNT=1`. No utilizar cuentas personales.
 - Sin credenciales no afirmar que esta prueba autenticada pasó; no crear usuarios ni cambiar contraseñas para saltarla.
 
