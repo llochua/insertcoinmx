@@ -74,17 +74,24 @@ try{
     'preview cannot create accounts by mistake');
   const lab=page.locator('#profile .profile-account a[href="/qa/registro/"]');
   assert.equal(await lab.isVisible(),true);
-  // Regresión: salir del formulario desde la flecha superior no lo deja como portada.
-  await page.locator('#profile [data-home]').click();
+  // La flecha única regresa a Mi perfil desde registro; un segundo toque va a Inicio.
+  await page.locator('#profile .top .vback').click();
+  assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,
+    'volver desde registro muestra pasaporte y resumen');
+  assert.equal(await page.locator('#profileAccountPanel').isVisible(),false,
+    'registro no queda abierto');
+  await page.locator('#profile .top .vback').click();
+  assert.equal(await page.locator('#home .home-player-card').isVisible(),true);
   await page.locator('#home .home-player-card').click();
   assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,
-    'volver a Mi perfil muestra pasaporte y resumen');
-  assert.equal(await page.locator('#profileAccountPanel').isVisible(),false,
-    'registro no queda abierto al regresar');
+    'volver a Mi perfil desde Inicio muestra resumen');
   await page.locator('#profileQuickLogin').click();
   assert.equal(await page.locator('#profileAccountPanel').isVisible(),true,
     'login se abre al elegirlo');
-  await page.locator('#profile [data-home]').click();
+  await page.locator('#profile .top .vback').click();
+  assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,
+    'volver desde login muestra el resumen en la misma vista');
+  await page.locator('#profile .top .vback').click();
   await page.locator('#home .home-player-card').click();
   assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,
     'login anterior no reemplaza al perfil');
