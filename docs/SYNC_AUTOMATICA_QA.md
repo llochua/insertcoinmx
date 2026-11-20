@@ -61,6 +61,12 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
 - `content/cloud-sync.mjs` inicia automáticamente el snapshot **solo** cuando no hay progreso local ni remoto; no intenta migrar una colección local existente. Si hay progreso local sin snapshot remoto, se mantiene el estado de respaldo inicial pendiente para no perder ni inventar cartas.
 - Sigue pendiente la política de migración de colecciones antiguas y prueba de sesiones Auth reales en dos dispositivos. No ampliar lista de laboratorio ni fusionar hasta cerrar esas validaciones.
 
+## Cierre de dos riesgos críticos · 20 noviembre 2026
+- `close_untrusted_initial_upload.sql` aplicada: `sync_player_snapshot` ya no acepta `expected_revision=0` ni crea snapshots. El alta se realiza exclusivamente mediante `ensure_player_snapshot()`, que crea un inventario vacío del lado del servidor.
+- SQL con `BEGIN/ROLLBACK`: rechazo de alta con 999 cartas inventadas, rechazo de inventario falsificado en una revisión existente y actualización legítima de un campo editorial aceptada. Al terminar, dos usuarios, un snapshot en revisión 1, cero emisiones y cero canjes persistidos.
+- Protección de cambio de cuenta: como el álbum del navegador aún usa un almacenamiento local compartido, `cloud-sync.mjs` asocia el dispositivo a la primera cuenta sincronizada y bloquea operaciones de nube cuando cambia el UID. No borra ni migra automáticamente ninguna colección. La prueba Chromium verifica que no cambian el álbum local ni los snapshots de ninguna de las dos cuentas.
+- **Limitación consciente:** para permitir cambiar entre varias cuentas en un mismo dispositivo será necesario particionar el almacenamiento local por UID y diseñar una transición segura. Por ahora se prefiere bloquear a mezclar cartas.
+
 ## Pendiente antes de considerar main
 1. **Prueba con Supabase real y sesiones autenticadas**: dos navegadores con el mismo origen; recuperación, apertura, reintento y conflicto. Chromium con nube simulada ya pasó, pero no sustituye esta prueba.
 2. **Validación de jugadas en servidor**: la RPC de laboratorio comprueba revisión/formato, pero todavía no que las cartas provengan de sobres legítimos ni que la cuota esté disponible. No habilitar escritura general.
