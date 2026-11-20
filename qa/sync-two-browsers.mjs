@@ -230,6 +230,8 @@ async function run(){
   const before=await read(A.page);
   await A.page.evaluate(()=>openPack());
   await until(()=>cloud.get(USER).revision===2,'sobre A debe subir con CAS');
+  await until(async()=>count(await read(A.page))===count(before)+5,
+    'el navegador A debe terminar de guardar el sobre antes de verificar');
   const after=await read(A.page);
   assert.equal(count(after)-count(before),5,'abrir un sobre entrega 5 cartas');
   assert.equal(after.pk.length,before.pk.length+1);
@@ -291,6 +293,8 @@ async function run(){
   const beforeTrade=await read(B.page);
   await B.page.evaluate(()=>trade(renderHome));
   await until(()=>cloud.get(USER).revision===6,'canje transaccional en la nube');
+  await until(async()=>count(await read(B.page))===count(beforeTrade)-5,
+    'el canje debe estar restaurado en el navegador antes de verificar');
   const afterTrade=await read(B.page);
   assert.equal(count(beforeTrade)-count(afterTrade),5);
   assert.equal(afterTrade.extra,beforeTrade.extra+1);
