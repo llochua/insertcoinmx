@@ -58,4 +58,164 @@ const server=createServer(async(req,res)=>{
   res.end(content);
  }catch(e){res.writeHead(404);res.end('Not found')}
 });
-const SDK_STUB=String.raw
+const SDK_STUB=String.raw`
+export function createClient(){
+ const uid=()=>localStorage.getItem('icmx-qa-user');
+ const offline=()=>window.__qaCloudOffline===true;
+ const fetchJSON=async(url,opts)=>{
+  if(offline())throw Error('offline');
+  const res=await fetch(url,opts);
+  if(!res.ok)throw Error('mock server');
+  return res.json();
+ };
+ return {
+  auth:{
+   async getUser(){return {data:{user:uid()?{id:uid(),email:'qa@example.invalid'}:null},error:null}},
+   async getSession(){return {data:{session:uid()?{user:{id:uid()}}:null},error:null}},
+   onAuthStateChange(callback){
+    Promise.resolve().then(()=>callback('INITIAL_SESSION',uid()?{user:{id:uid()}}:null));
+    return {data:{subscription:{unsubscribe(){}}}};
+   }
+  },
+  from(table){
+   if(table!=='player_snapshots')throw Error('Unexpected table');
+   return {
+    select(){return this},
+    eq(field,value){if(field!=='user_id')throw Error('Unexpected filter');this.id=value;return this},
+    async maybeSingle(){return fetchJSON('/__qa__/snapshot?uid='+encodeURIComponent(this.id))}
+   };
+  },
+  rpc(name,args){
+   if(name!=='sync_player_snapshot')throw Error('Unexpected RPC');
+   return fetchJSON('/__qa__/sync',{method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({uid:uid(),args})});
+  }
+ };
+}
+`;
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+async function until(predicate,message,ms=12000){
+ const start=Date.now();
+ while(Date.now()-start<ms){
+  if(await predicate())return;
+  await delay(80);
+ }
+ throw Error('Timeout: '+message);
+}
+const count=state=>Object.values(state.have).reduce((n,v)=>n+v,0);
+
+async function run(){
+ const listener=await new Promise(resolve=>server.listen(0,'127.0.0.1',()=>resolve(server.address())));
+ const origin='http://127.0.0.1:'+listener.port;
+ const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+ const contexts=[];
+ async function device(user,initial){
+  const context=await browser.newContext({reducedMotion:'reduce',viewport:{width:390,height:844}});
+  contexts.push(context);
+  await context.addInitScript(({user,initial})=>{
+   localStorage.setItem('icmx-qa-user',user);
+   if(initial)localStorage.setItem('icmx-album2',JSON.stringify(initial));
+  },{user,initial});
+  await context.route('**/*',route=>{
+   const url=route.request().url();
+   if(url==='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm')
+    return route.fallback();
+   if(route.request().resourceType()==='image'||route.request().resourceType()==='font')
+    return route.abort();
+   if(url.startsWith(origin+'/'))return route.continue();
+   return route.abort();
+  });
+  await context.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm',
+   route=>route.fulfill({status:200,contentType:'text/javascript',
+    headers:{'access-control-allow-origin':'*'},body:SDK_STUB}));
+  const page=await context.newPage();
+  const exceptions=[];
+  page.on('pageerror',error=>exceptions.push(error.message));
+  await page.goto(origin+'/index.html',{waitUntil:'domcontentloaded'});
+  await page.waitForSelector('#cloudState');
+  await until(async()=>{
+   const status=await page.locator('#cloudState').getAttribute('data-sync');
+   return ['synced','empty','pending','conflict','offline','guest'].includes(status);
+  },'estado inicial de sincronización');
+  return {page,exceptions,context};
+ }
+ const read=async page=>page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-album2')));
+ const check=async page=>page.evaluate(()=>cloudSync.check());
+ let result;
+ try{
+  const A=await device(USER,baseState());
+  const B=await device(USER,null);
+  await until(async()=> (await read(B.page))?.have?.abuket_b===2,
+    'B debe recuperar de la nube');
+  assert.equal((await read(B.page)).freeCycle,baseState().freeCycle);
+  assert.equal((await read(B.page)).welcomeLeft,4);
+  console.log('✓ Recuperación B desde la nube sin duplicar cartas');
+
+  // Abrir sobre desde el código real del juego, sin alterar funciones del juego.
+  const before=await read(A.page);
+  await A.page.evaluate(()=>openPack());
+  await until(()=>cloud.get(USER).revision===2,'sobre A debe subir con CAS');
+  const after=await read(A.page);
+  assert.equal(count(after)-count(before),5,'abrir un sobre entrega 5 cartas');
+  assert.equal(after.pk.length,before.pk.length+1);
+  assert.equal(after.welcomeLeft,before.welcomeLeft-1);
+  await check(B.page);
+  await until(async()=> (await read(B.page)).pk.length===after.pk.length,
+    'B debe recibir el nuevo sobre');
+  assert.deepEqual((await read(B.page)).have,after.have);
+  assert.equal((await read(B.page)).welcomeLeft,after.welcomeLeft);
+  await check(B.page);
+  await delay(350);
+  assert.equal(cloud.get(USER).revision,2,'no debe haber segundo envío');
+  console.log('✓ Sobre abierto en A, cinco cartas recibidas en B, sin duplicaciones');
+
+  // B conserva un cambio local mientras se simula desconexión de Supabase.
+  await B.page.evaluate(()=>{window.__qaCloudOffline=true;S.ini='OFF';save()});
+  await delay(1400);
+  assert.equal(cloud.get(USER).revision,2);
+  assert.equal((await read(B.page)).ini,'OFF');
+  await B.page.evaluate(()=>{window.__qaCloudOffline=false});
+  await check(B.page);
+  await until(()=>cloud.get(USER).revision===3,'reconexión debe subir cambios de B');
+  await check(A.page);
+  await until(async()=> (await read(A.page)).ini==='OFF',
+    'A debe recibir cambios reconectados');
+  console.log('✓ Cambios sin conexión, reconexión y recuperación en A');
+
+  // Divergencia: dos dispositivos guardan antes de consultar la nube.
+  await A.page.evaluate(()=>{S.ini='AAA';save()});
+  await B.page.evaluate(()=>{S.ini='BBB';save()});
+  await check(A.page);
+  await until(()=>cloud.get(USER).revision===4,'A debe subir el primer cambio');
+  await check(B.page);
+  await until(async()=> (await B.page.locator('#cloudState').getAttribute('data-sync'))==='conflict',
+    'B debe detectar conflicto');
+  assert.equal((await read(B.page)).ini,'BBB');
+  assert.equal(cloud.get(USER).state.data.ini,'AAA');
+  assert.equal(cloud.get(USER).revision,4);
+  console.log('✓ Conflicto concurrente: estado remoto y local preservados');
+
+  const C=await device(OTHER,null);
+  assert.equal((await read(C.page))?.have?.abuket_b,undefined);
+  assert.equal(cloud.get(OTHER),undefined);
+  console.log('✓ Otro usuario no recibe cartas ajenas');
+
+  for(const [name,entry] of [['A',A],['B',B],['C',C]])
+   assert.deepEqual(entry.exceptions,[],name+' tuvo errores JavaScript');
+  result={passed:true,revision:cloud.get(USER).revision};
+ }finally{
+  await Promise.all(contexts.map(c=>c.close()));
+  await browser.close();
+  server.close();
+ }
+ return result;
+}
+try{
+ const result=await run();
+ console.log('PRUEBA EN DOS NAVEGADORES APROBADA',result);
+}catch(error){
+ console.error(error);
+ server.close();
+ process.exitCode=1;
+}
