@@ -90,3 +90,16 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 - **No interpretar la aprobación de la transacción como una auditoría exhaustiva de seguridad ni como beta autorizada**. Falta probar acceso entre dos cuentas, los errores de cuota/condiciones de carrera en Supabase real y el recorrido completo con una cuenta desechable.
 
 - **Nota de estabilidad:** una ejecución posterior del smoke E2E en PR recuperó bien la colección desde dos navegadores, pero agotó el tiempo esperado tras pulsar «Cerrar sesión» en navegador B. La ejecución original completa sí había pasado. No se atribuye automáticamente a un bug del producto: investigar flaqueza de red/cierre de sesión si se reproduce, sin repetir logins en cada commit. La prueba real quedó manual; CI sigue probando lógica con nube simulada y acceso anónimo.
+
+## Prueba de sobres y canjes con Supabase real · 20 noviembre 2026
+
+- **Aprobada en transacción SQL reversible.** Guion: `qa/supabase-rollback-pack-flow.sql`. Se crearon dos identidades ficticias únicamente dentro del `BEGIN ... ROLLBACK`, sin correos ni sesiones permanentes.
+- Comprobaciones realizadas con RPC reales: alta limpia de A; primer sobre de cinco cartas con Full garantizada; catálogo servidor; reintento idempotente; revisión obsoleta; rechazo de alteración de inventario por el cliente; guardado legítimo de calificaciones; cinco sobres de bienvenida; bloqueo por cuota; canje de cinco cartas repetidas conservando el original; no duplicar canjes; emisión y consumo de un sobre extra; nueva cuenta B vacía y sin modificar A.
+- Resultado post-rollback: **0** emisiones persistidas, **0** canjes persistidos, **1** cuenta previamente autorizada y **1** colección previa. No se alteraron cartas ni permisos. El test no prueba el render visual del sobre en dos navegadores ni un registro real nuevo a través de Auth.
+- En una repetición del QA de navegador con Auth real, ambos navegadores recuperaron correctamente la colección, pero el paso de cerrar sesión agotó el timeout. La ejecución de referencia anterior sí había aprobado el recorrido completo. Se añadió diagnóstico seguro de cierre de sesión para distinguir respuesta HTTP, error visible y bloqueo de interfaz, sin registrar credenciales.
+- No ejecutar aperturas reales sobre la cuenta existente: actualmente contiene progreso y no se ha autorizado alterarlo. Para el último E2E visual de emisión se necesitará una **cuenta desechable exclusiva de QA**, con autorización del usuario y ninguna colección que preservar.
+
+## Integración con los últimos cambios de main
+
+- Al preparar esta prueba, `main` avanzó en artes y generadores; la rama técnica quedó detrás de ese commit.
+- El PR de sincronización de `main` hacia la rama técnica (#68) indicó conflicto de fusión. **No se forzó el merge ni se modificó main.** La reconciliación de cambios de `index.html` y archivos de validación se resolverá antes de publicar el PR #63.
