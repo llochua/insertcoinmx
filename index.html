@@ -2986,6 +2986,9 @@ import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCl
   const current=LS.get(KEY);
   if(current!==null&&current!==lastRaw)syncIn();
   if(saveFailed||NOWRITE)throw Error('Hay progreso local pendiente de proteger');
+  // Nunca reemplazar una extensión local dañada por una copia aparentemente vacía.
+  if(LS.get(KEY_EXT)!==null&&readExt()===null)
+   throw Error('Los datos extendidos no se pudieron leer');
   return JSON.parse(buildBackup());
  },
  restoreLocal:backup=>applyCloudRestore(backup,sameProgress),
