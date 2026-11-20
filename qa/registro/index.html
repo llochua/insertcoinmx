@@ -175,7 +175,7 @@ function markBackupSaved(){
 }
 function resetBackupUi(){
  clearPreparedBackup();
- el("backupUpload").textContent="2 · GUARDAR EN SUPABASE";
+ el("backupUpload").textContent="CARGA MANUAL SUSPENDIDA";
  delete el("backupUpload").dataset.saved;
  el("backupDownload").disabled=false;
  el("backupConsentLabel").hidden=true;
