@@ -100,3 +100,10 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
 - Se amplió `qa/sync-two-browsers.mjs` para comprobar el recorrido importación → sobre emitido por servidor → recuperación en otro navegador independiente → ninguna emisión duplicada. Es Chromium real contra nube simulada; el resultado de CI debe comprobarse en el commit que contiene esta prueba.
 - **No equivale a E2E autenticado con Supabase real.** Antes de apertura pública hacen falta pruebas con sesiones confirmadas en dos dispositivos y una política explícita para las colecciones invitadas existentes, sin sobrescribir progreso.
 - La prueba de acceso anónimo contra Supabase real verifica denegación, pero no sustituye la prueba autenticada. No se modificó `main`, no se eliminaron colecciones ni se amplió la allowlist.
+
+## Decisión de lanzamiento: reinicio futuro, sin migración automática
+- El usuario decidió que, cuando el contenido y las mecánicas estén terminados, quienes jugaron durante las pruebas **empezarán su colección desde cero**.
+- **No ejecutar ningún reinicio, borrado de cartas, cuentas ni respaldos hasta recibir autorización expresa.** Tampoco fusionar a `main` ni publicar la beta sin su autorización.
+- Por esta decisión, **importar inventarios de invitado no es un requisito de lanzamiento**. La importación existente se mantiene solo en laboratorio y sin habilitarla para todos. No utilizarla como atajo para acuñar cartas.
+- Se corrigió `qa/registro/` para consultar y descargar un respaldo de revisión 2 o posterior (tras jugar), en lugar de aceptar exclusivamente revisión 1. Se añadió prueba automática para revisiones positivas y rechazo de propietarios o versiones incorrectos.
+- Los bloqueos técnicos que sí permanecen: probar alta y recuperación con Auth real, preparar el inicio limpio **cuando se autorice**, y validar que el recorrido del jugador no pierda progreso durante la beta.
