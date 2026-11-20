@@ -3428,7 +3428,16 @@ function openAvatarSelect(){avatarDraft=avatarCurrent;paintAvatarSelect();go('av
 $('profileAvatarButton').onclick=openAvatarSelect;
 $('profileAvatarChange').onclick=openAvatarSelect;
 $('avatarBack').onclick=()=>go('profile');
-$('avatarGrid').onclick=e=>{const b=e.target.closest('[data-avatar]');if(!b)return;avatarDraft=profileAvatar(b.dataset.avatar)[0];paintAvatarSelect()};
+$('avatarGrid').onclick=e=>{
+ const b=e.target.closest('[data-avatar]');if(!b)return;
+ avatarDraft=profileAvatar(b.dataset.avatar)[0];
+ const av=profileAvatar(avatarDraft);
+ $('avatarPreviewName').textContent=av[1];
+ $('avatarPreviewImage').src=avatarPath(av[0],320);
+ $('avatarPreviewImage').alt='Avatar '+av[1];
+ $('avatarGrid').querySelectorAll('[data-avatar]').forEach(option=>option.setAttribute('aria-pressed',String(option.dataset.avatar===avatarDraft)));
+ $('avatarSave').disabled=avatarDraft===avatarCurrent;
+};
 $('avatarSave').onclick=()=>{
  if(avatarDraft===avatarCurrent)return;
  try{sessionStorage.setItem(PROFILE_AVATAR_KEY,avatarDraft)}catch(e){$('avatarNote').textContent='No fue posible guardar la selección durante esta sesión.';return}
