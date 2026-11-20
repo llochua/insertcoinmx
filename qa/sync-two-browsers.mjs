@@ -133,7 +133,7 @@ async function run(){
   const exceptions=[];
   page.on('pageerror',error=>exceptions.push(error.message));
   await page.goto(origin+'/index.html',{waitUntil:'domcontentloaded'});
-  await page.waitForSelector('#cloudState');
+  await page.waitForSelector('#cloudState',{state:'attached'});
   await until(async()=>{
    const status=await page.locator('#cloudState').getAttribute('data-sync');
    return ['synced','empty','pending','conflict','offline','guest'].includes(status);
