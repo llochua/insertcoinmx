@@ -1198,9 +1198,15 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .z-narrative p{font:500 15px/1.6 AV,system-ui,sans-serif;color:#f5f2ff;white-space:pre-line}
 
 
-/* IC · Espectáculo contenido: el color de la imagen continúa hasta el escenario. */
-.dx-flat-art{overflow:hidden}
-.dx-flat-art>img{display:block;width:100%;height:100%;object-fit:contain;object-position:center center;pointer-events:none}
+/* Holo y Dorada comparten un sistema de fondo continuo.
+   Un color plano no coincide con ambos bordes cuando el JPG tiene gradientes.
+   La misma imagen crea el ambiente, y el primer plano conserva el arte completo
+   mientras desvanece solo los extremos (sin recortes ni estiramiento). */
+.dx-art-ambient,.disc.dx.v-e .dx-full-view::before,.disc.dx.v-r .dx-full-view::before{position:absolute;inset:-48px;pointer-events:none;background-image:var(--ic-art-image);background-position:center 40%;background-repeat:no-repeat;background-size:cover;filter:blur(46px) saturate(.92);opacity:.92}
+.dx-art-ambient{z-index:0}
+.dx-flat-art{z-index:0;overflow:hidden;background:transparent!important}
+.dx-flat-art>img,.disc.dx.v-e .dx-full-view>img,.disc.dx.v-r .dx-full-view>img{display:block;flex:none;width:auto;max-width:100%;height:100%;max-height:100%;object-fit:contain;object-position:center center;pointer-events:none;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 92%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 92%,transparent 100%)}
+.disc.dx.v-e .dx-full-view>img,.disc.dx.v-r .dx-full-view>img{position:relative;z-index:1}
 .disc.dx.v-r{background:var(--bg)!important}
 .rh.v-r{background:var(--bg)!important}
 
@@ -1326,8 +1332,10 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 
 /* Ilustración primero: sin barra de reacciones ni botón central durante el descubrimiento. */
 .dx-top{gap:clamp(7px,2vw,13px);padding-inline:16px}
-.dx-top .dx-leave{flex:0 0 30px;width:30px;height:36px;min-height:36px;padding:0;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(12,11,25,.5);color:#fff;opacity:.65}
-.dx-top .dx-leave svg{width:16px;height:16px}
+/* Cierre compartido con ficha/zoom: círculo real de 44 x 44 y SVG centrado. */
+.dx-top .dx-leave{box-sizing:border-box;flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.26);border-radius:50%;background:rgba(12,11,25,.52);color:#fff;opacity:1;line-height:0}
+.dx-top .dx-leave svg{display:block;flex:none;width:20px;height:20px}
+.dx-top .dx-leave:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
 .dx-top .dx-seg{min-width:34px}
 .dx-top .sound-toggle{background:#171228;border:1px solid #FFD400;color:#FFD400;box-shadow:0 2px 12px rgba(0,0,0,.36)}
 .dx-top .sound-toggle.is-muted{background:#171228;border-color:rgba(255,255,255,.65);color:#fff}
@@ -2173,8 +2181,8 @@ function resolveArtworkBackground(d,D){
   AUTO_BG_COLORS[d.id]=color;
   if(D.dataset.artId!==d.id||D.classList.contains('cov'))return;
   D.style.setProperty('--bg',color);
-  const flat=D.querySelector('.dx-flat-art');
-  if(flat)flat.style.backgroundColor=color;
+  // El escenario recibe el color medido, pero el arte nunca recibe un
+  // rectángulo opaco que vuelva a crear un corte.
   D.classList.toggle('bg-light',lum(color)>.72);
  };
  if(im.complete&&im.naturalWidth)update();
@@ -2203,7 +2211,7 @@ const STAGE=id=>{const d=DB[id];if(d&&d.cm)return d.cm;const b=ABOX[id];if(!b||!
 let pi=0,PHS=[];
 function phasesOf(c){const L=[];if(c._dnew)L.push('design');if(c._new&&c.v!=='b')L.push('back');L.push('card');return L}
 let REV=new Set();
-const dxTop=()=>`<div class="dx-top"><button type="button" id="dcLeave" class="dx-leave" aria-label="Salir del sobre" title="Salir del sobre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"/></svg></button><span class="dx-seg" aria-label="Carta ${idx+1} de 5">${hand.map((_,i)=>`<i class="${i<idx?'ok':i===idx?'cur':''}"></i>`).join('')}</span><span class="dx-n">${String(idx+1).padStart(2,'0')}/05</span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>`;
+const dxTop=()=>`<div class="dx-top"><button type="button" id="dcLeave" class="ic-close dx-leave" aria-label="Salir del sobre" title="Salir del sobre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"/></svg></button><span class="dx-seg" aria-label="Carta ${idx+1} de 5">${hand.map((_,i)=>`<i class="${i<idx?'ok':i===idx?'cur':''}"></i>`).join('')}</span><span class="dx-n">${String(idx+1).padStart(2,'0')}/05</span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>`;
 const dxArrow=dir=>dir==='left'?'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 5-7 7 7 7"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 5 7 7-7 7"/></svg>';
 /* Navegación mínima: las reacciones son una acción de detalle, no de revelación. */
 const REACTION_EMOJI=['🤯','😍','😐','😒'];
@@ -2304,9 +2312,9 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
  /* la ilustración es la de esta versión: Base/Especial = estampa original · Rara = su arte en oro · Full = su escena completa */
  const fullSrc=fa||artOf(d.id);
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
-  :(v==='e'||v==='r')?`<div class="dx-art dx-flat-art" style="background-color:${col}"><img src="${artOf(d.id)}" alt="" decoding="async"></div>`
+  :(v==='e'||v==='r')?`<div class="dx-art-ambient" aria-hidden="true"></div><div class="dx-art dx-flat-art"><img src="${artOf(d.id)}" alt="" decoding="async"></div>`
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:${artOf(d.id).startsWith('d/')?.8:.667}"><img src="${artOf(d.id)}" alt=""></span>`}</span></div>`;
- D.className=`disc on dx v-${v} k-${k}${storyFor(c)?' has-narrative':''}${v==='b'&&CARD_TEXTS[d.id]?' has-base-copy':''}${hasCol(d.id)?'':' neu'}${lum(col)>.72?' bg-light':''}`;D.dataset.artId=d.id;D.style.setProperty('--bg',col);
+ D.className=`disc on dx v-${v} k-${k}${storyFor(c)?' has-narrative':''}${v==='b'&&CARD_TEXTS[d.id]?' has-base-copy':''}${hasCol(d.id)?'':' neu'}${lum(col)>.72?' bg-light':''}`;D.dataset.artId=d.id;D.style.setProperty('--bg',col);D.style.setProperty('--ic-art-image',`url("${fullSrc}")`);
  D.innerHTML=`${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}
   <div class="dx-full-view" id="dcFullView" hidden aria-hidden="true"><img src="${fullSrc}" alt="Ilustración completa de ${esc(d.n)}" decoding="async"></div>
   <button type="button" id="dcArtBack" class="dx-art-back" hidden aria-label="Volver a la carta"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m14.5 5-7 7 7 7"/></svg><span>Volver a carta</span></button>
