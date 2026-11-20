@@ -1573,6 +1573,37 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-account-return:focus-visible{outline:2px solid #ffd400;outline-offset:3px}
 #profile .profile-account-return[hidden]{display:none!important}
 @media(min-width:1000px){.crt:has(> #profile.on){width:min(740px,calc(100vw - 40px));height:calc(100dvh - 26px);max-height:none}}
+
+/* Avatares · solo laboratorio de perfil */
+#profile .profile-avatar{padding:0;overflow:hidden;position:relative;cursor:pointer;background:#15112e!important;border:2px solid #ffd400!important;border-radius:14px}
+#profile .profile-avatar img,#home .home-player-avatar img{width:100%!important;height:100%!important;object-fit:cover}
+#home .home-player-avatar{overflow:hidden;background:#15112e}
+#profile .profile-avatar::after{content:'✎';position:absolute;right:0;bottom:0;width:19px;height:19px;background:#ffd400;color:#15112e;font:900 13px AV;display:grid;place-items:center}
+#profile .profile-avatar-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #ffffff2b}
+#profile .profile-avatar-strip span{font:600 12px AV;color:#cfc9e4}
+#profile .profile-avatar-strip button{min-height:43px;padding:8px 10px;border:1px solid #ffd40088;border-radius:9px;font:800 11px AV;color:#ffd400}
+#avatarSelect .avatar-scroller{display:flex;flex-direction:column;gap:17px;flex:1;width:min(100%,620px);align-self:center;overflow:auto;padding:17px 17px 30px;scrollbar-width:none}
+#avatarSelect .avatar-scroller::-webkit-scrollbar{display:none}
+#avatarSelect .avatar-intro small{font:800 10px AV;color:#ffd400;letter-spacing:.1em}
+#avatarSelect .avatar-intro h2{font:800 25px AV;color:#fff;margin:6px 0}
+#avatarSelect .avatar-intro p{font:500 13px/1.5 AV;color:#c6bfdc}
+#avatarSelect .avatar-preview{display:flex;align-items:center;gap:14px;padding:13px;background:linear-gradient(115deg,#302557,#151029);border:1px solid #ffd40077;border-radius:15px}
+#avatarSelect .avatar-preview img{width:94px;height:94px;border:2px solid #ffd400;border-radius:12px;object-fit:cover}
+#avatarSelect .avatar-preview small{font:700 10px AV;color:#ffd400}
+#avatarSelect .avatar-preview strong{display:block;font:800 19px AV;margin:5px 0}
+#avatarSelect .avatar-preview p{font:500 11px AV;color:#c7c0d9}
+#avatarSelect .avatar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+#avatarSelect .avatar-option{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:7px 5px 10px;border:2px solid transparent;border-radius:12px;background:#ffffff0d;min-width:0}
+#avatarSelect .avatar-option img{width:100%;max-width:144px;aspect-ratio:1;object-fit:cover;border-radius:8px}
+#avatarSelect .avatar-option span{font:700 11px/1.3 AV;color:#fff;text-align:center}
+#avatarSelect .avatar-option[aria-pressed="true"]{border-color:#ffd400;background:#ffd40018}
+#avatarSelect .avatar-option[aria-pressed="true"]::after{content:'✓';position:absolute;right:8px;top:8px;width:25px;height:25px;border-radius:50%;background:#ffd400;color:#15112e;display:grid;place-items:center;font:900 15px AV}
+#avatarSelect button:focus-visible,#profile #profileAvatarChange:focus-visible,#profile #profileAvatarButton:focus-visible{outline:3px solid #ffd400;outline-offset:3px}
+#avatarSelect .avatar-save{position:sticky;bottom:0;min-height:52px;width:100%;border-radius:10px;background:#ffd400;color:#15112e;font:800 13px AV}
+#avatarSelect .avatar-save:disabled{opacity:.45}
+#avatarSelect .avatar-note{font:500 11px/1.5 AV;color:#aaa2c6;text-align:center}
+@media(min-width:540px){#avatarSelect .avatar-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:360px){#avatarSelect .avatar-option span{font-size:10px}#avatarSelect .avatar-grid{gap:7px}}
 </style></head><body>
 <div class="lab-ribbon" aria-label="Vista previa no publicada">LAB · VISTA PREVIA · NO USA TUS CARTAS</div>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
@@ -1591,7 +1622,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="profile-entry" data-go="profile" aria-label="Mi perfil de jugador" title="Mi perfil"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-4.3 3.4-6 7.5-6s6.7 1.7 7.5 6"/></svg></button><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
  <span id="test" class="htest"></span>
  <button type="button" class="home-player-card" data-go="profile" aria-label="Abrir Mi perfil y proteger mi colección">
-  <span class="home-player-avatar" aria-hidden="true"><img src="coin.png" alt=""></span>
+  <span class="home-player-avatar" aria-hidden="true"><img id="homePlayerAvatarImage" src="assets/avatars/moneda-128.webp" alt="" width="48" height="48"></span>
   <span class="home-player-copy"><strong>MI PERFIL <span class="home-player-pill">1UP</span></strong><small id="homePlayerStatus">Tu colección, tu progreso</small></span>
   <span class="home-player-count"><b id="homePlayerCards">0</b><small>CARTAS</small></span>
   <svg class="home-player-arrow" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 5 7 7-7 7"/></svg>
@@ -1652,7 +1683,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="profile-scroll">
   <section class="profile-passport" aria-label="Mi partida">
    <div class="profile-head">
-    <div class="profile-avatar" aria-hidden="true"><img src="coin.png" alt=""></div>
+    <button type="button" id="profileAvatarButton" class="profile-avatar" aria-label="Cambiar mi avatar"><img id="profileAvatarImage" src="assets/avatars/moneda-128.webp" alt="" width="54" height="54"></button>
     <div class="profile-identity"><p class="profile-kicker">PLAYER 01 · INSERT COIN MX</p><h2 id="profilePlayerName">Jugador invitado</h2><p class="profile-status" id="profilePlayerState">Progreso en este navegador</p><p class="profile-initials" id="profileInitials" hidden></p></div>
    </div>
    <div class="profile-collection">
@@ -1664,6 +1695,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
      <p class="profile-progress-note" id="profilePercent">0% de la colección</p>
     </div>
    </div>
+   <div class="profile-avatar-strip"><span>Tu personaje de Insert Coin MX</span><button type="button" id="profileAvatarChange">CAMBIAR AVATAR</button></div>
   </section>
   <div class="profile-metrics" aria-label="Resumen de mi colección">
    <div><span class="profile-metric-icon" aria-hidden="true">✦</span><strong id="profileDesigns">0</strong><span>Diseños</span></div>
@@ -1709,6 +1741,16 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
     <button type="button" class="profile-action secondary" id="profileImport">RECUPERAR UN RESPALDO</button>
    </div>
   </details>
+ </div>
+</section>
+<section class="view" id="avatarSelect" aria-label="Selección de avatar">
+ <div class="top"><button type="button" class="vback" id="avatarBack" aria-label="Volver al perfil">←</button><h1 class="vt">Mi avatar</h1><span class="sp"></span></div>
+ <div class="avatar-scroller">
+  <div class="avatar-intro"><small>IDENTIDAD DE JUGADOR</small><h2>Elige tu personaje</h2><p>12 personajes de Insert Coin MX. Puedes cambiar el tuyo cuando quieras.</p></div>
+  <div class="avatar-preview"><img id="avatarPreviewImage" src="assets/avatars/moneda-320.webp" alt="Avatar Moneda" width="94" height="94"><div><small>TU SELECCIÓN</small><strong id="avatarPreviewName">Moneda</strong><p>Así se verá en tu perfil.</p></div></div>
+  <div id="avatarGrid" class="avatar-grid" role="group" aria-label="Avatares disponibles"></div>
+  <button type="button" id="avatarSave" class="avatar-save" disabled>GUARDAR AVATAR</button>
+  <p id="avatarNote" class="avatar-note" role="status" aria-live="polite">Laboratorio: tu elección se conserva durante esta sesión. No modifica tu cuenta ni tus cartas.</p>
  </div>
 </section>
 <div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onT" aria-hidden="true">
@@ -3361,6 +3403,39 @@ $('profileAccountBack').onclick=()=>{
 };
 $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
+
+/* Preferencia de laboratorio independiente del progreso y del login. */
+const PROFILE_AVATARS=[["moneda","Moneda"],["pizza","Pizza"],["control","Control"],["cartucho","Cartucho"],["bote-tinta","Bote de tinta"],["mago","Mago"],["gato-afk","Gato AFK"],["jos","Jos"],["glitch","Glitch"],["playera","Playera"],["rasqueta-malla","Rasqueta y malla"],["arcade","Arcade"]];
+const PROFILE_AVATAR_KEY='icmx-preview-avatar-20261120';
+const profileAvatar=id=>PROFILE_AVATARS.find(a=>a[0]===id)||PROFILE_AVATARS[0];
+const avatarPath=(id,size)=>'assets/avatars/'+profileAvatar(id)[0]+'-'+size+'.webp';
+let avatarCurrent=(()=>{try{return profileAvatar(sessionStorage.getItem(PROFILE_AVATAR_KEY))[0]}catch(_){return 'moneda'}})(),avatarDraft=avatarCurrent;
+function paintAvatar(){
+ for(const id of ['profileAvatarImage','homePlayerAvatarImage']){
+  const el=$(id);el.src=avatarPath(avatarCurrent,128);
+  el.srcset=avatarPath(avatarCurrent,128)+' 128w, '+avatarPath(avatarCurrent,320)+' 320w';
+  el.sizes=id==='profileAvatarImage'?'54px':'48px';
+  el.onerror=()=>{el.onerror=null;el.removeAttribute('srcset');el.src='coin.png'};
+ }
+}
+function paintAvatarSelect(){
+ const av=profileAvatar(avatarDraft);
+ $('avatarPreviewName').textContent=av[1];$('avatarPreviewImage').src=avatarPath(av[0],320);$('avatarPreviewImage').alt='Avatar '+av[1];
+ $('avatarGrid').innerHTML=PROFILE_AVATARS.map(([id,label])=>'<button type="button" class="avatar-option" data-avatar="'+id+'" aria-pressed="'+(id===avatarDraft)+'" aria-label="Elegir avatar '+label+'"><img src="'+avatarPath(id,128)+'" width="128" height="128" loading="lazy" decoding="async" alt=""><span>'+label+'</span></button>').join('');
+ $('avatarSave').disabled=avatarDraft===avatarCurrent;
+}
+function openAvatarSelect(){avatarDraft=avatarCurrent;paintAvatarSelect();go('avatarSelect')}
+$('profileAvatarButton').onclick=openAvatarSelect;
+$('profileAvatarChange').onclick=openAvatarSelect;
+$('avatarBack').onclick=()=>go('profile');
+$('avatarGrid').onclick=e=>{const b=e.target.closest('[data-avatar]');if(!b)return;avatarDraft=profileAvatar(b.dataset.avatar)[0];paintAvatarSelect()};
+$('avatarSave').onclick=()=>{
+ if(avatarDraft===avatarCurrent)return;
+ try{sessionStorage.setItem(PROFILE_AVATAR_KEY,avatarDraft)}catch(e){$('avatarNote').textContent='No fue posible guardar la selección durante esta sesión.';return}
+ avatarCurrent=avatarDraft;paintAvatar();go('profile');
+};
+paintAvatar();
+
 /* ---------- arranque ---------- */
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
 claimPend();initSound();go('home');STORE.init();
