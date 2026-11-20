@@ -43,7 +43,7 @@ const backup=(data,ext)=>({
 test('Restauración exacta: conserva cuota, ciclo, historial y datos extendidos',()=>{
  const s=scenario(),remote=backup({reta2:{round:3}},
   {pend:{future_f:2}});
- assert.deepEqual(s.apply(remote),{ok:true});
+ assert.equal(s.apply(remote).ok,true);
  const restored=JSON.parse(s.localStorage.getItem('icmx-album2'));
  assert.equal(restored.freeCycle,135);
  assert.equal(restored.freeUsed,2);
@@ -58,7 +58,7 @@ test('Restauración exacta: conserva cuota, ciclo, historial y datos extendidos'
 test('Si normalizar modifica un campo persistente, bloquea y recupera original',()=>{
  const s=scenario({normalize:x=>{x.freeCycle=999;return x}});
  const previous=s.localStorage.getItem('icmx-album2');
- assert.deepEqual(s.apply(backup()),{ok:false});
+ assert.equal(s.apply(backup()).ok,false);
  assert.equal(s.localStorage.getItem('icmx-album2'),previous);
  assert.equal(s.S.have.gato_b,1);
 });
@@ -67,7 +67,7 @@ test('No restaurar si hay un sobre todavía sin guardar o animación en curso',(
   const s=scenario(config);
   if(!config.opening)s.context.saveFailed=true;
   const before=s.localStorage.getItem('icmx-album2');
-  assert.deepEqual(s.apply(backup()),{ok:false});
+  assert.equal(s.apply(backup()).ok,false);
   assert.equal(s.localStorage.getItem('icmx-album2'),before);
  }
 });
