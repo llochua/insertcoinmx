@@ -44,6 +44,12 @@ jobs:
       - name: Validar catálogo y narrativas
         run: node content/validate.mjs
 
+      - name: Probar actualización completa de una carta sin publicarla
+        if: github.event_name == 'pull_request'
+        run: |
+          python -m pip install numpy opencv-python-headless
+          python cartas/actualizar.py sonic
+
       - name: Verificar imágenes y tratamiento visual
         shell: bash
         run: |
