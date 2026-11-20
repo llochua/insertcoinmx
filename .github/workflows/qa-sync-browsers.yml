@@ -16,7 +16,7 @@ permissions:
 jobs:
   qa-dos-navegadores:
     name: Chromium · dos sesiones · nube simulada
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Obtener código
