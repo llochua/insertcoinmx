@@ -216,7 +216,12 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
     p_request_id:id,p_expected_revision:baseline?.revision??rev
    });
    if(error)throw error;
-   if(data?.status==='conflict'){rerun=true;return {status:'pending'}}
+   if(data?.status==='conflict'){
+    // El servidor confirma que esta petición NO fue emitida. Permitir
+    // un nuevo request_id una vez recuperada la revisión actual.
+    localStorage.removeItem(pendingKey);
+    rerun=true;return {status:'pending'}
+   }
    if(data?.status==='no_packs'){
     localStorage.removeItem(pendingKey);
     rerun=true;
