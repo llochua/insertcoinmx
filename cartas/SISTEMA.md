@@ -169,7 +169,7 @@ lo renueva automáticamente a partir de hashes SHA-256 de las fuentes; no hay qu
 
 ### Criterio visual obligatorio
 
-Las variantes **Base, Holo y Dorada extienden el fondo plano real del JPG al escenario completo** (mismo `--bg` compartido). La ilustración se muestra completa y sin deformación; no se crean duplicados desenfocados, halos, imágenes ampliadas ni estilos por ID. El color se recalcula desde los bordes de la ilustración cargada y se actualiza al reemplazar el diseño. Para Full se conserva el tratamiento a sangre aprobado. El control de calidad rechaza la reintroducción del fondo desenfocado. Cierres y controles reutilizan el botón circular estándar.
+Las variantes **Base, Holo y Dorada extienden el fondo del JPG al escenario completo** (mismo `--bg` compartido). La ilustración se muestra **nítida y sin máscaras de transparencia laterales o verticales, sombras sobre sus bordes ni halos radiales**. El degradado inferior para legibilidad del texto (`.dx-fade`) es independiente del arte y se conserva. No crear duplicados desenfocados, filtros ni estilos por ID. El color se recalcula desde los bordes del arte al actualizar el diseño. La Full conserva su tratamiento a sangre. `cartas/qa.py` bloquea la reintroducción de estos efectos sobre el arte.
 
 
 ## 7. Publicación optimizada de imágenes (20 nov 2026)
