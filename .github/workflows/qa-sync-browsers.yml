@@ -8,6 +8,8 @@ on:
       - 'index.html'
       - 'qa/sync-two-browsers.mjs'
       - 'qa/supabase-live-anon.mjs'
+      - 'qa/live-auth-two-browsers.mjs'
+      - 'qa/registro/index.html'
       - '.github/workflows/qa-sync-browsers.yml'
   workflow_dispatch:
 
