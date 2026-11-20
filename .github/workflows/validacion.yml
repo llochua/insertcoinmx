@@ -33,7 +33,7 @@ jobs:
 
       - name: Probar sincronización segura
         run: |
-          node --test content/cloud-sync.test.mjs content/cloud-restore.test.mjs
+          node --test content/cloud-sync.test.mjs content/cloud-restore.test.mjs qa/registro/cloud-snapshot.test.mjs
           node - <<'NODE'
           const fs = require('node:fs');
           const vm = require('node:vm');
@@ -45,6 +45,13 @@ jobs:
             count++;
           }
           if(!count)throw Error('No se hallaron scripts en index.html');
+          const registration=fs.readFileSync('qa/registro/index.html','utf8');
+          const moduleScript=registration.match(/<script type="module">([\\s\\S]*?)<\\/script>/)?.[1];
+          if(!moduleScript)throw Error('No se halló el script de registro');
+          const {spawnSync}=require('node:child_process');
+          const checked=spawnSync(process.execPath,['--check','--input-type=module'],{input:moduleScript,encoding:'utf8'});
+          if(checked.status!==0)throw Error(checked.stderr);
+          console.log('Módulo de registro válido');
           console.log('Scripts inline válidos: '+count);
           NODE
 
