@@ -1551,6 +1551,28 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .onb .on-choice .on-next{width:100%}
 .onb.account-step .on-copy p{max-width:400px}
 @media(max-height:690px){.on-save-device{height:clamp(112px,25vh,175px)}.on-save{gap:5px}.on-save-caption{font-size:9px!important}.onb .on-choice{gap:5px}.onb .on-choice .on-account{padding:11px 8px}}
+
+/* Refinamiento UX: la tercera pantalla del onboarding tiene una sola acción primaria. */
+.onb .on-actions{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;max-width:415px;margin:0 auto;flex:none}
+.onb .on-choice{width:100%;min-width:0;flex:none;display:flex;flex-direction:column;gap:8px}
+.onb .on-choice .on-account{min-height:50px;padding:13px 16px;margin:0;border:0;border-radius:10px;background:#ffd400;color:#161027;font:800 13px/1.2 AV,system-ui,sans-serif;box-shadow:none;letter-spacing:.03em}
+.onb.account-step .on-choice .on-next{display:block;width:100%;min-height:42px;flex:none;padding:9px 12px!important;background:transparent!important;color:#c8c2df!important;border:0!important;border-radius:10px;box-shadow:none!important;font:700 12px/1.3 AV,system-ui,sans-serif!important;letter-spacing:0!important}
+.onb.account-step .on-choice .on-next:hover{color:#fff!important;background:rgba(255,255,255,.06)!important}
+.onb .on-actions .on-back{flex:none;align-self:center;min-width:0;min-height:33px;padding:7px 13px;margin-top:2px;border:0;border-radius:8px;background:transparent;color:#b9b2d2;font:700 11px AV,system-ui,sans-serif}
+.onb .on-actions .on-back:hover{color:#fff;background:rgba(255,255,255,.055)}
+.onb .on-actions .on-back[hidden]{display:none!important}
+.onb .on-account:focus-visible,.onb .on-next:focus-visible,.onb .on-back:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(min-width:1000px) and (min-height:650px){.onb .on-actions{max-width:none;margin:0;align-items:stretch}.onb .on-actions .on-back{align-self:flex-start}}
+/* El perfil contiene una sola tarea por vista, sin registros duplicados ni barras visibles. */
+#profile .profile-scroll{scrollbar-width:none;-ms-overflow-style:none;scroll-padding-top:8px;overscroll-behavior-y:contain}
+#profile .profile-scroll::-webkit-scrollbar{display:none;width:0;height:0}
+#profile.account-focus .profile-passport,#profile.account-focus .profile-metrics,#profile.account-focus .profile-spotlight,#profile.account-focus .profile-backup{display:none!important}
+#profile.account-focus .profile-scroll{gap:0;padding-top:18px}
+#profile.account-focus .profile-account{width:100%;margin:0 auto;display:flex!important;flex-direction:column}
+#profile .profile-account-return{align-self:flex-start;padding:7px 6px;margin-bottom:5px;background:transparent;border:0;border-radius:6px;color:#ffd400;font:700 11px AV,system-ui,sans-serif}
+#profile .profile-account-return:focus-visible{outline:2px solid #ffd400;outline-offset:3px}
+#profile .profile-account-return[hidden]{display:none!important}
+@media(min-width:1000px){.crt:has(> #profile.on){width:min(740px,calc(100vw - 40px));height:calc(100dvh - 26px);max-height:none}}
 </style></head><body>
 <div class="lab-ribbon" aria-label="Vista previa no publicada">LAB · VISTA PREVIA · NO USA TUS CARTAS</div>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
@@ -1656,7 +1678,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <button type="button" class="profile-action secondary" id="profileQuickLogin">YA TENGO CUENTA</button>
    <small>También puedes seguir jugando como invitado.</small>
   </section>
-  <section class="profile-panel profile-account" id="profileAccountPanel" aria-labelledby="profileAccountTitle" hidden>
+  <section class="profile-panel profile-account" id="profileAccountPanel" aria-labelledby="profileAccountTitle" tabindex="-1" hidden>
+   <button type="button" id="profileAccountBack" class="profile-account-return">← VOLVER AL PERFIL</button>
    <p class="profile-kicker">TU CUENTA</p>
    <h3 id="profileAccountTitle">Acceso de jugador</h3>
    <p class="profile-account-intro">Tus cartas estarán respaldadas cuando aparezca el estado «NUBE AL DÍA».</p>
@@ -1716,7 +1739,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="on-panel">
   <div class="on-copy"><div class="on-kicker" id="onK"></div><h2 id="onT"></h2><p id="onP"></p></div>
   <div class="on-progress" id="onDots" aria-label="Paso 1 de 3"></div>
-  <div class="on-actions"><button type="button" class="on-back" id="onBack" hidden>ATRÁS</button><div class="on-choice"><button type="button" class="on-account" id="onAccount" hidden>CREAR MI CUENTA</button><button type="button" class="big on-next" id="onNext">SIGUIENTE</button></div></div>
+  <div class="on-actions"><div class="on-choice"><button type="button" class="on-account" id="onAccount" hidden>CREAR MI CUENTA</button><button type="button" class="big on-next" id="onNext">SIGUIENTE</button></div><button type="button" class="on-back" id="onBack" hidden>← ATRÁS</button></div>
  </div>
 </div>
 </div>
@@ -2230,7 +2253,7 @@ function showOn(){
  $('onDots').innerHTML=ON.map((_,i)=>'<i class="'+(i===onI?'on':'')+'"></i>').join('');
  $('onDots').setAttribute('aria-label','Paso '+(onI+1)+' de '+ON.length);
  $('onBack').hidden=onI===0;$('onNext').textContent=onI<2?'SIGUIENTE':'SEGUIR COMO INVITADO';$('onAccount').hidden=onI!==ON.length-1;
- $('onNext').focus({preventScroll:true})
+ if(onI===ON.length-1)$('onAccount').focus({preventScroll:true});else $('onNext').focus({preventScroll:true})
 }
 function closeOn(openPack){
  $('onb').classList.remove('on');$('onb').setAttribute('aria-hidden','true');
@@ -3315,11 +3338,27 @@ $('profileExport').onclick=()=>$('bkExp').click();
 $('profileImport').onclick=()=>$('bkImp').click();
 $('profileLinkCollection').onclick=()=>{$('cloudImport').click()};
 function revealProfileAuth(mode='signup'){
- const panel=$('profileAccountPanel');panel.hidden=false;
+ const panel=$('profileAccountPanel');
+ $('profile').classList.add('account-focus');
+ $('profileWelcome').hidden=true;
+ panel.hidden=false;
+ $('profileAccountBack').hidden=false;
  const tab=$(mode==='login'?'profileAuthTabLogin':'profileAuthTabSignup');
  if(tab&&!tab.disabled)tab.click();
- requestAnimationFrame(()=>{panel.scrollIntoView({behavior:'smooth',block:'start'});});
+ requestAnimationFrame(()=>{
+  const scroller=document.querySelector('#profile .profile-scroll');
+  if(scroller)scroller.scrollTop=0;
+  panel.focus({preventScroll:true});
+ });
 }
+$('profileAccountBack').onclick=()=>{
+ $('profile').classList.remove('account-focus');
+ $('profileAccountPanel').hidden=true;
+ $('profileWelcome').hidden=false;
+ const scroller=document.querySelector('#profile .profile-scroll');
+ if(scroller)scroller.scrollTop=0;
+ $('profileQuickSignup').focus({preventScroll:true});
+};
 $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
