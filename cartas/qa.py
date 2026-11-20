@@ -105,7 +105,7 @@ def gradiente_bordes(path):
             [(x, y) for x in (30, 31) for y in range(40)]
         ):
             bordes.append([median([p[x, y][c] for x, y in coords]) for c in range(3)])
-    return round(max(abs(a-b) for a in bordes for b in bordes), 1)
+    return round(max(abs(a-b) for left in bordes for right in bordes for a, b in zip(left, right)), 1)
 
 
 def check_image(relative, errors):
