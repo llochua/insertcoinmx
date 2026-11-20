@@ -102,18 +102,21 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
     autoRefreshToken:true,storageKey:'icmx-auth-qa-nov2026'}}
  );
  let stopped=false,busy=false,rerun=false,debounce=null,interval=null;
+ let accountUid=null,issuing=false;
  const status=(code,message)=>{if(!stopped)onStatus(code,message)};
  async function syncOnce(){
   const {data:verified,error:authError}=await client.auth.getUser();
   if(authError){
    const {data:sessionData}=await client.auth.getSession();
+   if(!sessionData?.session)accountUid=null;
    status(sessionData?.session?'offline':'guest',
     sessionData?.session?'NUBE SIN CONEXIÓN · EL PROGRESO LOCAL SIGUE A SALVO':'INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');
    return;
   }
   const user=verified?.user;
-  if(!user?.id){status('guest','INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');return}
+  if(!user?.id){accountUid=null;status('guest','INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');return}
   const uid=user.id;
+  accountUid=uid;
   const local=assertBackup(readLocal());
   const {data:row,error:readError}=await client.from('player_snapshots')
    .select('user_id,game_format,state,revision').eq('user_id',uid).maybeSingle();
@@ -164,7 +167,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  }
  async function check(){
   if(stopped)return;
-  if(busy){rerun=true;return}
+  if(busy||issuing){rerun=true;return}
   busy=true;
   try{
    status('checking','COMPROBANDO SINCRONIZACIÓN…');
@@ -172,6 +175,73 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   }catch(_){status('offline','NUBE NO DISPONIBLE · CONSERVAMOS TU PROGRESO LOCAL')}
   finally{
    busy=false;
+   if(rerun&&!stopped){rerun=false;setTimeout(check,80)}
+  }
+ }
+ /**
+  * Emisión en servidor. request_id permanece hasta confirmar la restauración:
+  * un reintento tras perder la respuesta HTTP no entrega otras cinco cartas.
+  * No existen parámetros de cartas o cuotas controlables por el navegador.
+  */
+ async function issuePack(){
+  if(stopped||!accountUid)return {status:'guest'};
+  if(issuing||busy)return {status:'busy'};
+  issuing=true;
+  const uid=accountUid;
+  const pendingKey='icmx-cloud-pack-request-v1:'+uid;
+  try{
+   const {data:authData,error:authErr}=await client.auth.getUser();
+   if(authErr||authData?.user?.id!==uid)throw Error('La sesión cambió');
+   const local=assertBackup(readLocal());
+   const {data:row,error:readErr}=await client.from('player_snapshots')
+    .select('user_id,game_format,state,revision').eq('user_id',uid).maybeSingle();
+   if(readErr)throw readErr;
+   if(!row||row.user_id!==uid||row.game_format!==2||
+      !Number.isSafeInteger(Number(row.revision)))
+    return {status:'pending'};
+   const remote=assertBackup(row.state),rev=Number(row.revision);
+   const baseline=readBaseline(localStorage,uid);
+   const pending=localStorage.getItem(pendingKey);
+   if(!pending&&(!sameProgress(local,remote)||
+      baseline&&decideSync({local,remote,base:baseline,remoteRevision:rev})==='conflict')){
+    rerun=true;return {status:'pending'};
+   }
+   let id=pending;
+   if(!id){
+    id=crypto.randomUUID();
+    localStorage.setItem(pendingKey,id);
+    if(localStorage.getItem(pendingKey)!==id)throw Error('No se pudo guardar la petición');
+   }
+   const {data,error}=await client.rpc('issue_player_pack',{
+    p_request_id:id,p_expected_revision:baseline?.revision??rev
+   });
+   if(error)throw error;
+   if(data?.status==='conflict'){rerun=true;return {status:'pending'}}
+   if(data?.status==='no_packs'){
+    localStorage.removeItem(pendingKey);
+    rerun=true;
+    return {status:'no_packs'};
+   }
+   if(!['issued','duplicate'].includes(data?.status)||
+      !Array.isArray(data.cards)||data.cards.length!==5||
+      !Number.isSafeInteger(Number(data.revision))||!data.state)
+    throw Error('Respuesta de sobre inesperada');
+   if(!sameProgress(readLocal(),local)){
+    rerun=true;
+    return {status:'pending'};
+   }
+   const outcome=restoreLocal(assertBackup(data.state));
+   if(!outcome?.ok)throw Error('No fue posible restaurar las cartas protegidas');
+   persistBaseline(localStorage,uid,Number(data.revision),data.state);
+   localStorage.removeItem(pendingKey);
+   status('synced','NUBE AL DÍA · SOBRE GUARDADO EN TU CUENTA');
+   rerun=true;
+   return data;
+  }catch(_){
+   status('offline','NO SE CONFIRMÓ EL SOBRE · PUEDE REINTENTARSE SIN DUPLICAR');
+   return {status:'pending'};
+  }finally{
+   issuing=false;
    if(rerun&&!stopped){rerun=false;setTimeout(check,80)}
   }
  }
@@ -190,7 +260,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  window.addEventListener('storage',onStorage);
  interval=setInterval(()=>{if(!document.hidden)check()},15000);
  check();
- return {changed,check,stop(){
+ return {changed,check,issuePack,isAccount:()=>Boolean(accountUid),stop(){
   stopped=true;clearTimeout(debounce);clearInterval(interval);
   listener?.subscription?.unsubscribe();
   window.removeEventListener('focus',onFocus);
