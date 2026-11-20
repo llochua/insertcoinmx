@@ -58,6 +58,14 @@ jobs:
         run: npx playwright install chromium
       - name: Verificar onboarding, perfil y protección de cartas
         run: node qa/perfil-preview-browsers.mjs
+      - name: Guardar capturas del perfil de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perfil-avatares-capturas
+          path: qa/screenshots/*.png
+          if-no-files-found: ignore
+          retention-days: 7
 
   supabase-anon-smoke:
     name: Supabase real · verificar acceso anónimo
