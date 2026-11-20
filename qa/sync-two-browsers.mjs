@@ -60,6 +60,15 @@ const server=createServer(async(req,res)=>{
    }
    return json(res,{data:{status,state:clone(row.state),revision:row.revision},error:null});
   }
+  if(uri.pathname==='/__qa__/import'){
+   let body='';for await(const chunk of req)body+=chunk;
+   const {uid,args}=JSON.parse(body);
+   const old=cloud.get(uid);
+   if(old)return json(res,{data:{status:'conflict',state:clone(old.state),revision:old.revision},error:null});
+   const state=clone(args.p_state);
+   cloud.set(uid,{user_id:uid,game_format:2,revision:1,state});
+   return json(res,{data:{status:'imported',state,revision:1},error:null});
+  }
   if(uri.pathname==='/__qa__/exchange'){
    let body='';
    for await(const chunk of req)body+=chunk;
@@ -160,8 +169,8 @@ export function createClient(){
    };
   },
   rpc(name,args){
-   if(!['sync_player_snapshot','issue_player_pack','exchange_duplicate_cards','ensure_player_snapshot'].includes(name))throw Error('Unexpected RPC');
-   return fetchJSON(name==='ensure_player_snapshot'?'/__qa__/initialize':name==='issue_player_pack'?'/__qa__/pack':name==='exchange_duplicate_cards'?'/__qa__/exchange':'/__qa__/sync',{method:'POST',
+   if(!['sync_player_snapshot','issue_player_pack','exchange_duplicate_cards','ensure_player_snapshot','import_guest_collection'].includes(name))throw Error('Unexpected RPC');
+   return fetchJSON(name==='ensure_player_snapshot'?'/__qa__/initialize':name==='issue_player_pack'?'/__qa__/pack':name==='exchange_duplicate_cards'?'/__qa__/exchange':name==='import_guest_collection'?'/__qa__/import':'/__qa__/sync',{method:'POST',
     headers:{'content-type':'application/json'},
     body:JSON.stringify({uid:uid(),args})});
   }
@@ -348,6 +357,18 @@ async function run(){
     'una cuenta pendiente no puede acuñar cartas en local');
   assert.equal(cloud.has(LEGACY),false);
   console.log('✓ Colección local previa permanece intacta, sin migración automática ni sobres locales');
+  assert.equal(await D.page.evaluate(()=>cloudSync.canImport()),true);
+  await D.page.locator('#cloudImport').click();
+  await D.page.once('dialog',dialog=>dialog.accept());
+  await until(()=>cloud.has(LEGACY),'importación de colección local');
+  await until(async()=>await D.page.locator('#cloudState').getAttribute('data-sync')==='synced',
+    'estado sincronizado tras importación');
+  assert.equal(cloud.get(LEGACY).state.data.have.abuket_b,4);
+  assert.equal(await D.page.evaluate(()=>cloudSync.canImport()),false);
+  const importedBefore=clone(cloud.get(LEGACY));
+  await check(D.page);
+  assert.deepEqual(cloud.get(LEGACY),importedBefore,'no reimportar colección');
+  console.log('✓ Vinculación explícita conserva cartas y permite recuperar en otro dispositivo');
 
   for(const [name,entry] of [['A',A],['B',B],['C',C],['D',D]])
    assert.deepEqual(entry.exceptions,[],name+' tuvo errores JavaScript');
