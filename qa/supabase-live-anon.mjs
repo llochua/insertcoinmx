@@ -69,6 +69,16 @@ for(const rpcName of ['issue_player_pack','exchange_duplicate_cards']){
 }
 console.log('✓ Emisión y canje: anónimos no pueden generar cartas ni sobres');
 
+const importResult=await request('/rest/v1/rpc/import_guest_collection',{
+ method:'POST',headers:{'content-type':'application/json'},
+ body:JSON.stringify({p_state:{
+  app:'insertcoinmx-album',format:2,data:{have:{},rate:{}}
+ }})
+});
+assertDeniedResult(importResult,'Importación de colecciones sin sesión');
+console.log('✓ Migración invitada: anónimos no pueden enviar inventarios');
+
+
 // No se comprueban aquí las sesiones reales A/B (no hay credenciales de QA
 // conectadas al runner). El aislamiento de cuentas se probó antes con SQL
 // reversible, y la lógica de dos navegadores se probó con nube simulada.
