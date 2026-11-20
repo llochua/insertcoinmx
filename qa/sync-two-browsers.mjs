@@ -183,18 +183,29 @@ async function run(){
     'A debe recibir cambios reconectados');
   console.log('✓ Cambios sin conexión, reconexión y recuperación en A');
 
-  // Divergencia: dos dispositivos guardan antes de consultar la nube.
-  await A.page.evaluate(()=>{S.ini='AAA';save()});
-  await B.page.evaluate(()=>{S.ini='BBB';save()});
+  // Dos sobres simultáneos en navegadores diferentes.
+  // B queda sin red para garantizar que el primer CAS corresponde a A.
+  const shared=await read(A.page);
+  await B.page.evaluate(()=>{window.__qaCloudOffline=true});
+  await Promise.all([A.page.evaluate(()=>openPack()),B.page.evaluate(()=>openPack())]);
+  await until(async()=>{
+   const [a,b]=await Promise.all([read(A.page),read(B.page)]);
+   return a.pk.length===shared.pk.length+1&&b.pk.length===shared.pk.length+1;
+  },'cada navegador debe guardar su apertura local');
   await check(A.page);
-  await until(()=>cloud.get(USER).revision===4,'A debe subir el primer cambio');
+  await until(()=>cloud.get(USER).revision===4,'A debe guardar primero su apertura');
+  await B.page.evaluate(()=>{window.__qaCloudOffline=false});
   await check(B.page);
   await until(async()=> (await B.page.locator('#cloudState').getAttribute('data-sync'))==='conflict',
-    'B debe detectar conflicto');
-  assert.equal((await read(B.page)).ini,'BBB');
-  assert.equal(cloud.get(USER).state.data.ini,'AAA');
-  assert.equal(cloud.get(USER).revision,4);
-  console.log('✓ Conflicto concurrente: estado remoto y local preservados');
+    'B debe detectar sobres abiertos en paralelo');
+  const divergentA=await read(A.page),divergentB=await read(B.page);
+  assert.equal(count(divergentA)-count(shared),5);
+  assert.equal(count(divergentB)-count(shared),5);
+  assert.notEqual(divergentA.pk.at(-1),divergentB.pk.at(-1));
+  assert.equal(cloud.get(USER).state.data.pk.at(-1),divergentA.pk.at(-1));
+  assert.equal(cloud.get(USER).revision,4,'solo una apertura llega al servidor');
+  assert.equal(divergentB.welcomeLeft,shared.welcomeLeft-1);
+  console.log('✓ Dos sobres paralelos: uno confirmado, el otro protegido como conflicto');
 
   const C=await device(OTHER,null);
   assert.equal((await read(C.page))?.have?.abuket_b,undefined);
