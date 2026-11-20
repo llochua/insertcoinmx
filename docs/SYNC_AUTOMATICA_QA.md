@@ -67,9 +67,16 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
 - Protección de cambio de cuenta: como el álbum del navegador aún usa un almacenamiento local compartido, `cloud-sync.mjs` asocia el dispositivo a la primera cuenta sincronizada y bloquea operaciones de nube cuando cambia el UID. No borra ni migra automáticamente ninguna colección. La prueba Chromium verifica que no cambian el álbum local ni los snapshots de ninguna de las dos cuentas.
 - **Limitación consciente:** para permitir cambiar entre varias cuentas en un mismo dispositivo será necesario particionar el almacenamiento local por UID y diseñar una transición segura. Por ahora se prefiere bloquear a mezclar cartas.
 
+## Cierre de inserciones directas y pantalla de registro · laboratorio
+- Auditoría de permisos detectó una **política RLS de INSERT directo** para `public.player_snapshots`: permitía insertar un inventario arbitrario con `revision=1` aunque se hubiera bloqueado `sync_player_snapshot(..., expected_revision=0)`.
+- Aplicada y versionada `supabase/sql/revoke_direct_snapshot_insert.sql`: `authenticated` pierde el permiso de INSERT y se elimina `player_snapshots_insert_own_first`. Se conserva SELECT sujeto a RLS por usuario y las RPC seguras que crean/emiten/actualizan. No se tocaron registros.
+- Comprobación con rol `authenticated` bajo transacción reversible: `has_table_privilege(INSERT)=false`, `SELECT=true`, `ensure_player_snapshot()` sigue ejecutable. Los snapshots, sobres y canjes persistidos permanecieron sin cambios.
+- `qa/registro/index.html` ya no ofrece la carga manual que ahora está prohibida. Se conserva la descarga de respaldo local y el diagnóstico de nube. La migración de colecciones antiguas requiere un procedimiento explícito y validado, no un INSERT desde el navegador.
+- Las pruebas de dos navegadores de GitHub usan **nube simulada**. Aún falta la prueba autenticada real de extremo a extremo antes de ampliar el acceso fuera del laboratorio.
+
 ## Pendiente antes de considerar main
 1. **Prueba con Supabase real y sesiones autenticadas**: dos navegadores con el mismo origen; recuperación, apertura, reintento y conflicto. Chromium con nube simulada ya pasó, pero no sustituye esta prueba.
-2. **Validación de jugadas en servidor**: la RPC de laboratorio comprueba revisión/formato, pero todavía no que las cartas provengan de sobres legítimos ni que la cuota esté disponible. No habilitar escritura general.
+2. **Migración de colecciones antiguas**: no existe una ruta aprobada que valide la procedencia de cartas preexistentes. No reabrir INSERT directo ni confiar en respaldos arbitrarios.
 3. Resolución consciente de conflictos sin sumar cantidades automáticamente ni perder ninguno de los dos estados.
 4. Revisar avisos del asesor Supabase: función SECURITY DEFINER deliberada de laboratorio, contraseñas filtradas y aviso informativo RLS de lista privada.
 5. main recibió commits paralelos; reconciliar antes de cualquier fusión preservando las ilustraciones recientes.
