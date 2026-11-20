@@ -29,6 +29,10 @@ jobs:
           node --check reta-diaria.js
           node --check content/card-texts.js
           node --check content/validate.mjs
+          node --check content/cloud-sync.mjs
+
+      - name: Probar sincronización segura
+        run: node --test content/cloud-sync.test.mjs
 
       - name: Validar catálogo y narrativas
         run: node content/validate.mjs
