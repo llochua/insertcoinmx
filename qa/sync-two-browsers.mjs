@@ -374,12 +374,17 @@ async function run(){
   // Recorrido completo después de importar: emisión por servidor y recuperación
   // desde un navegador nuevo, sin compartir almacenamiento local.
   const importedCards=count((await read(D.page)));
+  await D.page.evaluate(()=>go('pack'));
+  await until(async()=>await D.page.locator('#cloudState').getAttribute('data-sync')==='synced',
+    'sincronización lista antes de abrir el primer sobre vinculado');
   await D.page.evaluate(()=>openPack());
-  await until(()=>cloud.get(LEGACY).revision===2,
+  await until(()=>[...issued.keys()].some(key=>key.startsWith(LEGACY+':')),
     'el primer sobre tras vincular debe emitirse en servidor');
   await until(async()=>count(await read(D.page))===importedCards+5,
     'la colección vinculada debe recibir exactamente cinco cartas');
   assert.equal(cloud.get(LEGACY).state.data.have.abuket_b,5);
+  assert.equal([...issued.keys()].filter(key=>key.startsWith(LEGACY+':')).length,1,
+    'el sobre vinculado solamente debe emitirse una vez');
   const importedAfterPack=await read(D.page);
   const E=await device(LEGACY,null);
   await until(async()=>count(await read(E.page))===count(importedAfterPack),
@@ -388,7 +393,7 @@ async function run(){
   assert.deepEqual((await read(E.page)).pk,importedAfterPack.pk);
   assert.equal((await read(E.page)).welcomeLeft,importedAfterPack.welcomeLeft);
   await check(E.page);
-  assert.equal(cloud.get(LEGACY).revision,2,
+  assert.equal([...issued.keys()].filter(key=>key.startsWith(LEGACY+':')).length,1,
     'recuperar en otro dispositivo no debe crear sobres adicionales');
   console.log('✓ Importación, apertura de sobre y recuperación en segundo dispositivo sin duplicar');
 
