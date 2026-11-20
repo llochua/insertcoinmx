@@ -44,14 +44,37 @@ try{
   assert.equal(await page.locator('.on-save').isVisible(),true,'bienvenida muestra visual de respaldo');
   assert.equal(await page.locator('#onNext').textContent(),'SEGUIR COMO INVITADO');
   assert.match(await page.locator('#onP').textContent(),/navegador/);
+  const hierarchy=await page.evaluate(()=>{
+   const primary=document.getElementById('onAccount');
+   const secondary=document.getElementById('onNext');
+   const back=document.getElementById('onBack');
+   return {
+    primaryBackground:getComputedStyle(primary).backgroundColor,
+    secondaryBackground:getComputedStyle(secondary).backgroundColor,
+    backWidth:back.getBoundingClientRect().width,
+    primaryWidth:primary.getBoundingClientRect().width,
+    secondaryWidth:secondary.getBoundingClientRect().width
+   };
+  });
+  assert.equal(hierarchy.primaryBackground,'rgb(255, 212, 0)','crear cuenta es la única acción amarilla');
+  assert.equal(hierarchy.secondaryBackground,'rgba(0, 0, 0, 0)','seguir como invitado es enlace secundario sin fondo');
+  assert.ok(hierarchy.backWidth<140,'atrás es discreto, no una columna');
+  assert.ok(hierarchy.primaryWidth>hierarchy.backWidth*2);
+  assert.ok(hierarchy.secondaryWidth>hierarchy.backWidth*2);
   await page.locator('#onAccount').click();
   assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true);
-  assert.equal(await page.locator('#profileAccountPanel').isVisible(),true,'formulario se revela solo al pedir cuenta');
+  assert.equal(await page.locator('#profileAccountPanel').isVisible(),true,'formulario se revela al pedir cuenta');
+  assert.equal(await page.locator('#profileWelcome').isVisible(),false,'sin duplicación de crear cuenta y formulario');
+  assert.equal(await page.locator('#profile .profile-passport').isVisible(),false,'acceso a cuenta es una vista enfocada');
+  assert.equal(await page.locator('#profile .profile-scroll').evaluate(e=>getComputedStyle(e).scrollbarWidth),'none','no hay barra lateral');
   assert.equal(await page.locator('#profileBackup').evaluate(e=>e.open),false,'respaldo manual plegado');
   assert.equal(await page.locator('#profileAuthSend').isDisabled(),true,
     'preview cannot create accounts by mistake');
   const lab=page.locator('#profile .profile-account a[href="/qa/registro/"]');
   assert.equal(await lab.isVisible(),true);
+  await page.locator('#profileAccountBack').click();
+  assert.equal(await page.locator('#profileWelcome').isVisible(),true,'volver restaura el resumen');
+  assert.equal(await page.locator('#profileAccountPanel').isVisible(),false);
   await page.locator('#profile [data-home]').click();
   assert.equal(await page.locator('#home .home-player-card').isVisible(),true,'tarjeta de Mi perfil visible en Inicio');
   await page.locator('#home .home-player-card').click();
