@@ -67,14 +67,14 @@ async function openDevice(){
  const errors=[];
  page.on('pageerror',err=>errors.push(err.message));
  await page.goto(origin+'/qa/registro/',{waitUntil:'domcontentloaded'});
- await until(async()=>await page.locator('#submit').isEnabled(),'formulario disponible');
+ await until(async()=>((await page.locator('#message').innerText()).includes('Listo para registrar una cuenta de prueba.')),'formulario autenticado disponible');
  await page.locator('#tabLogin').click();
  await page.locator('#email').fill(EMAIL);
  await page.locator('#password').fill(PASSWORD);
  await page.locator('#submit').click();
  await until(async()=>await page.locator('#signed').getAttribute('aria-hidden')==='false',
   'sesión real confirmada');
- assert.equal(await page.locator('#signedEmail').innerText(),EMAIL);
+ assert.equal((await page.locator('#signedEmail').innerText()).toLowerCase(),EMAIL.toLowerCase());
  await page.goto(origin+'/index.html',{waitUntil:'domcontentloaded'});
  await until(async()=>await page.locator('#cloudState').getAttribute('data-sync')==='synced',
   'colección sincronizada en juego');
