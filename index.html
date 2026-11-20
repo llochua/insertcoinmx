@@ -1654,6 +1654,7 @@ const baseHtml=c=>{
 };
 
 
+const IMGV='20261120a'; // versión de imágenes de cartas: súbela cuando se reemplace un arte (Arte Especial, diseño) para que los navegadores bajen la nueva
 const VL=['b','e','r','f'],VN={b:'Base',e:'Holo',r:'Dorada',f:'Arte Especial'},VSHORT={b:'Base',e:'Holo',r:'Dorada',f:'Especial'},VC={b:'comun',e:'holo',r:'dorada',f:'full'},OLDV={comun:'b',holo:'e',dorada:'r'};
 const CARDS=[],DB={},ALIAS={},CB={};
 for(const d of DESIGNS){d.fk=d.f?(d.fk||'F_'+d.id):null;DB[d.id]=d;for(const a of d.al||[])ALIAS[a]=d.id;
@@ -1670,14 +1671,14 @@ const NEWK=/^([a-z0-9]{1,40})_([berf])$/;
 const cardKey=k=>{if(typeof k!=='string')return null;const m=NEWK.exec(k);if(m){const id=ALIAS[m[1]]||m[1];return DB[id]?id+'_'+m[2]:null}
  const full=k.startsWith('F_'),s=full?k.slice(2):k,d=DB[ALIAS[s]||s];if(!d)return null;return full?d.id+'_f':(d.r?d.id+'_'+OLDV[d.r]:null)};
 const designId=k=>{if(typeof k!=='string')return null;const m=NEWK.exec(k);const s=m?m[1]:k.startsWith('F_')?k.slice(2):k;const id=ALIAS[s]||s;return DB[id]?id:null}; // id de diseño vigente (acepta alias, F_ y _v)
-const artOf=id=>DB[id]&&!DB[id].r&&DB[id].fk?'fa/'+DB[id].fk.slice(2)+'.jpg':'d/'+id+'.jpg'; // arte del diseño (Tier, Retas)
+const artOf=id=>DB[id]&&!DB[id].r&&DB[id].fk?'fa/'+DB[id].fk.slice(2)+'.jpg?v='+IMGV:'d/'+id+'.jpg?v='+IMGV; // arte del diseño (Tier, Retas)
 /* imagen de una carta; si falta se dibuja un recuadro provisional (nunca se usa el archivo de otra versión) */
 const PHM={};
 function PH(c){return PHM[c.k]||(PHM[c.k]=(()=>{const e=s=>String(s).replace(/[&<>"']/g,m=>'&#'+m.charCodeAt(0)+';');
  const ls=[];let l='';for(const w of String(c.n).split(' ')){if(l&&(l+' '+w).length>14){ls.push(l);l=w}else l=l?l+' '+w:w}ls.push(l);const n=Math.min(ls.length,3);
  const tx=ls.slice(0,3).map((x,i)=>`<text x="240" y="${330+(i-(n-1)/2)*46}" text-anchor="middle" font-size="36" font-weight="800" fill="#fff">${e(x)}</text>`).join('');
  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 670" font-family="Arial,Helvetica,sans-serif"><rect width="480" height="670" rx="26" fill="#120F1A"/><rect x="14" y="14" width="452" height="642" rx="18" fill="none" stroke="#FFD400" stroke-width="4" stroke-dasharray="14 10"/><text x="240" y="92" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="4" fill="#FFD400">INSERT COIN MX</text>${tx}<text x="240" y="510" text-anchor="middle" font-size="30" font-weight="800" letter-spacing="3" fill="#FFD400">${(VSHORT[c.v]||'').toUpperCase()}</text><text x="240" y="552" text-anchor="middle" font-size="20" font-weight="700" letter-spacing="3" fill="#8a86a3">PRÓXIMAMENTE</text></svg>`)})())}
-const imgOf=(c,dir)=>c&&c.img?dir+'/'+c.img+'.jpg':PH(c||{k:'?',n:'Carta',v:'b'});
+const imgOf=(c,dir)=>c&&c.img?dir+'/'+c.img+'.jpg?v='+IMGV:PH(c||{k:'?',n:'Carta',v:'b'});
 const imgK=(k,dir)=>imgOf(CB[cardKey(k)||k],dir);
 const W={comun:70,holo:18,dorada:5,full:7};
 const TN=['GOTY','GENIAL','OK','MMM'],TC=['#FFD400','#f0a830','#a9a3c4','#6e6a85'];
@@ -2071,7 +2072,7 @@ const VORD={f:0,r:1,e:2,b:3}; // de mejor a peor
 /* al rasgar, la luz que sale del sobre es la de su mejor carta: blanca (Base), arcoíris (Especial), oro (Rara), rosa (Full) */
 function leak(v){const L=$('leak');L.className='leak';void L.offsetWidth;L.className='leak on v-'+v;
  if(v==='b')beep(300,.2);else{beep(220,.12);setTimeout(()=>[523,659,784,1047,1319].slice(0,v==='e'?3:v==='r'?4:5).forEach((f,i)=>setTimeout(()=>beep(f,.09),i*90)),180)}}
-function resetPack(){$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.jpg)`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
+function resetPack(){$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.jpg?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
  $('stack').classList.remove('on');$('sum').classList.remove('on');$('stHint').style.display='none';$('openBtn').style.visibility='visible'}
 let tx=null;
 $('tearZone').addEventListener('pointerdown',e=>{tx=e.clientX;$('hand').style.display='none';try{$('tearZone').setPointerCapture(e.pointerId)}catch(_){}});
@@ -2261,7 +2262,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
    beep(c.v==='r'?1175:c.v==='f'?1568:988,.12);
    // Preparamos la imagen grande y la miniatura antes de quitar el reverso.
    // El DOM se construye una sola vez: no se reinician animaciones ni aparece el arte anterior.
-   const d=DB[c.d],src=c.v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':artOf(d.id);
+   const d=DB[c.d],src=c.v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg?v='+IMGV:artOf(d.id);
    const load=imageSrc=>new Promise(done=>{
     const im=new Image();let settled=false;
     const finish=()=>{if(!settled){settled=true;done()}};
@@ -2279,7 +2280,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   dxNav();
   return}
 
- const d=DB[c.d],col=dcol(d.id),k=caseOf(c),v=c.v,fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':null;
+ const d=DB[c.d],col=dcol(d.id),k=caseOf(c),v=c.v,fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg?v='+IMGV:null;
  const lab={dnew:'NUEVA',vnew:'NUEVA VARIANTE',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
  /* la ilustración es la de esta versión: Base/Especial = estampa original · Rara = su arte en oro · Full = su escena completa */
  const fullSrc=fa||artOf(d.id);
@@ -2402,7 +2403,7 @@ setInterval(()=>{
 function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');const entering=!s.classList.contains('on');s.classList.add('on');
  const comp=hand.filter(c=>c._comp),rank=c=>(c._comp?-10:0)+VORD[c.v]+(c._new?0:5);
  const H=hand.slice().sort((a,b)=>rank(a)-rank(b))[0],d=DB[H.d],v=H.v,st=dState(d);
- const fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg':null;
+ const fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg?v='+IMGV:null;
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
   :(v==='e'||v==='r')?`<div class="dx-art dx-flat-art" style="background-color:${dcol(d.id)}"><img src="${artOf(d.id)}" alt="" decoding="async"></div>`
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:.8"><img src="${artOf(d.id)}" alt=""></span>`}</span></div>`;
