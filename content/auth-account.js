@@ -46,7 +46,23 @@ function showAuthUser(user) {
   $auth('profilePlayerState').textContent = active
     ? 'Sesión activa · comprueba el estado de la nube'
     : 'Invitado · progreso solo en este dispositivo';
+  globalThis.icmxAvatarAuthUser = user || null;
+  document.dispatchEvent(new Event('icmx:avatar-auth'));
+
 }
+/* El avatar es metadato cosmético controlado por la cuenta; no autoriza sobres ni premios. */
+const ACCOUNT_AVATAR_IDS = new Set('moneda pizza control cartucho bote-tinta mago gato-afk jos glitch playera rasqueta-malla arcade'.split(' '));
+globalThis.icmxAvatarSaveForUser = async function(id) {
+  if (!ACCOUNT_AVATAR_IDS.has(id) || !authClient) throw new Error('Avatar o sesión no disponibles');
+  const {data:verified,error:verifyError} = await authClient.auth.getUser();
+  if (verifyError || !verified?.user?.id) throw new Error('Primero confirma tu sesión');
+  const {data,error} = await authClient.auth.updateUser({data:{icmx_avatar_id:id}});
+  if (error || !data?.user || data.user.id!==verified.user.id) throw new Error('No se pudo guardar el avatar');
+  globalThis.icmxAvatarAuthUser = data.user;
+  document.dispatchEvent(new Event('icmx:avatar-auth'));
+  return data.user;
+};
+
 function changeAuthMode(mode) {
   if (authBusy || (mode !== 'signup' && mode !== 'login')) return;
   authMode = mode;
