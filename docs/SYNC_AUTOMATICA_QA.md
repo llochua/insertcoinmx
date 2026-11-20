@@ -30,10 +30,10 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
   - Apertura real de sobre en A: cinco cartas nuevas recibidas también en B, con cuota e historial intactos.
   - Reintento: no se incrementó la revisión remota dos veces.
   - Desconexión: B guardó localmente, subió al reconectarse y A recibió el cambio.
-  - Divergencia concurrente: conflicto bloqueado sin sumar ni sobrescribir datos.
+  - Dos sobres abiertos en paralelo: cada dispositivo guardó cinco cartas, solo uno se confirmó en la nube y el segundo quedó bloqueado como conflicto sin perderse.
   - Tercer usuario de prueba: no recibió colección ajena.
   - Sin errores JavaScript en los tres contextos.
-  - Evidencia: https://github.com/llochua/insertcoinmx/actions/runs/44662711220 (éxito).
+  - Evidencia: https://github.com/llochua/insertcoinmx/actions/runs/44663141911 (éxito).
   - **Límite**: servidor y sesiones simulados, sin usar Supabase real ni cuentas reales.
 
 ## Pendiente antes de considerar main
