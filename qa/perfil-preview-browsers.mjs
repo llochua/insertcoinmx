@@ -105,6 +105,14 @@ try{
   assert.equal(await page.locator('#profile .top .vback').getAttribute('aria-label'),'Volver a Mi perfil');
   await page.locator('#profile .top .vback').click();
   assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,'flecha devuelve al resumen');
+  const signupStyle=await page.locator('#profileQuickSignup').evaluate(el=>({
+    radius:getComputedStyle(el).borderRadius,
+    fontWeight:getComputedStyle(el).fontWeight,
+    fontSize:getComputedStyle(el).fontSize
+  }));
+  assert.equal(signupStyle.radius,'10px','botón de registro usa radios del sistema');
+  assert.equal(signupStyle.fontWeight,'800','acción principal usa tipografía del juego');
+  assert.equal(signupStyle.fontSize,'12px','acción principal usa tamaño compacto');
   assert.equal(await page.locator('#profile .top .vback').getAttribute('aria-label'),'Volver al inicio');
   assert.equal(await page.locator('#profileWelcome').isVisible(),true,'volver restaura el resumen');
   assert.equal(await page.locator('#profileAccountPanel').isVisible(),false);
@@ -122,6 +130,7 @@ try{
   const profileContentWidth=await page.locator('#profile .profile-scroll').evaluate(el=>el.getBoundingClientRect().width);
   await page.locator('#profileAvatarChange').click();
   assert.equal(await page.locator('#avatarSelect.on').isVisible(),true,'pantalla de avatar accesible desde el perfil');
+  assert.equal(await page.locator('#avatarBack svg').count(),1,'selector de avatar usa la misma flecha del sistema');
   const avatarContentWidth=await page.locator('#avatarSelect .avatar-scroller').evaluate(el=>el.getBoundingClientRect().width);
   assert.equal(Math.round(avatarContentWidth),Math.round(profileContentWidth),'selector usa mismo ancho del perfil');
   assert.equal(await page.locator('#avatarGrid .avatar-option').count(),12,'doce personajes aprobados');
