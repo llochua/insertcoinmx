@@ -25,6 +25,7 @@ const snapshot=data=>({app:'insertcoinmx-album',format:2,
  exportedAt:'2026-11-19T00:00:00.000Z',data:clone(data)});
 const cloud=new Map([[USER,{user_id:USER,game_format:2,
  revision:1,state:snapshot(baseState())}]]);
+const issued=new Map();
 const json=(res,value,status=200)=>{
  res.writeHead(status,{'content-type':'application/json','access-control-allow-origin':'*'});
  res.end(JSON.stringify(value));
@@ -38,6 +39,32 @@ const server=createServer(async(req,res)=>{
   if(uri.pathname==='/__qa__/snapshot'){
    const row=cloud.get(uri.searchParams.get('uid'))??null;
    return json(res,{data:row?clone(row):null,error:null});
+  }
+  if(uri.pathname==='/__qa__/pack'){
+   let body='';
+   for await(const chunk of req)body+=chunk;
+   const {uid,args}=JSON.parse(body);
+   const row=cloud.get(uid);
+   if(!row)return json(res,{data:{status:'no_snapshot'},error:null});
+   const key=uid+':'+args.p_request_id;
+   const prior=issued.get(key);
+   if(prior){
+    return json(res,{data:{...clone(prior),status:'duplicate',
+     revision:row.revision,state:clone(row.state)},error:null});
+   }
+   if(row.revision!==args.p_expected_revision)
+    return json(res,{data:{status:'conflict',revision:row.revision},error:null});
+   const d=row.state.data;
+   if(d.welcomeLeft<=0)return json(res,{data:{status:'no_packs',revision:row.revision},error:null});
+   const cards=['abuket_b','arcade_b','artemis_b','abuket_e','abuket_f'];
+   for(const k of cards)d.have[k]=(d.have[k]||0)+1;
+   const packId='qa'+String(issued.size).padStart(8,'0');
+   d.pk.push(packId);d.fg=1;d.welcomeLeft--;d.last='2026-11-19';
+   row.revision++;
+   const result={status:'issued',pack_id:packId,kind:'welcome',
+    cards,revision:row.revision,state:clone(row.state)};
+   issued.set(key,result);
+   return json(res,{data:result,error:null});
   }
   if(uri.pathname==='/__qa__/sync'){
    let body='';
@@ -86,8 +113,8 @@ export function createClient(){
    };
   },
   rpc(name,args){
-   if(name!=='sync_player_snapshot')throw Error('Unexpected RPC');
-   return fetchJSON('/__qa__/sync',{method:'POST',
+   if(name!=='sync_player_snapshot'&&name!=='issue_player_pack')throw Error('Unexpected RPC');
+   return fetchJSON(name==='issue_player_pack'?'/__qa__/pack':'/__qa__/sync',{method:'POST',
     headers:{'content-type':'application/json'},
     body:JSON.stringify({uid:uid(),args})});
   }
@@ -183,29 +210,35 @@ async function run(){
     'A debe recibir cambios reconectados');
   console.log('✓ Cambios sin conexión, reconexión y recuperación en A');
 
-  // Dos sobres simultáneos en navegadores diferentes.
-  // B queda sin red para garantizar que el primer CAS corresponde a A.
+  // Desconexión al abrir un sobre NO entrega cartas localmente.
   const shared=await read(A.page);
   await B.page.evaluate(()=>{window.__qaCloudOffline=true});
-  await Promise.all([A.page.evaluate(()=>openPack()),B.page.evaluate(()=>openPack())]);
-  await until(async()=>{
-   const [a,b]=await Promise.all([read(A.page),read(B.page)]);
-   return a.pk.length===shared.pk.length+1&&b.pk.length===shared.pk.length+1;
-  },'cada navegador debe guardar su apertura local');
-  await check(A.page);
-  await until(()=>cloud.get(USER).revision===4,'A debe guardar primero su apertura');
+  await B.page.evaluate(()=>openPack());
+  await delay(1000);
+  assert.deepEqual((await read(B.page)).have,shared.have,
+    'sin servidor no debe aparecer ninguna carta nueva');
+  assert.equal(cloud.get(USER).revision,3);
+
+  // A abre el segundo sobre; B aún tiene su petición anterior pendiente.
+  await A.page.evaluate(()=>openPack());
+  await until(()=>cloud.get(USER).revision===4,'sobre A confirmado por servidor');
   await B.page.evaluate(()=>{window.__qaCloudOffline=false});
+  await B.page.evaluate(()=>openPack());
   await check(B.page);
-  await until(async()=> (await B.page.locator('#cloudState').getAttribute('data-sync'))==='conflict',
-    'B debe detectar sobres abiertos en paralelo');
-  const divergentA=await read(A.page),divergentB=await read(B.page);
-  assert.equal(count(divergentA)-count(shared),5);
-  assert.equal(count(divergentB)-count(shared),5);
-  assert.notEqual(divergentA.pk.at(-1),divergentB.pk.at(-1));
-  assert.equal(cloud.get(USER).state.data.pk.at(-1),divergentA.pk.at(-1));
-  assert.equal(cloud.get(USER).revision,4,'solo una apertura llega al servidor');
-  assert.equal(divergentB.welcomeLeft,shared.welcomeLeft-1);
-  console.log('✓ Dos sobres paralelos: uno confirmado, el otro protegido como conflicto');
+  await until(async()=> (await read(B.page)).pk.length===3,
+    'B debe restaurar el sobre de A sin inventar uno');
+  assert.equal(cloud.get(USER).revision,4);
+  console.log('✓ Sin conexión no se acuñan cartas; conflicto conserva revisión real');
+
+  // Reintento después de sincronizar: nueva petición legítima.
+  await B.page.evaluate(()=>openPack());
+  await until(()=>cloud.get(USER).revision===5,'B debe emitir su propio sobre desde servidor');
+  await check(A.page);
+  await until(async()=> (await read(A.page)).pk.length===4,
+    'A recibe el siguiente sobre emitido desde B');
+  assert.equal(cloud.get(USER).state.data.welcomeLeft,1);
+  assert.equal(issued.size,3);
+  console.log('✓ Dos dispositivos emiten con revisiones distintas y reciben tres sobres únicos');
 
   const C=await device(OTHER,null);
   assert.equal((await read(C.page))?.have?.abuket_b,undefined);
