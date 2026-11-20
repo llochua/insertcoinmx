@@ -50,3 +50,27 @@ jobs:
 
       - name: Validar catálogo y narrativas
         run: node content/validate.mjs
+
+
+  qa-sincronizacion:
+    name: QA · dos navegadores Chromium (rama de pruebas)
+    if: github.event_name == 'pull_request' && github.head_ref == 'feat/sync-automatica-segura-20261119'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Instalar Playwright fijado
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+
+      - name: Instalar Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Probar dos dispositivos aislados
+        run: node qa/sync-two-browsers.mjs
