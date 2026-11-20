@@ -92,3 +92,11 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
 - `main` no ha sido modificado por estos cambios.
 - No se eliminan cuentas ni colecciones; el reinicio general se pospone hasta antes del lanzamiento oficial.
 - Sin nuevos servicios pagos ni ramas de base de datos con costo.
+
+
+## Verificación adicional · vinculación invitada (rama, sin publicación)
+- La pantalla Récords ofrece «VINCULAR MIS CARTAS A MI CUENTA» solo cuando una sesión tiene progreso local, carece de respaldo remoto y la vinculación está disponible. Solicita confirmación antes de importar.
+- La RPC `import_guest_collection` **continúa restringida a la allowlist de laboratorio**. No se debe quitar esta restricción para beta pública: un respaldo proporcionado por el cliente puede contener inventario inventado; las validaciones de formato no prueban procedencia.
+- Se amplió `qa/sync-two-browsers.mjs` para comprobar el recorrido importación → sobre emitido por servidor → recuperación en otro navegador independiente → ninguna emisión duplicada. Es Chromium real contra nube simulada; el resultado de CI debe comprobarse en el commit que contiene esta prueba.
+- **No equivale a E2E autenticado con Supabase real.** Antes de apertura pública hacen falta pruebas con sesiones confirmadas en dos dispositivos y una política explícita para las colecciones invitadas existentes, sin sobrescribir progreso.
+- La prueba de acceso anónimo contra Supabase real verifica denegación, pero no sustituye la prueba autenticada. No se modificó `main`, no se eliminaron colecciones ni se amplió la allowlist.
