@@ -407,6 +407,27 @@ async function run(){
     'recuperar en otro dispositivo no debe crear sobres adicionales');
   console.log('✓ Importación, apertura de sobre y recuperación en segundo dispositivo sin duplicar');
 
+  // Cerrar y reabrir la misma sesión en el mismo navegador no borra
+  // ni cambia la colección; durante el cierre no se pueden abrir sobres.
+  const beforeRelog=await read(B.page);
+  const beforeRevision=cloud.get(USER).revision;
+  await B.page.evaluate(()=>localStorage.removeItem('icmx-qa-user'));
+  await check(B.page);
+  await until(async()=>await B.page.locator('#cloudState').getAttribute('data-sync')==='guest',
+    'estado invitado tras cerrar sesión');
+  await B.page.evaluate(()=>openPack());
+  await delay(250);
+  assert.deepEqual(await read(B.page),beforeRelog,
+    'cerrar sesión no puede alterar ni generar cartas asociadas a la cuenta');
+  await B.page.evaluate(()=>localStorage.setItem('icmx-qa-user', 'qa-sync-user-01'));
+  await check(B.page);
+  await until(async()=>await B.page.locator('#cloudState').getAttribute('data-sync')==='synced',
+    'la misma cuenta debe volver a sincronizar tras iniciar sesión');
+  assert.deepEqual(await read(B.page),beforeRelog);
+  assert.equal(cloud.get(USER).revision,beforeRevision,
+    'volver a iniciar sesión no debe duplicar cartas ni sobres');
+  console.log('✓ Cerrar y volver a iniciar sesión preserva la colección sin nuevas emisiones');
+
   for(const [name,entry] of [['A',A],['B',B],['C',C],['D',D],['E',E]])
    assert.deepEqual(entry.exceptions,[],name+' tuvo errores JavaScript');
   result={passed:true,revision:cloud.get(USER).revision};
