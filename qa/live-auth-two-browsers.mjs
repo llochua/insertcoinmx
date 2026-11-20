@@ -141,9 +141,32 @@ try{
  await B.page.goto(origin+'/qa/registro/',{waitUntil:'domcontentloaded'});
  await until(async()=>await B.page.locator('#signed').getAttribute('aria-hidden')==='false',
   'sesión de laboratorio todavía activa');
+ const logoutStatuses=[];
+ const observeLogout=response=>{
+  if(response.url().includes('.supabase.co/auth/v1/logout'))
+   logoutStatuses.push(response.status());
+ };
+ B.page.on('response',observeLogout);
  await B.page.locator('#logout').click();
- await until(async()=>await B.page.locator('#signed').getAttribute('aria-hidden')==='true',
-  'sesión cerrada en navegador B');
+ try{
+  await until(async()=>{
+   const closed=await B.page.locator('#signed').getAttribute('aria-hidden')==='true';
+   if(closed)return true;
+   const tone=await B.page.locator('#message').getAttribute('data-tone');
+   const label=await B.page.locator('#message').innerText();
+   if(tone==='error')throw Error('El cierre de sesión devolvió error: '+label.slice(0,120));
+   return false;
+  },'sesión cerrada en navegador B');
+ }catch(error){
+  const ui=await B.page.evaluate(()=>({
+   tone:document.getElementById('message')?.dataset?.tone,
+   notice:document.getElementById('message')?.textContent?.slice(0,140),
+   waiting:document.getElementById('logout')?.disabled,
+   signed:document.getElementById('signed')?.getAttribute('aria-hidden')
+  }));
+  throw Error(error.message+' | Diagnóstico logout sin datos personales: '+
+    JSON.stringify({ui,logoutHttpStatuses:logoutStatuses,errors:B.errors?.length??0}));
+ }finally{B.page.off('response',observeLogout)}
  await B.page.goto(origin+'/index.html',{waitUntil:'domcontentloaded'});
  await until(async()=>await B.page.locator('#cloudState').getAttribute('data-sync')==='guest',
   'estado de invitado tras cerrar sesión');
