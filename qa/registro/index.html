@@ -92,6 +92,7 @@ a{color:var(--yellow)}
 <p class="foot"><strong>Solo pruebas.</strong> Esta página no abre sobres ni modifica tu colección. Tu cuenta es real. La descarga de respaldo sigue disponible. La carga manual permanece suspendida; la sincronización protegida se prueba en el juego.</p>
 </main>
 <script type="module">
+import {validCloudSnapshot} from "./cloud-snapshot.mjs";
 const URL_SUPABASE = "https://ynugqxbtszhsupadqdkz.supabase.co";
 const PUBLIC_KEY = "sb_publishable_3wyMm9dwLqSb9GiYTh245Q_9TukyCLK";
 const SDK_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm";
@@ -235,10 +236,6 @@ async function getBackupUser(){
  const {data,error}=await client.auth.getUser();
  if(error||!data?.user?.id)throw Error("Sesión no verificada");
  return data.user;
-}
-function validCloudSnapshot(snapshot,userId){
- return snapshot?.user_id===userId && snapshot.game_format===2 &&
-   Number.isSafeInteger(Number(snapshot.revision)) && Number(snapshot.revision)>=1;
 }
 async function existingSnapshot(userId){
  const {data,error}=await client.from("player_snapshots").select("user_id,state,revision,game_format").eq("user_id",userId).maybeSingle();
