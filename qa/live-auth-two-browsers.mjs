@@ -106,6 +106,34 @@ try{
  }else{
   console.log('✓ Modo solo lectura: no se pidió emitir ningún sobre');
  }
+ // La misma cuenta debe restaurar su avance al cerrar y volver a entrar.
+ const preserved=extract(await read(B.page));
+ await B.page.goto(origin+'/qa/registro/',{waitUntil:'domcontentloaded'});
+ await until(async()=>await B.page.locator('#signed').getAttribute('aria-hidden')==='false',
+  'sesión de laboratorio todavía activa');
+ await B.page.locator('#logout').click();
+ await until(async()=>await B.page.locator('#signed').getAttribute('aria-hidden')==='true',
+  'sesión cerrada en navegador B');
+ await B.page.goto(origin+'/index.html',{waitUntil:'domcontentloaded'});
+ await until(async()=>await B.page.locator('#cloudState').getAttribute('data-sync')==='guest',
+  'estado de invitado tras cerrar sesión');
+ assert.deepEqual(extract(await read(B.page)),preserved,
+  'cerrar sesión no debe borrar la colección local');
+ await B.page.goto(origin+'/qa/registro/',{waitUntil:'domcontentloaded'});
+ await until(async()=>((await B.page.locator('#message').innerText()).includes('Listo para registrar una cuenta de prueba.')),
+  'formulario listo para volver a entrar');
+ await B.page.locator('#tabLogin').click();
+ await B.page.locator('#email').fill(EMAIL);
+ await B.page.locator('#password').fill(PASSWORD);
+ await B.page.locator('#submit').click();
+ await until(async()=>await B.page.locator('#signed').getAttribute('aria-hidden')==='false',
+  'sesión recuperada');
+ await B.page.goto(origin+'/index.html',{waitUntil:'domcontentloaded'});
+ await until(async()=>await B.page.locator('#cloudState').getAttribute('data-sync')==='synced',
+  'sincronización después de reingresar');
+ assert.deepEqual(extract(await read(B.page)),preserved,
+  'reingresar no debe borrar ni duplicar cartas');
+ console.log('✓ Cierre de sesión y reingreso real conserva la colección');
  for(const [i,device] of [A,B].entries())
   assert.deepEqual(device.errors,[],'Error JavaScript en navegador '+(i+1));
  console.log('QA REAL COMPLETADA (sin publicar ni reiniciar colecciones)');
