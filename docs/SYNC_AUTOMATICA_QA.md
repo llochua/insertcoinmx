@@ -54,6 +54,13 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
 - **Todas las pruebas SQL mutadoras fueron realizadas bajo `BEGIN ... ROLLBACK`**. Estado verificado después: dos cuentas, un snapshot con revisión 1, cero emisiones y cero canjes persistidos.
 - **Límites pendientes:** la aceptación inicial de respaldos antiguos solo está permitida en la cuenta de laboratorio; no es una ruta aprobada para crear cuentas públicas con cartas verificadas. La validación antifraude para migrar colecciones preexistentes necesita política explícita. Los canjes y las cuotas están protegidos para snapshots existentes, pero siguen pendientes pruebas con dos sesiones reales de Supabase Auth, controles de UX completos para respuestas de error y revisión de seguridad antes de ampliar la lista permitida.
 
+## Alta segura de colecciones vacías · laboratorio
+- Se incorporaron a la rama los cambios de `main` del 20/nov: siete ilustraciones, `IMGV 20261120b` y fondo continuo de Evilexes. La rama ya no está detrás de `main`.
+- Migración aplicada `ensure_player_snapshot_lab_20261119`: la RPC `ensure_player_snapshot()` no acepta cartas, cuotas ni estado del cliente; verifica Auth y correo confirmado, exige lista de laboratorio, crea exclusivamente un snapshot vacío en revisión 1 y usa `ON CONFLICT DO NOTHING`.
+- SQL reversible con cuenta existente: dos invocaciones no modifican su snapshot. Con la segunda cuenta temporalmente autorizada dentro de la transacción: inicialización nueva, repetición idempotente, primera apertura con Full y nueva inicialización que conserva el progreso. Se ejecutó `ROLLBACK`; lista de laboratorio, cuentas y respaldos sin cambios.
+- `content/cloud-sync.mjs` inicia automáticamente el snapshot **solo** cuando no hay progreso local ni remoto; no intenta migrar una colección local existente. Si hay progreso local sin snapshot remoto, se mantiene el estado de respaldo inicial pendiente para no perder ni inventar cartas.
+- Sigue pendiente la política de migración de colecciones antiguas y prueba de sesiones Auth reales en dos dispositivos. No ampliar lista de laboratorio ni fusionar hasta cerrar esas validaciones.
+
 ## Pendiente antes de considerar main
 1. **Prueba con Supabase real y sesiones autenticadas**: dos navegadores con el mismo origen; recuperación, apertura, reintento y conflicto. Chromium con nube simulada ya pasó, pero no sustituye esta prueba.
 2. **Validación de jugadas en servidor**: la RPC de laboratorio comprueba revisión/formato, pero todavía no que las cartas provengan de sobres legítimos ni que la cuota esté disponible. No habilitar escritura general.
