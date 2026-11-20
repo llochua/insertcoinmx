@@ -25,7 +25,7 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 
 - Existe prueba manual `qa/live-auth-two-browsers.mjs` y workflow `.github/workflows/qa-live-auth-manual.yml`.
 - **Por defecto no modifica inventario.** Requiere credenciales de **cuenta exclusiva de laboratorio** guardadas como secretos `ICMX_QA_EMAIL` y `ICMX_QA_PASSWORD` en GitHub.
-- En la rama, la prueba autenticada de PR **se marca pendiente/saltada** hasta que la variable de repositorio `ICMX_QA_AUTH_TEST_READY=true` habilite su ejecución. Sin esa variable no debe contarse como prueba real superada.
+- La QA autenticada real está habilitada **solo bajo ejecución manual** de GitHub Actions, con `ICMX_QA_AUTH_TEST_READY=true` y secretos privados, para no hacer logins repetidos en cada commit. Ya existe un resultado aprobado; nuevos despliegues requieren una nueva ejecución de ser necesario.
 - Emisión opcional de **un sobre de prueba**, solo con autorización separada del operador, flag manual y la marca `ICMX_QA_CONFIRM_TEST_ACCOUNT=1`. No utilizar cuentas personales.
 - **Ejecutado y aprobado:** run #44770831798, nuevo intento del 20 noviembre 2026. Dos sesiones reales de Supabase en navegadores aislados recuperaron la misma colección; cierre de sesión y reingreso mantuvieron las cartas. No se abrió ningún sobre real.
 
@@ -88,3 +88,5 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 - El SQL de preparación se ejecutó **dentro de una transacción que terminó con ROLLBACK**, únicamente para comprobar que compila. Se verificó después: la tabla `private_sync.beta_access_gate` **no existe** (no quedó aplicada); 1 colección existente, 386 variantes y 1 cuenta de laboratorio siguen igual.
 - La prueba automática `qa/check-beta-gate.mjs` impide publicar accidentalmente una migración con la compuerta encendida y exige proteger cuatro RPC y cerrar la importación de inventario local.
 - **No interpretar la aprobación de la transacción como una auditoría exhaustiva de seguridad ni como beta autorizada**. Falta probar acceso entre dos cuentas, los errores de cuota/condiciones de carrera en Supabase real y el recorrido completo con una cuenta desechable.
+
+- **Nota de estabilidad:** una ejecución posterior del smoke E2E en PR recuperó bien la colección desde dos navegadores, pero agotó el tiempo esperado tras pulsar «Cerrar sesión» en navegador B. La ejecución original completa sí había pasado. No se atribuye automáticamente a un bug del producto: investigar flaqueza de red/cierre de sesión si se reproduce, sin repetir logins en cada commit. La prueba real quedó manual; CI sigue probando lógica con nube simulada y acceso anónimo.
