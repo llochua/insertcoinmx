@@ -32,7 +32,21 @@ jobs:
           node --check content/cloud-sync.mjs
 
       - name: Probar sincronización segura
-        run: node --test content/cloud-sync.test.mjs
+        run: |
+          node --test content/cloud-sync.test.mjs content/cloud-restore.test.mjs
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const vm = require('node:vm');
+          const html = fs.readFileSync('index.html','utf8');
+          let count=0;
+          for(const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)){
+            if(!match[1].trim())continue;
+            new vm.Script(match[1],{filename:'index.html (inline)'});
+            count++;
+          }
+          if(!count)throw Error('No se hallaron scripts en index.html');
+          console.log('Scripts inline válidos: '+count);
+          NODE
 
       - name: Validar catálogo y narrativas
         run: node content/validate.mjs
