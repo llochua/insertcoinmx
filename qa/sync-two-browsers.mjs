@@ -358,8 +358,8 @@ async function run(){
   assert.equal(cloud.has(LEGACY),false);
   console.log('✓ Colección local previa permanece intacta, sin migración automática ni sobres locales');
   assert.equal(await D.page.evaluate(()=>cloudSync.canImport()),true);
+  D.page.once('dialog',dialog=>dialog.accept());
   await D.page.locator('#cloudImport').click();
-  await D.page.once('dialog',dialog=>dialog.accept());
   await until(()=>cloud.has(LEGACY),'importación de colección local');
   await until(async()=>await D.page.locator('#cloudState').getAttribute('data-sync')==='synced',
     'estado sincronizado tras importación');
