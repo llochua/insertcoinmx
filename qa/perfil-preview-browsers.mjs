@@ -3,7 +3,7 @@
  * Nunca inicia sesión, emite sobres remotos ni toca la colección de producción.
  */
 import {createServer} from 'node:http';
-import {readFile} from 'node:fs/promises';
+import {readFile,mkdir} from 'node:fs/promises';
 import {resolve,dirname,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import assert from 'node:assert/strict';
@@ -95,6 +95,8 @@ try{
     await img.evaluate(el=>el.decode());
     assert.equal(await img.evaluate(el=>el.naturalWidth),128,'miniatura WebP cargada sin error');
   }
+  await mkdir('qa/screenshots',{recursive:true});
+  await page.screenshot({path:'qa/screenshots/avatar-selector-'+width+'.png',fullPage:true});
   const first=await page.locator('#avatarGrid .avatar-option[aria-pressed="true"]').getAttribute('data-avatar');
   assert.equal(first,'moneda','primer avatar predeterminado');
   await page.locator('[data-avatar="pizza"]').click();
@@ -106,6 +108,7 @@ try{
   await page.locator('[data-avatar="cartucho"]').click();
   await page.locator('#avatarSave').click();
   assert.equal(await page.locator('#profileAvatarImage').getAttribute('src'),'assets/avatars/cartucho-128.webp');
+  await page.screenshot({path:'qa/screenshots/mi-perfil-'+width+'.png',fullPage:true});
   await page.locator('#profile [data-home]').click();
   assert.equal(await page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/cartucho-128.webp');
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('icmx-preview-avatar-20261120')),'cartucho');
