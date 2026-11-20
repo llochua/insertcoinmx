@@ -91,18 +91,30 @@ try{
   assert.equal(await page.locator('#profileAccountPanel').isVisible(),false,
     'login queda cerrado al reentrar a Mi perfil');
   await page.locator('#profileQuickLogin').click();
-  await page.locator('#profileAccountBack').click();
+  assert.equal(await page.locator('#profileAccountBack').count(),0,'no hay un segundo Volver al perfil');
+  assert.equal(await page.locator('#profile .vback').count(),1,'una sola flecha atrás en Mi perfil');
+  assert.equal(await page.locator('#profile .top .vback').getAttribute('aria-label'),'Volver a Mi perfil');
+  await page.locator('#profile .top .vback').click();
+  assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,'flecha devuelve al resumen');
+  assert.equal(await page.locator('#profile .top .vback').getAttribute('aria-label'),'Volver al inicio');
   assert.equal(await page.locator('#profileWelcome').isVisible(),true,'volver restaura el resumen');
   assert.equal(await page.locator('#profileAccountPanel').isVisible(),false);
   await page.locator('#profile [data-home]').click();
   assert.equal(await page.locator('#home .home-player-card').isVisible(),true,'tarjeta de Mi perfil visible en Inicio');
+  const homeCRT=await page.locator('.crt').boundingBox();
   await page.locator('#home .home-player-card').click();
   assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true);
+  const profileCRT=await page.locator('.crt').boundingBox();
+  assert.equal(Math.round(profileCRT.width),Math.round(homeCRT.width),'Mi perfil comparte ancho CRT de Inicio');
+  assert.equal(Math.round(profileCRT.height),Math.round(homeCRT.height),'Mi perfil comparte alto CRT de Inicio');
   await page.locator('#profileBackup summary').click();
   assert.equal(await page.locator('#profileExport').isVisible(),true,'respaldo visible a solicitud');
   // Selector de personajes: usa los 24 WebP reales ya integrados.
+  const profileContentWidth=await page.locator('#profile .profile-scroll').evaluate(el=>el.getBoundingClientRect().width);
   await page.locator('#profileAvatarChange').click();
   assert.equal(await page.locator('#avatarSelect.on').isVisible(),true,'pantalla de avatar accesible desde el perfil');
+  const avatarContentWidth=await page.locator('#avatarSelect .avatar-scroller').evaluate(el=>el.getBoundingClientRect().width);
+  assert.equal(Math.round(avatarContentWidth),Math.round(profileContentWidth),'selector usa mismo ancho del perfil');
   assert.equal(await page.locator('#avatarGrid .avatar-option').count(),12,'doce personajes aprobados');
   const avatars=await page.locator('#avatarGrid .avatar-option img').evaluateAll(imgs=>imgs.map(img=>({src:img.getAttribute('src'),loaded:img.complete&&img.naturalWidth===128&&img.naturalHeight===128})));
   assert.equal(new Set(avatars.map(x=>x.src)).size,12,'todas las miniaturas son diferentes');
