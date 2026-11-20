@@ -801,6 +801,7 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 
 /* ===== descubrimiento (calidad): ilustración de orilla a orilla, luz, degradado para el texto, carta chica al lado ===== */
 .disc.dx{background:var(--bg)}
+
 .dx-mv{display:block;position:relative}
 /* El arte original se muestra nítido: sin máscaras, halos ni sombras de borde.
    La legibilidad del texto se resuelve aparte con .dx-fade. */
@@ -1392,6 +1393,12 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-width:380px){.ic-award{left:-25px;top:-24px;width:74px}.ic-award strong{font-size:13px}.ic-award.is-variant strong{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.ic-award{animation:icBadgeReduced 2.8s .1s linear both}}
 @keyframes icBadgeReduced{0%,85%{opacity:1;transform:rotate(-9deg)}100%{opacity:0;transform:rotate(-9deg)}}
+
+.cloud-state{font-size:11px!important;font-weight:700;line-height:1.5;margin:14px 0 4px!important;color:#c8c1df}
+.cloud-state[data-sync="synced"]{color:#9bebbd}
+.cloud-state[data-sync="conflict"]{color:#ffd400}
+.cloud-state[data-sync="offline"]{color:#ffbdc0}
+.cloud-link{font-size:12px;margin:5px 0 0!important}.cloud-link a{color:#ffd400;text-decoration:underline;text-underline-offset:3px}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1456,7 +1463,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
   <button class="btn y" id="sSave">GUARDAR</button>
   <div class="tbl" id="tbl"></div>
-  <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden></div>
+  <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden><p class="cloud-state" id="cloudState" role="status" aria-live="polite">CONSULTANDO CUENTA…</p><button class="btn" id="cloudImport" type="button" hidden>VINCULAR MIS CARTAS A MI CUENTA</button><p class="cloud-link"><a href="/qa/registro/">CUENTA DE PRUEBA · ACCESO Y RESPALDO</a></p></div>
  </div>
 </section>
 <div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onT" aria-hidden="true">
@@ -1776,7 +1783,7 @@ const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude
    - Si se adopta un guardado de otra pestaña, se vuelven a sumar SOLO los sobres cuyo id no está en S.pk:
      así nunca se suman dos veces y no se pierden si otra pestaña escribió casi al mismo tiempo.
    - Los sobres ya guardados se vigilan 60 s más por si otra pestaña los pisó en ese lapso. */
-let MINE=[],saveFailed=false;
+let MINE=[],saveFailed=false,cloudSync=null;
 const PKRE=/^[a-z0-9]{6,24}$/;
 function applyPack(p){S.pk=Array.isArray(S.pk)?S.pk:[];if(S.pk.includes(p.id))return false;
  for(const k in p.have)S.have[k]=(S.have[k]||0)+p.have[k];
@@ -1799,12 +1806,13 @@ function adoptRaw(raw){let o;try{o=pj(raw)}catch(e){return false}if(!o||typeof o
 function syncIn(){const raw=LS.get(KEY);if(raw===null||raw===lastRaw)return false;const a=adoptRaw(raw);if(!a)return false;
  try{refresh()}catch(e){}if(document.visibilityState==='visible')toast('TU PROGRESO SE ACTUALIZÓ<br>DESDE OTRA PESTAÑA');
  if(a===2)setTimeout(save,0); // había sobres propios sin guardar o pisados: guardarlos encima
+  if(cloudSync)cloudSync.changed();
  return true}
 function save(){if(syncIn()&&!saveFailed&&!MINE.some(p=>!p.saved))return false;
  S.rev=(S.rev||0)+1;const str=JSON.stringify(S);let ok=false;
  if(!NOWRITE){try{localStorage.setItem(KEY,str);ok=localStorage.getItem(KEY)===str}catch(e){}}
  if(ok){lastRaw=str;const now=Date.now();MINE.forEach(p=>{if(!p.saved){p.saved=true;p.t=now}});saveFailed=false}else{S.rev--;saveFailed=true}
- setWarn(saveFailed);if(ok){clearTimeout(save.t);save.t=setTimeout(()=>STORE.put(),600)}return ok}
+ setWarn(saveFailed);if(ok){clearTimeout(save.t);save.t=setTimeout(()=>STORE.put(),600);if(cloudSync)cloudSync.changed()}return ok}
 window.addEventListener('storage',e=>{if(e.key===KEY)syncIn()});
 /* candado entre pestañas (Web Locks): abrir sobre y canjear se hacen de a uno por navegador.
    Límites sin servidor: en un navegador sin Web Locks dos pestañas pueden abrir el mismo sobre a la vez
@@ -2065,7 +2073,25 @@ armDay();setInterval(dayTick,30000);
  document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake)}
 setInterval(()=>{if(saveFailed)save()},30000);
 if(NOWRITE){saveFailed=true;setWarn(true)}
-function trade(after){withLock(()=>{syncIn();if(dups()<5){after&&after();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})}
+let serverTradeBusy=false;
+function trade(after){
+ if(cloudSync?.requiresServer?.()){
+  if(serverTradeBusy)return;
+  serverTradeBusy=true;
+  cloudSync.exchangeDuplicates().then(result=>{
+   serverTradeBusy=false;
+   if(result?.status==='exchanged'||result?.status==='duplicate'){
+    jingle();toast('¡SOBRE EXTRA!');after&&after();return;
+   }
+   if(result?.status==='not_enough_duplicates'){
+    toast('NECESITAS CINCO REPETIDAS');after&&after();return;
+   }
+   toast('CANJE PENDIENTE<br>REINTENTA SIN PERDER CARTAS');
+  }).catch(()=>{serverTradeBusy=false;toast('CANJE PENDIENTE<br>REINTENTA')});
+  return;
+ }
+ withLock(()=>{syncIn();if(dups()<5){after&&after();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})
+}
 $('tDupB').onclick=()=>trade(renderHome);
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
@@ -2097,7 +2123,56 @@ $('tearZone').addEventListener('pointerup',()=>{if(tx!==null){tx=null;$('cutp').
 $('openBtn').onclick=openPack;
 /* abrir sobre: en un solo bloque, dentro del candado, se adopta lo guardado, se revisa que haya sobre,
    se suman las cartas, se gasta el sobre y se guarda. La animación empieza después. */
-let opening=false;function openPack(){if(opening)return;opening=true;clearTimeout(hintT);
+let opening=false,serverPackBusy=false;
+function openServerPack(){
+ if(opening||serverPackBusy)return;
+ serverPackBusy=true;clearTimeout(hintT);
+ const beforeHave={...S.have},doneBefore=new Set(DESIGNS.filter(d=>dState(d).done).map(d=>d.id));
+ const beforeUnique=uniq();
+ cloudSync.issuePack().then(result=>{
+  if(!result||!['issued','duplicate'].includes(result.status)){
+   serverPackBusy=false;
+   if(result?.status==='no_packs'){uxEmptyPacks(true);return}
+   toast('SINCRONIZACIÓN PENDIENTE<br>INTENTA DE NUEVO');
+   return;
+  }
+  if(!Array.isArray(result.cards)||result.cards.some(k=>!CB[k])){
+   serverPackBusy=false;toast('ERROR EN EL SOBRE<br>NO SE PERDIERON CARTAS');return;
+  }
+  const already={},seenDesign={};
+  hand=result.cards.map(k=>{
+   const c={...CB[k]};
+   c._new=!beforeHave[k]&&!already[k];already[k]=1;
+   c._prev=VL.filter(v=>beforeHave[c.d+'_'+v]);
+   c._dnew=c._new&&!c._prev.length&&!seenDesign[c.d];
+   seenDesign[c.d]=1;c._doneB=doneBefore.has(c.d);
+   return c;
+  });
+  lastOpenedPack=result.kind==='welcome'
+   ?{kind:'welcome',number:5-S.welcomeLeft}
+   :result.kind==='daily'
+   ?{kind:'daily',number:S.freeUsed}
+   :{kind:'extra',number:0};
+  ga('abrir_sobre',{tipo:result.kind,servidor:1});
+  hand.forEach(c=>ga('carta_obtenida',{diseno:c.d,rareza:VC[c.v],nueva:c._new?1:0}));
+  const afterUnique=uniq();
+  GOALS.forEach(g=>{if(beforeUnique<g[0]&&afterUnique>=g[0])ga('hito',{hito:g[1],cartas:afterUnique})});
+  // Los logros son metadatos del álbum; las cantidades siguen siendo del servidor.
+  if(markLogros())save();
+  serverPackBusy=false;opening=true;
+  setTimeout(()=>opening=false,900);$('env').classList.add('cut');
+  const bv=hand.reduce((a,c)=>VORD[c.v]<VORD[a]?c.v:a,'b');
+  leak(bv);idx=0;
+  setTimeout(()=>{$('env').style.display='none';buildStack()},bv==='b'?450:1000);
+ }).catch(()=>{
+  serverPackBusy=false;
+  toast('SIN RESPUESTA DEL SERVIDOR<br>REINTENTA SIN DUPLICAR');
+ });
+}
+function openPack(){
+ if(opening||serverPackBusy)return;
+ if(cloudSync?.requiresServer?.()){openServerPack();return}
+ opening=true;clearTimeout(hintT);
  withLock(()=>{syncIn();if(!packReady()){opening=false;go('home');uxEmptyPacks(true);return}
   const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,welcome:0,daily:0,dailyDay:'',dailyCycle:null,saved:false,t:0};
   if(!S.test&&!PRUEBA){
@@ -2130,19 +2205,16 @@ const AUTO_BG_COLORS=Object.create(null);
 /* zona con dibujo dentro de cada d/id.webp (fracciones x0,y0,x1,y1): sirve para darles un peso visual parecido sin recortar el arte */
 const ABOX={"9000":[0.109,0.138,0.892,0.615],"abuket":[0.039,0.068,0.959,0.679],"alienonboard":[0.123,0.074,0.878,0.677],"androidsdays":[0.116,0.072,0.886,0.677],"animehero":[0.266,0.071,0.738,0.679],"arcade":[0.083,0.025,0.897,0.969],"arcade2":[0.142,0.0,0.856,1.0],"artemis":[0.2,0.072,0.802,0.677],"blooper":[0.142,0.074,0.831,0.824],"bort":[0.1,0.14,0.897,0.477],"bustfiction":[0.084,0.058,0.891,0.556],"challenger":[0.053,0.051,0.947,0.949],"choochoo":[0.225,0.071,0.78,0.679],"chorriuken":[0.15,0.072,0.852,0.677],"collector":[0.106,0.024,0.88,0.964],"controls":[0.125,0.046,0.848,0.951],"family":[0.247,0.071,0.755,0.679],"fatality":[0.102,0.045,0.872,0.416],"fatman":[0.056,0.036,0.942,0.439],"fck":[0.089,0.048,0.883,0.711],"futbolito":[0.087,0.021,0.886,0.994],"galaxianwars":[0.206,0.08,0.8,0.679],"gameover":[0.075,0.089,0.9,0.636],"gamepop":[0.081,0.018,0.894,0.99],"gatosamurai":[0.159,0.056,0.892,0.922],"gunsncontrols":[0.077,0.037,0.895,0.65],"humangamer":[0.113,0.069,0.887,0.932],"hyrule":[0.07,0.079,0.931,0.657],"imposible":[0.211,0.072,0.819,0.704],"invader":[0.062,0.041,0.938,0.551],"kaiji":[0.153,0.074,0.848,0.677],"kame":[0.275,0.071,0.727,0.679],"karting":[0.198,0.037,0.847,0.713],"keepcalm":[0.087,0.06,0.912,0.94],"killbills":[0.263,0.071,0.738,0.679],"kof":[0.175,0.037,0.822,0.713],"konamicode":[0.123,0.072,0.878,0.677],"linkfloyd":[0.109,0.084,0.892,0.669],"links":[0.136,0.062,0.819,0.966],"luna":[0.2,0.072,0.803,0.677],"mainstream":[0.109,0.145,0.891,0.608],"mapa":[0.037,0.025,0.964,0.662],"mrkarate":[0.016,0.065,0.959,0.915],"n64":[0.05,0.028,0.952,0.761],"navidadgamer":[0.206,0.072,0.794,0.679],"nerv":[0.094,0.037,0.906,0.599],"no":[0.117,0.074,0.894,0.677],"nowloading":[0.109,0.117,0.891,0.634],"ochentas":[0.108,0.089,0.892,0.664],"oldschool":[0.108,0.212,0.892,0.539],"omkami":[0.064,0.056,0.912,0.945],"patronus":[0.202,0.077,0.803,0.67],"pikaball":[0.161,0.072,0.841,0.677],"pizzcipher":[0.081,0.025,0.895,0.713],"poketaco":[0.097,0.028,0.9,0.69],"polystation":[0.086,0.1,0.914,0.757],"portatiles":[0.242,0.059,0.758,0.691],"sailors":[0.13,0.072,0.87,0.677],"sailourss":[0.15,0.074,0.853,0.677],"samus":[0.081,0.06,0.894,0.904],"sensei":[0.075,0.003,0.923,0.996],"shadaloo":[0.109,0.139,0.892,0.614],"shenzalcoatl":[0.044,0.028,0.958,0.748],"snes":[0.094,0.045,0.881,0.733],"sv001":[0.111,0.018,0.889,0.983],"thankyou":[0.083,0.036,0.892,0.629],"thelostgame":[0.109,0.142,0.892,0.608],"theworldwarrior":[0.077,0.086,0.897,0.73],"tmnt":[0.111,0.147,0.887,0.605],"toto":[0.123,0.072,0.88,0.677],"triforce":[0.077,0.064,0.922,0.864],"vamonospest":[0.134,0.074,0.867,0.676],"vidaextra":[0.084,0.018,0.887,0.941],"wirimask":[0.086,0.019,0.889,0.64],"x":[0.089,0.035,0.884,0.892],"yinyang":[0.062,0.043,0.936,0.774],"zero":[0.111,0.034,0.863,0.839],"zodiac":[0.073,0.026,0.903,0.71],"asteroids":[0.147,0.08,0.853,0.92],"docecasas":[0.08,0.2,0.92,0.8],"sonic":[0.109,0.08,0.892,0.92],"chocarreros":[0.078,0.405,0.922,0.594],"god":[0.173,0.08,0.828,0.92],"guardianes":[0.12,0.08,0.881,0.92],"king":[0.173,0.08,0.828,0.92],"levelup":[0.08,0.368,0.92,0.635],"loveyourbits":[0.08,0.172,0.92,0.829],"neo":[0.08,0.309,0.92,0.692],"tetris2":[0.194,0.08,0.806,0.92],"versus":[0.08,0.218,0.92,0.782],"pirata":[0.08,0.296,0.92,0.704],"1up":[0.161,0.08,0.839,0.92],"blowme":[0.08,0.154,0.92,0.846],"booit":[0.12,0.08,0.881,0.92],"captor":[0.153,0.08,0.847,0.92],"caritele":[0.08,0.079,0.92,0.819],"carton":[0.08,0.389,0.92,0.611],"continuara":[0.22,0.08,0.781,0.92],"continue":[0.08,0.294,0.92,0.708],"deathlove":[0.12,0.08,0.881,0.92],"friendzone":[0.109,0.08,0.892,0.911],"friezainfinito":[0.125,0.08,0.875,0.92],"gojira":[0.081,0.162,0.92,0.838],"gokuvolution":[0.08,0.341,0.92,0.659],"hipstermario":[0.078,0.204,0.92,0.798],"jokers":[0.1,0.08,0.9,0.92],"karma":[0.08,0.164,0.922,0.836],"oneplayer":[0.081,0.112,0.92,0.889],"oogie":[0.077,0.125,0.922,0.876],"queenpower":[0.116,0.08,0.886,0.92],"robogodin":[0.12,0.08,0.88,0.92],"tokyo3":[0.08,0.189,0.92,0.811],"evilexes":[0.08,0.139,0.919,0.861],"aku":[0.097,0.08,0.903,0.92],"fotonicos":[0.08,0.34,0.92,0.66],"jaws":[0.164,0.08,0.836,0.92],"patchman":[0.205,0.08,0.795,0.92],"rastreador":[0.078,0.208,0.923,0.791],"skellington":[0.162,0.08,0.838,0.92],"universe":[0.078,0.161,0.923,0.839],"clarita":[0.138,0.081,0.862,0.92],"ko":[0.08,0.189,0.92,0.812],"peaceamongus":[0.111,0.08,0.889,0.92],"pegasus":[0.08,0.259,0.919,0.742],"rugal":[0.08,0.131,0.92,0.869],"yoshis":[0.08,0.081,0.92,0.919]};
 /* color de fondo de la ilustración original de cada diseño sin color registrado (esquinas de d/id.webp) */
-const ICOL={"9000":"#1154c5","artemis":"#4099ff","thelostgame":"#151412","mainstream":"#595a5c","vamonospest":"#084f23","shadaloo":"#111111","kaiji":"#151412","navidadgamer":"#c90a11","no":"#12354b","sailors":"#e05c98","ochentas":"#ffffff","karting":"#314a68","family":"#258b63","alienonboard":"#ffffff","pikaball":"#fced20","sailourss":"#f81026","kof":"#2c2e2b","konamicode":"#000000","imposible":"#28386c","kame":"#121212","tmnt":"#0d692a","killbills":"#feff4b","nowloading":"#11228e","animehero":"#ffffff","choochoo":"#d00910","patronus":"#141414","toto":"#060121","chorriuken":"#fa004c","androidsdays":"#1d1d1b","portatiles":"#dbdbdb","luna":"#ff2a94","linkfloyd":"#1d1d1b","oldschool":"#de2e2e","galaxianwars":"#151829","asteroids":"#1e1e1e","chocarreros":"#000000","docecasas":"#000000","god":"#1e1e1e","guardianes":"#000000","king":"#1e1e1e","levelup":"#1e1e1e","loveyourbits":"#e20b32","neo":"#000000","pirata":"#fff1cc","sonic":"#295292","tetris2":"#ffffff","versus":"#111025"};
-const dcol=id=>AUTO_BG_COLORS[id]||RBG[id]||ICOL[id]||NEU;const hasCol=id=>!!(RBG[id]||ICOL[id]||AUTO_BG_IDS.has(id)); // identifica artes con fondo integrable (registrado o automático)
+const ICOL={"9000":"#1154c5","artemis":"#4099ff","thelostgame":"#151412","mainstream":"#595a5c","vamonospest":"#084f23","shadaloo":"#111111","kaiji":"#151412","navidadgamer":"#c90a11","no":"#12354b","sailors":"#e05c98","ochentas":"#ffffff","karting":"#314a68","family":"#258b63","alienonboard":"#ffffff","pikaball":"#fced20","sailourss":"#f81026","kof":"#2c2e2b","evilexes":"#232323","konamicode":"#000000","imposible":"#28386c","kame":"#121212","tmnt":"#0d692a","killbills":"#feff4b","nowloading":"#11228e","animehero":"#ffffff","choochoo":"#d00910","patronus":"#141414","toto":"#060121","chorriuken":"#fa004c","androidsdays":"#1d1d1b","portatiles":"#dbdbdb","luna":"#ff2a94","linkfloyd":"#1d1d1b","oldschool":"#de2e2e","galaxianwars":"#151829","asteroids":"#1e1e1e","chocarreros":"#000000","docecasas":"#000000","god":"#1e1e1e","guardianes":"#000000","king":"#1e1e1e","levelup":"#1e1e1e","loveyourbits":"#e20b32","neo":"#000000","pirata":"#fff1cc","sonic":"#295292","tetris2":"#ffffff","versus":"#111025"};
+const dcol=id=>RBG[id]||ICOL[id]||AUTO_BG_COLORS[id]||NEU;const hasCol=id=>!!(RBG[id]||ICOL[id]||AUTO_BG_IDS.has(id)); // colores existentes intactos; los nuevos obtienen el suyo del arte
 /* ilustración encuadrada a su zona dibujada (+ margen). Con color original el borde no se nota; en neutro queda como muestra de tela */
 function artBox(id,cls=''){const src=artOf(id),b=src.startsWith('d/')&&ABOX[id];const m=hasCol(id)?.04:.07;
  let x0=0,y0=0,x1=1,y1=1;if(b){x0=Math.max(0,b[0]-m);y0=Math.max(0,b[1]-m*.8);x1=Math.min(1,b[2]+m);y1=Math.min(1,b[3]+m*.8)}
  const cw=x1-x0,ch=y1-y0,ratio=(cw*(src.startsWith('d/')?640:600))/(ch*(src.startsWith('d/')?800:900));
  return `<span class="ab ${cls}${hasCol(id)?'':' neu'}" style="--ar:${ratio.toFixed(3)}"><img src="${src}" alt="" loading="lazy" style="width:${(100/cw).toFixed(2)}%;left:${(-x0/cw*100).toFixed(2)}%;top:${(-y0/ch*100).toFixed(2)}%"></span>`}
-/* Estándar: el escenario debe continuar el color real de las orillas del JPG.
-   Incluso si hay un color manual en RBG/ICOL, se audita en el cliente para
-   corregir discrepancias grandes (como Evilexes) sin rehacer ilustraciones.
-   Color plano de las orillas del arte original. Mismo criterio de fondo_de()
+/* Color plano de las orillas del arte original. Mismo criterio de fondo_de()
    usado por cartas/generar.py, a tamaño reducido para no procesar una imagen grande.
-   En Descubrimiento también valida colores registrados para detectar errores. */
+   Solo se llama para los 21 diseños nuevos que no tienen color definido. */
 function bgFromArtwork(img){
  try{
   const cv=document.createElement('canvas');cv.width=32;cv.height=40;
@@ -2854,7 +2926,43 @@ function applyImport(v){clearTimeout(save.t);syncIn();
  catch(e){const ok=restoreKeys(prevMain,prevExt);for(const k of Object.keys(S))delete S[k];Object.assign(S,prevS);lastRaw=LS.get(KEY);
   return {ok:false,err:ok?'No se pudo guardar el respaldo. Tu progreso quedó exactamente como estaba.':'No se pudo guardar el respaldo. Tu progreso sigue en esta pestaña y en la copia de seguridad; no la cierres y vuelve a intentarlo.'}}
  for(const k of Object.keys(S))delete S[k];Object.assign(S,N);lastRaw=mainStr;MINE=[];saveFailed=false;NOWRITE=false;setWarn(false);
- save.t=setTimeout(()=>STORE.put(),600);return {ok:true}}
+ save.t=setTimeout(()=>STORE.put(),600);if(cloudSync)cloudSync.changed();return {ok:true}}
+/* Restauración fiel del snapshot de cuenta.
+   El importador manual migra valores desconocidos a .ext: esa transformación
+   no sirve para sincronizar, pues cambiaría el estado de sobres (freeCycle).
+   Se valida, protege el texto previo y se revierte si el resultado difiere. */
+function applyCloudRestore(backup,sameProgress){
+ if(saveFailed||NOWRITE||opening)return {ok:false};
+ syncIn();
+ const text=JSON.stringify(backup);
+ const valid=validateBackup(text);
+ if(!valid.ok||!isObj(backup.data))return {ok:false};
+ const prevMain=LS.get(KEY),prevExt=LS.get(KEY_EXT),prevS=JSON.parse(JSON.stringify(S));
+ const next=JSON.parse(JSON.stringify(backup.data));
+ normalize(next);
+ const mainStr=JSON.stringify(next),extStr=backup.ext?JSON.stringify(backup.ext):null;
+ try{
+  localStorage.setItem(KEY_BAK,JSON.stringify({at:new Date().toISOString(),
+   main:prevMain,ext:prevExt,reason:'cloud-sync'}));
+  if(extStr===null)localStorage.removeItem(KEY_EXT);
+  else localStorage.setItem(KEY_EXT,extStr);
+  localStorage.setItem(KEY,mainStr);
+  if(localStorage.getItem(KEY)!==mainStr||localStorage.getItem(KEY_EXT)!==extStr)
+   throw Error('No se verificó la restauración');
+  const applied={app:'insertcoinmx-album',format:FORMAT,data:next};
+  if(backup.ext)applied.ext=backup.ext;
+  if(!sameProgress(applied,backup))throw Error('Restauración no idéntica');
+ }catch(_){
+  restoreKeys(prevMain,prevExt);
+  for(const k of Object.keys(S))delete S[k];
+  Object.assign(S,prevS);lastRaw=LS.get(KEY);
+  return {ok:false};
+ }
+ for(const k of Object.keys(S))delete S[k];
+ Object.assign(S,next);lastRaw=mainStr;MINE=[];saveFailed=false;
+ setWarn(false);refresh();
+ return {ok:true};
+}
 async function saveFile(name,text){const blob=new Blob([text],{type:'application/json'});
  if(STORE.dl){try{await STORE.dl.save({filename:name,data:blob});return true}catch(e){if(e&&e.code==='declined')return false}}
  try{const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}catch(e){return false}}
@@ -2956,4 +3064,40 @@ async function shareTier(){toast('PREPARANDO IMAGEN...');await document.fonts.re
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
 claimPend();initSound();go('home');STORE.init();
 if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
+/* Integración segura: nunca reemplaza un progreso distinto sin revisión.
+   Los visitantes sin sesión continúan jugando y guardando localmente. */
+import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCloudSync({
+ readLocal:()=>{
+  // Nunca publicar un sobre que el navegador no logró guardar.
+  if(saveFailed||NOWRITE)throw Error('Hay progreso local pendiente de proteger');
+  const current=LS.get(KEY);
+  if(current!==null&&current!==lastRaw)syncIn();
+  if(saveFailed||NOWRITE)throw Error('Hay progreso local pendiente de proteger');
+  // Nunca reemplazar una extensión local dañada por una copia aparentemente vacía.
+  if(LS.get(KEY_EXT)!==null&&readExt()===null)
+   throw Error('Los datos extendidos no se pudieron leer');
+  return JSON.parse(buildBackup());
+ },
+ restoreLocal:backup=>applyCloudRestore(backup,sameProgress),
+ onStatus:(code,message)=>{
+  const element=$('cloudState');
+  if(element){element.dataset.sync=code;element.textContent=message}
+  const importButton=$('cloudImport');
+  if(importButton)importButton.hidden=!(code==='pending'&&message.includes('PUEDES VINCULARLA'));
+ }
+})).then(controller=>{
+ cloudSync=controller;
+ const button=$('cloudImport');
+ if(button)button.addEventListener('click',async()=>{
+  if(!cloudSync?.canImport?.()||button.disabled)return;
+  if(!confirm('¿Vincular las cartas de este dispositivo a tu cuenta? Podrás recuperarlas en otro teléfono.'))return;
+  button.disabled=true;
+  const result=await cloudSync.importGuest();
+  button.disabled=false;
+  if(result?.status==='imported'){button.hidden=true;toast('¡CARTAS VINCULADAS A TU CUENTA!')}
+  else toast('NO SE PUDO VINCULAR<br>TUS CARTAS SIGUEN AQUÍ');
+ });
+ cloudSync.check();
+})
+.catch(()=>{const e=$('cloudState');if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}});
 </script></body></html>

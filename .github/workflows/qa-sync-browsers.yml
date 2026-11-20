@@ -1,0 +1,85 @@
+name: QA · Sincronización en dos navegadores
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'content/cloud-sync.mjs'
+      - 'index.html'
+      - 'qa/sync-two-browsers.mjs'
+      - 'qa/supabase-live-anon.mjs'
+      - 'qa/live-auth-two-browsers.mjs'
+      - 'qa/registro/index.html'
+      - '.github/workflows/qa-sync-browsers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa-dos-navegadores:
+    name: Chromium · dos sesiones · nube simulada
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Instalar Playwright fijado
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+
+      - name: Instalar Chromium para pruebas
+        run: npx playwright install chromium
+
+      - name: Ejecutar dos navegadores independientes
+        run: node qa/sync-two-browsers.mjs
+
+  supabase-anon-smoke:
+    name: Supabase real · verificar acceso anónimo
+    if: github.event_name == 'pull_request' && github.head_ref == 'feat/sync-automatica-segura-20261119'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Comprobar acceso público sin mutaciones
+        run: node qa/supabase-live-anon.mjs
+
+  auth-real-lectura:
+    name: Supabase real · dos sesiones (requiere credenciales)
+    if: github.event_name == 'workflow_dispatch' && vars.ICMX_QA_AUTH_TEST_READY == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      ICMX_QA_EMAIL: ${{ secrets.ICMX_QA_EMAIL }}
+      ICMX_QA_PASSWORD: ${{ secrets.ICMX_QA_PASSWORD }}
+    steps:
+      - name: Verificar configuración exclusiva de QA
+        run: |
+          if [ -z "$ICMX_QA_EMAIL" ] || [ -z "$ICMX_QA_PASSWORD" ]; then
+            echo '::error::Faltan secretos de cuenta real de laboratorio.'
+            exit 1
+          fi
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar Playwright
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Instalar Chromium
+        run: npx playwright install chromium
+      - name: Verificar inicio de sesión y recuperación real
+        run: node qa/live-auth-two-browsers.mjs
