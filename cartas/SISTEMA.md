@@ -94,14 +94,13 @@ su `marco_*.png` y se regenera todo.
    existentes con arte reemplazado. Revisar los diseños en una hoja de contacto antes de escribir.
 
 **B. Cartas (repo)**
-2. Copiar el arte a `cartas/arte/<id>.png`. Arte reemplazado: borrar `d/<id>.jpg` y su entrada en `ABOX`
-   de index.html antes de regenerar (el generador solo crea `d/` si falta).
+2. Copiar el arte a `cartas/arte/<id>.png`, conservando el ID estable. **No borrar manualmente** `d/`, `ABOX` ni colores: el nuevo comando se encarga de actualizarlos.
 3. Si el diseño no tiene fila en la hoja, Claude redacta nombre, categoría, referencia, línea y frase a
    partir del diseño (sin inventar datos históricos) y los agrega al catálogo; también `habilidad` y
    `frase` en `content/card-texts.js` (el validador exige que coincida con DESIGNS) y sube el `?v=` del script.
-4. `python3 cartas/generar.py` completo (cambia el total `/NNN` y renumera todo) y `node content/validate.mjs`.
+4. Ejecutar `python3 cartas/actualizar.py <id1> <id2>` para generar las tres rarezas, la Full disponible, `d/`, encuadre, paleta, manifiesto de hashes, caché y vista previa. Para una actualización masiva se mantiene `python3 cartas/generar.py` (y se valida aparte). Ejecutar `node content/validate.mjs`.
 5. Rama aparte + PR. **No fusionar a main sin autorización de Jos** (este flujo no está autorizado como el de las Full).
-6. Mostrar a Jos la hoja de contacto de las cartas nuevas.
+6. Mostrar a Jos `cartas/muestra-cambios.jpg` y el resultado de `python cartas/qa.py --ids <id1> <id2>` antes de fusionar.
 
 **C. Hoja "Narrativas TCG" (Drive)** — las filas nuevas deben quedar idénticas a las existentes:
 7. Escribir cada fila: Diseño, miniatura (B), K id, L categoría, M número, N/O referencia, P línea,
@@ -120,7 +119,7 @@ su `marco_*.png` y se regenera todo.
     sigan correspondiendo a su fila.
 13. Lo que sale de Jos se deja vacío y se le pide: Diseñado por, relato original y concepto (D, F).
 
-Cambiar un texto: corregir la hoja → catálogo → `python3 cartas/generar.py --solo <id>`.
+Cambiar un texto: corregir la hoja → catálogo → `python3 cartas/actualizar.py <id>`; los textos editoriales aprobados se sincronizan por separado con `content/card-texts.js`.
 
 ## 5b. Full (ilustración completa)
 
@@ -153,6 +152,22 @@ Python 3 con `numpy`, `opencv-python` y `Pillow`. Fuentes: Avenir Next LT Pro (`
 
 ## Caché de imágenes (IMGV)
 
-Las imágenes de cartas se piden con `?v=IMGV` (constante en index.html). Cada vez que se **reemplaza** un
-arte existente (Arte Especial actualizado, diseño con arte nuevo), subir `IMGV` (p. ej. `20261120a` → `20261120b`)
-en el mismo commit; si no, los navegadores siguen mostrando la imagen vieja.
+Las imágenes de cartas se piden con `?v=IMGV` en index.html. El comando `cartas/actualizar.py`
+lo renueva automáticamente a partir de hashes SHA-256 de las fuentes; no hay que cambiarlo a mano.
+
+## Control de calidad recurrente (20 nov 2026)
+
+- **Fuente canónica:** `cartas/arte/<id>.png`; `cartas/full/<id>.jpg` para la Full. El ID nunca se modifica.
+- **Actualización rápida local:** `python3 cartas/actualizar.py sonic` o varios IDs separados por espacios.
+- **Detección incremental:** `python3 cartas/actualizar.py --pendientes` compara los hashes; la primera ejecución puede procesar todo el inventario no registrado.
+- **Vista previa:** `cartas/muestra-cambios.jpg`, con tres rarezas por fila; es material para revisión visual, no una publicación del juego.
+- **Auditoría:** `python3 cartas/qa.py --ids sonic`, `--changed --base <sha>` o `--all` valida archivos, dimensiones, consistencia del manifiesto y presencia del componente de fondo/cierre compartido. Una diferencia notable entre orillas del arte es aviso de revisión, no motivo de recortar la ilustración.
+- **Automatización GitHub:** al subir o reemplazar fuentes en una rama que no sea `main`, `.github/workflows/actualizar-artes.yml` identifica los IDs, regenera las piezas y sube el resultado **a esa misma rama**, además de adjuntar la hoja de revisión. También se puede activar manualmente con IDs.
+- **Control previo a publicación:** `.github/workflows/validacion.yml` comprueba las imágenes y el sistema visual en cada PR hacia main. Un resultado verde no reemplaza la revisión visual en móvil y escritorio.
+- **Manifiesto:** `cartas/arte-manifest.json` guarda las huellas de las fuentes y salidas procesadas; sirve para detectar si se reemplazó un arte sin actualizar sus cartas. Se completa progresivamente; las cartas históricas aún no procesadas no figuran.
+- **Publicación:** mantener rama y PR; **no fusionar a main sin autorización**. El generador nunca escribe en Drive; la hoja maestra sigue actualizándose por el flujo editorial.
+
+### Criterio visual obligatorio
+
+Las variantes Holo y Dorada usan **la misma imagen como ambiente desenfocado** y conservan el arte sin recortes con un fundido lateral. Evitar fondos planos que revelen un rectángulo, colores fijados a mano por carta, `cover` en el arte principal o cambios de CSS por ID. Cierres y controles reutilizan el botón circular estándar; no se ajustan individualmente.
+
