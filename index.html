@@ -1460,7 +1460,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
   <button class="btn y" id="sSave">GUARDAR</button>
   <div class="tbl" id="tbl"></div>
-  <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden><p class="cloud-state" id="cloudState" role="status" aria-live="polite">CONSULTANDO CUENTA…</p><p class="cloud-link"><a href="/qa/registro/">CUENTA DE PRUEBA · ACCESO Y RESPALDO</a></p></div>
+  <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden><p class="cloud-state" id="cloudState" role="status" aria-live="polite">CONSULTANDO CUENTA…</p><button class="btn" id="cloudImport" type="button" hidden>VINCULAR MIS CARTAS A MI CUENTA</button><p class="cloud-link"><a href="/qa/registro/">CUENTA DE PRUEBA · ACCESO Y RESPALDO</a></p></div>
  </div>
 </section>
 <div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onT" aria-hidden="true">
@@ -3062,7 +3062,22 @@ import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCl
  onStatus:(code,message)=>{
   const element=$('cloudState');
   if(element){element.dataset.sync=code;element.textContent=message}
+  const importButton=$('cloudImport');
+  if(importButton)importButton.hidden=!(code==='pending'&&message.includes('PUEDES VINCULARLA'));
  }
-})).then(controller=>{cloudSync=controller;cloudSync.check()})
+})).then(controller=>{
+ cloudSync=controller;
+ const button=$('cloudImport');
+ if(button)button.addEventListener('click',async()=>{
+  if(!cloudSync?.canImport?.()||button.disabled)return;
+  if(!confirm('¿Vincular las cartas de este dispositivo a tu cuenta? Podrás recuperarlas en otro teléfono.'))return;
+  button.disabled=true;
+  const result=await cloudSync.importGuest();
+  button.disabled=false;
+  if(result?.status==='imported'){button.hidden=true;toast('¡CARTAS VINCULADAS A TU CUENTA!')}
+  else toast('NO SE PUDO VINCULAR<br>TUS CARTAS SIGUEN AQUÍ');
+ });
+ cloudSync.check();
+})
 .catch(()=>{const e=$('cloudState');if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}});
 </script></body></html>
