@@ -26,6 +26,7 @@ const snapshot=data=>({app:'insertcoinmx-album',format:2,
 const cloud=new Map([[USER,{user_id:USER,game_format:2,
  revision:1,state:snapshot(baseState())}]]);
 const issued=new Map();
+const exchanges=new Map();
 const json=(res,value,status=200)=>{
  res.writeHead(status,{'content-type':'application/json','access-control-allow-origin':'*'});
  res.end(JSON.stringify(value));
@@ -39,6 +40,33 @@ const server=createServer(async(req,res)=>{
   if(uri.pathname==='/__qa__/snapshot'){
    const row=cloud.get(uri.searchParams.get('uid'))??null;
    return json(res,{data:row?clone(row):null,error:null});
+  }
+  if(uri.pathname==='/__qa__/exchange'){
+   let body='';
+   for await(const chunk of req)body+=chunk;
+   const {uid,args}=JSON.parse(body);
+   const row=cloud.get(uid),id=uid+':'+args.p_request_id;
+   if(!row)return json(res,{data:{status:'no_snapshot'},error:null});
+   if(exchanges.has(id))return json(res,{data:{status:'duplicate',
+    revision:row.revision,state:clone(row.state)},error:null});
+   if(row.revision!==args.p_expected_revision)
+    return json(res,{data:{status:'conflict',revision:row.revision},error:null});
+   let need=5;
+   for(const k of Object.keys(row.state.data.have).sort()){
+    const n=row.state.data.have[k],taken=Math.min(need,Math.max(0,n-1));
+    need-=taken;
+   }
+   if(need>0)return json(res,{data:{status:'not_enough_duplicates',revision:row.revision},error:null});
+   need=5;
+   for(const k of Object.keys(row.state.data.have).sort()){
+    const n=row.state.data.have[k],taken=Math.min(need,Math.max(0,n-1));
+    row.state.data.have[k]=n-taken;need-=taken;
+    if(need===0)break;
+   }
+   row.state.data.extra=(row.state.data.extra||0)+1;
+   row.revision++;exchanges.set(id,row.revision);
+   return json(res,{data:{status:'exchanged',revision:row.revision,
+    state:clone(row.state)},error:null});
   }
   if(uri.pathname==='/__qa__/pack'){
    let body='';
@@ -113,8 +141,8 @@ export function createClient(){
    };
   },
   rpc(name,args){
-   if(name!=='sync_player_snapshot'&&name!=='issue_player_pack')throw Error('Unexpected RPC');
-   return fetchJSON(name==='issue_player_pack'?'/__qa__/pack':'/__qa__/sync',{method:'POST',
+   if(!['sync_player_snapshot','issue_player_pack','exchange_duplicate_cards'].includes(name))throw Error('Unexpected RPC');
+   return fetchJSON(name==='issue_player_pack'?'/__qa__/pack':name==='exchange_duplicate_cards'?'/__qa__/exchange':'/__qa__/sync',{method:'POST',
     headers:{'content-type':'application/json'},
     body:JSON.stringify({uid:uid(),args})});
   }
@@ -239,6 +267,19 @@ async function run(){
   assert.equal(cloud.get(USER).state.data.welcomeLeft,1);
   assert.equal(issued.size,3);
   console.log('✓ Dos dispositivos emiten con revisiones distintas y reciben tres sobres únicos');
+
+  // El canje no permite usar las mismas cinco repetidas dos veces.
+  const beforeTrade=await read(B.page);
+  await B.page.evaluate(()=>trade(renderHome));
+  await until(()=>cloud.get(USER).revision===6,'canje transaccional en la nube');
+  const afterTrade=await read(B.page);
+  assert.equal(count(beforeTrade)-count(afterTrade),5);
+  assert.equal(afterTrade.extra,beforeTrade.extra+1);
+  await check(A.page);
+  await until(async()=> (await read(A.page)).extra===afterTrade.extra,
+    'A debe recibir el canje desde B');
+  assert.equal(exchanges.size,1);
+  console.log('✓ Canje de 5 duplicadas: sobre extra y revisión única, sincronizado en A');
 
   const C=await device(OTHER,null);
   assert.equal((await read(C.page))?.have?.abuket_b,undefined);
