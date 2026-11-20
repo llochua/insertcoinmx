@@ -2057,7 +2057,25 @@ armDay();setInterval(dayTick,30000);
  document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake)}
 setInterval(()=>{if(saveFailed)save()},30000);
 if(NOWRITE){saveFailed=true;setWarn(true)}
-function trade(after){withLock(()=>{syncIn();if(dups()<5){after&&after();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})}
+let serverTradeBusy=false;
+function trade(after){
+ if(cloudSync?.isAccount?.()){
+  if(serverTradeBusy)return;
+  serverTradeBusy=true;
+  cloudSync.exchangeDuplicates().then(result=>{
+   serverTradeBusy=false;
+   if(result?.status==='exchanged'||result?.status==='duplicate'){
+    jingle();toast('¡SOBRE EXTRA!');after&&after();return;
+   }
+   if(result?.status==='not_enough_duplicates'){
+    toast('NECESITAS CINCO REPETIDAS');after&&after();return;
+   }
+   toast('CANJE PENDIENTE<br>REINTENTA SIN PERDER CARTAS');
+  }).catch(()=>{serverTradeBusy=false;toast('CANJE PENDIENTE<br>REINTENTA')});
+  return;
+ }
+ withLock(()=>{syncIn();if(dups()<5){after&&after();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})
+}
 $('tDupB').onclick=()=>trade(renderHome);
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
