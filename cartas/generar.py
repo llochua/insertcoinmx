@@ -295,7 +295,7 @@ def cubrir(im, W, H, sesgo):
 
 def carta_full(T, d, total):
     W, H = 960, 1340
-    ilu = Image.open(os.path.join(FULL_DIR, d['id'] + '.webp')).convert('RGB')
+    ilu = Image.open(os.path.join(FULL_DIR, d['id'] + '.jpg')).convert('RGB')
     out = np.asarray(cubrir(ilu, W, H, F_ENCUADRE)).astype(np.float32)
     # velo inferior
     ys, vs = zip(*F_VELO)
