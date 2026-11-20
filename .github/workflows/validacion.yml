@@ -1,4 +1,4 @@
-name: Validación básica
+name: Validación de cartas y artes
 
 on:
   pull_request:
@@ -12,23 +12,49 @@ permissions:
 
 jobs:
   validar:
-    name: Cartas y sintaxis JavaScript
+    name: Catálogo, integridad de imágenes y UI
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - name: Obtener código
+      - name: Obtener código y base de comparación
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Comprobar sintaxis JavaScript
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar librería de imágenes
+        run: python -m pip install pillow
+
+      - name: Comprobar sintaxis JavaScript y Python
         run: |
           node --check reta-diaria.js
           node --check content/card-texts.js
           node --check content/validate.mjs
+          python -m py_compile cartas/generar.py cartas/actualizar.py cartas/qa.py
 
       - name: Validar catálogo y narrativas
         run: node content/validate.mjs
+
+      - name: Probar actualización completa de una carta sin publicarla
+        if: github.event_name == 'pull_request'
+        run: |
+          python -m pip install numpy opencv-python-headless
+          python cartas/actualizar.py sonic
+
+      - name: Verificar imágenes y tratamiento visual
+        shell: bash
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            python cartas/qa.py --changed --base "$(git merge-base HEAD origin/main)"
+          else
+            python cartas/qa.py --all
+          fi
