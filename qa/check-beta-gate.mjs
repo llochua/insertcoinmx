@@ -9,8 +9,9 @@ assert.match(sql,/ALTER TABLE private_sync\.beta_access_gate ENABLE ROW LEVEL SE
 assert.match(sql,/REVOKE ALL ON private_sync\.beta_access_gate FROM PUBLIC,anon,authenticated/);
 assert.match(sql,/REVOKE ALL ON FUNCTION private_sync\.can_access_beta\(uuid\)\s*FROM PUBLIC,anon,authenticated/);
 assert.match(sql,/REVOKE ALL ON FUNCTION public\.import_guest_collection\(jsonb\)\s*FROM PUBLIC,anon,authenticated/);
-assert.ok(!/\b(?:INSERT\s+INTO|UPDATE)\s+public\.player_snapshots\b/i.test(sql),
- 'Preparar beta no debe escribir colecciones directamente');
+const deploymentStatements=sql.replace(/AS\s+(\$[a-z]+\$)[\s\S]*?\1\s*;/gi,'');
+assert.ok(!/\b(?:INSERT\s+INTO|UPDATE)\s+public\.player_snapshots\b/i.test(deploymentStatements),
+ 'La migración no debe modificar colecciones directamente fuera de sus RPC');
 assert.ok(!/\bUPDATE\s+private_sync\.beta_access_gate[\s\S]*?enabled\s*=\s*true/i.test(sql),
  'No habilitar la beta dentro de la preparación');
 const names=['ensure_player_snapshot','issue_player_pack','exchange_duplicate_cards','sync_player_snapshot'];
