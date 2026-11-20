@@ -149,3 +149,10 @@ Actualizar o agregar Full:
 
 Python 3 con `numpy`, `opencv-python` y `Pillow`. Fuentes: Avenir Next LT Pro (`f/`, de Jos) y Carlito
 (`cartas/fuentes/`, licencia OFL, mismas formas que Lato).
+
+
+## Caché de imágenes (IMGV)
+
+Las imágenes de cartas se piden con `?v=IMGV` (constante en index.html). Cada vez que se **reemplaza** un
+arte existente (Arte Especial actualizado, diseño con arte nuevo), subir `IMGV` (p. ej. `20261120a` → `20261120b`)
+en el mismo commit; si no, los navegadores siguen mostrando la imagen vieja.
