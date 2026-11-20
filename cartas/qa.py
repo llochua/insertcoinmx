@@ -151,6 +151,14 @@ def main():
     # debe prolongarse con un color plano, jamás con una copia borrosa.
     if "dx-art-ambient" in html or "--ic-art-image" in html:
         errors.append("Se detectó un fondo duplicado/desenfocado en Descubrimiento")
+    # Eliminar la causa recurrente: máscaras al 10% y luces que
+    # desvanecían el arte original aun cuando el fondo era plano.
+    for selector in (".dx:not(.neu) .dx-mv{", ".dx:not(.neu) .dx-mv>.ab",
+                     ".dx::before{", ".dx.v-r::before{"):
+        if selector in html:
+            errors.append("Regresión: máscara o halo sobre ilustración: " + selector)
+    if ".disc.dx .dx-art .ab{filter:none!important;box-shadow:none!important}" not in html:
+        errors.append("Falta estándar de ilustración sin sombras ni filtros")
     if not ids <= catalog.keys():
         errors.append("IDs desconocidos: " + ", ".join(sorted(ids - catalog.keys())))
     touched_src = {
