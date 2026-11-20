@@ -51,6 +51,12 @@ const rpc=await request('/rest/v1/rpc/sync_player_snapshot',{
 assertDeniedResult(rpc,'RPC de sincronización sin sesión');
 console.log('✓ RPC: visitante sin sesión no puede sincronizar');
 
+const initResponse=await request('/rest/v1/rpc/ensure_player_snapshot',{
+ method:'POST',headers:{'content-type':'application/json'},body:'{}'
+});
+assertDeniedResult(initResponse,'Inicialización de cuenta sin sesión');
+console.log('✓ Inicialización: un visitante no puede crear colecciones remotas');
+
 for(const rpcName of ['issue_player_pack','exchange_duplicate_cards']){
  const response=await request('/rest/v1/rpc/'+rpcName,{
   method:'POST',headers:{'content-type':'application/json'},
