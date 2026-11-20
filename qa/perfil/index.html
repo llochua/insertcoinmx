@@ -2286,7 +2286,7 @@ document.addEventListener('keydown',e=>{
 
 /* ---------- navegación ---------- */
 let cur='home';
-function go(id){if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
+function go(id){if(id==='profile')resetProfileToOverview();if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores,profile:renderProfile}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
@@ -3388,6 +3388,16 @@ function renderProfile(){
 $('profileExport').onclick=()=>$('bkExp').click();
 $('profileImport').onclick=()=>$('bkImp').click();
 $('profileLinkCollection').onclick=()=>{$('cloudImport').click()};
+/* Acceso a cuenta: subvista transitoria; cada nueva entrada a Mi perfil
+   muestra el resumen del jugador, nunca el formulario anterior. */
+function resetProfileToOverview(){
+ const profile=$('profile');
+ profile.classList.remove('account-focus');
+ $('profileAccountPanel').hidden=true;
+ $('profileWelcome').hidden=false;
+ const scroller=profile.querySelector('.profile-scroll');
+ if(scroller)scroller.scrollTop=0;
+}
 function revealProfileAuth(mode='signup'){
  const panel=$('profileAccountPanel');
  $('profile').classList.add('account-focus');
@@ -3402,14 +3412,7 @@ function revealProfileAuth(mode='signup'){
   panel.focus({preventScroll:true});
  });
 }
-$('profileAccountBack').onclick=()=>{
- $('profile').classList.remove('account-focus');
- $('profileAccountPanel').hidden=true;
- $('profileWelcome').hidden=false;
- const scroller=document.querySelector('#profile .profile-scroll');
- if(scroller)scroller.scrollTop=0;
- $('profileQuickSignup').focus({preventScroll:true});
-};
+$('profileAccountBack').onclick=()=>{resetProfileToOverview();$('profileQuickSignup').focus({preventScroll:true})};
 $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 
