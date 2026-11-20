@@ -44,6 +44,16 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
 - **Límite de seguridad:** los checks de estructura NO validan origen legítimo de cartas, resultado probabilístico, canjes ni elegibilidad real de sobres. Se mantiene la RPC restringida a la cuenta de laboratorio y el PR en borrador.
 - No existen credenciales de sesiones A/B aportadas al runner: no se afirma haber probado dos sesiones reales de Supabase.
 
+## Apertura autoritativa y canjes · laboratorio (20 noviembre 2026)
+- El catálogo de sobres se guarda en `private_sync.pack_pool`: **354 variantes**, extraídas de `DESIGNS` y excluyendo diseños `bx` que no salen en sobres (86 Base, 97 Holo, 97 Dorada, 74 Full). Es una versión estática que deberá mantenerse alineada con el catálogo al añadir/quitar diseños.
+- `public.issue_player_pack(request_id, expected_revision)`: Supabase decide cinco cartas, la cuota disponible, la recompensa Full del primer sobre y la revisión. Bloquea snapshot por usuario y registra cada emisión en `private_sync.pack_issues`; reintentar el mismo UUID retorna la emisión anterior.
+- `public.exchange_duplicate_cards(request_id, expected_revision)`: consume exactamente cinco repetidas, conserva al menos una unidad de cada carta, incrementa un sobre extra y registra el canje idempotente en `private_sync.pack_exchanges`.
+- La RPC de snapshot `sync_player_snapshot` ahora rechaza cambios directos a `have`, `pk`, `fg`, `last`, `extra`, `welcomeLeft`, `freeDay`, `freeUsed`, `freeCycle`, `test` y `ext` al actualizar una revisión ya existente. Sigue aceptando campos sociales/editoriales; solo los endpoints de juego escriben cartas/cuotas.
+- En `index.html`, cuentas detectadas usan RPC para sobres y canjes. Invitados conservan el modo local. UUIDs pendientes se guardan en localStorage por cuenta: una interrupción de red no puede duplicar el resultado.
+- SQL reversible comprobado: primer sobre con Full; cinco bienvenidas consumidas; sexto rechazado; misma petición repetida; CAS obsoleto rechazado; canje exacto de cinco duplicadas; obtención de sobre extra; intento de modificar cartas/cuotas vía sincronización rechazado; cuenta fuera del laboratorio rechazada.
+- **Todas las pruebas SQL mutadoras fueron realizadas bajo `BEGIN ... ROLLBACK`**. Estado verificado después: dos cuentas, un snapshot con revisión 1, cero emisiones y cero canjes persistidos.
+- **Límites pendientes:** la aceptación inicial de respaldos antiguos solo está permitida en la cuenta de laboratorio; no es una ruta aprobada para crear cuentas públicas con cartas verificadas. La validación antifraude para migrar colecciones preexistentes necesita política explícita. Los canjes y las cuotas están protegidos para snapshots existentes, pero siguen pendientes pruebas con dos sesiones reales de Supabase Auth, controles de UX completos para respuestas de error y revisión de seguridad antes de ampliar la lista permitida.
+
 ## Pendiente antes de considerar main
 1. **Prueba con Supabase real y sesiones autenticadas**: dos navegadores con el mismo origen; recuperación, apertura, reintento y conflicto. Chromium con nube simulada ya pasó, pero no sustituye esta prueba.
 2. **Validación de jugadas en servidor**: la RPC de laboratorio comprueba revisión/formato, pero todavía no que las cartas provengan de sobres legítimos ni que la cuota esté disponible. No habilitar escritura general.
