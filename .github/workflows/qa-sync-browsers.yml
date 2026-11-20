@@ -45,7 +45,7 @@ jobs:
 
   supabase-anon-smoke:
     name: Supabase real · verificar acceso anónimo
-    if: github.event_name == 'pull_request' && github.head_ref == 'feat/sync-automatica-segura-20261119'
+    if: github.event_name == 'pull_request' && (github.head_ref == 'feat/sync-automatica-segura-20261119' || github.head_ref == 'feat/perfil-cuentas-integradas-20261120')
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
