@@ -801,13 +801,11 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 
 /* ===== descubrimiento (calidad): ilustración de orilla a orilla, luz, degradado para el texto, carta chica al lado ===== */
 .disc.dx{background:var(--bg)}
-.dx::before{content:"";position:absolute;z-index:1;left:50%;top:34%;width:150vw;height:150vw;max-width:900px;max-height:900px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.34),rgba(255,255,255,0));mix-blend-mode:soft-light;pointer-events:none}
 .dx-mv{display:block;position:relative}
-.dx:not(.neu) .dx-mv{-webkit-mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 90%,transparent)}
-.dx:not(.neu) .dx-mv>.ab,.dx-mv>.dx-gold{-webkit-mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent)}
-.dx-gold{box-shadow:none!important}.dx:not(.neu) .dx-art .ab{filter:none}
-.dx.v-r::before{background:radial-gradient(closest-side,rgba(255,190,70,.45),rgba(255,190,70,0));mix-blend-mode:screen;opacity:.5}
-.dx.v-f::before{display:none}
+/* El arte original se muestra nítido: sin máscaras, halos ni sombras de borde.
+   La legibilidad del texto se resuelve aparte con .dx-fade. */
+.dx-gold{box-shadow:none!important}
+.disc.dx .dx-art .ab{filter:none!important;box-shadow:none!important}
 .dx-art{position:absolute;left:0;right:0;top:56px;height:64%;container-type:size;display:flex;align-items:center;justify-content:center;animation:dxIn .6s cubic-bezier(.2,.9,.3,1) both}
 .dx-art .ab{width:min(100cqw,96cqh*var(--ar));filter:drop-shadow(0 18px 30px rgba(0,0,0,.28))}
 .neu .dx-art .ab{width:min(88cqw,90cqh*var(--ar));border-radius:6px;box-shadow:0 24px 50px rgba(0,0,0,.5)}
