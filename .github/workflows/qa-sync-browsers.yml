@@ -6,6 +6,8 @@ on:
     paths:
       - 'content/cloud-sync.mjs'
       - 'index.html'
+      - 'qa/perfil/index.html'
+      - 'qa/perfil-preview-browsers.mjs'
       - 'qa/sync-two-browsers.mjs'
       - 'qa/supabase-live-anon.mjs'
       - 'qa/live-auth-two-browsers.mjs'
@@ -37,7 +39,9 @@ jobs:
         run: npx playwright install chromium
 
       - name: Ejecutar dos navegadores independientes
-        run: node qa/sync-two-browsers.mjs
+        run: |
+          node qa/sync-two-browsers.mjs
+          node qa/perfil-preview-browsers.mjs
 
   supabase-anon-smoke:
     name: Supabase real · verificar acceso anónimo
