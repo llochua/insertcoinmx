@@ -2987,6 +2987,7 @@ function bkReview(text){const v=validateBackup(text);if(!v.ok){bkMsg(v.err,'bker
  syncIn();const m=v.meta,nowC=uniq(),nowV=Object.keys(S.have).length,nowCopies=Object.values(S.have).reduce((n,c)=>n+c,0),nowR=Object.keys(S.rate).length,d=new Date(m.at),when=isNaN(d)?'fecha desconocida':d.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
  bkOpen(`<h2>¿REEMPLAZAR TU PROGRESO?</h2><p>Respaldo del ${esc(when)}</p>
  <div class="bkcmp"><span></span><span>AHORA</span><span>RESPALDO</span><b>Cartas distintas (álbum)</b><span>${nowC}</span><span>${m.cards}</span><b>Variantes guardadas</b><span>${nowV}</span><span>${m.variants}</span><b>Copias totales</b><span>${nowCopies}</span><span>${m.copies}</span><b>Calificaciones</b><span>${nowR}</span><span>${m.rates}</span><b>Iniciales</b><span>${esc(S.ini||'—')}</span><span>${m.ini||'—'}</span></div>
+ <p>«Distintas (álbum)» excluye las cartas bonus; «variantes» y «copias» sí las incluyen.</p>
  ${m.cards<nowC?'<p class="bkwarn">Ojo: el respaldo tiene MENOS cartas que tu progreso actual.</p>':''}
  ${m.pend?`<p>${m.pend} ${m.pend===1?'carta del respaldo todavía no existe':'cartas del respaldo todavía no existen'} en el álbum; se guardan aparte y aparecerán cuando se agreguen.</p>`:''}
  <p>Antes de reemplazar, tu progreso actual se guarda en una copia de seguridad.</p>
