@@ -25,14 +25,24 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
 - Roles: `anon` no ejecuta la RPC; `authenticated` solamente funciona si la cuenta está autorizada para el laboratorio.
 - Tests Node: mismo progreso y reintentos; nuevo dispositivo vacío; cambios locales/remotos; conflicto; datos inválidos; reversión; recuperación exacta de cuota y extensión.
 - CI valida sintaxis del JavaScript del juego y del módulo, además de catálogo/narrativas.
+- **Prueba end-to-end en Chromium real con nube simulada**, ejecutando el juego de esta rama en dos contextos aislados:
+  - B restauró la colección sin duplicar cartas.
+  - Apertura real de sobre en A: cinco cartas nuevas recibidas también en B, con cuota e historial intactos.
+  - Reintento: no se incrementó la revisión remota dos veces.
+  - Desconexión: B guardó localmente, subió al reconectarse y A recibió el cambio.
+  - Divergencia concurrente: conflicto bloqueado sin sumar ni sobrescribir datos.
+  - Tercer usuario de prueba: no recibió colección ajena.
+  - Sin errores JavaScript en los tres contextos.
+  - Evidencia: https://github.com/llochua/insertcoinmx/actions/runs/44662711220 (éxito).
+  - **Límite**: servidor y sesiones simulados, sin usar Supabase real ni cuentas reales.
 
 ## Pendiente antes de considerar main
-1. Prueba real con **dos navegadores o dispositivos**, sobre una vista servida desde el mismo origen con acceso a la sesión de prueba. No confundir Node/SQL con navegador real.
-2. Primer respaldo en laboratorio, inicialización del baseline, abrir un sobre en A, comprobar subida y recepción en B sin duplicación; repetir con reconexión y edición concurrente.
-3. Validación de jugadas en un backend confiable: actualmente la operación CAS valida forma y revisión, no que cada carta provenga de un sobre legítimo ni que el usuario tenga cuota disponible. **No activar escritura general a usuarios registrados** sin esto.
-4. Resolver el procedimiento de revisión de conflictos sin perder los dos estados. Evitar un merge automático por suma o máximo.
-5. Revisar los avisos del asesor Supabase: RPC `SECURITY DEFINER` deliberada y acotada a laboratorio, protección contra contraseñas filtradas inactiva y aviso informativo RLS sin política en la tabla privada de lista de prueba.
-6. Confirmar QA y autorización explícita antes de fusionar el PR.
+1. **Prueba con Supabase real y sesiones autenticadas**: dos navegadores con el mismo origen; recuperación, apertura, reintento y conflicto. Chromium con nube simulada ya pasó, pero no sustituye esta prueba.
+2. **Validación de jugadas en servidor**: la RPC de laboratorio comprueba revisión/formato, pero todavía no que las cartas provengan de sobres legítimos ni que la cuota esté disponible. No habilitar escritura general.
+3. Resolución consciente de conflictos sin sumar cantidades automáticamente ni perder ninguno de los dos estados.
+4. Revisar avisos del asesor Supabase: función SECURITY DEFINER deliberada de laboratorio, contraseñas filtradas y aviso informativo RLS de lista privada.
+5. main recibió commits paralelos; reconciliar antes de cualquier fusión preservando las ilustraciones recientes.
+6. QA final y autorización explícita antes de publicar.
 
 ## Protección y alcance
 - `main` no ha sido modificado por estos cambios.
