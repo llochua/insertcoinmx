@@ -143,10 +143,14 @@ def main():
            set(args.ids) if args.ids else changed_ids(paths, catalog))
     errors, warnings = [], []
     # Invariantes compartidas en lugar de hacks por ID.
-    for pattern in (".dx-art-ambient", "--ic-art-image", ".dx-flat-art>img",
+    for pattern in (".dx-flat-art>img", "bgFromArtwork", "resolveArtworkBackground",
                     'class="ic-close dx-leave"'):
         if pattern not in html:
             errors.append("Falta el tratamiento visual común: " + pattern)
+    # Regresión de Karma, Jaws 19 y Continuará: el fondo del arte
+    # debe prolongarse con un color plano, jamás con una copia borrosa.
+    if "dx-art-ambient" in html or "--ic-art-image" in html:
+        errors.append("Se detectó un fondo duplicado/desenfocado en Descubrimiento")
     if not ids <= catalog.keys():
         errors.append("IDs desconocidos: " + ", ".join(sorted(ids - catalog.keys())))
     touched_src = {
