@@ -379,7 +379,17 @@ async function run(){
     'sincronización lista antes de abrir el primer sobre vinculado');
   await D.page.evaluate(()=>openPack());
   await until(()=>[...issued.keys()].some(key=>key.startsWith(LEGACY+':')),
-    'el primer sobre tras vincular debe emitirse en servidor');
+    'el primer sobre tras vincular debe emitirse en servidor',4500).catch(async(error)=>{
+    const diagnostic=await D.page.evaluate(()=>({
+      sync:document.getElementById('cloudState').dataset.sync,
+      canImport:cloudSync.canImport(),account:cloudSync.isAccount(),
+      requiresServer:cloudSync.requiresServer(),busy:serverPackBusy,
+      scene:cur,packReady:packReady(),
+      welcomeLeft:S.welcomeLeft,localCards:Object.keys(S.have).length,
+      pending:localStorage.getItem('icmx-cloud-pack-request-v1:'+localStorage.getItem('icmx-qa-user'))
+    }));
+    throw Error(error.message+' | Diagnóstico: '+JSON.stringify(diagnostic));
+  });
   await until(async()=>count(await read(D.page))===importedCards+5,
     'la colección vinculada debe recibir exactamente cinco cartas');
   assert.equal(cloud.get(LEGACY).state.data.have.abuket_b,5);
