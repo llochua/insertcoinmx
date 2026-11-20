@@ -125,7 +125,7 @@ BEGIN
 
   IF v_welcome>0 THEN
     v_kind:='welcome';
-  ELSIF v_last_cycle<>v_cycle OR v_free_used<2 THEN
+  ELSIF v_last_cycle<v_cycle OR (v_last_cycle=v_cycle AND v_free_used<2) THEN
     v_kind:='daily';
   ELSIF v_extra>0 THEN
     v_kind:='extra';
