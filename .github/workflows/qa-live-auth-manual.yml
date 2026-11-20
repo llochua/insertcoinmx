@@ -1,0 +1,43 @@
+name: QA · Cuenta real en dos navegadores (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      open_one_pack:
+        description: 'Emitir UN sobre solo en la cuenta exclusiva de laboratorio'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  auth-real:
+    name: Supabase real · Auth y recuperación entre navegadores
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      ICMX_QA_EMAIL: ${{ secrets.ICMX_QA_EMAIL }}
+      ICMX_QA_PASSWORD: ${{ secrets.ICMX_QA_PASSWORD }}
+      ICMX_QA_CONFIRM_TEST_ACCOUNT: ${{ secrets.ICMX_QA_CONFIRM_TEST_ACCOUNT }}
+      ICMX_QA_PACK_TEST: ${{ inputs.open_one_pack && '1' || '0' }}
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar credenciales dedicadas de laboratorio
+        run: |
+          if [ -z "$ICMX_QA_EMAIL" ] || [ -z "$ICMX_QA_PASSWORD" ]; then
+            echo '::error::Faltan secretos ICMX_QA_EMAIL e ICMX_QA_PASSWORD de una cuenta exclusiva de laboratorio.'
+            exit 1
+          fi
+      - name: Instalar Playwright fijado
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Instalar Chromium
+        run: npx playwright install chromium
+      - name: Probar inicio de sesión y recuperar colección
+        run: node qa/live-auth-two-browsers.mjs
