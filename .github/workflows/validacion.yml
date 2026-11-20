@@ -30,6 +30,7 @@ jobs:
           node --check content/card-texts.js
           node --check content/validate.mjs
           node --check content/cloud-sync.mjs
+          node --check qa/live-auth-two-browsers.mjs
 
       - name: Probar sincronización segura
         run: |
@@ -56,4 +57,6 @@ jobs:
           NODE
 
       - name: Validar catálogo y narrativas
-        run: node content/validate.mjs
+        run: |
+          node content/validate.mjs
+          node qa/check-server-pack-pool.mjs
