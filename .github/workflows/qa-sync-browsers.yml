@@ -6,6 +6,8 @@ on:
     paths:
       - 'content/cloud-sync.mjs'
       - 'index.html'
+      - 'content/auth-account.js'
+      - 'qa/profile-browsers.mjs'
       - 'qa/sync-two-browsers.mjs'
       - 'qa/supabase-live-anon.mjs'
       - 'qa/live-auth-two-browsers.mjs'
@@ -37,11 +39,13 @@ jobs:
         run: npx playwright install chromium
 
       - name: Ejecutar dos navegadores independientes
-        run: node qa/sync-two-browsers.mjs
+        run: |
+          node qa/sync-two-browsers.mjs
+          node qa/profile-browsers.mjs
 
   supabase-anon-smoke:
     name: Supabase real · verificar acceso anónimo
-    if: github.event_name == 'pull_request' && github.head_ref == 'feat/sync-automatica-segura-20261119'
+    if: github.event_name == 'pull_request' && (github.head_ref == 'feat/sync-automatica-segura-20261119' || github.head_ref == 'feat/perfil-cuentas-integradas-20261120')
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
