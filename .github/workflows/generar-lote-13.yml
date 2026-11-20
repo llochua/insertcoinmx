@@ -1,0 +1,67 @@
+name: Generar 13 cartas nuevas (rama de pruebas)
+on:
+  push:
+    branches:
+      - cartas-13-nuevas-20261120
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar bibliotecas de imágenes
+        run: python -m pip install numpy opencv-python-headless pillow
+      - name: Generar todas las cartas con plantillas oficiales
+        run: python cartas/generar.py
+      - name: Renovar caché de textos e imágenes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('content/card-texts.js?v=20261119b','content/card-texts.js?v=20261120c')
+          s=s.replace("const IMGV='20261120b'","const IMGV='20261120c'")
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Validar catálogo y sintaxis
+        run: |
+          node --check content/card-texts.js
+          node content/validate.mjs
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          cat=json.loads(Path('cartas/catalogo.json').read_text(encoding='utf8'))
+          assert len(cat)==126
+          new={'aku','fotonicos','jaws','patchman','rastreador','skellington','universe','clarita','ko','peaceamongus','pegasus','rugal','yoshis'}
+          assert new.issubset({d['id'] for d in cat})
+          for name in new:
+              for suffix in ('','_e','_r'):
+                  assert (Path('c')/f'{name}{suffix}.jpg').exists(),name+suffix
+                  assert (Path('c2')/f'{name}{suffix}.jpg').exists(),name+suffix
+              assert (Path('d')/f'{name}.jpg').exists(),name
+          assert sum(d['tipo']=='Álbum' for d in cat)==104
+          assert sum(d['tipo']!='Álbum' for d in cat)==22
+          print('OK: 13 diseños x tres rarezas, 104 álbum y 22 bonus')
+          PY
+      - name: Subir imágenes oficiales a la rama de pruebas
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A c c2 d index.html cartas/catalogo.json content/card-texts.js
+          if ! git diff --cached --quiet; then
+            git commit -m "Generar cartas oficiales para 13 diseños nuevos"
+            git push
+          fi
