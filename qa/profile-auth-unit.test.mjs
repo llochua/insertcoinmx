@@ -52,7 +52,7 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
 
 test('real profile components exist on the game without duplicate IDs',()=>{
  const body=page.slice(page.indexOf('<body>'),page.indexOf('<script src="content/card-texts.js'));
- const ids=[...body.matchAll(/\\bid="([^"]+)"/g)].map(m=>m[1]);
+ const ids=[...body.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
  assert.equal(new Set(ids).size,ids.length,'duplicate static IDs');
  for(const id of ['profile','profileAuthForm','profileAuthSend','profileCloudStatus','profileLinkCollection','onAccount'])
   assert.ok(ids.includes(id),'missing '+id);
