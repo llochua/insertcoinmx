@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, feat/perfil-avatar-persistente-20261120]
   workflow_dispatch:
 
 permissions:
@@ -41,6 +41,7 @@ jobs:
           node --check content/validate.mjs
           node --check content/cloud-sync.mjs
           node --check content/auth-account.js
+          node --check content/avatar-profile.js
           node --check qa/profile-browsers.mjs
           node --check qa/profile-auth-unit.test.mjs
           node --check qa/live-auth-two-browsers.mjs
