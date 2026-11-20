@@ -250,6 +250,72 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
    if(rerun&&!stopped){rerun=false;setTimeout(check,80)}
   }
  }
+ async function exchangeDuplicates(){
+  if(stopped||!accountUid)return {status:'guest'};
+  if(issuing||busy)return {status:'busy'};
+  issuing=true;
+  const uid=accountUid;
+  const pendingKey='icmx-cloud-exchange-request-v1:'+uid;
+  try{
+   const {data:authData,error:authErr}=await client.auth.getUser();
+   if(authErr||authData?.user?.id!==uid)throw Error('La sesión cambió');
+   const local=assertBackup(readLocal());
+   const {data:row,error:readErr}=await client.from('player_snapshots')
+    .select('user_id,game_format,state,revision').eq('user_id',uid).maybeSingle();
+   if(readErr)throw readErr;
+   if(!row||row.user_id!==uid||row.game_format!==2||
+      !Number.isSafeInteger(Number(row.revision)))
+    return {status:'pending'};
+   const remote=assertBackup(row.state),rev=Number(row.revision);
+   const baseline=readBaseline(localStorage,uid);
+   const pending=localStorage.getItem(pendingKey);
+   if(!pending&&(!sameProgress(local,remote)||
+      baseline&&decideSync({local,remote,base:baseline,remoteRevision:rev})==='conflict')){
+    rerun=true;return {status:'pending'};
+   }
+   let id=pending;
+   if(!id){
+    id=crypto.randomUUID();
+    localStorage.setItem(pendingKey,id);
+    if(localStorage.getItem(pendingKey)!==id)throw Error('No se pudo guardar la petición');
+   }
+   const {data,error}=await client.rpc('exchange_duplicate_cards',{
+    p_request_id:id,p_expected_revision:baseline?.revision??rev
+   });
+   if(error)throw error;
+   if(data?.status==='conflict'){
+    // El servidor confirma que esta petición NO fue emitida. Permitir
+    // un nuevo request_id una vez recuperada la revisión actual.
+    localStorage.removeItem(pendingKey);
+    rerun=true;return {status:'pending'}
+   }
+   if(data?.status==='not_enough_duplicates'||data?.status==='extra_limit'){
+    localStorage.removeItem(pendingKey);
+    rerun=true;
+    return {status:data.status};
+   }
+   if(!['exchanged','duplicate'].includes(data?.status)||
+      !Number.isSafeInteger(Number(data.revision))||!data.state)
+    throw Error('Respuesta de canje inesperada');
+   if(!sameProgress(readLocal(),local)){
+    rerun=true;
+    return {status:'pending'};
+   }
+   const outcome=restoreLocal(assertBackup(data.state));
+   if(!outcome?.ok)throw Error('No fue posible restaurar el canje protegido');
+   persistBaseline(localStorage,uid,Number(data.revision),data.state);
+   localStorage.removeItem(pendingKey);
+   status('synced','NUBE AL DÍA · CANJE GUARDADO EN TU CUENTA');
+   rerun=true;
+   return data;
+  }catch(_){
+   status('offline','NO SE CONFIRMÓ EL CANJE · REINTENTA SIN DUPLICAR');
+   return {status:'pending'};
+  }finally{
+   issuing=false;
+   if(rerun&&!stopped){rerun=false;setTimeout(check,80)}
+  }
+ }
  const changed=()=>{
   if(stopped)return;
   clearTimeout(debounce);
@@ -265,7 +331,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  window.addEventListener('storage',onStorage);
  interval=setInterval(()=>{if(!document.hidden)check()},15000);
  check();
- return {changed,check,issuePack,isAccount:()=>Boolean(accountUid),stop(){
+ return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),stop(){
   stopped=true;clearTimeout(debounce);clearInterval(interval);
   listener?.subscription?.unsubscribe();
   window.removeEventListener('focus',onFocus);
