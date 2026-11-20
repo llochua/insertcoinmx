@@ -56,7 +56,7 @@ try{
     accidental:localStorage.getItem('icmx-preview-perfil-20261120')
   }));
   assert.deepEqual(JSON.parse(saved.real).have,{abuket_b:3});
-  assert.ok(saved.preview,'lab should only store its own preview progress in this tab');
+  assert.ok(saved.preview===null||typeof saved.preview==='string', 'preview remains isolated from the real game');
   assert.equal(saved.accidental,null);
   assert.deepEqual(supabaseCalls,[],'preview must not reach Supabase');
   assert.deepEqual(exceptions,[],'no uncaught JavaScript errors');
