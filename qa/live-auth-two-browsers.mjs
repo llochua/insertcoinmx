@@ -80,6 +80,12 @@ async function openDevice(){
  await page.locator('#tabLogin').click();
  await page.locator('#email').fill(EMAIL);
  await page.locator('#password').fill(PASSWORD);
+ const validity=await page.locator('#authForm').evaluate(form=>({
+  valid:form.checkValidity(),
+  emailValid:form.querySelector('#email').validity.valid,
+  passwordValid:form.querySelector('#password').validity.valid
+ }));
+ if(!validity.valid)throw Error('El formulario bloquea el acceso: '+JSON.stringify(validity)+' (sin mostrar credenciales)');
  await page.locator('#submit').click();
  try{
   await until(async()=>{
