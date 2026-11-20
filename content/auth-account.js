@@ -100,7 +100,9 @@ async function initAccount() {
     }
     if (enteredFromEmail && sessionData?.session) {
       authMessage('¡Correo confirmado! Tu sesión ya está activa.', 'success');
-      if (typeof window.go === 'function') window.go('profile');
+      // Al volver del correo, salir de START y mostrar el perfil real.
+      document.getElementById('title')?.classList.remove('on');
+      document.querySelector('#home .profile-entry')?.click();
     }
   } catch (_error) {
     authClient = null;
