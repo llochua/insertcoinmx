@@ -1390,6 +1390,12 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-width:380px){.ic-award{left:-25px;top:-24px;width:74px}.ic-award strong{font-size:13px}.ic-award.is-variant strong{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.ic-award{animation:icBadgeReduced 2.8s .1s linear both}}
 @keyframes icBadgeReduced{0%,85%{opacity:1;transform:rotate(-9deg)}100%{opacity:0;transform:rotate(-9deg)}}
+
+.cloud-state{font-size:11px!important;font-weight:700;line-height:1.5;margin:14px 0 4px!important;color:#c8c1df}
+.cloud-state[data-sync="synced"]{color:#9bebbd}
+.cloud-state[data-sync="conflict"]{color:#ffd400}
+.cloud-state[data-sync="offline"]{color:#ffbdc0}
+.cloud-link{font-size:12px;margin:5px 0 0!important}.cloud-link a{color:#ffd400;text-decoration:underline;text-underline-offset:3px}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1454,7 +1460,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
   <button class="btn y" id="sSave">GUARDAR</button>
   <div class="tbl" id="tbl"></div>
-  <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden></div>
+  <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden><p class="cloud-state" id="cloudState" role="status" aria-live="polite">CONSULTANDO CUENTA…</p><p class="cloud-link"><a href="/qa/registro/">CUENTA DE PRUEBA · ACCESO Y RESPALDO</a></p></div>
  </div>
 </section>
 <div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onT" aria-hidden="true">
@@ -1760,7 +1766,7 @@ const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude
    - Si se adopta un guardado de otra pestaña, se vuelven a sumar SOLO los sobres cuyo id no está en S.pk:
      así nunca se suman dos veces y no se pierden si otra pestaña escribió casi al mismo tiempo.
    - Los sobres ya guardados se vigilan 60 s más por si otra pestaña los pisó en ese lapso. */
-let MINE=[],saveFailed=false;
+let MINE=[],saveFailed=false,cloudSync=null;
 const PKRE=/^[a-z0-9]{6,24}$/;
 function applyPack(p){S.pk=Array.isArray(S.pk)?S.pk:[];if(S.pk.includes(p.id))return false;
  for(const k in p.have)S.have[k]=(S.have[k]||0)+p.have[k];
@@ -1783,12 +1789,13 @@ function adoptRaw(raw){let o;try{o=pj(raw)}catch(e){return false}if(!o||typeof o
 function syncIn(){const raw=LS.get(KEY);if(raw===null||raw===lastRaw)return false;const a=adoptRaw(raw);if(!a)return false;
  try{refresh()}catch(e){}if(document.visibilityState==='visible')toast('TU PROGRESO SE ACTUALIZÓ<br>DESDE OTRA PESTAÑA');
  if(a===2)setTimeout(save,0); // había sobres propios sin guardar o pisados: guardarlos encima
+  if(cloudSync)cloudSync.changed();
  return true}
 function save(){if(syncIn()&&!saveFailed&&!MINE.some(p=>!p.saved))return false;
  S.rev=(S.rev||0)+1;const str=JSON.stringify(S);let ok=false;
  if(!NOWRITE){try{localStorage.setItem(KEY,str);ok=localStorage.getItem(KEY)===str}catch(e){}}
  if(ok){lastRaw=str;const now=Date.now();MINE.forEach(p=>{if(!p.saved){p.saved=true;p.t=now}});saveFailed=false}else{S.rev--;saveFailed=true}
- setWarn(saveFailed);if(ok){clearTimeout(save.t);save.t=setTimeout(()=>STORE.put(),600)}return ok}
+ setWarn(saveFailed);if(ok){clearTimeout(save.t);save.t=setTimeout(()=>STORE.put(),600);if(cloudSync)cloudSync.changed()}return ok}
 window.addEventListener('storage',e=>{if(e.key===KEY)syncIn()});
 /* candado entre pestañas (Web Locks): abrir sobre y canjear se hacen de a uno por navegador.
    Límites sin servidor: en un navegador sin Web Locks dos pestañas pueden abrir el mismo sobre a la vez
@@ -2832,7 +2839,7 @@ function applyImport(v){clearTimeout(save.t);syncIn();
  catch(e){const ok=restoreKeys(prevMain,prevExt);for(const k of Object.keys(S))delete S[k];Object.assign(S,prevS);lastRaw=LS.get(KEY);
   return {ok:false,err:ok?'No se pudo guardar el respaldo. Tu progreso quedó exactamente como estaba.':'No se pudo guardar el respaldo. Tu progreso sigue en esta pestaña y en la copia de seguridad; no la cierres y vuelve a intentarlo.'}}
  for(const k of Object.keys(S))delete S[k];Object.assign(S,N);lastRaw=mainStr;MINE=[];saveFailed=false;NOWRITE=false;setWarn(false);
- save.t=setTimeout(()=>STORE.put(),600);return {ok:true}}
+ save.t=setTimeout(()=>STORE.put(),600);if(cloudSync)cloudSync.changed();return {ok:true}}
 async function saveFile(name,text){const blob=new Blob([text],{type:'application/json'});
  if(STORE.dl){try{await STORE.dl.save({filename:name,data:blob});return true}catch(e){if(e&&e.code==='declined')return false}}
  try{const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}catch(e){return false}}
@@ -2934,4 +2941,18 @@ async function shareTier(){toast('PREPARANDO IMAGEN...');await document.fonts.re
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
 claimPend();initSound();go('home');STORE.init();
 if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
+/* Integración segura: nunca reemplaza un progreso distinto sin revisión.
+   Los visitantes sin sesión continúan jugando y guardando localmente. */
+import('./content/cloud-sync.mjs').then(({startCloudSync})=>startCloudSync({
+ readLocal:()=>JSON.parse(buildBackup()),
+ restoreLocal:backup=>{
+  const valid=validateBackup(JSON.stringify(backup));
+  return valid.ok?applyImport(valid):{ok:false};
+ },
+ onStatus:(code,message)=>{
+  const element=$('cloudState');
+  if(element){element.dataset.sync=code;element.textContent=message}
+ }
+})).then(controller=>{cloudSync=controller;cloudSync.check()})
+.catch(()=>{const e=$('cloudState');if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}});
 </script></body></html>
