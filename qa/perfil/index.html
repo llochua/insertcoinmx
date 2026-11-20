@@ -1569,10 +1569,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile.account-focus .profile-passport,#profile.account-focus .profile-metrics,#profile.account-focus .profile-spotlight,#profile.account-focus .profile-backup{display:none!important}
 #profile.account-focus .profile-scroll{gap:0;padding-top:18px}
 #profile.account-focus .profile-account{width:100%;margin:0 auto;display:flex!important;flex-direction:column}
-#profile .profile-account-return{align-self:flex-start;padding:7px 6px;margin-bottom:5px;background:transparent;border:0;border-radius:6px;color:#ffd400;font:700 11px AV,system-ui,sans-serif}
-#profile .profile-account-return:focus-visible{outline:2px solid #ffd400;outline-offset:3px}
-#profile .profile-account-return[hidden]{display:none!important}
-@media(min-width:1000px){.crt:has(> #profile.on){width:min(740px,calc(100vw - 40px));height:calc(100dvh - 26px);max-height:none}}
+/* Mi perfil mantiene el mismo tamaño CRT que Inicio y Sobres. */
 
 /* Avatares · solo laboratorio de perfil */
 #profile .profile-avatar{padding:0;overflow:hidden;position:relative;cursor:pointer;background:#15112e!important;border:2px solid #ffd400!important;border-radius:14px}
@@ -1582,7 +1579,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-avatar-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #ffffff2b}
 #profile .profile-avatar-strip span{font:600 12px AV;color:#cfc9e4}
 #profile .profile-avatar-strip button{min-height:43px;padding:8px 10px;border:1px solid #ffd40088;border-radius:9px;font:800 11px AV;color:#ffd400}
-#avatarSelect .avatar-scroller{display:flex;flex-direction:column;gap:17px;flex:1;width:min(100%,620px);align-self:center;overflow:auto;padding:17px 17px 30px;scrollbar-width:none}
+#avatarSelect .avatar-scroller{display:flex;flex-direction:column;gap:17px;flex:1;width:min(100%,540px);align-self:center;overflow:auto;padding:17px 17px 30px;scrollbar-width:none}
 #avatarSelect .avatar-scroller::-webkit-scrollbar{display:none}
 #avatarSelect .avatar-intro small{font:800 10px AV;color:#ffd400;letter-spacing:.1em}
 #avatarSelect .avatar-intro h2{font:800 25px AV;color:#fff;margin:6px 0}
@@ -1688,7 +1685,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  </div>
 </section>
 <section class="view" id="profile" aria-label="Mi perfil de jugador">
- <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Mi perfil</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
+ <div class="top"><button class="vback" data-home aria-label="Volver al inicio"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Mi perfil</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="profile-scroll">
   <section class="profile-passport" aria-label="Mi partida">
    <div class="profile-head">
@@ -1720,7 +1717,6 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <small>También puedes seguir jugando como invitado.</small>
   </section>
   <section class="profile-panel profile-account" id="profileAccountPanel" aria-labelledby="profileAccountTitle" tabindex="-1" hidden>
-   <button type="button" id="profileAccountBack" class="profile-account-return">← VOLVER AL PERFIL</button>
    <p class="profile-kicker">TU CUENTA</p>
    <h3 id="profileAccountTitle">Acceso de jugador</h3>
    <p class="profile-account-intro">Tus cartas estarán respaldadas cuando aparezca el estado «NUBE AL DÍA».</p>
@@ -2289,7 +2285,7 @@ let cur='home';
 function go(id){if(id==='profile')resetProfileToOverview();if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores,profile:renderProfile}[cur]||(()=>{}))()}
-document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(cur==='profile'&&$('profile').classList.contains('account-focus')){resetProfileToOverview();refresh()}else if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
 /* ---------- bienvenida ---------- */
 const ON=[
  {k:'EL ÁLBUM · 01 / 03',t:'Las playeras que hemos hecho, ahora tienen una carta.',p:'Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección.'},
@@ -3397,13 +3393,14 @@ function resetProfileToOverview(){
  $('profileWelcome').hidden=false;
  const scroller=profile.querySelector('.profile-scroll');
  if(scroller)scroller.scrollTop=0;
+ profile.querySelector('.top .vback')?.setAttribute('aria-label','Volver al inicio');
 }
 function revealProfileAuth(mode='signup'){
  const panel=$('profileAccountPanel');
  $('profile').classList.add('account-focus');
  $('profileWelcome').hidden=true;
  panel.hidden=false;
- $('profileAccountBack').hidden=false;
+ $('profile').querySelector('.top .vback')?.setAttribute('aria-label','Volver a Mi perfil');
  const tab=$(mode==='login'?'profileAuthTabLogin':'profileAuthTabSignup');
  if(tab&&!tab.disabled)tab.click();
  requestAnimationFrame(()=>{
@@ -3412,7 +3409,6 @@ function revealProfileAuth(mode='signup'){
   panel.focus({preventScroll:true});
  });
 }
-$('profileAccountBack').onclick=()=>{resetProfileToOverview();$('profileQuickSignup').focus({preventScroll:true})};
 $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 
