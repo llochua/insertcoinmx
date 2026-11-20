@@ -2922,7 +2922,7 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
  for(const k of Object.keys(x))if(!Object.keys(x[k]).length)delete x[k];
  const ext=Object.keys(x).length?x:null;
  if(ext&&JSON.stringify(ext).length>262144)return E('Los datos extra del respaldo pesan demasiado.');
- return {ok:true,data:out,ext,meta:{at:typeof b.exportedAt==='string'?b.exportedAt.slice(0,40):'',cards:Object.keys(out.have).length,rates:Object.keys(out.rate).length,ini:out.ini,pend:extCount(ext)}}}
+ return {ok:true,data:out,ext,meta:{at:typeof b.exportedAt==='string'?b.exportedAt.slice(0,40):'',cards:Object.keys(out.have).filter(k=>CB[k]&&!CB[k].bx).length,variants:Object.keys(out.have).length,copies:Object.values(out.have).reduce((n,c)=>n+c,0),rates:Object.keys(out.rate).length,ini:out.ini,pend:extCount(ext)}}}
 function buildBackup(){syncIn();const b={app:'insertcoinmx-album',format:FORMAT,exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(S))};
  const e=readExt();if(e)b.ext=e;return JSON.stringify(b,null,1)}
 /* restaura cada clave por separado; no reescribe la que ya tiene su texto original (si faltó espacio, el navegador la conservó) */
@@ -2984,9 +2984,9 @@ $('bkImp').onclick=()=>{beep(880);bkOpen(`<h2>IMPORTAR RESPALDO</h2><p>Elige el 
 $('bkFile').onchange=()=>{const f=$('bkFile').files[0];if(!f)return;if(f.size>1048576){bkMsg('El archivo pesa más de 1 MB; no parece un respaldo.','bkerr');return}
  const r=new FileReader();r.onload=()=>bkReview(String(r.result));r.onerror=()=>bkMsg('No se pudo leer el archivo.','bkerr');r.readAsText(f)};
 function bkReview(text){const v=validateBackup(text);if(!v.ok){bkMsg(v.err,'bkerr');beep(150,.2);return}
- syncIn();const m=v.meta,nowC=uniq(),nowR=Object.keys(S.rate).length,d=new Date(m.at),when=isNaN(d)?'fecha desconocida':d.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+ syncIn();const m=v.meta,nowC=uniq(),nowV=Object.keys(S.have).length,nowCopies=Object.values(S.have).reduce((n,c)=>n+c,0),nowR=Object.keys(S.rate).length,d=new Date(m.at),when=isNaN(d)?'fecha desconocida':d.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
  bkOpen(`<h2>¿REEMPLAZAR TU PROGRESO?</h2><p>Respaldo del ${esc(when)}</p>
- <div class="bkcmp"><span></span><span>AHORA</span><span>RESPALDO</span><b>Cartas distintas</b><span>${nowC}</span><span>${m.cards}</span><b>Calificaciones</b><span>${nowR}</span><span>${m.rates}</span><b>Iniciales</b><span>${esc(S.ini||'—')}</span><span>${m.ini||'—'}</span></div>
+ <div class="bkcmp"><span></span><span>AHORA</span><span>RESPALDO</span><b>Cartas distintas (álbum)</b><span>${nowC}</span><span>${m.cards}</span><b>Variantes guardadas</b><span>${nowV}</span><span>${m.variants}</span><b>Copias totales</b><span>${nowCopies}</span><span>${m.copies}</span><b>Calificaciones</b><span>${nowR}</span><span>${m.rates}</span><b>Iniciales</b><span>${esc(S.ini||'—')}</span><span>${m.ini||'—'}</span></div>
  ${m.cards<nowC?'<p class="bkwarn">Ojo: el respaldo tiene MENOS cartas que tu progreso actual.</p>':''}
  ${m.pend?`<p>${m.pend} ${m.pend===1?'carta del respaldo todavía no existe':'cartas del respaldo todavía no existen'} en el álbum; se guardan aparte y aparecerán cuando se agreguen.</p>`:''}
  <p>Antes de reemplazar, tu progreso actual se guarda en una copia de seguridad.</p>
