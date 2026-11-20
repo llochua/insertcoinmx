@@ -53,3 +53,39 @@ jobs:
 
       - name: Comprobar acceso público sin mutaciones
         run: node qa/supabase-live-anon.mjs
+
+  auth-real-lectura:
+    name: Supabase real · dos sesiones (opcional, solo lectura)
+    if: github.event_name == 'pull_request' && github.head_ref == 'feat/sync-automatica-segura-20261119'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      ICMX_QA_EMAIL: ${{ secrets.ICMX_QA_EMAIL }}
+      ICMX_QA_PASSWORD: ${{ secrets.ICMX_QA_PASSWORD }}
+    steps:
+      - name: Comprobar disponibilidad de cuenta exclusiva
+        id: config
+        run: |
+          if [ -n "$ICMX_QA_EMAIL" ] && [ -n "$ICMX_QA_PASSWORD" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "QA autenticada NO ejecutada: sin credenciales exclusivas de laboratorio."
+          fi
+      - name: Obtener código
+        if: steps.config.outputs.ready == 'true'
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        if: steps.config.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar Playwright
+        if: steps.config.outputs.ready == 'true'
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Instalar Chromium
+        if: steps.config.outputs.ready == 'true'
+        run: npx playwright install chromium
+      - name: Verificar inicio de sesión y recuperación real
+        if: steps.config.outputs.ready == 'true'
+        run: node qa/live-auth-two-browsers.mjs
