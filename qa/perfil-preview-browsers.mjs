@@ -41,15 +41,23 @@ try{
   await page.locator('#onNext').click();
   await page.locator('#onNext').click();
   assert.equal(await page.locator('#onAccount').isVisible(),true);
+  assert.equal(await page.locator('.on-save').isVisible(),true,'bienvenida muestra visual de respaldo');
+  assert.equal(await page.locator('#onNext').textContent(),'SEGUIR COMO INVITADO');
+  assert.match(await page.locator('#onP').textContent(),/navegador/);
   await page.locator('#onAccount').click();
   assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true);
+  assert.equal(await page.locator('#profileAccountPanel').isVisible(),true,'formulario se revela solo al pedir cuenta');
+  assert.equal(await page.locator('#profileBackup').evaluate(e=>e.open),false,'respaldo manual plegado');
   assert.equal(await page.locator('#profileAuthSend').isDisabled(),true,
     'preview cannot create accounts by mistake');
   const lab=page.locator('#profile .profile-account a[href="/qa/registro/"]');
   assert.equal(await lab.isVisible(),true);
   await page.locator('#profile [data-home]').click();
-  await page.locator('#home .profile-entry').click();
+  assert.equal(await page.locator('#home .home-player-card').isVisible(),true,'tarjeta de Mi perfil visible en Inicio');
+  await page.locator('#home .home-player-card').click();
   assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true);
+  await page.locator('#profileBackup summary').click();
+  assert.equal(await page.locator('#profileExport').isVisible(),true,'respaldo visible a solicitud');
   const saved=await page.evaluate(()=>({
     real:localStorage.getItem('icmx-album2'),
     preview:sessionStorage.getItem('icmx-preview-perfil-20261120'),
