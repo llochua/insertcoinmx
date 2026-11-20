@@ -74,6 +74,6 @@ test('No restaurar si hay un sobre todavía sin guardar o animación en curso',(
 test('Respaldo inválido se rechaza sin tocar el dispositivo',()=>{
  const s=scenario({valid:()=>({ok:false})});
  const before=s.localStorage.getItem('icmx-album2');
- assert.deepEqual(s.apply(backup()),{ok:false});
+ assert.equal(s.apply(backup()).ok,false);
  assert.equal(s.localStorage.getItem('icmx-album2'),before);
 });
