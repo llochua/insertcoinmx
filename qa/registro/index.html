@@ -148,7 +148,7 @@ function inspectLocalProgress(){
   if(!data||typeof data!=="object"||Array.isArray(data)||!data.have||typeof data.have!=="object"||Array.isArray(data.have))throw new Error("Datos no válidos");
   const entries=Object.entries(data.have).filter(([name,qty])=>/^[a-z0-9]{1,40}_[berf]$/.test(name)&&Number.isInteger(qty)&&qty>=1&&qty<=9999);
   const copies=entries.reduce((sum,[,qty])=>sum+qty,0);
-  output.textContent="Este navegador tiene "+entries.length+" variantes de carta distintas y "+copies+" copias en total. Todavía no se han subido a Supabase.";
+  output.textContent="Este navegador tiene "+entries.length+" variantes de carta distintas y "+copies+" copias en total. Esta consulta solo revisa el navegador: no comprueba la copia en Supabase ni sincroniza cambios.";
  }catch(e){output.textContent="No pude comprobar la colección local. No modifiqué ningún dato."}
 }
 el("inspectProgress").addEventListener("click",inspectLocalProgress);
