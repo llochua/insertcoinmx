@@ -74,6 +74,8 @@ try{
     'preview cannot create accounts by mistake');
   const lab=page.locator('#profile .profile-account a[href="/qa/registro/"]');
   assert.equal(await lab.isVisible(),true);
+  await mkdir('qa/screenshots',{recursive:true});
+  await page.screenshot({path:'qa/screenshots/perfil-cuenta-'+width+'.png',fullPage:true});
   // La flecha única regresa a Mi perfil desde registro; un segundo toque va a Inicio.
   await page.locator('#profile .top .vback').click();
   assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,
