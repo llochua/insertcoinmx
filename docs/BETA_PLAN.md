@@ -31,16 +31,16 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 
 **Cierre:** completado con Auth real en dos navegadores, recuperación tras reingreso y sin mutaciones en inventario. La emisión de un sobre real y su recuperación E2E aún no se probaron en esta sesión (solo se validó su RPC de modo reversible y la emisión con nube simulada).
 
-## Fase 3 · Preparar acceso general sin tocar colecciones — pendiente
+## Fase 3 · Preparar acceso general sin tocar colecciones — preparada, sin activar
 
 **Resultado esperado:** nueva cuenta comienza con inventario generado exclusivamente por servidor y recuperable en otro dispositivo; cuota, aleatoriedad y canjes protegidos.
 
 - Revisar permisos y funciones públicas. Mantener el bloqueo al endpoint de importación de inventarios invitados.
-- Preparar y revisar una migración de activación para las RPC seguras: alta, abrir sobre, canjear y guardar metadatos. **No aplicar hasta autorización de beta.**
+- **Preparada:** `supabase/sql/prepare_public_beta_CLOSED.sql` instala una compuerta de acceso común **apagada por defecto** para las RPC seguras de alta, abrir sobre, canjear y guardar metadatos; revoca la función de importación invitada. **No se aplicó** a Supabase real. Su activación pública requerirá una acción independiente y autorización expresa.
 - Revisar [avisos de seguridad de Supabase](https://supabase.com/dashboard/project/ynugqxbtszhsupadqdkz/advisors/security), especialmente protección de contraseñas filtradas.
 - Conservar cualquier cuenta/colección antigua hasta decisión del creador.
 
-**Cierre:** validación de acceso de dos usuarios distintos y aislamiento, sin permitir escribir cartas arbitrarias.
+**Cierre:** pendiente de prueba de integración con dos usuarios distintos y apertura de sobre E2E en cuenta desechable de QA; no retirar la lista de laboratorio antes de la autorización.
 
 ## Fase 4 · Verificación del recorrido visible — pendiente
 
@@ -78,3 +78,13 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 - La comprobación de visitante anónimo y las pruebas Chromium con nube simulada también pasaron.
 - Esto **no autoriza** a retirar los límites de laboratorio ni a publicar `main`. La fase siguiente es revisar seguridad y preparar la activación pública sin ejecutarla.
 
+
+## Auditoría de seguridad y preparación cerrada · 20 noviembre 2026
+
+- Se confirmó por SQL que `public.player_snapshots` tiene RLS y política de lectura exclusivamente para el dueño; `anon` no puede leer y `authenticated` **no puede INSERT/UPDATE/DELETE directo**.
+- Las cinco RPC públicas usan `SECURITY DEFINER`: los avisos de Supabase sobre ejecución por usuarios registrados son **intencionales en cuatro** (alta, sobres, canje, metadatos), por lo que hay que validar sus comprobaciones internas. La quinta, `import_guest_collection`, debe perder el permiso `EXECUTE` al desplegar la preparación.
+- Las cuatro tablas de `private_sync` tienen RLS activo sin políticas para navegadores, intencionalmente (solo acceso privilegiado interno). Supabase lo reporta como aviso informativo.
+- Supabase advierte que **Leaked Password Protection está desactivada**. Revisar [Password Security](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection) antes del lanzamiento; no se cambió esa configuración.
+- El SQL de preparación se ejecutó **dentro de una transacción que terminó con ROLLBACK**, únicamente para comprobar que compila. Se verificó después: la tabla `private_sync.beta_access_gate` **no existe** (no quedó aplicada); 1 colección existente, 386 variantes y 1 cuenta de laboratorio siguen igual.
+- La prueba automática `qa/check-beta-gate.mjs` impide publicar accidentalmente una migración con la compuerta encendida y exige proteger cuatro RPC y cerrar la importación de inventario local.
+- **No interpretar la aprobación de la transacción como una auditoría exhaustiva de seguridad ni como beta autorizada**. Falta probar acceso entre dos cuentas, los errores de cuota/condiciones de carrera en Supabase real y el recorrido completo con una cuenta desechable.
