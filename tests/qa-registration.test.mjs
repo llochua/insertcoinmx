@@ -113,3 +113,8 @@ test('disabled QA controls use neutral cursor instead of an hourglass',()=>{
  assert.doesNotMatch(page,/cursor:\s*wait/);
  assert.match(page,/#backupUpload\[data-saved="true"\]\{[^}]*cursor:default/);
 });
+
+test('local inspector never claims cloud backup is absent',()=>{
+ assert.match(page,/Esta consulta solo revisa el navegador: no comprueba la copia en Supabase ni sincroniza cambios/);
+ assert.doesNotMatch(page,/Todavía no se han subido a Supabase/);
+});
