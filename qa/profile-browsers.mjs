@@ -60,6 +60,22 @@ try{
  assert.equal(await page.locator('#profileExport').isVisible(),true,'respaldo manual disponible bajo demanda');
  assert.ok(await page.locator('#profileCloudStatus').isVisible(),
   'estado de sincronización debe estar en Mi perfil');
+ // Preferencia de avatar del invitado: separada de la colección real.
+ const back=page.locator('#profileAccountBack');
+ if(await back.isVisible())await back.click();
+ await page.locator('#profileAvatarChange').click();
+ assert.equal(await page.locator('#avatarSelect.on').isVisible(),true);
+ assert.equal(await page.locator('#avatarGrid .avatar-option').count(),12);
+ const pizza=page.locator('#avatarGrid [data-avatar="pizza"]');
+ await pizza.click();
+ await page.locator('#avatarSave').click();
+ assert.equal(await page.locator('#profileAvatarImage').getAttribute('src'),'assets/avatars/pizza-128.webp');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('icmx-avatar-guest-v1')),'pizza');
+ assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-album2')||'{}').have||{}),
+  cardsBefore,'cambiar avatar no toca las cartas');
+ await page.reload({waitUntil:'domcontentloaded'});
+ assert.equal(await page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/pizza-128.webp',
+  'el avatar de invitado se recuerda al recargar');
  assert.deepEqual(errors,[],'juego debe arrancar sin excepciones JS');
  await page.close();
  console.log('✓ Primera visita, Mi perfil, registro visible y progreso intacto');
