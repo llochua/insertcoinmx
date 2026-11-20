@@ -89,7 +89,7 @@ try{
   assert.equal(await page.locator('#avatarGrid .avatar-option').count(),12,'doce personajes aprobados');
   const avatars=await page.locator('#avatarGrid .avatar-option img').evaluateAll(imgs=>imgs.map(img=>({src:img.getAttribute('src'),loaded:img.complete&&img.naturalWidth===128&&img.naturalHeight===128})));
   assert.equal(new Set(avatars.map(x=>x.src)).size,12,'todas las miniaturas son diferentes');
-  assert.ok(avatars.every(x=>/assets\\/avatars\\/.+-128\\.webp$/.test(x.src)),'usa WebP de 128px');
+  assert.ok(avatars.every(x=>x.src.includes('assets/avatars/')&&x.src.endsWith('-128.webp')),'usa WebP de 128px');
   for(const img of page.locator('#avatarGrid .avatar-option img').all?await page.locator('#avatarGrid .avatar-option img').all():[]){
     await img.scrollIntoViewIfNeeded();
     await img.evaluate(el=>el.decode());
