@@ -20,6 +20,15 @@ function authMessage(text, kind = 'info') {
 }
 function showAuthUser(user) {
   const active = Boolean(user);
+  // Perfil progresivo: invitado ve una sola invitación; cuenta autenticada ve su estado.
+  const welcome = $auth('profileWelcome');
+  const panel = $auth('profileAccountPanel');
+  const homeStatus = $auth('homePlayerStatus');
+  if (welcome) welcome.hidden = active;
+  if (panel) panel.hidden = active ? false : panel.hidden;
+  if (homeStatus) homeStatus.textContent = active
+    ? 'Cuenta conectada · revisa tu respaldo'
+    : 'Tu colección, tu progreso';
   $auth('profileAuthGuest').hidden = active;
   $auth('profileAuthSigned').hidden = !active;
   $auth('profileAuthUser').textContent = active ? (user.email || 'Cuenta conectada') : '';
