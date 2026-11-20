@@ -311,6 +311,20 @@ async function run(){
   assert.equal(cloud.get(OTHER).revision,1,'repetir check no debe reiniciar la cuenta');
   console.log('✓ Alta de segunda cuenta vacía, idempotente y aislada');
 
+  // Cambiar de cuenta en el mismo navegador nunca reemplaza ni sube
+  // el álbum de la cuenta anterior (el localStorage del juego es compartido).
+  const otherBefore=await read(C.page);
+  const firstBefore=clone(cloud.get(USER));
+  const secondBefore=clone(cloud.get(OTHER));
+  await C.page.evaluate(()=>localStorage.setItem('icmx-qa-user',"qa-sync-user-01"));
+  await check(C.page);
+  assert.equal(await C.page.locator('#cloudState').getAttribute('data-sync'),'conflict');
+  assert.deepEqual(await read(C.page),otherBefore,'el cambio de cuenta alteró cartas locales');
+  assert.deepEqual(cloud.get(USER),firstBefore,'el cambio de cuenta escribió en el primer usuario');
+  assert.deepEqual(cloud.get(OTHER),secondBefore,'el cambio de cuenta escribió en el segundo usuario');
+  assert.equal(await C.page.evaluate(()=>cloudSync.isAccount()),false);
+  console.log('✓ Cambio de cuenta bloqueado sin mezclar ni sustituir colecciones');
+
   // La existencia de cartas locales sin nube bloquea la migración automática.
   const LEGACY='qa-sync-legacy-03';
   const D=await device(LEGACY,{...baseState(),have:{abuket_b:4}});
