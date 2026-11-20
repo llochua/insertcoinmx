@@ -68,3 +68,10 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 - **Terminado o listo para probar:** mecanismo de guardado, emisión, canjes, protección, reconciliación de catálogo, prueba con nube simulada.
 - **Bloqueo técnico real:** prueba autenticada con cuenta de laboratorio; permisos generales todavía restringidos.
 - **Fuera del trabajo técnico hasta decisión:** fecha de lanzamiento, reglas finales de colección, reinicio de jugadores anteriores, aprobación visual/publicación.
+
+## Resultado de prueba autenticada real · 20 noviembre 2026
+
+- Se ejecutó GitHub Actions contra Supabase real con credenciales privadas ya configuradas; el formulario aceptó el formato del correo.
+- Supabase Auth respondió **HTTP 400 · credenciales inválidas** al intentar iniciar sesión en la cuenta de laboratorio. No hubo sesión autenticada; por ello la recuperación real de dos navegadores **permanece pendiente**.
+- CI con nube simulada y verificación anónima pasaron. No se abrieron sobres reales ni se alteró inventario.
+- Próxima acción mínima: verificar que `ICMX_QA_PASSWORD` sea la contraseña de **esa cuenta de Supabase Auth**, no la de GitHub. No hacer más reintentos automáticos hasta actualizar esa credencial; no restablecer contraseña ni modificar cuentas sin autorización.
