@@ -7,6 +7,7 @@ on:
       - 'content/cloud-sync.mjs'
       - 'index.html'
       - 'qa/sync-two-browsers.mjs'
+      - 'qa/supabase-live-anon.mjs'
       - '.github/workflows/qa-sync-browsers.yml'
   workflow_dispatch:
 
@@ -35,3 +36,20 @@ jobs:
 
       - name: Ejecutar dos navegadores independientes
         run: node qa/sync-two-browsers.mjs
+
+  supabase-anon-smoke:
+    name: Supabase real · verificar acceso anónimo
+    if: github.event_name == 'pull_request' && github.head_ref == 'feat/sync-automatica-segura-20261119'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Comprobar acceso público sin mutaciones
+        run: node qa/supabase-live-anon.mjs
