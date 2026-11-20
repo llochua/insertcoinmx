@@ -96,6 +96,7 @@ try{
     assert.equal(await img.evaluate(el=>el.naturalWidth),128,'miniatura WebP cargada sin error');
   }
   await mkdir('qa/screenshots',{recursive:true});
+  await page.locator('#avatarSelect .avatar-scroller').evaluate(el=>el.scrollTop=0);
   await page.screenshot({path:'qa/screenshots/avatar-selector-'+width+'.png',fullPage:true});
   const first=await page.locator('#avatarGrid .avatar-option[aria-pressed="true"]').getAttribute('data-avatar');
   assert.equal(first,'moneda','primer avatar predeterminado');
