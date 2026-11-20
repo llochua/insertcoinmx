@@ -327,6 +327,11 @@ async function run(){
   assert.deepEqual(cloud.get(USER),firstBefore,'el cambio de cuenta escribió en el primer usuario');
   assert.deepEqual(cloud.get(OTHER),secondBefore,'el cambio de cuenta escribió en el segundo usuario');
   assert.equal(await C.page.evaluate(()=>cloudSync.isAccount()),false);
+  assert.equal(await C.page.evaluate(()=>cloudSync.requiresServer()),true);
+  await C.page.evaluate(()=>openPack());
+  await delay(250);
+  assert.deepEqual(await read(C.page),otherBefore,
+    'cambiar de cuenta no debe abrir sobres locales mientras la nube está bloqueada');
   console.log('✓ Cambio de cuenta bloqueado sin mezclar ni sustituir colecciones');
 
   // La existencia de cartas locales sin nube bloquea la migración automática.
@@ -335,7 +340,14 @@ async function run(){
   assert.equal(cloud.has(LEGACY),false,'una colección local no debe crear respaldo remoto');
   assert.equal((await read(D.page)).have.abuket_b,4);
   assert.equal(await D.page.locator('#cloudState').getAttribute('data-sync'),'pending');
-  console.log('✓ Colección local previa permanece intacta, sin migración automática');
+  assert.equal(await D.page.evaluate(()=>cloudSync.requiresServer()),true);
+  const legacyBefore=await read(D.page);
+  await D.page.evaluate(()=>openPack());
+  await delay(300);
+  assert.deepEqual(await read(D.page),legacyBefore,
+    'una cuenta pendiente no puede acuñar cartas en local');
+  assert.equal(cloud.has(LEGACY),false);
+  console.log('✓ Colección local previa permanece intacta, sin migración automática ni sobres locales');
 
   for(const [name,entry] of [['A',A],['B',B],['C',C],['D',D]])
    assert.deepEqual(entry.exceptions,[],name+' tuvo errores JavaScript');
