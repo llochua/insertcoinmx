@@ -50,7 +50,8 @@ PASTILLA_POS = (50, 48)
 TINTA = {'comun': (25, 18, 0), 'holo': (19, 17, 17), 'dorada': (25, 18, 3)}
 LETRA = {'comun': 'b', 'holo': 'e', 'dorada': 'r'}
 RAREZAS = ('comun', 'holo', 'dorada')
-JPG_CALIDAD = 92
+WEBP_CALIDAD = 90
+ARTE_WEBP_CALIDAD = 88
 
 
 def cargar_plantillas():
@@ -206,22 +207,22 @@ def carta(T, d, rareza, ventana_arte):
 
 
 def archivo(d, rareza):
-    """id.jpg es la versión original del diseño (así se conserva el progreso guardado); las otras llevan _letra."""
+    """id.webp es la versión original del diseño (así se conserva el progreso guardado); las otras llevan _letra."""
     return d['id'] if rareza == d['version_original'] else d['id'] + '_' + LETRA[rareza]
 
 
 def guardar(img, d, rareza):
     n = archivo(d, rareza)
-    Image.fromarray(img).save(os.path.join(RAIZ, 'c2', n + '.jpg'), quality=JPG_CALIDAD)
+    Image.fromarray(img).save(os.path.join(RAIZ, 'c2', n + '.webp'), quality=WEBP_CALIDAD, method=6)
     Image.fromarray(cv2.resize(img, (480, 670), interpolation=cv2.INTER_AREA)).save(
-        os.path.join(RAIZ, 'c', n + '.jpg'), quality=JPG_CALIDAD)
+        os.path.join(RAIZ, 'c', n + '.webp'), quality=WEBP_CALIDAD, method=6)
 
 
 def guardar_d(arte, cid, regenerar=False):
     """Regenera la imagen de juego al reemplazar el arte; evita el JPG anterior."""
-    p = os.path.join(RAIZ, 'd', cid + '.jpg')
+    p = os.path.join(RAIZ, 'd', cid + '.webp')
     if regenerar or not os.path.exists(p):
-        Image.fromarray(np.clip(acomodar_arte(arte, 640, 800, 0.08), 0, 255).astype(np.uint8)).save(p, quality=90)
+        Image.fromarray(np.clip(acomodar_arte(arte, 640, 800, 0.08), 0, 255).astype(np.uint8)).save(p, quality=ARTE_WEBP_CALIDAD, method=6)
 
 
 
@@ -362,11 +363,11 @@ def numerar_fulls(cat):
 
 
 def guardar_full(img, ilu_path, fk):
-    Image.fromarray(img).save(os.path.join(RAIZ, 'c2', fk + '.jpg'), quality=JPG_CALIDAD)
+    Image.fromarray(img).save(os.path.join(RAIZ, 'c2', fk + '.webp'), quality=WEBP_CALIDAD, method=6)
     Image.fromarray(cv2.resize(img, (480, 670), interpolation=cv2.INTER_AREA)).save(
-        os.path.join(RAIZ, 'c', fk + '.jpg'), quality=JPG_CALIDAD)
+        os.path.join(RAIZ, 'c', fk + '.webp'), quality=WEBP_CALIDAD, method=6)
     cubrir(Image.open(ilu_path).convert('RGB'), 600, 900, 0.5).save(
-        os.path.join(RAIZ, 'fa', fk[2:] + '.jpg'), quality=90)
+        os.path.join(RAIZ, 'fa', fk[2:] + '.webp'), quality=ARTE_WEBP_CALIDAD, method=6)
 
 
 # ---------------------------------------------------------------- index.html
@@ -391,13 +392,13 @@ def actualizar_web(cat, actualizados=()):
                       (d['id'], bx, ex, n, d['categoria'], d['version_original'], no, extra))
     nuevo = 'const DESIGNS=[\n' + ',\n'.join(lineas) + '];'
     src = src[:i0] + nuevo + src[i1:]
-    # ABOX: caja del contenido de d/<id>.jpg (la usan el Tier y las Retas para encuadrar el arte)
+    # ABOX: caja del contenido de d/<id>.webp (la usan el Tier y las Retas para encuadrar el arte)
     m = re.search(r'const ABOX=(\{.*?\});', src)
     if m:
         abox = json.loads(m.group(1))
         for d in cat:
             if d['id'] not in abox or d['id'] in actualizados:
-                a = np.asarray(Image.open(os.path.join(RAIZ, 'd', d['id'] + '.jpg')).convert('RGB')).astype(np.float32)
+                a = np.asarray(Image.open(os.path.join(RAIZ, 'd', d['id'] + '.webp')).convert('RGB')).astype(np.float32)
                 ys, xs = np.where(np.linalg.norm(a - fondo_de(a), axis=2) > 30)
                 h, w = a.shape[:2]
                 # Arte plano o casi uniforme: usar la caja completa, nunca fallar.
@@ -419,7 +420,7 @@ def actualizar_web(cat, actualizados=()):
             # los demás conservan los ajustes curatoriales previamente aprobados.
             if ident not in actualizados and (ident in viejas or ident in fondos or ident in colores_previos):
                 continue
-            path_arte = os.path.join(RAIZ, 'd', ident + '.jpg')
+            path_arte = os.path.join(RAIZ, 'd', ident + '.webp')
             if not os.path.isfile(path_arte):
                 continue
             arte = np.asarray(Image.open(path_arte).convert('RGB')).astype(np.float32)
@@ -437,7 +438,7 @@ def muestra(cat):
     for k, d in enumerate(ids):
         for j, r in enumerate(RAREZAS):
             n = k * 3 + j
-            im = Image.open(os.path.join(RAIZ, 'c', archivo(d, r) + '.jpg')).resize((W, H))
+            im = Image.open(os.path.join(RAIZ, 'c', archivo(d, r) + '.webp')).resize((W, H))
             sh.paste(im, ((n % 9) * W, (n // 9) * H))
     sh.save(os.path.join(C, 'muestra.jpg'), quality=82)
 

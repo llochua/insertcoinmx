@@ -400,7 +400,7 @@ body::before{background:none}
 .winner-screen.on{display:flex}
 .winner-bg{
  position:absolute;inset:-15%;z-index:-3;pointer-events:none;
- background:var(--winner-art,url("c2/gatosamurai.jpg")) center 42%/cover no-repeat;
+ background:var(--winner-art,url("c2/gatosamurai.webp")) center 42%/cover no-repeat;
  filter:blur(33px) saturate(1.32) brightness(.58);
  transform:scale(1.13);
 }

@@ -43,13 +43,13 @@ def outputs(d, html):
     for rareza in LETRAS:
         name = ident if rareza == d["version_original"] else ident + "_" + LETRAS[rareza]
         for directory in ("c", "c2"):
-            names.append(f"{directory}/{name}.jpg")
-    names.append(f"d/{ident}.jpg")
+            names.append(f"{directory}/{name}.webp")
+    names.append(f"d/{ident}.webp")
     full = ROOT / f"cartas/full/{ident}.jpg"
     if full.is_file() and d.get("full"):
         match = re.search(r"\{id:'" + re.escape(ident) + r"'[^\n]*?fk:'([^']+)'", html)
         fk = match.group(1) if match else "F_" + ident
-        names += [f"c/{fk}.jpg", f"c2/{fk}.jpg", f"fa/{fk[2:]}.jpg"]
+        names += [f"c/{fk}.webp", f"c2/{fk}.webp", f"fa/{fk[2:]}.webp"]
     return names
 
 
@@ -82,11 +82,11 @@ def changed_ids(paths, catalog):
         if m:
             ids.add(m.group(1))
             continue
-        m = re.fullmatch(r"d/([a-z0-9]+)\.jpg", path)
+        m = re.fullmatch(r"d/([a-z0-9]+)\.webp", path)
         if m:
             ids.add(m.group(1))
             continue
-        m = re.fullmatch(r"c2?/([a-z0-9]+)(?:_[er])?\.jpg", path)
+        m = re.fullmatch(r"c2?/([a-z0-9]+)(?:_[er])?\.webp", path)
         if m:
             ids.add(m.group(1))
     return ids
@@ -177,8 +177,8 @@ def main():
                         errors.append(ident + ": arte o carta desincronizada: " + p)
             if ident in touched_src and not all(p in entry.get("sources", {}) for p in sources(d)):
                 errors.append(ident + ": manifiesto incompleto para una fuente modificada")
-        if (ROOT / f"d/{ident}.jpg").is_file():
-            delta = gradiente_bordes(ROOT / f"d/{ident}.jpg")
+        if (ROOT / f"d/{ident}.webp").is_file():
+            delta = gradiente_bordes(ROOT / f"d/{ident}.webp")
             if delta > 35:
                 warnings.append(f"{ident}: orillas con diferencia de color {delta}; revisar integración visual")
     print(f"QA arte: {len(ids)} diseños revisados; {len(warnings)} avisos; {len(errors)} errores.")

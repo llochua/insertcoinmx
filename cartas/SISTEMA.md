@@ -76,11 +76,11 @@ su `marco_*.png` y se regenera todo.
 
 ## 4. Archivos que produce
 
-- `c2/<archivo>.jpg`: 960×1340 (sobre, carta ampliada, menú) · `c/<archivo>.jpg`: 480×670 (álbum)
+- `c2/<archivo>.webp`: 960×1340 (sobre, carta ampliada, menú) · `c/<archivo>.webp`: 480×670 (álbum)
 - `<archivo>` = `id` para la **versión original** del diseño y `id_<letra>` para las otras dos.
   La versión original (`version_original` en el catálogo) es la que tenía el diseño cuando era de una
   sola rareza: así el progreso guardado sigue apuntando a la misma carta. No se cambia.
-- `d/<id>.jpg`: 640×800, arte del diseño para Tier y Retas (solo se crea si falta).
+- `d/<id>.webp`: 640×800, arte del diseño para Tier y Retas (solo se crea si falta).
 - `index.html`: reescribe `DESIGNS` (nombre, categoría, número, `r`, `ex`, `bx`, `f`) y agrega a `ABOX`
   los diseños nuevos. Lo demás del juego no se toca.
 
@@ -106,8 +106,8 @@ su `marco_*.png` y se regenera todo.
 7. Escribir cada fila: Diseño, miniatura (B), K id, L categoría, M número, N/O referencia, P línea,
    Q frase, R tipo, T arte, U `Propuesta · revisar`. **Sin notas en la columna J** ni ninguna marca que
    las distinga de las demás.
-8. Miniatura (B): `=IMAGE("https://raw.githubusercontent.com/llochua/insertcoinmx/<rama>/d/"&K<fila>&".jpg")`
-   apuntando a la rama donde ya existe `d/<id>.jpg` (comprobar que responde 200). Al publicar en main,
+8. Miniatura (B): `=IMAGE("https://raw.githubusercontent.com/llochua/insertcoinmx/<rama>/d/"&K<fila>&".webp")`
+   apuntando a la rama donde ya existe `d/<id>.webp` (comprobar que responde 200). Al publicar en main,
    cambiarla a la ruta normal. Arte reemplazado: actualizar también su miniatura.
 9. Formato: copiar el formato de una fila normal del **álbum** (no de una bonus: esas tienen fondo
    rosa en A:C). Alto de fila **120 px** como todas.
@@ -141,7 +141,7 @@ Actualizar o agregar Full:
 - Capas: `plantillas/full_marca.png` (pestaña INSERT COIN MX), pastilla de categoría, nombre blanco,
   VALOR + moneda blanca (`full_moneda.png`) + 100, HABILIDAD ESPECIAL, ✦ referencia y — GOTY en amarillo,
   frase en pastilla amarilla, pie `Carta F02/49 · ★★ Ilustración · Valor –`.
-- Salida: `c2/F_<id>.jpg`, `c/F_<id>.jpg` y `fa/<id>.jpg` (600×900, ilustración limpia).
+- Salida: `c2/F_<id>.webp`, `c/F_<id>.webp` y `fa/<id>.webp` (600×900, ilustración limpia).
   Los nombres viejos se respetan (`F_worldwarrior`, `F_zodiaco`, por `fk` en `DESIGNS`).
 
 ## 6. Requisitos
@@ -171,3 +171,13 @@ lo renueva automáticamente a partir de hashes SHA-256 de las fuentes; no hay qu
 
 Las variantes **Base, Holo y Dorada extienden el fondo plano real del JPG al escenario completo** (mismo `--bg` compartido). La ilustración se muestra completa y sin deformación; no se crean duplicados desenfocados, halos, imágenes ampliadas ni estilos por ID. El color se recalcula desde los bordes de la ilustración cargada y se actualiza al reemplazar el diseño. Para Full se conserva el tratamiento a sangre aprobado. El control de calidad rechaza la reintroducción del fondo desenfocado. Cierres y controles reutilizan el botón circular estándar.
 
+
+## 7. Publicación optimizada de imágenes (20 nov 2026)
+
+- Los originales permanecen intactos en `cartas/arte/*.png` y `cartas/full/*.jpg`.
+- El generador escribe `c/`, `c2/`, `d/` y `fa/` en WebP, sin cambiar dimensiones ni IDs.
+- Parámetros: cartas WebP calidad 90; ilustraciones limpias WebP calidad 88, método 6.
+- Una sola migración de la biblioteca previa: `python cartas/migrar_webp.py` (idempotente).
+- Los cambios de artes procesados por `cartas/actualizar.py` y el workflow existente generan WebP.
+- Se eliminan JPG generados tras comprobar cada WebP; los originales fuente no se borran. El historial de Git se conserva.
+- Probar cambios futuros en rama y revisar `python cartas/qa.py --all` y aspecto visual.
