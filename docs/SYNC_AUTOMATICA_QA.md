@@ -36,6 +36,14 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
   - Evidencia: https://github.com/llochua/insertcoinmx/actions/runs/44663141911 (éxito).
   - **Límite**: servidor y sesiones simulados, sin usar Supabase real ni cuentas reales.
 
+## Ampliación de QA: Supabase real e integridad de respaldos
+- Se integraron en la rama los dos commits que habían llegado a main: artes especiales de Frieza Infinito y Robogodín, además de IMGV. No se alteraron identificadores persistidos.
+- Smoke test real de Supabase contra API con clave publicable y **sin sesión**: Auth rechaza perfil, PostgREST no entrega colecciones ajenas y la RPC no admite sincronización. Ejecución automatizada en `qa/supabase-live-anon.mjs` (no crea cuentas ni escribe datos).
+- Migración aplicada `guard_snapshot_payload_lab`: la función CAS del laboratorio rechaza nombres JSON inseguros (incluidos anidados), cuotas fuera de rango, modo de prueba, historial de sobres demasiado largo, malformado o repetido.
+- SQL dentro de `BEGIN ... ROLLBACK`: actualización válida; seis variantes de respaldo inválido rechazadas; CAS obsoleto rechazado. Tras `ROLLBACK`: 2 cuentas, 1 snapshot y revisión 1.
+- **Límite de seguridad:** los checks de estructura NO validan origen legítimo de cartas, resultado probabilístico, canjes ni elegibilidad real de sobres. Se mantiene la RPC restringida a la cuenta de laboratorio y el PR en borrador.
+- No existen credenciales de sesiones A/B aportadas al runner: no se afirma haber probado dos sesiones reales de Supabase.
+
 ## Pendiente antes de considerar main
 1. **Prueba con Supabase real y sesiones autenticadas**: dos navegadores con el mismo origen; recuperación, apertura, reintento y conflicto. Chromium con nube simulada ya pasó, pero no sustituye esta prueba.
 2. **Validación de jugadas en servidor**: la RPC de laboratorio comprueba revisión/formato, pero todavía no que las cartas provengan de sobres legítimos ni que la cuota esté disponible. No habilitar escritura general.
