@@ -2141,6 +2141,8 @@ function openServerPack(){
   hand.forEach(c=>ga('carta_obtenida',{diseno:c.d,rareza:VC[c.v],nueva:c._new?1:0}));
   const afterUnique=uniq();
   GOALS.forEach(g=>{if(beforeUnique<g[0]&&afterUnique>=g[0])ga('hito',{hito:g[1],cartas:afterUnique})});
+  // Los logros son metadatos del álbum; las cantidades siguen siendo del servidor.
+  if(markLogros())save();
   serverPackBusy=false;opening=true;
   setTimeout(()=>opening=false,900);$('env').classList.add('cut');
   const bv=hand.reduce((a,c)=>VORD[c.v]<VORD[a]?c.v:a,'b');
