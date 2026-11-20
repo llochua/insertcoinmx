@@ -74,6 +74,12 @@ Las migraciones no eliminan usuarios, cartas ni respaldos.
 - `qa/registro/index.html` ya no ofrece la carga manual que ahora está prohibida. Se conserva la descarga de respaldo local y el diagnóstico de nube. La migración de colecciones antiguas requiere un procedimiento explícito y validado, no un INSERT desde el navegador.
 - Las pruebas de dos navegadores de GitHub usan **nube simulada**. Aún falta la prueba autenticada real de extremo a extremo antes de ampliar el acceso fuera del laboratorio.
 
+## Corrección de flujo previo a beta · rama de pruebas
+- Se corrigió el desvío del juego que, cuando existe sesión pero el respaldo está pendiente o la cuenta cambió, permitía abrir sobres y canjear desde el motor local. El guard conserva el modo invitado tras verificar que no hay sesión y nunca cambia el inventario durante un bloqueo de nube.
+- La prueba Chromium ahora comprueba de forma específica que un cambio de cuenta y una colección local anterior sin snapshot remoto **no emiten cartas locales**.
+- Se preparó y aplicó solo en laboratorio `import_guest_collection(jsonb)`: una importación única que no reemplaza respaldos con juego previo. **No se conectó al frontend ni se habilitó públicamente** porque aceptar cartas locales del navegador necesita una decisión explícita de migración y revisión adicional; nunca se debe usar como vía pública de acuñación arbitraria.
+- Para beta pública sigue pendiente retirar de forma controlada la allowlist de las RPC de nueva cuenta/sobres/canjes y realizar una comprobación real con usuario autenticado. **No se han ampliado permisos públicos en esta tanda.**
+
 ## Pendiente antes de considerar main
 1. **Prueba con Supabase real y sesiones autenticadas**: dos navegadores con el mismo origen; recuperación, apertura, reintento y conflicto. Chromium con nube simulada ya pasó, pero no sustituye esta prueba.
 2. **Migración de colecciones antiguas**: no existe una ruta aprobada que valide la procedencia de cartas preexistentes. No reabrir INSERT directo ni confiar en respaldos arbitrarios.
