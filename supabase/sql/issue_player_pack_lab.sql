@@ -105,7 +105,7 @@ BEGIN
   IF pg_catalog.jsonb_typeof(v_pk) <> 'array' THEN
     RAISE EXCEPTION 'Historial inválido' USING ERRCODE='22023';
   END IF;
-  v_cycle := pg_catalog.floor(pg_catalog.extract(epoch FROM pg_catalog.now()) / 21600)::bigint;
+  v_cycle := pg_catalog.floor(extract(epoch FROM pg_catalog.now()) / 21600)::bigint;
   v_today := pg_catalog.to_char(pg_catalog.timezone('America/Monterrey', pg_catalog.now()),'YYYY-MM-DD');
   v_last_cycle := COALESCE((v_data->>'freeCycle')::bigint,-1);
   v_welcome := COALESCE((v_data->>'welcomeLeft')::integer,
