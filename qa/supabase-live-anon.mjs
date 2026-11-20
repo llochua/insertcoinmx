@@ -51,6 +51,18 @@ const rpc=await request('/rest/v1/rpc/sync_player_snapshot',{
 assertDeniedResult(rpc,'RPC de sincronización sin sesión');
 console.log('✓ RPC: visitante sin sesión no puede sincronizar');
 
+for(const rpcName of ['issue_player_pack','exchange_duplicate_cards']){
+ const response=await request('/rest/v1/rpc/'+rpcName,{
+  method:'POST',headers:{'content-type':'application/json'},
+  body:JSON.stringify({
+   p_request_id:'11111111-2222-4333-8444-555555555555',
+   p_expected_revision:1
+  })
+ });
+ assertDeniedResult(response,rpcName+' sin sesión');
+}
+console.log('✓ Emisión y canje: anónimos no pueden generar cartas ni sobres');
+
 // No se comprueban aquí las sesiones reales A/B (no hay credenciales de QA
 // conectadas al runner). El aislamiento de cuentas se probó antes con SQL
 // reversible, y la lógica de dos navegadores se probó con nube simulada.
