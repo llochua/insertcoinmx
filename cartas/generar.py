@@ -50,7 +50,8 @@ PASTILLA_POS = (50, 48)
 TINTA = {'comun': (25, 18, 0), 'holo': (19, 17, 17), 'dorada': (25, 18, 3)}
 LETRA = {'comun': 'b', 'holo': 'e', 'dorada': 'r'}
 RAREZAS = ('comun', 'holo', 'dorada')
-JPG_CALIDAD = 92
+WEBP_CALIDAD = 90
+ARTE_WEBP_CALIDAD = 88
 
 
 def cargar_plantillas():
@@ -206,21 +207,22 @@ def carta(T, d, rareza, ventana_arte):
 
 
 def archivo(d, rareza):
-    """id.jpg es la versión original del diseño (así se conserva el progreso guardado); las otras llevan _letra."""
+    """id.webp es la versión original del diseño (así se conserva el progreso guardado); las otras llevan _letra."""
     return d['id'] if rareza == d['version_original'] else d['id'] + '_' + LETRA[rareza]
 
 
 def guardar(img, d, rareza):
     n = archivo(d, rareza)
-    Image.fromarray(img).save(os.path.join(RAIZ, 'c2', n + '.jpg'), quality=JPG_CALIDAD)
+    Image.fromarray(img).save(os.path.join(RAIZ, 'c2', n + '.webp'), quality=WEBP_CALIDAD, method=6)
     Image.fromarray(cv2.resize(img, (480, 670), interpolation=cv2.INTER_AREA)).save(
-        os.path.join(RAIZ, 'c', n + '.jpg'), quality=JPG_CALIDAD)
+        os.path.join(RAIZ, 'c', n + '.webp'), quality=WEBP_CALIDAD, method=6)
 
 
-def guardar_d(arte, cid):
-    p = os.path.join(RAIZ, 'd', cid + '.jpg')
-    if not os.path.exists(p):
-        Image.fromarray(np.clip(acomodar_arte(arte, 640, 800, 0.08), 0, 255).astype(np.uint8)).save(p, quality=90)
+def guardar_d(arte, cid, regenerar=False):
+    """Regenera la imagen de juego al reemplazar el arte; evita el JPG anterior."""
+    p = os.path.join(RAIZ, 'd', cid + '.webp')
+    if regenerar or not os.path.exists(p):
+        Image.fromarray(np.clip(acomodar_arte(arte, 640, 800, 0.08), 0, 255).astype(np.uint8)).save(p, quality=ARTE_WEBP_CALIDAD, method=6)
 
 
 
@@ -361,15 +363,17 @@ def numerar_fulls(cat):
 
 
 def guardar_full(img, ilu_path, fk):
-    Image.fromarray(img).save(os.path.join(RAIZ, 'c2', fk + '.jpg'), quality=JPG_CALIDAD)
+    Image.fromarray(img).save(os.path.join(RAIZ, 'c2', fk + '.webp'), quality=WEBP_CALIDAD, method=6)
     Image.fromarray(cv2.resize(img, (480, 670), interpolation=cv2.INTER_AREA)).save(
-        os.path.join(RAIZ, 'c', fk + '.jpg'), quality=JPG_CALIDAD)
+        os.path.join(RAIZ, 'c', fk + '.webp'), quality=WEBP_CALIDAD, method=6)
     cubrir(Image.open(ilu_path).convert('RGB'), 600, 900, 0.5).save(
-        os.path.join(RAIZ, 'fa', fk[2:] + '.jpg'), quality=90)
+        os.path.join(RAIZ, 'fa', fk[2:] + '.webp'), quality=ARTE_WEBP_CALIDAD, method=6)
 
 
 # ---------------------------------------------------------------- index.html
-def actualizar_web(cat):
+def actualizar_web(cat, actualizados=()):
+    """Sincroniza catálogo, cajas y fondos para los diseños actualizados."""
+    actualizados = set(actualizados)
     p = os.path.join(RAIZ, 'index.html')
     src = open(p, encoding='utf8').read()
     i0 = src.index('const DESIGNS=['); i1 = src.index('];', i0) + 2
@@ -388,16 +392,19 @@ def actualizar_web(cat):
                       (d['id'], bx, ex, n, d['categoria'], d['version_original'], no, extra))
     nuevo = 'const DESIGNS=[\n' + ',\n'.join(lineas) + '];'
     src = src[:i0] + nuevo + src[i1:]
-    # ABOX: caja del contenido de d/<id>.jpg (la usan el Tier y las Retas para encuadrar el arte)
+    # ABOX: caja del contenido de d/<id>.webp (la usan el Tier y las Retas para encuadrar el arte)
     m = re.search(r'const ABOX=(\{.*?\});', src)
     if m:
         abox = json.loads(m.group(1))
         for d in cat:
-            if d['id'] not in abox:
-                a = np.asarray(Image.open(os.path.join(RAIZ, 'd', d['id'] + '.jpg')).convert('RGB')).astype(np.float32)
+            if d['id'] not in abox or d['id'] in actualizados:
+                a = np.asarray(Image.open(os.path.join(RAIZ, 'd', d['id'] + '.webp')).convert('RGB')).astype(np.float32)
                 ys, xs = np.where(np.linalg.norm(a - fondo_de(a), axis=2) > 30)
                 h, w = a.shape[:2]
-                abox[d['id']] = [round(xs.min() / w, 3), round(ys.min() / h, 3), round((xs.max() + 1) / w, 3), round((ys.max() + 1) / h, 3)]
+                # Arte plano o casi uniforme: usar la caja completa, nunca fallar.
+                abox[d['id']] = ([0, 0, 1, 1] if len(xs) == 0 else
+                    [round(xs.min() / w, 3), round(ys.min() / h, 3),
+                     round((xs.max() + 1) / w, 3), round((ys.max() + 1) / h, 3)])
         src = src[:m.start(1)] + json.dumps(abox, separators=(',', ':')) + src[m.end(1):]
     # Nuevos diseños: publicar también el color real del fondo para el escenario
     # inmersivo. Respeta las paletas de RBG e ICOL ya ajustadas manualmente y
@@ -409,9 +416,11 @@ def actualizar_web(cat):
         colores_previos = json.loads(m_icol.group(1)) if m_icol else {}
         for d in cat:
             ident = d['id']
-            if ident in viejas or ident in fondos or ident in colores_previos:
+            # Diseños existentes: al reemplazar la imagen, recalcular la paleta;
+            # los demás conservan los ajustes curatoriales previamente aprobados.
+            if ident not in actualizados and (ident in viejas or ident in fondos or ident in colores_previos):
                 continue
-            path_arte = os.path.join(RAIZ, 'd', ident + '.jpg')
+            path_arte = os.path.join(RAIZ, 'd', ident + '.webp')
             if not os.path.isfile(path_arte):
                 continue
             arte = np.asarray(Image.open(path_arte).convert('RGB')).astype(np.float32)
@@ -429,7 +438,7 @@ def muestra(cat):
     for k, d in enumerate(ids):
         for j, r in enumerate(RAREZAS):
             n = k * 3 + j
-            im = Image.open(os.path.join(RAIZ, 'c', archivo(d, r) + '.jpg')).resize((W, H))
+            im = Image.open(os.path.join(RAIZ, 'c', archivo(d, r) + '.webp')).resize((W, H))
             sh.paste(im, ((n % 9) * W, (n // 9) * H))
     sh.save(os.path.join(C, 'muestra.jpg'), quality=82)
 
@@ -440,9 +449,16 @@ def main():
     ap.add_argument('--sin-web', action='store_true')
     ap.add_argument('--muestra', action='store_true')
     ap.add_argument('--fulls', action='store_true', help='solo las Full')
+    ap.add_argument('--regenerar-arte', action='store_true',
+                    help='recalcula d/, ABOX y el fondo de los IDs indicados en --solo')
     a = ap.parse_args()
     cat = json.load(open(os.path.join(C, 'catalogo.json'), encoding='utf8'))
     T = cargar_plantillas()
+    desconocidos = set(a.solo or []) - {d['id'] for d in cat}
+    if desconocidos:
+        ap.error('IDs ausentes del catálogo: ' + ', '.join(sorted(desconocidos)))
+    if a.regenerar_arte and not a.solo:
+        ap.error('--regenerar-arte necesita --solo con IDs explícitos')
     sel = [d for d in cat if not a.solo or d['id'] in a.solo]
     x0, y0, x1, y1 = VENTANA
     nuevos = numerar_fulls(cat)
@@ -464,10 +480,10 @@ def main():
         w = acomodar_arte(arte, x1 - x0, y1 - y0, MARGEN_ARTE)
         for r in RAREZAS:
             guardar(carta(T, d, r, w), d, r)
-        guardar_d(arte, d['id'])
+        guardar_d(arte, d['id'], regenerar=a.regenerar_arte)
         print('ok', d['id'])
     if not a.sin_web:
-        actualizar_web(cat)
+        actualizar_web(cat, actualizados=a.solo if a.regenerar_arte else ())
     if a.muestra:
         muestra(cat)
 

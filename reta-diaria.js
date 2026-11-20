@@ -19,8 +19,8 @@ const $=id=>document.getElementById(id);
 const isEmbedded=new URLSearchParams(location.search).get('embedded')==='1';
 if(isEmbedded)document.documentElement.classList.add('embedded');
 let dailyDay='',dailyState=null;
-const artSrc=id=>DESIGNS[id]?.art||'d/'+id+'.jpg';
-const ambientSrc=id=>DESIGNS[id]?.ambient||'c2/'+id+'.jpg';
+const artSrc=id=>DESIGNS[id]?.art||'d/'+id+'.webp';
+const ambientSrc=id=>DESIGNS[id]?.ambient||'c2/'+id+'.webp';
 const htmlEscape=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const tellParent=data=>{if(isEmbedded)window.parent.postMessage(data,location.origin)};
 const prefersReduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -250,8 +250,8 @@ function hydrate(config){
   DESIGNS[d.id]={
    name:String(d.name||d.id).slice(0,90),
    base:/^#[0-9a-f]{6}$/i.test(d.base)?d.base:'#1b2148',
-   art:String(d.art||'d/'+d.id+'.jpg'),
-   ambient:String(d.ambient||d.art||'d/'+d.id+'.jpg')
+   art:String(d.art||'d/'+d.id+'.webp'),
+   ambient:String(d.ambient||d.art||'d/'+d.id+'.webp')
   };
  }
  const state=config.state;

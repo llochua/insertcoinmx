@@ -49,9 +49,9 @@ jobs:
           assert new.issubset({d['id'] for d in cat})
           for name in new:
               for suffix in ('','_e','_r'):
-                  assert (Path('c')/f'{name}{suffix}.jpg').exists(),name+suffix
-                  assert (Path('c2')/f'{name}{suffix}.jpg').exists(),name+suffix
-              assert (Path('d')/f'{name}.jpg').exists(),name
+                  assert (Path('c')/f'{name}{suffix}.webp').exists(),name+suffix
+                  assert (Path('c2')/f'{name}{suffix}.webp').exists(),name+suffix
+              assert (Path('d')/f'{name}.webp').exists(),name
           assert sum(d['tipo']=='Álbum' for d in cat)==104
           assert sum(d['tipo']!='Álbum' for d in cat)==22
           print('OK: 13 diseños x tres rarezas, 104 álbum y 22 bonus')

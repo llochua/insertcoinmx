@@ -1,0 +1,56 @@
+name: Migrar derivados a WebP (rama de pruebas)
+
+on:
+  push:
+    branches: [optimizacion-webp-20261120]
+    paths:
+      - 'cartas/migrar_webp.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Obtener repositorio
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar dependencias para QA
+        run: python -m pip install pillow numpy opencv-python-headless
+      - name: Convertir y medir
+        run: python cartas/migrar_webp.py
+      - name: Verificar sintaxis y datos
+        run: |
+          python -m py_compile cartas/generar.py cartas/actualizar.py cartas/qa.py cartas/migrar_webp.py
+          node --check reta-diaria.js
+          node content/validate.mjs
+      - name: Verificar todas las cartas
+        run: python cartas/qa.py --all
+      - name: Adjuntar comparación de calidad
+        uses: actions/upload-artifact@v4
+        with:
+          name: comparacion-webp
+          path: |
+            cartas/revision-webp.jpg
+            cartas/reporte-webp.md
+          if-no-files-found: error
+          retention-days: 14
+      - name: Guardar resultados en rama de pruebas
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A c c2 d fa
+          if [ -f cartas/arte-manifest.json ]; then git add cartas/arte-manifest.json; fi
+          git add -A cartas/reporte-webp.md cartas/revision-webp.jpg
+          if ! git diff --cached --quiet; then
+            git commit -m "perf: convertir derivados a WebP tras QA"
+            git push
+          fi
