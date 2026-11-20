@@ -2840,6 +2840,42 @@ function applyImport(v){clearTimeout(save.t);syncIn();
   return {ok:false,err:ok?'No se pudo guardar el respaldo. Tu progreso quedó exactamente como estaba.':'No se pudo guardar el respaldo. Tu progreso sigue en esta pestaña y en la copia de seguridad; no la cierres y vuelve a intentarlo.'}}
  for(const k of Object.keys(S))delete S[k];Object.assign(S,N);lastRaw=mainStr;MINE=[];saveFailed=false;NOWRITE=false;setWarn(false);
  save.t=setTimeout(()=>STORE.put(),600);if(cloudSync)cloudSync.changed();return {ok:true}}
+/* Restauración fiel del snapshot de cuenta.
+   El importador manual migra valores desconocidos a .ext: esa transformación
+   no sirve para sincronizar, pues cambiaría el estado de sobres (freeCycle).
+   Se valida, protege el texto previo y se revierte si el resultado difiere. */
+function applyCloudRestore(backup,sameProgress){
+ if(saveFailed||NOWRITE||opening)return {ok:false};
+ syncIn();
+ const text=JSON.stringify(backup);
+ const valid=validateBackup(text);
+ if(!valid.ok||!isObj(backup.data))return {ok:false};
+ const prevMain=LS.get(KEY),prevExt=LS.get(KEY_EXT),prevS=JSON.parse(JSON.stringify(S));
+ const next=JSON.parse(JSON.stringify(backup.data));
+ normalize(next);
+ const mainStr=JSON.stringify(next),extStr=backup.ext?JSON.stringify(backup.ext):null;
+ try{
+  localStorage.setItem(KEY_BAK,JSON.stringify({at:new Date().toISOString(),
+   main:prevMain,ext:prevExt,reason:'cloud-sync'}));
+  if(extStr===null)localStorage.removeItem(KEY_EXT);
+  else localStorage.setItem(KEY_EXT,extStr);
+  localStorage.setItem(KEY,mainStr);
+  if(localStorage.getItem(KEY)!==mainStr||localStorage.getItem(KEY_EXT)!==extStr)
+   throw Error('No se verificó la restauración');
+  const applied={app:'insertcoinmx-album',format:FORMAT,data:next};
+  if(backup.ext)applied.ext=backup.ext;
+  if(!sameProgress(applied,backup))throw Error('Restauración no idéntica');
+ }catch(_){
+  restoreKeys(prevMain,prevExt);
+  for(const k of Object.keys(S))delete S[k];
+  Object.assign(S,prevS);lastRaw=LS.get(KEY);
+  return {ok:false};
+ }
+ for(const k of Object.keys(S))delete S[k];
+ Object.assign(S,next);lastRaw=mainStr;MINE=[];saveFailed=false;
+ setWarn(false);refresh();
+ return {ok:true};
+}
 async function saveFile(name,text){const blob=new Blob([text],{type:'application/json'});
  if(STORE.dl){try{await STORE.dl.save({filename:name,data:blob});return true}catch(e){if(e&&e.code==='declined')return false}}
  try{const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}catch(e){return false}}
@@ -2943,7 +2979,7 @@ claimPend();initSound();go('home');STORE.init();
 if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
 /* Integración segura: nunca reemplaza un progreso distinto sin revisión.
    Los visitantes sin sesión continúan jugando y guardando localmente. */
-import('./content/cloud-sync.mjs').then(({startCloudSync})=>startCloudSync({
+import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCloudSync({
  readLocal:()=>{
   // Nunca publicar un sobre que el navegador no logró guardar.
   if(saveFailed||NOWRITE)throw Error('Hay progreso local pendiente de proteger');
@@ -2952,10 +2988,7 @@ import('./content/cloud-sync.mjs').then(({startCloudSync})=>startCloudSync({
   if(saveFailed||NOWRITE)throw Error('Hay progreso local pendiente de proteger');
   return JSON.parse(buildBackup());
  },
- restoreLocal:backup=>{
-  const valid=validateBackup(JSON.stringify(backup));
-  return valid.ok?applyImport(valid):{ok:false};
- },
+ restoreLocal:backup=>applyCloudRestore(backup,sameProgress),
  onStatus:(code,message)=>{
   const element=$('cloudState');
   if(element){element.dataset.sync=code;element.textContent=message}
