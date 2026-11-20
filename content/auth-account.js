@@ -24,8 +24,18 @@ function showAuthUser(user) {
   const welcome = $auth('profileWelcome');
   const panel = $auth('profileAccountPanel');
   const homeStatus = $auth('homePlayerStatus');
-  if (welcome) welcome.hidden = active;
-  if (panel) panel.hidden = active ? false : panel.hidden;
+  const profile = $auth('profile');
+  const back = $auth('profileAccountBack');
+  if (active) {
+    profile?.classList.remove('account-focus');
+    if (welcome) welcome.hidden = true;
+    if (panel) panel.hidden = false;
+    if (back) back.hidden = true;
+  } else {
+    if (welcome) welcome.hidden = Boolean(profile?.classList.contains('account-focus'));
+    if (panel && !profile?.classList.contains('account-focus')) panel.hidden = true;
+    if (back) back.hidden = false;
+  }
   if (homeStatus) homeStatus.textContent = active
     ? 'Cuenta conectada · revisa tu respaldo'
     : 'Tu colección, tu progreso';
