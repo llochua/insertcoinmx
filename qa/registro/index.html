@@ -76,20 +76,20 @@ a{color:var(--yellow)}
  <button type="button" class="action secondary" id="inspectProgress">REVISAR MI COLECCIÓN LOCAL</button>
  <p id="localSummary" class="subtle" role="status" aria-live="polite">Este diagnóstico solo lee el progreso del navegador. No guarda ni envía cartas a la nube.</p>
  <div id="backupPanel" style="margin-top:24px;padding-top:17px;border-top:1px solid rgba(255,255,255,.16)">
-  <p class="subtle" style="margin:0 0 6px;color:#ffd400;font-weight:800">RESPALDO DE PRUEBA · SOLO PRIMERA VEZ</p>
-  <p class="subtle">Primero descargaremos un archivo con tu progreso completo. Después, si lo autorizas, guardaremos una copia en tu cuenta de Supabase. Ninguna carta se borra o reemplaza.</p>
-  <button type="button" class="action secondary" id="backupDownload">1 · DESCARGAR MI RESPALDO</button>
-  <label id="backupConsentLabel" style="display:flex;align-items:flex-start;gap:10px;margin:16px 0 12px">
+  <p class="subtle" style="margin:0 0 6px;color:#ffd400;font-weight:800">RESPALDO LOCAL · DESCARGA SEGURA</p>
+  <p class="subtle">Puedes descargar una copia de tu progreso actual. Para proteger las colecciones, la carga manual de cartas a Supabase está suspendida mientras se valida la migración.</p>
+  <button type="button" class="action secondary" id="backupDownload">DESCARGAR MI RESPALDO</button>
+  <label id="backupConsentLabel" hidden style="display:none;align-items:flex-start;gap:10px;margin:16px 0 12px">
     <input id="backupConsent" type="checkbox" disabled style="width:19px;height:19px;flex:0 0 19px;margin:3px 0">
     <span>Confirmo que descargué mi respaldo y autorizo guardar esta copia en mi cuenta.</span>
   </label>
-  <button type="button" class="action" id="backupUpload" disabled>2 · GUARDAR EN SUPABASE</button>
-  <p id="backupStatus" role="status" aria-live="polite" class="subtle">No se ha subido ninguna carta desde esta página.</p>
+  <button type="button" class="action" id="backupUpload" disabled>CARGA MANUAL SUSPENDIDA</button>
+  <p id="backupStatus" role="status" aria-live="polite" class="subtle">Tu colección local permanece intacta.</p>
  </div>
  <button type="button" class="action secondary" id="logout">CERRAR SESIÓN DE PRUEBA</button>
 </section>
 <p id="message" role="status" aria-live="polite">Conectando con Supabase…</p>
-<p class="foot"><strong>Solo pruebas.</strong> Esta página no abre sobres ni modifica tu colección. Tu cuenta es real. El progreso solo se guarda en la nube cuando autorizas el primer respaldo; todavía no hay sincronización entre dispositivos.</p>
+<p class="foot"><strong>Solo pruebas.</strong> Esta página no abre sobres ni modifica tu colección. Tu cuenta es real. La descarga de respaldo sigue disponible. La carga manual permanece suspendida; la sincronización protegida se prueba en el juego.</p>
 </main>
 <script type="module">
 const URL_SUPABASE = "https://ynugqxbtszhsupadqdkz.supabase.co";
@@ -170,7 +170,7 @@ function markBackupSaved(){
  el("backupUpload").textContent="✓ RESPALDO GUARDADO";
  el("backupUpload").dataset.saved="true";
  el("backupUpload").disabled=true;
- el("backupDownload").disabled=true;
+ el("backupDownload").disabled=false;
  el("backupConsentLabel").hidden=true;
 }
 function resetBackupUi(){
@@ -178,8 +178,8 @@ function resetBackupUi(){
  el("backupUpload").textContent="2 · GUARDAR EN SUPABASE";
  delete el("backupUpload").dataset.saved;
  el("backupDownload").disabled=false;
- el("backupConsentLabel").hidden=false;
- backupMessage("No se ha subido ninguna carta desde esta página.");
+ el("backupConsentLabel").hidden=true;
+ backupMessage("La carga manual está suspendida; puedes descargar tu copia local.");
 }
 async function refreshBackupSavedState(userId){
  try{
@@ -300,58 +300,20 @@ el("downloadCloud").addEventListener("click",async()=>{
 
 el("backupDownload").addEventListener("click",async()=>{
  if(backupBusy)return;
- backupBusy=true;clearPreparedBackup();el("backupDownload").disabled=true;
- backupMessage("Comprobando cuenta y progreso…");
+ backupBusy=true;el("backupDownload").disabled=true;
+ backupMessage("Preparando tu copia local…");
  try{
-  const user=await getBackupUser();
-  if(await existingSnapshot(user.id)){
-    markBackupSaved();
-    backupMessage("Esta cuenta ya tiene un respaldo en la nube. No se reemplazará ni se sumará nada.","success");return;
-  }
+  await getBackupUser();
   const candidate=prepareBackup();
   downloadBackup(candidate.exportText);
-  pendingBackup={...candidate,userId:user.id};
-  el("backupConsent").disabled=false;
-  backupMessage("Se preparó el archivo con "+candidate.count+" variantes. Confirma que quedó guardado en tu dispositivo antes de continuar.");
- }catch(e){backupMessage("No se pudo preparar el respaldo. No se cambió ningún dato local. "+(e?.code==="42501"?"Revisa permisos de lectura.":""),"error");}
- finally{backupBusy=false;if(el("backupUpload").dataset.saved!=="true")el("backupDownload").disabled=false}
-});
-el("backupConsent").addEventListener("change",()=>{
- el("backupUpload").disabled=!el("backupConsent").checked||!pendingBackup||backupBusy;
-});
-el("backupUpload").addEventListener("click",async()=>{
- if(backupBusy||!pendingBackup||!el("backupConsent").checked)return;
- backupBusy=true;el("backupUpload").disabled=true;el("backupDownload").disabled=true;
- backupMessage("Verificando que el respaldo sigue intacto…");
- try{
-  const user=await getBackupUser();
-  if(user.id!==pendingBackup.userId)throw Error("La cuenta cambió");
-  if(localStorage.getItem(backupMainKey)!==pendingBackup.raw ||
-     localStorage.getItem(backupExtKey)!==pendingBackup.rawExt)throw Error("El progreso cambió");
-  if(await existingSnapshot(user.id)){
-    markBackupSaved();backupMessage("Ya existe un respaldo de esta cuenta. No se reemplazó ningún dato.","success");return;
-  }
-  // INSERT, nunca UPSERT ni UPDATE. La PK y RLS impiden sustituir otro respaldo.
-  const {error}=await client.from("player_snapshots").insert({
-    user_id:user.id,game_format:2,revision:1,state:pendingBackup.state
-  });
-  if(error){
-    if(error.code==="23505"){
-      markBackupSaved();backupMessage("Esta cuenta ya tiene un respaldo. No se reemplazó.","success");return;
-    }
-    throw error;
-  }
-  const saved=await existingSnapshot(user.id);
-  if(!saved || saved.game_format!==2 || saved.revision!==1 ||
-     stableJSON(saved.state)!==stableJSON(pendingBackup.state))throw Error("La lectura de verificación no coincide");
-  markBackupSaved();
-  backupMessage("¡Respaldo confirmado en Supabase! Tu colección local permanece intacta.","success");
+  backupMessage("Copia local preparada con "+candidate.count+" variantes. No se subió ni reemplazó ninguna carta.","success");
  }catch(_error){
-  clearPreparedBackup();
-  backupMessage("No pudimos verificar el respaldo. Tu colección local no cambió. Antes de repetir, revisaremos si quedó guardado en la cuenta.","error");
- }finally{backupBusy=false;if(el("backupUpload").dataset.saved!=="true")el("backupDownload").disabled=false}
+  backupMessage("No se pudo preparar la descarga. Tu colección permanece intacta.","error");
+ }finally{
+  backupBusy=false;
+  el("backupDownload").disabled=false;
+ }
 });
-
 el("tabSignup").addEventListener("click",()=>setMode("signup"));
 el("tabLogin").addEventListener("click",()=>setMode("login"));
 el("authForm").addEventListener("submit",async e=>{
