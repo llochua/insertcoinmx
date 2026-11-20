@@ -117,5 +117,18 @@ window.ICMX_CARD_TEXTS=Object.freeze({
   "oogie": {"habilidad":"Tira los dados y se queda con la casa.","frase":"¿A quién vas a llamar?"},
   "queenpower": {"habilidad":"Rompe el orden con un solo batazo.","frase":"Las malas también podemos."},
   "robogodin": {"habilidad":"Cumple su turno sin pedir hora de comida.","frase":"Mitad hombre, mitad máquina, todo godín."},
-  "tokyo3": {"habilidad":"Se activa aunque nadie lo pilotee.","frase":"Súbete al Eva, Shinji."}
+  "tokyo3": {"habilidad":"Se activa aunque nadie lo pilotee.","frase":"Súbete al Eva, Shinji."},
+  "aku": {"habilidad":"Te protege aunque rompas todas las cajas.","frase":"Ooga booga con licencia de Sony."},
+  "fotonicos": {"habilidad":"Dispara rayos desde los ojos sin pedir permiso.","frase":"Pechos fuera; rayos fotónicos."},
+  "jaws": {"habilidad":"Salta del anuncio y te muerde la cara.","frase":"Lo predijo Hill Valley."},
+  "patchman": {"habilidad":"Encuentra atajos cuando el nivel ya no debía existir.","frase":"+5 parches y todavía jala."},
+  "rastreador": {"habilidad":"Detecta rivales aunque anden escondidos.","frase":"¡Su nivel de pelea es de...!"},
+  "skellington": {"habilidad":"Abre portales festivos fuera de temporada.","frase":"¿Sandy Claws eres tú?"},
+  "universe": {"habilidad":"Te vuelve invencible por un ratito.","frase":"No, no la sueltes."},
+  "clarita": {"habilidad":"Endulza el universo con maldad congelada.","frase":"Se ve tierna... hasta que te borra."},
+  "ko": {"habilidad":"Cierra el round sin recibir un golpe.","frase":"Perfect... y sin rematch."},
+  "peaceamongus": {"habilidad":"Firma la paz aunque llegues del espacio.","frase":"La paz se entiende de muchas formas."},
+  "pegasus": {"habilidad":"Te eleva cuando la batalla ya tocó fondo.","frase":"Dame tu fuerza, Pegaso."},
+  "rugal": {"habilidad":"Roba la reta sin usar continues.","frase":"Los ganadores no usan a Rugal."},
+  "yoshis": {"habilidad":"Se traga el peligro y sigue adelante.","frase":"La lengua también es estrategia."}
 });
