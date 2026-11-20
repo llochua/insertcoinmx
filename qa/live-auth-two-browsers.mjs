@@ -65,18 +65,39 @@ async function openDevice(){
  });
  const page=await context.newPage();
  const errors=[];
+ const authResponses=[];
  page.on('pageerror',err=>errors.push(err.message));
+ page.on('response',response=>{
+  if(response.url().includes('.supabase.co/auth/v1/token'))
+   authResponses.push(response.status());
+ });
+ page.on('requestfailed',request=>{
+  if(request.url().includes('.supabase.co/auth/v1/token'))
+   authResponses.push('network:'+request.failure()?.errorText?.slice(0,100));
+ });
  await page.goto(origin+'/qa/registro/',{waitUntil:'domcontentloaded'});
  await until(async()=>((await page.locator('#message').innerText()).includes('Listo para registrar una cuenta de prueba.')),'formulario autenticado disponible');
  await page.locator('#tabLogin').click();
  await page.locator('#email').fill(EMAIL);
  await page.locator('#password').fill(PASSWORD);
  await page.locator('#submit').click();
- await until(async()=>{
-  if(await page.locator('#message').getAttribute('data-tone')==='error')
-   throw Error('Auth rechazó el inicio de sesión de laboratorio: '+await page.locator('#message').innerText());
-  return await page.locator('#signed').getAttribute('aria-hidden')==='false';
- },'sesión real confirmada');
+ try{
+  await until(async()=>{
+   if(await page.locator('#message').getAttribute('data-tone')==='error')
+    throw Error('Auth rechazó el inicio de sesión de laboratorio: '+await page.locator('#message').innerText());
+   return await page.locator('#signed').getAttribute('aria-hidden')==='false';
+  },'sesión real confirmada');
+ }catch(error){
+  const snapshot=await page.evaluate(()=>({
+   state:document.getElementById('message')?.textContent?.slice(0,160),
+   tone:document.getElementById('message')?.dataset?.tone,
+   session:document.getElementById('signed')?.getAttribute('aria-hidden'),
+   submitDisabled:document.getElementById('submit')?.disabled
+  }));
+  throw Error(error.message+' | Diagnóstico sin datos personales: '+JSON.stringify({
+   ...snapshot,authHttpStatuses:authResponses,jsErrorCount:errors.length
+  }));
+ }
  assert.equal((await page.locator('#signedEmail').innerText()).toLowerCase(),EMAIL.toLowerCase());
  await page.goto(origin+'/index.html',{waitUntil:'domcontentloaded'});
  await until(async()=>await page.locator('#cloudState').getAttribute('data-sync')==='synced',
