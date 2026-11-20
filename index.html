@@ -1654,7 +1654,7 @@ const baseHtml=c=>{
 };
 
 
-const IMGV='20261120a'; // versión de imágenes de cartas: súbela cuando se reemplace un arte (Arte Especial, diseño) para que los navegadores bajen la nueva
+const IMGV='20261120b'; // versión de imágenes de cartas: súbela cuando se reemplace un arte (Arte Especial, diseño) para que los navegadores bajen la nueva
 const VL=['b','e','r','f'],VN={b:'Base',e:'Holo',r:'Dorada',f:'Arte Especial'},VSHORT={b:'Base',e:'Holo',r:'Dorada',f:'Especial'},VC={b:'comun',e:'holo',r:'dorada',f:'full'},OLDV={comun:'b',holo:'e',dorada:'r'};
 const CARDS=[],DB={},ALIAS={},CB={};
 for(const d of DESIGNS){d.fk=d.f?(d.fk||'F_'+d.id):null;DB[d.id]=d;for(const a of d.al||[])ALIAS[a]=d.id;
