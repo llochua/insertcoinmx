@@ -169,5 +169,5 @@ lo renueva automáticamente a partir de hashes SHA-256 de las fuentes; no hay qu
 
 ### Criterio visual obligatorio
 
-Las variantes Holo y Dorada usan **la misma imagen como ambiente desenfocado** y conservan el arte sin recortes con un fundido lateral. Evitar fondos planos que revelen un rectángulo, colores fijados a mano por carta, `cover` en el arte principal o cambios de CSS por ID. Cierres y controles reutilizan el botón circular estándar; no se ajustan individualmente.
+Las variantes **Base, Holo y Dorada extienden el fondo plano real del JPG al escenario completo** (mismo `--bg` compartido). La ilustración se muestra completa y sin deformación; no se crean duplicados desenfocados, halos, imágenes ampliadas ni estilos por ID. El color se recalcula desde los bordes de la ilustración cargada y se actualiza al reemplazar el diseño. Para Full se conserva el tratamiento a sangre aprobado. El control de calidad rechaza la reintroducción del fondo desenfocado. Cierres y controles reutilizan el botón circular estándar.
 
