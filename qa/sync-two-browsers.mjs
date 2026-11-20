@@ -41,6 +41,25 @@ const server=createServer(async(req,res)=>{
    const row=cloud.get(uri.searchParams.get('uid'))??null;
    return json(res,{data:row?clone(row):null,error:null});
   }
+  if(uri.pathname==='/__qa__/initialize'){
+   let body='';
+   for await(const chunk of req)body+=chunk;
+   const {uid}=JSON.parse(body);
+   if(!uid)return json(res,{data:null,error:{message:'No session'}},401);
+   let row=cloud.get(uid);
+   let status='existing';
+   if(!row){
+    status='created';
+    const state=snapshot({
+     have:{},rate:{},ini:'',seen:0,last:'',extra:0,test:0,champ:'',
+     sv:2,mv:2,rev:0,fg:0,pk:[],welcomeLeft:5,
+     freeDay:'',freeUsed:0,freeCycle:0
+    });
+    row={user_id:uid,game_format:2,revision:1,state};
+    cloud.set(uid,row);
+   }
+   return json(res,{data:{status,state:clone(row.state),revision:row.revision},error:null});
+  }
   if(uri.pathname==='/__qa__/exchange'){
    let body='';
    for await(const chunk of req)body+=chunk;
@@ -141,8 +160,8 @@ export function createClient(){
    };
   },
   rpc(name,args){
-   if(!['sync_player_snapshot','issue_player_pack','exchange_duplicate_cards'].includes(name))throw Error('Unexpected RPC');
-   return fetchJSON(name==='issue_player_pack'?'/__qa__/pack':name==='exchange_duplicate_cards'?'/__qa__/exchange':'/__qa__/sync',{method:'POST',
+   if(!['sync_player_snapshot','issue_player_pack','exchange_duplicate_cards','ensure_player_snapshot'].includes(name))throw Error('Unexpected RPC');
+   return fetchJSON(name==='ensure_player_snapshot'?'/__qa__/initialize':name==='issue_player_pack'?'/__qa__/pack':name==='exchange_duplicate_cards'?'/__qa__/exchange':'/__qa__/sync',{method:'POST',
     headers:{'content-type':'application/json'},
     body:JSON.stringify({uid:uid(),args})});
   }
@@ -281,12 +300,26 @@ async function run(){
   assert.equal(exchanges.size,1);
   console.log('✓ Canje de 5 duplicadas: sobre extra y revisión única, sincronizado en A');
 
+  // Una cuenta nueva sin cartas se inicializa una sola vez en servidor.
   const C=await device(OTHER,null);
+  await until(()=>cloud.has(OTHER),'la segunda cuenta debe inicializarse');
+  assert.deepEqual(cloud.get(OTHER).state.data.have,{});
+  assert.equal(cloud.get(OTHER).state.data.welcomeLeft,5);
+  assert.equal(cloud.get(OTHER).revision,1);
   assert.equal((await read(C.page))?.have?.abuket_b,undefined);
-  assert.equal(cloud.get(OTHER),undefined);
-  console.log('✓ Otro usuario no recibe cartas ajenas');
+  await check(C.page);
+  assert.equal(cloud.get(OTHER).revision,1,'repetir check no debe reiniciar la cuenta');
+  console.log('✓ Alta de segunda cuenta vacía, idempotente y aislada');
 
-  for(const [name,entry] of [['A',A],['B',B],['C',C]])
+  // La existencia de cartas locales sin nube bloquea la migración automática.
+  const LEGACY='qa-sync-legacy-03';
+  const D=await device(LEGACY,{...baseState(),have:{abuket_b:4}});
+  assert.equal(cloud.has(LEGACY),false,'una colección local no debe crear respaldo remoto');
+  assert.equal((await read(D.page)).have.abuket_b,4);
+  assert.equal(await D.page.locator('#cloudState').getAttribute('data-sync'),'pending');
+  console.log('✓ Colección local previa permanece intacta, sin migración automática');
+
+  for(const [name,entry] of [['A',A],['B',B],['C',C],['D',D]])
    assert.deepEqual(entry.exceptions,[],name+' tuvo errores JavaScript');
   result={passed:true,revision:cloud.get(USER).revision};
  }finally{
