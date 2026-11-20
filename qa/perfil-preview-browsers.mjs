@@ -45,7 +45,7 @@ try{
   assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true);
   assert.equal(await page.locator('#profileAuthSend').isDisabled(),true,
     'preview cannot create accounts by mistake');
-  const lab=page.locator('a[href="/qa/registro/"]');
+  const lab=page.locator('#profile .profile-account a[href="/qa/registro/"]');
   assert.equal(await lab.isVisible(),true);
   await page.locator('#profile [data-home]').click();
   await page.locator('#home .profile-entry').click();
