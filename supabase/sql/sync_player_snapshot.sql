@@ -23,8 +23,8 @@ BEGIN
     RAISE EXCEPTION 'Revisión inválida' USING ERRCODE='22023';
   END IF;
   IF p_state IS NULL OR pg_catalog.jsonb_typeof(p_state) <> 'object'
-     OR p_state->>'app' <> 'insertcoinmx-album'
-     OR p_state->>'format' <> '2'
+     OR p_state->>'app' IS DISTINCT FROM 'insertcoinmx-album'
+     OR p_state->>'format' IS DISTINCT FROM '2'
      OR pg_catalog.jsonb_typeof(p_state->'data') <> 'object'
      OR pg_catalog.jsonb_typeof(p_state->'data'->'have') <> 'object'
      OR pg_catalog.jsonb_typeof(p_state->'data'->'rate') <> 'object'
