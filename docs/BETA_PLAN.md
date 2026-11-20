@@ -19,7 +19,7 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 
 **Cierre:** CI de validación básica, navegador simulado y humo anónimo en verde en el último commit. Revisión de seguridad antes de habilitar público.
 
-## Fase 2 · Dos sesiones reales de Supabase — preparada, pendiente de ejecutar
+## Fase 2 · Dos sesiones reales de Supabase — aprobada (solo lectura)
 
 **Resultado esperado:** una cuenta de laboratorio con correo confirmado entra en dos navegadores independientes, ambos ven la misma colección, sin sobres inventados ni mezcla con otra cuenta.
 
@@ -27,9 +27,9 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 - **Por defecto no modifica inventario.** Requiere credenciales de **cuenta exclusiva de laboratorio** guardadas como secretos `ICMX_QA_EMAIL` y `ICMX_QA_PASSWORD` en GitHub.
 - En la rama, la prueba autenticada de PR **se marca pendiente/saltada** hasta que la variable de repositorio `ICMX_QA_AUTH_TEST_READY=true` habilite su ejecución. Sin esa variable no debe contarse como prueba real superada.
 - Emisión opcional de **un sobre de prueba**, solo con autorización separada del operador, flag manual y la marca `ICMX_QA_CONFIRM_TEST_ACCOUNT=1`. No utilizar cuentas personales.
-- Sin credenciales no afirmar que esta prueba autenticada pasó; no crear usuarios ni cambiar contraseñas para saltarla.
+- **Ejecutado y aprobado:** run #44770831798, nuevo intento del 20 noviembre 2026. Dos sesiones reales de Supabase en navegadores aislados recuperaron la misma colección; cierre de sesión y reingreso mantuvieron las cartas. No se abrió ningún sobre real.
 
-**Cierre:** informe de ejecución exitoso con Auth real, y comprobación de recuperación desde un segundo navegador.
+**Cierre:** completado con Auth real en dos navegadores, recuperación tras reingreso y sin mutaciones en inventario. La emisión de un sobre real y su recuperación E2E aún no se probaron en esta sesión (solo se validó su RPC de modo reversible y la emisión con nube simulada).
 
 ## Fase 3 · Preparar acceso general sin tocar colecciones — pendiente
 
@@ -66,12 +66,15 @@ Estado: **preparación técnica, no publicada**. Documento de trabajo de la rama
 ## Lectura rápida del estado
 
 - **Terminado o listo para probar:** mecanismo de guardado, emisión, canjes, protección, reconciliación de catálogo, prueba con nube simulada.
-- **Bloqueo técnico real:** prueba autenticada con cuenta de laboratorio; permisos generales todavía restringidos.
+- **Bloqueo técnico real:** permisos generales todavía restringidos y revisión de habilitación pública pendiente; validación de emisión E2E con Supabase real no destructiva pendiente de diseñar con una cuenta de QA desechable.
 - **Fuera del trabajo técnico hasta decisión:** fecha de lanzamiento, reglas finales de colección, reinicio de jugadores anteriores, aprobación visual/publicación.
 
 ## Resultado de prueba autenticada real · 20 noviembre 2026
 
-- Se ejecutó GitHub Actions contra Supabase real con credenciales privadas ya configuradas; el formulario aceptó el formato del correo.
-- Supabase Auth respondió **HTTP 400 · credenciales inválidas** al intentar iniciar sesión en la cuenta de laboratorio. No hubo sesión autenticada; por ello la recuperación real de dos navegadores **permanece pendiente**.
-- CI con nube simulada y verificación anónima pasaron. No se abrieron sobres reales ni se alteró inventario.
-- Próxima acción mínima: verificar que `ICMX_QA_PASSWORD` sea la contraseña de **esa cuenta de Supabase Auth**, no la de GitHub. No hacer más reintentos automáticos hasta actualizar esa credencial; no restablecer contraseña ni modificar cuentas sin autorización.
+- **Resultado final: APROBADA.** GitHub Actions run [#44770831798](https://github.com/llochua/insertcoinmx/actions/runs/44770831798) (reintento tras actualizar credenciales privadas).
+- Inicio de sesión real en **dos navegadores aislados** y recuperación de la misma colección.
+- Cerrar sesión y volver a iniciar sesión conservó el inventario.
+- La ejecución fue **solo lectura**: no abrió sobres ni alteró progreso, cuentas ni datos.
+- La comprobación de visitante anónimo y las pruebas Chromium con nube simulada también pasaron.
+- Esto **no autoriza** a retirar los límites de laboratorio ni a publicar `main`. La fase siguiente es revisar seguridad y preparar la activación pública sin ejecutarla.
+
