@@ -2944,7 +2944,14 @@ if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
 /* Integración segura: nunca reemplaza un progreso distinto sin revisión.
    Los visitantes sin sesión continúan jugando y guardando localmente. */
 import('./content/cloud-sync.mjs').then(({startCloudSync})=>startCloudSync({
- readLocal:()=>JSON.parse(buildBackup()),
+ readLocal:()=>{
+  // Nunca publicar un sobre que el navegador no logró guardar.
+  if(saveFailed||NOWRITE)throw Error('Hay progreso local pendiente de proteger');
+  const current=LS.get(KEY);
+  if(current!==null&&current!==lastRaw)syncIn();
+  if(saveFailed||NOWRITE)throw Error('Hay progreso local pendiente de proteger');
+  return JSON.parse(buildBackup());
+ },
  restoreLocal:backup=>{
   const valid=validateBackup(JSON.stringify(backup));
   return valid.ok?applyImport(valid):{ok:false};
