@@ -36,21 +36,28 @@ try{
  await page.locator('#onNext').click();
  await page.locator('#onNext').click();
  await page.locator('#onAccount').waitFor({state:'visible'});
+ assert.equal(await page.locator('#onNext').textContent(),'SEGUIR COMO INVITADO');
+ assert.equal(await page.locator('.on-save').isVisible(),true,'nueva ilustración visual de respaldo');
  assert.match(await page.locator('#onP').textContent(),/invitado|navegador/i);
  await page.locator('#onAccount').click();
  assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true,
   'crear cuenta desde bienvenida debe abrir Mi perfil');
  await page.locator('#profileAuthTabSignup').click();
+ assert.equal(await page.locator('#profileAccountPanel').isVisible(),true,'registro revelado al elegir crear cuenta');
  assert.equal(await page.locator('#profileAuthForm').isVisible(),true);
+ assert.equal(await page.locator('#profileBackup').evaluate(e=>e.open),false,'respaldo manual oculto hasta que el jugador lo solicite');
  assert.equal(await page.locator('#profileAuthEmail').isVisible(),true);
  assert.equal(await page.locator('#profileAuthPassword').isVisible(),true);
  const cardsBefore=await page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-album2')||'{}').have||{});
  await page.locator('#profile [data-home]').click();
- await page.locator('#home .profile-entry').click();
+ assert.equal(await page.locator('#home .home-player-card').isVisible(),true,'tarjeta visible en menú principal');
+ await page.locator('#home .home-player-card').click();
  assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true,
   'icono en Inicio debe abrir Mi perfil');
  const cardsAfter=await page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-album2')||'{}').have||{});
  assert.deepEqual(cardsAfter,cardsBefore,'navegar y sugerir registro no debe tocar cartas');
+ await page.locator('#profileBackup summary').click();
+ assert.equal(await page.locator('#profileExport').isVisible(),true,'respaldo manual disponible bajo demanda');
  assert.ok(await page.locator('#profileCloudStatus').isVisible(),
   'estado de sincronización debe estar en Mi perfil');
  assert.deepEqual(errors,[],'juego debe arrancar sin excepciones JS');
