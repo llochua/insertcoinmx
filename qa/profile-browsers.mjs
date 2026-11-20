@@ -58,8 +58,11 @@ try{
  assert.deepEqual(cardsAfter,cardsBefore,'navegar y sugerir registro no debe tocar cartas');
  await page.locator('#profileBackup summary').click();
  assert.equal(await page.locator('#profileExport').isVisible(),true,'respaldo manual disponible bajo demanda');
- assert.ok(await page.locator('#profileCloudStatus').isVisible(),
-  'estado de sincronización debe estar en Mi perfil');
+ assert.equal(await page.locator('#profileCloudStatus').count(),1,'estado de nube existe en el perfil');
+ await page.locator('#profileQuickLogin').click();
+ assert.equal(await page.locator('#profileCloudStatus').isVisible(),true,
+  'el estado de nube se revela dentro del acceso a cuenta, sin duplicarlo');
+ await page.locator('#profileAccountBack').click();
  // Preferencia de avatar del invitado: separada de la colección real.
  const back=page.locator('#profileAccountBack');
  if(await back.isVisible())await back.click();
