@@ -74,35 +74,65 @@ try{
     'preview cannot create accounts by mistake');
   const lab=page.locator('#profile .profile-account a[href="/qa/registro/"]');
   assert.equal(await lab.isVisible(),true);
-  // Regresión: salir del formulario desde la flecha superior no lo deja como portada.
-  await page.locator('#profile [data-home]').click();
+  await mkdir('qa/screenshots',{recursive:true});
+  await page.screenshot({path:'qa/screenshots/perfil-cuenta-'+width+'.png',fullPage:true});
+  // La flecha única regresa a Mi perfil desde registro; un segundo toque va a Inicio.
+  await page.locator('#profile .top .vback').click();
+  assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,
+    'volver desde registro muestra pasaporte y resumen');
+  assert.equal(await page.locator('#profileAccountPanel').isVisible(),false,
+    'registro no queda abierto');
+  await page.locator('#profile .top .vback').click();
+  assert.equal(await page.locator('#home .home-player-card').isVisible(),true);
   await page.locator('#home .home-player-card').click();
   assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,
-    'volver a Mi perfil muestra pasaporte y resumen');
-  assert.equal(await page.locator('#profileAccountPanel').isVisible(),false,
-    'registro no queda abierto al regresar');
+    'volver a Mi perfil desde Inicio muestra resumen');
   await page.locator('#profileQuickLogin').click();
   assert.equal(await page.locator('#profileAccountPanel').isVisible(),true,
     'login se abre al elegirlo');
-  await page.locator('#profile [data-home]').click();
+  await page.locator('#profile .top .vback').click();
+  assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,
+    'volver desde login muestra el resumen en la misma vista');
+  await page.locator('#profile .top .vback').click();
   await page.locator('#home .home-player-card').click();
   assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,
     'login anterior no reemplaza al perfil');
   assert.equal(await page.locator('#profileAccountPanel').isVisible(),false,
     'login queda cerrado al reentrar a Mi perfil');
   await page.locator('#profileQuickLogin').click();
-  await page.locator('#profileAccountBack').click();
+  assert.equal(await page.locator('#profileAccountBack').count(),0,'no hay un segundo Volver al perfil');
+  assert.equal(await page.locator('#profile .vback').count(),1,'una sola flecha atrás en Mi perfil');
+  assert.equal(await page.locator('#profile .top .vback').getAttribute('aria-label'),'Volver a Mi perfil');
+  await page.locator('#profile .top .vback').click();
+  assert.equal(await page.locator('#profile .profile-passport').isVisible(),true,'flecha devuelve al resumen');
+  const signupStyle=await page.locator('#profileQuickSignup').evaluate(el=>({
+    radius:getComputedStyle(el).borderRadius,
+    fontWeight:getComputedStyle(el).fontWeight,
+    fontSize:getComputedStyle(el).fontSize
+  }));
+  assert.equal(signupStyle.radius,'10px','botón de registro usa radios del sistema');
+  assert.equal(signupStyle.fontWeight,'800','acción principal usa tipografía del juego');
+  assert.equal(signupStyle.fontSize,'12px','acción principal usa tamaño compacto');
+  assert.equal(await page.locator('#profile .top .vback').getAttribute('aria-label'),'Volver al inicio');
   assert.equal(await page.locator('#profileWelcome').isVisible(),true,'volver restaura el resumen');
   assert.equal(await page.locator('#profileAccountPanel').isVisible(),false);
   await page.locator('#profile [data-home]').click();
   assert.equal(await page.locator('#home .home-player-card').isVisible(),true,'tarjeta de Mi perfil visible en Inicio');
+  const homeCRT=await page.locator('.crt').boundingBox();
   await page.locator('#home .home-player-card').click();
   assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true);
+  const profileCRT=await page.locator('.crt').boundingBox();
+  assert.equal(Math.round(profileCRT.width),Math.round(homeCRT.width),'Mi perfil comparte ancho CRT de Inicio');
+  assert.equal(Math.round(profileCRT.height),Math.round(homeCRT.height),'Mi perfil comparte alto CRT de Inicio');
   await page.locator('#profileBackup summary').click();
   assert.equal(await page.locator('#profileExport').isVisible(),true,'respaldo visible a solicitud');
   // Selector de personajes: usa los 24 WebP reales ya integrados.
+  const profileContentWidth=await page.locator('#profile .profile-scroll').evaluate(el=>el.getBoundingClientRect().width);
   await page.locator('#profileAvatarChange').click();
   assert.equal(await page.locator('#avatarSelect.on').isVisible(),true,'pantalla de avatar accesible desde el perfil');
+  assert.equal(await page.locator('#avatarBack svg').count(),1,'selector de avatar usa la misma flecha del sistema');
+  const avatarContentWidth=await page.locator('#avatarSelect .avatar-scroller').evaluate(el=>el.getBoundingClientRect().width);
+  assert.equal(Math.round(avatarContentWidth),Math.round(profileContentWidth),'selector usa mismo ancho del perfil');
   assert.equal(await page.locator('#avatarGrid .avatar-option').count(),12,'doce personajes aprobados');
   const avatars=await page.locator('#avatarGrid .avatar-option img').evaluateAll(imgs=>imgs.map(img=>({src:img.getAttribute('src'),loaded:img.complete&&img.naturalWidth===128&&img.naturalHeight===128})));
   assert.equal(new Set(avatars.map(x=>x.src)).size,12,'todas las miniaturas son diferentes');
