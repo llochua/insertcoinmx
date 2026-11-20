@@ -44,6 +44,8 @@ try{
   assert.equal(await page.locator('.on-save').isVisible(),true,'bienvenida muestra visual de respaldo');
   assert.equal(await page.locator('#onNext').textContent(),'SEGUIR COMO INVITADO');
   assert.match(await page.locator('#onP').textContent(),/navegador/);
+  // Evitar medir el hover residual tras pulsar Siguiente en escritorio.
+  await page.mouse.move(0,0);
   const hierarchy=await page.evaluate(()=>{
    const primary=document.getElementById('onAccount');
    const secondary=document.getElementById('onNext');
