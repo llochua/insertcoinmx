@@ -1,0 +1,38 @@
+name: Validar registro (rama de pruebas)
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'content/auth-account.js'
+      - 'emails/confirm-signup.html'
+      - 'tests/auth-account.test.mjs'
+      - 'tests/qa-registration.test.mjs'
+      - 'tests/qa-cloud-backup.test.mjs'
+      - 'qa/registro/**'
+      - '.github/workflows/auth-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  auth-smoke:
+    name: Registro y seguridad del progreso
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar sintaxis del módulo
+        run: node --check content/auth-account.js
+      - name: Probar registro, login, callback y conservación del progreso
+        run: node --test tests/auth-account.test.mjs tests/qa-registration.test.mjs tests/qa-cloud-backup.test.mjs
+      - name: Comprobar que la versión fija del SDK existe
+        run: |
+          curl --fail --silent --show-error --location --retry 2 --retry-delay 2 \
+            --output /dev/null \
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm'
