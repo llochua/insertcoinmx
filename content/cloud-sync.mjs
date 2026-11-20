@@ -7,6 +7,7 @@
  * No habilita nuevos registros ni mueve datos de un usuario a otro.
  */
 const BASE_PREFIX='icmx-cloud-baseline-v1:';
+const ACCOUNT_BINDING='icmx-cloud-active-account-v1';
 const IGNORED=new Set(['rev','sv','mv','test']);
 const CARD=/^[a-z0-9]{1,40}_[berf]$/;
 const RATING=/^[a-z0-9]{1,40}$/;
@@ -116,6 +117,15 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   const user=verified?.user;
   if(!user?.id){accountUid=null;status('guest','INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');return}
   const uid=user.id;
+  // El progreso local no está particionado por cuenta. Si alguien cambia
+  // de usuario en el mismo navegador, bloquear descargas y subidas antes
+  // de que una colección pueda sustituir o contaminar a la otra.
+  const bound=localStorage.getItem(ACCOUNT_BINDING);
+  if(bound&&bound!==uid){
+   accountUid=null;
+   status('conflict','OTRA CUENTA EN ESTE NAVEGADOR · COLECCIÓN LOCAL PROTEGIDA');
+   return;
+  }
   accountUid=uid;
   const local=assertBackup(readLocal());
   const {data:row,error:readError}=await client.from('player_snapshots')
@@ -127,6 +137,15 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   const rev=row?Number(row.revision):0;
   const base=readBaseline(localStorage,uid);
   const action=decideSync({local,remote,base,remoteRevision:rev});
+  // No vincular el dispositivo antes de comprobar que la colección local
+  // puede recuperarse o sincronizarse sin conflicto.
+  if(action!=='conflict'&&action!=='first-upload-required'){
+   if(!bound){
+    localStorage.setItem(ACCOUNT_BINDING,uid);
+    if(localStorage.getItem(ACCOUNT_BINDING)!==uid)
+     throw Error('No se pudo proteger la asociación de cuenta');
+   }
+  }
   if(action==='empty'){
    // Solo una cuenta sin respaldo Y un navegador sin progreso puede
    // inicializarse automáticamente. Nunca migrar cartas locales por esta vía.
