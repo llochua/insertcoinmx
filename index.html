@@ -286,7 +286,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @font-face{font-family:AV;src:url(f/AvenirNextLTPro-Demi.otf);font-weight:600}
 #title{position:absolute;inset:0;overflow:hidden;cursor:pointer;display:none;flex-direction:column;align-items:center;z-index:40;background:#07062a}
 #title.on{display:flex}
-#title .tbg{position:absolute;inset:-12%;background:url(c/F_gatosamurai.jpg) center 30%/cover;filter:blur(28px) saturate(1.3) brightness(.55);transform:scale(1.1)}
+#title .tbg{position:absolute;inset:-12%;background:url(c/F_gatosamurai.webp) center 30%/cover;filter:blur(28px) saturate(1.3) brightness(.55);transform:scale(1.1)}
 #title .tbg2{position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 46%,transparent 0,rgba(7,6,42,.55) 55%,#07062a 100%),linear-gradient(#07062a 0,transparent 22%,transparent 70%,#07062a 100%)}
 #title .tscan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0 1px,transparent 1px 3px);pointer-events:none}
 #title .thud{position:relative;width:100%;display:flex;justify-content:space-between;padding:18px 20px 0;font:8px PX;letter-spacing:.06em;color:rgba(255,255,255,.55)}
@@ -313,7 +313,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ===== MENU (home) v2 ===== */
 #home{padding:0 16px 16px!important;gap:0!important;justify-content:flex-start!important;align-items:stretch!important;text-align:left!important;overflow:hidden!important}
 #home>*:not(.amb){position:relative}
-#home .amb{position:absolute;inset:-12%;background:url(c/F_gatosamurai.jpg) center 30%/cover;filter:blur(30px) saturate(1.2) brightness(.4);z-index:0}
+#home .amb{position:absolute;inset:-12%;background:url(c/F_gatosamurai.webp) center 30%/cover;filter:blur(30px) saturate(1.2) brightness(.4);z-index:0}
 #home .amb::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 55% at 50% 40%,transparent,#07062a 85%)}
 .hh{display:flex;justify-content:space-between;align-items:center;padding:16px 2px 0}
 .hb{display:flex;align-items:center;gap:8px;font:700 10px AV;letter-spacing:.4em;color:#fff}.hb img{width:22px}
@@ -455,7 +455,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .view:not(#home){isolation:isolate}
 .view:not(#home)::before{content:"";position:absolute;inset:-14%;z-index:-2;background:var(--amb) center 30%/cover;filter:blur(34px) saturate(1.3) brightness(.42)}
 .view:not(#home)::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(90% 60% at 50% 45%,transparent,rgba(7,6,42,.6) 55%,#07062a),linear-gradient(#07062a,transparent 16%,transparent 82%,#07062a);pointer-events:none}
-#pack{--amb:url(c/F_gatosamurai.jpg)}#album{--amb:url(c/F_hyrule.jpg)}#torneo{--amb:url(c/fatality.jpg)}#tier{--amb:url(c/nerv.jpg)}#scores{--amb:url(c/F_samus.jpg)}
+#pack{--amb:url(c/F_gatosamurai.webp)}#album{--amb:url(c/F_hyrule.webp)}#torneo{--amb:url(c/fatality.webp)}#tier{--amb:url(c/nerv.webp)}#scores{--amb:url(c/F_samus.webp)}
 .view>.top{padding:16px 16px 12px!important;gap:12px!important;font:700 13px AV!important;color:rgba(255,255,255,.7)!important;align-items:center}
 .vback{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex:none}.vback svg{width:16px;height:16px}.vback:active{background:rgba(255,255,255,.2)}
 .vs .c{width:min(44vw,210px)!important}.vs .c img{border-radius:12px!important}#torneo .stage{gap:18px!important}
@@ -1405,7 +1405,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="tbg"></div><div class="tbg2"></div>
  <div class="thud"><span>1UP <b id="tiOne">0</b></span><span>HI <b id="tiHi">---</b></span></div><button type="button" class="sound-toggle title-sound" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button>
  <div class="tlogo"><img src="logo.png" alt="Insert Coin MX"><div class="tal">EL ÁLBUM</div></div>
- <div class="tfan"><div class="tc l"><div class="fx idle r-dorada" style="--rad:10px;height:100%"><img src="c/fatality.jpg"><i class="foil"></i><i class="glare"></i></div></div><div class="tc r"><div class="fx idle r-full" style="--rad:10px;height:100%"><img src="c/F_shenzalcoatl.jpg"><i class="foil"></i><i class="glare"></i></div></div><div class="tc m" id="tiHero"><div class="fx idle r-full" style="--rad:10px;height:100%"><img src="c/F_gatosamurai.jpg"><i class="foil"></i><i class="glare"></i></div></div></div>
+ <div class="tfan"><div class="tc l"><div class="fx idle r-dorada" style="--rad:10px;height:100%"><img src="c/fatality.webp"><i class="foil"></i><i class="glare"></i></div></div><div class="tc r"><div class="fx idle r-full" style="--rad:10px;height:100%"><img src="c/F_shenzalcoatl.webp"><i class="foil"></i><i class="glare"></i></div></div><div class="tc m" id="tiHero"><div class="fx idle r-full" style="--rad:10px;height:100%"><img src="c/F_gatosamurai.webp"><i class="foil"></i><i class="glare"></i></div></div></div>
  <div class="tstart">PRESIONA START</div>
  <div class="ttick"><span id="tiTick"></span></div>
  <div class="tscan"></div>
@@ -1469,16 +1469,16 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="on-head"><div class="on-brand"><img src="coin.png" alt=""><span><b>INSERT COIN MX</b><small>EL ÁLBUM</small></span></div><button type="button" class="on-skip" id="onSkip">SALTAR</button></div>
  <div class="on-visual" id="onVisual" data-step="0" aria-hidden="true">
   <div class="on-scene on-fan">
-   <img class="on-card-left" src="c/F_hyrule.jpg" alt="" draggable="false">
-   <img class="on-card-right" src="c/F_shenzalcoatl.jpg" alt="" draggable="false">
-   <img class="on-card-main" src="c/F_gatosamurai.jpg" alt="" draggable="false">
+   <img class="on-card-left" src="c/F_hyrule.webp" alt="" draggable="false">
+   <img class="on-card-right" src="c/F_shenzalcoatl.webp" alt="" draggable="false">
+   <img class="on-card-main" src="c/F_gatosamurai.webp" alt="" draggable="false">
   </div>
   <div class="on-scene on-pack"><img src="sobre.png" alt="" draggable="false"></div>
   <div class="on-scene on-play">
    <div class="on-play-grid">
-    <div class="on-feature"><span class="on-label">ÁLBUM</span><img class="on-mini-card" src="c/F_gatosamurai.jpg" alt=""></div>
-    <div class="on-feature"><span class="on-label">TIER</span><div class="on-ranks"><div class="on-rank"><strong>S</strong><img src="c/F_hyrule.jpg" alt=""></div><div class="on-rank"><strong>A</strong><img src="c/fatality.jpg" alt=""></div></div></div>
-    <div class="on-feature"><span class="on-label">RETA</span><div class="on-duel"><img src="c/fatality.jpg" alt=""><b>VS</b><img src="c/F_shenzalcoatl.jpg" alt=""></div></div>
+    <div class="on-feature"><span class="on-label">ÁLBUM</span><img class="on-mini-card" src="c/F_gatosamurai.webp" alt=""></div>
+    <div class="on-feature"><span class="on-label">TIER</span><div class="on-ranks"><div class="on-rank"><strong>S</strong><img src="c/F_hyrule.webp" alt=""></div><div class="on-rank"><strong>A</strong><img src="c/fatality.webp" alt=""></div></div></div>
+    <div class="on-feature"><span class="on-label">RETA</span><div class="on-duel"><img src="c/fatality.webp" alt=""><b>VS</b><img src="c/F_shenzalcoatl.webp" alt=""></div></div>
    </div>
   </div>
  </div>
@@ -1515,12 +1515,12 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    Para agregar un diseño nuevo:
    1) Suma su línea aquí. id = nombre de archivo sin extensión (minúsculas y números).
       n nombre · cat GAMER/ANIME/PELÍCULAS/CARICATURAS/OTROS · no número de diseño
-      r versión que ya tiene imagen en c/id.jpg: comun (=Base), holo (=Especial) o dorada (=Rara). r:0 = ninguna.
-      f número de la ilustración Full si ya existe (c/F_id.jpg) · fk su clave si no es F_+id · al alias viejos
-   2) Sube sus archivos: d/id.jpg (arte del Tier y las Retas), c/ (480 px) y c2/ (960 px) con la imagen de la versión;
-      con Full también fa/id.jpg, c/F_id.jpg y c2/F_id.jpg.
+      r versión que ya tiene imagen en c/id.webp: comun (=Base), holo (=Especial) o dorada (=Rara). r:0 = ninguna.
+      f número de la ilustración Full si ya existe (c/F_id.webp) · fk su clave si no es F_+id · al alias viejos
+   2) Sube sus archivos: d/id.webp (arte del Tier y las Retas), c/ (480 px) y c2/ (960 px) con la imagen de la versión;
+      con Full también fa/id.webp, c/F_id.webp y c2/F_id.webp.
    Para sumar la imagen de una versión que faltaba (sin regenerar nada más):
-   1) Sube c/id_b.jpg y c2/id_b.jpg (o _e / _r / _f según la versión).
+   1) Sube c/id_b.webp y c2/id_b.webp (o _e / _r / _f según la versión).
    2) Agrega la letra en el campo ex de su línea: ex:'b' (varias: ex:'br').
    Listo: aparece en el álbum y entra a los sobres sola. Mientras una versión no tenga imagen existe como carta
    pero se ve como un recuadro "PRÓXIMAMENTE" y no sale en sobres.
@@ -1675,7 +1675,7 @@ const baseHtml=c=>{
 };
 
 
-const IMGV='20261120c'; // versión de imágenes de cartas: súbela cuando se reemplace un arte (Arte Especial, diseño) para que los navegadores bajen la nueva
+const IMGV='webp20261120'; // versión de imágenes de cartas: súbela cuando se reemplace un arte (Arte Especial, diseño) para que los navegadores bajen la nueva
 const VL=['b','e','r','f'],VN={b:'Base',e:'Holo',r:'Dorada',f:'Arte Especial'},VSHORT={b:'Base',e:'Holo',r:'Dorada',f:'Especial'},VC={b:'comun',e:'holo',r:'dorada',f:'full'},OLDV={comun:'b',holo:'e',dorada:'r'};
 const CARDS=[],DB={},ALIAS={},CB={};
 for(const d of DESIGNS){d.fk=d.f?(d.fk||'F_'+d.id):null;DB[d.id]=d;for(const a of d.al||[])ALIAS[a]=d.id;
@@ -1692,14 +1692,14 @@ const NEWK=/^([a-z0-9]{1,40})_([berf])$/;
 const cardKey=k=>{if(typeof k!=='string')return null;const m=NEWK.exec(k);if(m){const id=ALIAS[m[1]]||m[1];return DB[id]?id+'_'+m[2]:null}
  const full=k.startsWith('F_'),s=full?k.slice(2):k,d=DB[ALIAS[s]||s];if(!d)return null;return full?d.id+'_f':(d.r?d.id+'_'+OLDV[d.r]:null)};
 const designId=k=>{if(typeof k!=='string')return null;const m=NEWK.exec(k);const s=m?m[1]:k.startsWith('F_')?k.slice(2):k;const id=ALIAS[s]||s;return DB[id]?id:null}; // id de diseño vigente (acepta alias, F_ y _v)
-const artOf=id=>DB[id]&&!DB[id].r&&DB[id].fk?'fa/'+DB[id].fk.slice(2)+'.jpg?v='+IMGV:'d/'+id+'.jpg?v='+IMGV; // arte del diseño (Tier, Retas)
+const artOf=id=>DB[id]&&!DB[id].r&&DB[id].fk?'fa/'+DB[id].fk.slice(2)+'.webp?v='+IMGV:'d/'+id+'.webp?v='+IMGV; // arte del diseño (Tier, Retas)
 /* imagen de una carta; si falta se dibuja un recuadro provisional (nunca se usa el archivo de otra versión) */
 const PHM={};
 function PH(c){return PHM[c.k]||(PHM[c.k]=(()=>{const e=s=>String(s).replace(/[&<>"']/g,m=>'&#'+m.charCodeAt(0)+';');
  const ls=[];let l='';for(const w of String(c.n).split(' ')){if(l&&(l+' '+w).length>14){ls.push(l);l=w}else l=l?l+' '+w:w}ls.push(l);const n=Math.min(ls.length,3);
  const tx=ls.slice(0,3).map((x,i)=>`<text x="240" y="${330+(i-(n-1)/2)*46}" text-anchor="middle" font-size="36" font-weight="800" fill="#fff">${e(x)}</text>`).join('');
  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 670" font-family="Arial,Helvetica,sans-serif"><rect width="480" height="670" rx="26" fill="#120F1A"/><rect x="14" y="14" width="452" height="642" rx="18" fill="none" stroke="#FFD400" stroke-width="4" stroke-dasharray="14 10"/><text x="240" y="92" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="4" fill="#FFD400">INSERT COIN MX</text>${tx}<text x="240" y="510" text-anchor="middle" font-size="30" font-weight="800" letter-spacing="3" fill="#FFD400">${(VSHORT[c.v]||'').toUpperCase()}</text><text x="240" y="552" text-anchor="middle" font-size="20" font-weight="700" letter-spacing="3" fill="#8a86a3">PRÓXIMAMENTE</text></svg>`)})())}
-const imgOf=(c,dir)=>c&&c.img?dir+'/'+c.img+'.jpg?v='+IMGV:PH(c||{k:'?',n:'Carta',v:'b'});
+const imgOf=(c,dir)=>c&&c.img?dir+'/'+c.img+'.webp?v='+IMGV:PH(c||{k:'?',n:'Carta',v:'b'});
 const imgK=(k,dir)=>imgOf(CB[cardKey(k)||k],dir);
 const W={comun:70,holo:18,dorada:5,full:7};
 const TN=['GOTY','GENIAL','OK','MMM'],TC=['#FFD400','#f0a830','#a9a3c4','#6e6a85'];
@@ -2018,9 +2018,9 @@ let mi=0;const menuCompact=window.matchMedia('(max-width:699px)');/* IC-05 · Il
 const MENU_ART={pack:'menu/final/sobres.webp',album:'menu/final/album.webp',torneo:'menu/final/reta.webp',tier:'menu/final/tier.webp',scores:'menu/final/records.webp'};
 const menuArtOK=new Set();
 const menuArtFailed=new Set();
-function menuArtSrc(m,dir){return menuArtOK.has(m.id)?MENU_ART[m.id]:dir+'/'+m.img+'.jpg'}
+function menuArtSrc(m,dir){return menuArtOK.has(m.id)?MENU_ART[m.id]:dir+'/'+m.img+'.webp'}
 function menuArtLoad(img,m,dir){
- const art=MENU_ART[m.id],fallback=dir+'/'+m.img+'.jpg';
+ const art=MENU_ART[m.id],fallback=dir+'/'+m.img+'.webp';
  img.onerror=()=>{menuArtFailed.add(m.id);menuArtOK.delete(m.id);if(img.getAttribute('src')!==fallback)img.src=fallback};
  if(!menuArtOK.has(m.id)&&!menuArtFailed.has(m.id)){
   const probe=new Image();probe.onload=()=>{menuArtOK.add(m.id);img.src=art;img.closest('.fx')?.classList.add('menu-illustration');if(MODES()[mi]?.id===m.id)$('mAmb').style.backgroundImage='url('+art+')'};
@@ -2038,15 +2038,15 @@ const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs
  {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Pon tus iniciales',img:'F_samus',rr:'full',go:'VER'}]};
 function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,imgDir=light?'c':'c2';
  $('hCount').textContent=u+' / '+N;
- const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="${imgDir}/${m.img}.jpg" alt="" decoding="async"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
+ const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="${imgDir}/${m.img}.webp" alt="" decoding="async"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
   [...fan.children].forEach((el,i)=>el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()})}
- [...fan.children].forEach((el,i)=>{const m=M[i],pic=el.querySelector('.fx>img'),src=imgDir+'/'+m.img+'.jpg';menuArtLoad(pic,m,imgDir);el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
+ [...fan.children].forEach((el,i)=>{const m=M[i],pic=el.querySelector('.fx>img'),src=imgDir+'/'+m.img+'.webp';menuArtLoad(pic,m,imgDir);el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
   let d=i-mi;if(d>2)d-=5;if(d<-2)d+=5;const a=Math.abs(d);
   el.style.transform=`translate(-50%,-50%) translateX(${d*60}%) rotate(${d*11}deg) translateY(${a*6}%) scale(${1-a*.16})`;el.style.zIndex=10-a;el.style.filter=light?'':(a?`brightness(${1-a*.3})`:'');el.style.opacity=a>1?0:1;el.style.pointerEvents=a>1?'none':''});
  const tabs=$('mTabs');
  if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
  [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
- const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.jpg'})`;
+ const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.webp'})`;
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
@@ -2093,7 +2093,7 @@ const VORD={f:0,r:1,e:2,b:3}; // de mejor a peor
 /* al rasgar, la luz que sale del sobre es la de su mejor carta: blanca (Base), arcoíris (Especial), oro (Rara), rosa (Full) */
 function leak(v){const L=$('leak');L.className='leak';void L.offsetWidth;L.className='leak on v-'+v;
  if(v==='b')beep(300,.2);else{beep(220,.12);setTimeout(()=>[523,659,784,1047,1319].slice(0,v==='e'?3:v==='r'?4:5).forEach((f,i)=>setTimeout(()=>beep(f,.09),i*90)),180)}}
-function resetPack(){$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.jpg?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
+function resetPack(){$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.webp?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
  $('stack').classList.remove('on');$('sum').classList.remove('on');$('stHint').style.display='none';$('openBtn').style.visibility='visible'}
 let tx=null;
 $('tearZone').addEventListener('pointerdown',e=>{tx=e.clientX;$('hand').style.display='none';try{$('tearZone').setPointerCapture(e.pointerId)}catch(_){}});
@@ -2133,9 +2133,9 @@ const NEU='#1b1826';
    el color real del JPG al cargar, sin mostrar un rectángulo neutro. */
 const AUTO_BG_IDS=new Set('evilexes 1up blowme booit captor caritele carton continuara continue deathlove friendzone friezainfinito gojira gokuvolution hipstermario jokers karma oneplayer oogie queenpower robogodin tokyo3'.split(' '));
 const AUTO_BG_COLORS=Object.create(null);
-/* zona con dibujo dentro de cada d/id.jpg (fracciones x0,y0,x1,y1): sirve para darles un peso visual parecido sin recortar el arte */
+/* zona con dibujo dentro de cada d/id.webp (fracciones x0,y0,x1,y1): sirve para darles un peso visual parecido sin recortar el arte */
 const ABOX={"9000":[0.109,0.138,0.892,0.615],"abuket":[0.039,0.068,0.959,0.679],"alienonboard":[0.123,0.074,0.878,0.677],"androidsdays":[0.116,0.072,0.886,0.677],"animehero":[0.266,0.071,0.738,0.679],"arcade":[0.083,0.025,0.897,0.969],"arcade2":[0.142,0.0,0.856,1.0],"artemis":[0.2,0.072,0.802,0.677],"blooper":[0.142,0.074,0.831,0.824],"bort":[0.1,0.14,0.897,0.477],"bustfiction":[0.084,0.058,0.891,0.556],"challenger":[0.053,0.051,0.947,0.949],"choochoo":[0.225,0.071,0.78,0.679],"chorriuken":[0.15,0.072,0.852,0.677],"collector":[0.106,0.024,0.88,0.964],"controls":[0.125,0.046,0.848,0.951],"family":[0.247,0.071,0.755,0.679],"fatality":[0.102,0.045,0.872,0.416],"fatman":[0.056,0.036,0.942,0.439],"fck":[0.089,0.048,0.883,0.711],"futbolito":[0.087,0.021,0.886,0.994],"galaxianwars":[0.206,0.08,0.8,0.679],"gameover":[0.075,0.089,0.9,0.636],"gamepop":[0.081,0.018,0.894,0.99],"gatosamurai":[0.159,0.056,0.892,0.922],"gunsncontrols":[0.077,0.037,0.895,0.65],"humangamer":[0.113,0.069,0.887,0.932],"hyrule":[0.07,0.079,0.931,0.657],"imposible":[0.211,0.072,0.819,0.704],"invader":[0.062,0.041,0.938,0.551],"kaiji":[0.153,0.074,0.848,0.677],"kame":[0.275,0.071,0.727,0.679],"karting":[0.198,0.037,0.847,0.713],"keepcalm":[0.087,0.06,0.912,0.94],"killbills":[0.263,0.071,0.738,0.679],"kof":[0.175,0.037,0.822,0.713],"konamicode":[0.123,0.072,0.878,0.677],"linkfloyd":[0.109,0.084,0.892,0.669],"links":[0.136,0.062,0.819,0.966],"luna":[0.2,0.072,0.803,0.677],"mainstream":[0.109,0.145,0.891,0.608],"mapa":[0.037,0.025,0.964,0.662],"mrkarate":[0.016,0.065,0.959,0.915],"n64":[0.05,0.028,0.952,0.761],"navidadgamer":[0.206,0.072,0.794,0.679],"nerv":[0.094,0.037,0.906,0.599],"no":[0.117,0.074,0.894,0.677],"nowloading":[0.109,0.117,0.891,0.634],"ochentas":[0.108,0.089,0.892,0.664],"oldschool":[0.108,0.212,0.892,0.539],"omkami":[0.064,0.056,0.912,0.945],"patronus":[0.202,0.077,0.803,0.67],"pikaball":[0.161,0.072,0.841,0.677],"pizzcipher":[0.081,0.025,0.895,0.713],"poketaco":[0.097,0.028,0.9,0.69],"polystation":[0.086,0.1,0.914,0.757],"portatiles":[0.242,0.059,0.758,0.691],"sailors":[0.13,0.072,0.87,0.677],"sailourss":[0.15,0.074,0.853,0.677],"samus":[0.081,0.06,0.894,0.904],"sensei":[0.075,0.003,0.923,0.996],"shadaloo":[0.109,0.139,0.892,0.614],"shenzalcoatl":[0.044,0.028,0.958,0.748],"snes":[0.094,0.045,0.881,0.733],"sv001":[0.111,0.018,0.889,0.983],"thankyou":[0.083,0.036,0.892,0.629],"thelostgame":[0.109,0.142,0.892,0.608],"theworldwarrior":[0.077,0.086,0.897,0.73],"tmnt":[0.111,0.147,0.887,0.605],"toto":[0.123,0.072,0.88,0.677],"triforce":[0.077,0.064,0.922,0.864],"vamonospest":[0.134,0.074,0.867,0.676],"vidaextra":[0.084,0.018,0.887,0.941],"wirimask":[0.086,0.019,0.889,0.64],"x":[0.089,0.035,0.884,0.892],"yinyang":[0.062,0.043,0.936,0.774],"zero":[0.111,0.034,0.863,0.839],"zodiac":[0.073,0.026,0.903,0.71],"asteroids":[0.147,0.08,0.853,0.92],"docecasas":[0.08,0.2,0.92,0.8],"sonic":[0.109,0.08,0.892,0.92],"chocarreros":[0.078,0.405,0.922,0.594],"god":[0.173,0.08,0.828,0.92],"guardianes":[0.12,0.08,0.881,0.92],"king":[0.173,0.08,0.828,0.92],"levelup":[0.08,0.368,0.92,0.635],"loveyourbits":[0.08,0.172,0.92,0.829],"neo":[0.08,0.309,0.92,0.692],"tetris2":[0.194,0.08,0.806,0.92],"versus":[0.08,0.218,0.92,0.782],"pirata":[0.08,0.296,0.92,0.704],"1up":[0.161,0.08,0.839,0.92],"blowme":[0.08,0.154,0.92,0.846],"booit":[0.12,0.08,0.881,0.92],"captor":[0.153,0.08,0.847,0.92],"caritele":[0.08,0.079,0.92,0.819],"carton":[0.08,0.389,0.92,0.611],"continuara":[0.22,0.08,0.781,0.92],"continue":[0.08,0.294,0.92,0.708],"deathlove":[0.12,0.08,0.881,0.92],"friendzone":[0.109,0.08,0.892,0.911],"friezainfinito":[0.125,0.08,0.875,0.92],"gojira":[0.081,0.162,0.92,0.838],"gokuvolution":[0.08,0.341,0.92,0.659],"hipstermario":[0.078,0.204,0.92,0.798],"jokers":[0.1,0.08,0.9,0.92],"karma":[0.08,0.164,0.922,0.836],"oneplayer":[0.081,0.112,0.92,0.889],"oogie":[0.077,0.125,0.922,0.876],"queenpower":[0.116,0.08,0.886,0.92],"robogodin":[0.12,0.08,0.88,0.92],"tokyo3":[0.08,0.189,0.92,0.811],"evilexes":[0.08,0.139,0.919,0.861],"aku":[0.097,0.08,0.903,0.92],"fotonicos":[0.08,0.34,0.92,0.66],"jaws":[0.164,0.08,0.836,0.92],"patchman":[0.205,0.08,0.795,0.92],"rastreador":[0.078,0.208,0.923,0.791],"skellington":[0.162,0.08,0.838,0.92],"universe":[0.078,0.161,0.923,0.839],"clarita":[0.138,0.081,0.862,0.92],"ko":[0.08,0.189,0.92,0.812],"peaceamongus":[0.111,0.08,0.889,0.92],"pegasus":[0.08,0.259,0.919,0.742],"rugal":[0.08,0.131,0.92,0.869],"yoshis":[0.08,0.081,0.92,0.919]};
-/* color de fondo de la ilustración original de cada diseño sin color registrado (esquinas de d/id.jpg) */
+/* color de fondo de la ilustración original de cada diseño sin color registrado (esquinas de d/id.webp) */
 const ICOL={"9000":"#1154c5","artemis":"#4099ff","thelostgame":"#151412","mainstream":"#595a5c","vamonospest":"#084f23","shadaloo":"#111111","kaiji":"#151412","navidadgamer":"#c90a11","no":"#12354b","sailors":"#e05c98","ochentas":"#ffffff","karting":"#314a68","family":"#258b63","alienonboard":"#ffffff","pikaball":"#fced20","sailourss":"#f81026","kof":"#2c2e2b","konamicode":"#000000","imposible":"#28386c","kame":"#121212","tmnt":"#0d692a","killbills":"#feff4b","nowloading":"#11228e","animehero":"#ffffff","choochoo":"#d00910","patronus":"#141414","toto":"#060121","chorriuken":"#fa004c","androidsdays":"#1d1d1b","portatiles":"#dbdbdb","luna":"#ff2a94","linkfloyd":"#1d1d1b","oldschool":"#de2e2e","galaxianwars":"#151829","asteroids":"#1e1e1e","chocarreros":"#000000","docecasas":"#000000","god":"#1e1e1e","guardianes":"#000000","king":"#1e1e1e","levelup":"#1e1e1e","loveyourbits":"#e20b32","neo":"#000000","pirata":"#fff1cc","sonic":"#295292","tetris2":"#ffffff","versus":"#111025"};
 const dcol=id=>AUTO_BG_COLORS[id]||RBG[id]||ICOL[id]||NEU;const hasCol=id=>!!(RBG[id]||ICOL[id]||AUTO_BG_IDS.has(id)); // identifica artes con fondo integrable (registrado o automático)
 /* ilustración encuadrada a su zona dibujada (+ margen). Con color original el borde no se nota; en neutro queda como muestra de tela */
@@ -2289,7 +2289,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
    beep(c.v==='r'?1175:c.v==='f'?1568:988,.12);
    // Preparamos la imagen grande y la miniatura antes de quitar el reverso.
    // El DOM se construye una sola vez: no se reinician animaciones ni aparece el arte anterior.
-   const d=DB[c.d],src=c.v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg?v='+IMGV:artOf(d.id);
+   const d=DB[c.d],src=c.v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.webp?v='+IMGV:artOf(d.id);
    const load=imageSrc=>new Promise(done=>{
     const im=new Image();let settled=false;
     const finish=()=>{if(!settled){settled=true;done()}};
@@ -2307,7 +2307,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   dxNav();
   return}
 
- const d=DB[c.d],col=dcol(d.id),k=caseOf(c),v=c.v,fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg?v='+IMGV:null;
+ const d=DB[c.d],col=dcol(d.id),k=caseOf(c),v=c.v,fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.webp?v='+IMGV:null;
  const lab={dnew:'NUEVA',vnew:'NUEVA VARIANTE',rep:'REPETIDA',comp:'COLECCIÓN COMPLETA'}[k];
  /* la ilustración es la de esta versión: Base/Especial = estampa original · Rara = su arte en oro · Full = su escena completa */
  const fullSrc=fa||artOf(d.id);
@@ -2430,7 +2430,7 @@ setInterval(()=>{
 function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');const entering=!s.classList.contains('on');s.classList.add('on');
  const comp=hand.filter(c=>c._comp),rank=c=>(c._comp?-10:0)+VORD[c.v]+(c._new?0:5);
  const H=hand.slice().sort((a,b)=>rank(a)-rank(b))[0],d=DB[H.d],v=H.v,st=dState(d);
- const fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.jpg?v='+IMGV:null;
+ const fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.webp?v='+IMGV:null;
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
   :(v==='e'||v==='r')?`<div class="dx-art dx-flat-art" style="background-color:${dcol(d.id)}"><img src="${artOf(d.id)}" alt="" decoding="async"></div>`
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:.8"><img src="${artOf(d.id)}" alt=""></span>`}</span></div>`;
