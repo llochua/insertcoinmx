@@ -18,7 +18,7 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
   checkValidity(){return this.id!=='profileAuthPassword'||this.value.length>=8},
   focus(){this.focused=true}
  }]));
- const calls={signup:[],signin:[],signout:[],events:[],opts:[],clicked:0,titleRemoved:0,storageWrites:[]};
+ const calls={signup:[],signin:[],signout:[],avatarUpdates:[],events:[],opts:[],clicked:0,titleRemoved:0,storageWrites:[]};
  const user={id:'user-lab',email:'qa@example.test'};
  const auth={
   onAuthStateChange(fn){this.emit=fn;return {data:{subscription:{unsubscribe(){}}}};},
@@ -27,6 +27,7 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
   async signUp(args){calls.signup.push(args);return signUpError?
     {data:null,error:signUpError}:{data:{user,session:null},error:null};},
   async signInWithPassword(args){calls.signin.push(args);return {data:{user,session:{user}},error:null};},
+  async updateUser(args){calls.avatarUpdates.push(args);return {data:{user:{...user,user_metadata:args.data}},error:null};},
   async signOut(args){calls.signout.push(args);return {error:null};}
  };
  const document={
@@ -47,7 +48,7 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
  assert.notEqual(runnable,code,'sdk mock injection must exist');
  vm.runInNewContext(runnable,ctx,{filename:'auth-account.js',timeout:2000});
  const flush=async()=>{for(let i=0;i<7;i++)await new Promise(resolve=>setImmediate(resolve))};
- return {elements,calls,auth,flush};
+ return {elements,calls,auth,flush,saveAvatar:ctx.icmxAvatarSaveForUser};
 }
 
 test('real profile components exist on the game without duplicate IDs',()=>{
@@ -97,4 +98,16 @@ test('email callback returns to visible profile, never starts a pack',async()=>{
  assert.equal(h.calls.clicked,1);
  assert.match(h.elements.profileAuthMessage.textContent,/Correo confirmado/);
  assert.equal(h.calls.storageWrites.length,0);
+});
+
+test('avatar saved as cosmetic user metadata, never as collection or authorization',async()=>{
+ const h=harness({initialSession:{user:{id:'user-lab',email:'qa@example.test'}}});
+ await h.flush();
+ const u=await h.saveAvatar('pizza');
+ assert.equal(u.user_metadata.icmx_avatar_id,'pizza');
+ assert.equal(h.calls.avatarUpdates.length,1);
+ assert.deepEqual(JSON.parse(JSON.stringify(h.calls.avatarUpdates[0])),{data:{icmx_avatar_id:'pizza'}});
+ assert.equal(h.calls.storageWrites.length,0,'no write to album storage');
+ await assert.rejects(()=>h.saveAvatar('admin'),/Avatar/,'unknown avatar rejected');
+ assert.equal(h.calls.avatarUpdates.length,1);
 });
