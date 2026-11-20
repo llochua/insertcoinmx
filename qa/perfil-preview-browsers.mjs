@@ -167,7 +167,36 @@ try{
   await page.locator('#profileAvatarChange').click();
   assert.equal(await page.locator('#avatarPreviewName').textContent(),'Cartucho');
   await page.locator('#avatarBack').click();
-  // El selector no debe permitir mutar cartas, iniciar sesión o emitir llamadas externas.
+
+  // El respaldo sigue funcionando desde Mi perfil, incluso sin botones en Récords.
+  await page.locator('#profileBackup summary').click();
+  assert.equal(await page.locator('#profileExport').isVisible(),true);
+  assert.equal(await page.locator('#profileImport').isVisible(),true);
+  await page.locator('#profileExport').click();
+  assert.equal(await page.locator('#bkm.on').count(),1,'exportar sigue accesible desde Mi perfil');
+  assert.match(await page.locator('#bkTxt').inputValue(),/insertcoinmx-album/,'respaldo original disponible');
+  await page.locator('#bkX').click();
+  await page.locator('#profileImport').click();
+  assert.equal(await page.locator('#bkm.on').count(),1,'importar sigue accesible desde Mi perfil');
+  assert.match(await page.locator('#bkm .bkin').textContent(),/IMPORTAR RESPALDO/);
+  await page.locator('#bkX').click();
+
+  // Récords se dedica al puntaje y Top 10, sin CTA ni respaldo duplicados.
+  await page.locator('#profile [data-home]').click();
+  await page.locator('#mTabs button').last().click();
+  await page.locator('#mGo').click();
+  assert.equal(await page.locator('#scores.on').count(),1,'Récords accesible desde Inicio');
+  assert.equal(await page.locator('#scores .bkp').count(),0,'el bloque de respaldo ya no aparece en Récords');
+  assert.equal(await page.locator('#scores #bkExp, #scores #bkImp').count(),0,'no hay botones duplicados');
+  assert.equal(await page.locator('#scores a[href*="registro"]').count(),0,'cuentas permanecen en Mi perfil');
+  assert.equal(await page.locator('#scoreTopTitle').textContent(),'TOP 10');
+  assert.equal(await page.locator('#scores .score-columns span').count(),3,'ranking con posición, iniciales y cartas');
+  await page.locator('#iniIn').fill('ABC');
+  await page.locator('#sSave').click();
+  assert.equal(await page.locator('#scores #tbl .r').count(),1,'guardar iniciales muestra registro local');
+  assert.equal(await page.locator('#scores #tbl .r span:nth-child(2)').textContent(),'ABC');
+  await page.screenshot({path:'qa/screenshots/records-top10-'+width+'.png',fullPage:true});
+  // El selector y los Récords no deben tocar las cartas reales, abrir sesiones ni emitir RPC.
   const saved=await page.evaluate(()=>({
     real:localStorage.getItem('icmx-album2'),
     preview:sessionStorage.getItem('icmx-preview-perfil-20261120'),
