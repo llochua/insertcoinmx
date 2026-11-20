@@ -104,6 +104,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  );
  let stopped=false,busy=false,rerun=false,debounce=null,interval=null;
  let accountUid=null,issuing=false,sessionActive=true;
+ let importAvailable=false;
  const status=(code,message)=>{if(!stopped)onStatus(code,message)};
  async function syncOnce(){
   const {data:verified,error:authError}=await client.auth.getUser();
@@ -116,9 +117,10 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
    return;
   }
   const user=verified?.user;
-  if(!user?.id){accountUid=null;sessionActive=false;status('guest','INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');return}
+  if(!user?.id){accountUid=null;sessionActive=false;importAvailable=false;status('guest','INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');return}
   const uid=user.id;
   sessionActive=true;
+  importAvailable=false;
   // El progreso local no está particionado por cuenta. Si alguien cambia
   // de usuario en el mismo navegador, bloquear descargas y subidas antes
   // de que una colección pueda sustituir o contaminar a la otra.
@@ -169,7 +171,8 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
    return;
   }
   if(action==='first-upload-required'){
-   status('pending','RESPALDO INICIAL PENDIENTE · DISPONIBLE EN TU CUENTA DE PRUEBA');
+   importAvailable=!bound&&!base&&!remote;
+   status('pending',importAvailable?'TU COLECCIÓN ESTÁ EN ESTE DISPOSITIVO · PUEDES VINCULARLA':'RESPALDO INICIAL PENDIENTE');
    return;
   }
   if(action==='conflict'){
@@ -356,6 +359,42 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
    if(rerun&&!stopped){rerun=false;setTimeout(check,80)}
   }
  }
+ async function importGuest(){
+  if(stopped||busy||issuing||!accountUid||!importAvailable)return {status:'unavailable'};
+  issuing=true;
+  const uid=accountUid;
+  try{
+   const {data:auth,error:authError}=await client.auth.getUser();
+   if(authError||auth?.user?.id!==uid)throw Error('La sesión cambió');
+   const local=assertBackup(readLocal());
+   if(!hasGameProgress(local))return {status:'unavailable'};
+   const {data:row,error:readError}=await client.from('player_snapshots')
+    .select('user_id,game_format,state,revision').eq('user_id',uid).maybeSingle();
+   if(readError)throw readError;
+   if(row||readBaseline(localStorage,uid)||localStorage.getItem(ACCOUNT_BINDING))
+    return {status:'conflict'};
+   if(!sameProgress(readLocal(),local))return {status:'pending'};
+   const {data,error}=await client.rpc('import_guest_collection',{p_state:local});
+   if(error)throw error;
+   if(data?.status!=='imported'||!Number.isSafeInteger(Number(data.revision))||Number(data.revision)<1)
+    return {status:'conflict'};
+   if(!sameProgress(readLocal(),local))return {status:'pending'};
+   const remote=assertBackup(data.state);
+   if(!sameProgress(remote,local))throw Error('La importación no coincide');
+   persistBaseline(localStorage,uid,Number(data.revision),remote);
+   localStorage.setItem(ACCOUNT_BINDING,uid);
+   if(localStorage.getItem(ACCOUNT_BINDING)!==uid)throw Error('No se pudo asociar la cuenta');
+   importAvailable=false;
+   status('synced','COLECCIÓN VINCULADA · YA PUEDES RECUPERAR TUS CARTAS');
+   return {status:'imported'};
+  }catch(_){
+   status('offline','NO SE PUDO VINCULAR · TUS CARTAS SIGUEN EN ESTE DISPOSITIVO');
+   return {status:'pending'};
+  }finally{
+   issuing=false;
+   if(!stopped)setTimeout(check,80);
+  }
+ }
  const changed=()=>{
   if(stopped)return;
   clearTimeout(debounce);
@@ -375,7 +414,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  window.addEventListener('storage',onStorage);
  interval=setInterval(()=>{if(!document.hidden)check()},15000);
  check();
- return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),requiresServer:()=>Boolean(sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)),stop(){
+ return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),canImport:()=>importAvailable,importGuest,requiresServer:()=>Boolean(sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)),stop(){
   stopped=true;clearTimeout(debounce);clearInterval(interval);
   listener?.subscription?.unsubscribe();
   window.removeEventListener('focus',onFocus);
