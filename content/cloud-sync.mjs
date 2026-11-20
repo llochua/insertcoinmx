@@ -127,7 +127,26 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   const rev=row?Number(row.revision):0;
   const base=readBaseline(localStorage,uid);
   const action=decideSync({local,remote,base,remoteRevision:rev});
-  if(action==='empty'){status('empty','CUENTA CONECTADA · SIN PROGRESO TODAVÍA');return}
+  if(action==='empty'){
+   // Solo una cuenta sin respaldo Y un navegador sin progreso puede
+   // inicializarse automáticamente. Nunca migrar cartas locales por esta vía.
+   if(!sameProgress(readLocal(),local)){rerun=true;return}
+   const {data:initialized,error:initError}=await client.rpc('ensure_player_snapshot');
+   if(initError)throw initError;
+   if(!['created','existing'].includes(initialized?.status)||
+      !Number.isSafeInteger(Number(initialized.revision))||
+      Number(initialized.revision)<1)
+    throw Error('No se pudo verificar la colección inicial');
+   const safeRemote=assertBackup(initialized.state);
+   if(!sameProgress(readLocal(),local)){rerun=true;return}
+   // Si se creó en otra pestaña y ya hay progreso, restaurar en lugar de
+   // subir o sustituir las cartas del servidor.
+   const outcome=restoreLocal(safeRemote);
+   if(!outcome?.ok)throw Error('No se pudo restaurar la colección inicial');
+   persistBaseline(localStorage,uid,Number(initialized.revision),safeRemote);
+   status('synced','CUENTA LISTA · COLECCIÓN PROTEGIDA EN LA NUBE');
+   return;
+  }
   if(action==='first-upload-required'){
    status('pending','RESPALDO INICIAL PENDIENTE · DISPONIBLE EN TU CUENTA DE PRUEBA');
    return;
