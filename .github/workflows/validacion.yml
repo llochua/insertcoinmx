@@ -60,3 +60,4 @@ jobs:
         run: |
           node content/validate.mjs
           node qa/check-server-pack-pool.mjs
+          node qa/check-beta-gate.mjs
