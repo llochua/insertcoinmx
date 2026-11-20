@@ -3,7 +3,7 @@
  * Nunca inicia sesión, emite sobres remotos ni toca la colección de producción.
  */
 import {createServer} from 'node:http';
-import {readFile} from 'node:fs/promises';
+import {readFile,mkdir} from 'node:fs/promises';
 import {resolve,dirname,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import assert from 'node:assert/strict';
@@ -83,6 +83,44 @@ try{
   assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true);
   await page.locator('#profileBackup summary').click();
   assert.equal(await page.locator('#profileExport').isVisible(),true,'respaldo visible a solicitud');
+  // Selector de personajes: usa los 24 WebP reales ya integrados.
+  await page.locator('#profileAvatarChange').click();
+  assert.equal(await page.locator('#avatarSelect.on').isVisible(),true,'pantalla de avatar accesible desde el perfil');
+  assert.equal(await page.locator('#avatarGrid .avatar-option').count(),12,'doce personajes aprobados');
+  const avatars=await page.locator('#avatarGrid .avatar-option img').evaluateAll(imgs=>imgs.map(img=>({src:img.getAttribute('src'),loaded:img.complete&&img.naturalWidth===128&&img.naturalHeight===128})));
+  assert.equal(new Set(avatars.map(x=>x.src)).size,12,'todas las miniaturas son diferentes');
+  assert.ok(avatars.every(x=>x.src.includes('assets/avatars/')&&x.src.endsWith('-128.webp')),'usa WebP de 128px');
+  for(const img of page.locator('#avatarGrid .avatar-option img').all?await page.locator('#avatarGrid .avatar-option img').all():[]){
+    await img.scrollIntoViewIfNeeded();
+    await img.evaluate(el=>el.decode());
+    assert.equal(await img.evaluate(el=>el.naturalWidth),128,'miniatura WebP cargada sin error');
+  }
+  await mkdir('qa/screenshots',{recursive:true});
+  await page.locator('#avatarSelect .avatar-scroller').evaluate(el=>el.scrollTop=0);
+  await page.screenshot({path:'qa/screenshots/avatar-selector-'+width+'.png',fullPage:true});
+  const first=await page.locator('#avatarGrid .avatar-option[aria-pressed="true"]').getAttribute('data-avatar');
+  assert.equal(first,'moneda','primer avatar predeterminado');
+  await page.locator('[data-avatar="pizza"]').click();
+  assert.equal(await page.locator('#avatarPreviewName').textContent(),'Pizza');
+  assert.equal(await page.locator('#avatarSave').isEnabled(),true);
+  await page.locator('#avatarBack').click();
+  await page.locator('#profileAvatarButton').click();
+  assert.equal(await page.locator('#avatarPreviewName').textContent(),'Moneda','volver sin guardar descarta la selección');
+  await page.locator('[data-avatar="cartucho"]').click();
+  await page.locator('#avatarSave').click();
+  assert.equal(await page.locator('#profileAvatarImage').getAttribute('src'),'assets/avatars/cartucho-128.webp');
+  await page.screenshot({path:'qa/screenshots/mi-perfil-'+width+'.png',fullPage:true});
+  await page.locator('#profile [data-home]').click();
+  assert.equal(await page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/cartucho-128.webp');
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('icmx-preview-avatar-20261120')),'cartucho');
+  await page.reload({waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/cartucho-128.webp','avatar persiste en sesión');
+  await page.locator('#onSkip').click();
+  await page.locator('#home .home-player-card').click();
+  await page.locator('#profileAvatarChange').click();
+  assert.equal(await page.locator('#avatarPreviewName').textContent(),'Cartucho');
+  await page.locator('#avatarBack').click();
+  // El selector no debe permitir mutar cartas, iniciar sesión o emitir llamadas externas.
   const saved=await page.evaluate(()=>({
     real:localStorage.getItem('icmx-album2'),
     preview:sessionStorage.getItem('icmx-preview-perfil-20261120'),
