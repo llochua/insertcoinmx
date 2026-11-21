@@ -1493,6 +1493,9 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-auth-modes button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 #profile .profile-auth-field{display:flex;flex-direction:column;gap:6px}
 #profile .profile-auth-help{font:500 12px/1.5 AV,system-ui,sans-serif;color:#a9a2c5}
+#profile .profile-auth-forgot,#entryAccount .profile-auth-forgot{display:block;align-self:flex-end;max-width:100%;padding:6px 1px;margin:0 0 2px;background:none;border:0;color:#ffe16b;font:700 12px/1.4 AV,system-ui,sans-serif;text-align:right;cursor:pointer}
+#profile .profile-auth-forgot:focus-visible,#entryAccount .profile-auth-forgot:focus-visible{outline:2px solid #fff;outline-offset:3px}
+#profile .profile-auth-forgot[hidden],#entryAccount .profile-auth-forgot[hidden]{display:none!important}
 #profile .profile-auth-message[data-type="success"]{color:#b8f7cb!important}
 #profile .profile-action:disabled{opacity:.55;cursor:wait}
 #profile .profile-account .profile-auth-hint{font:500 12px/1.55 AV,system-ui,sans-serif;color:rgba(255,255,255,.67)}
@@ -2030,6 +2033,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
      <div class="profile-auth-field" id="profileSignupHandleField"><label for="profileAuthHandle">Nombre de usuario único</label><input id="profileAuthHandle" type="text" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="nombre_usuario" required><p class="profile-auth-help">Entre 3 y 20 caracteres: letras, números y guion bajo. Se confirmará al activar tu cuenta.</p></div>
      <div class="profile-auth-field"><label for="profileAuthEmail">Correo electrónico</label><input type="email" id="profileAuthEmail" name="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="tu@correo.com"></div>
      <div class="profile-auth-field"><label for="profileAuthPassword">Contraseña</label><input type="password" id="profileAuthPassword" name="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Mínimo 8 caracteres"></div>
+     <button type="button" class="profile-auth-forgot" id="profileAuthForgot" hidden>¿OLVIDASTE TU CONTRASEÑA?</button>
      <p class="profile-auth-help" id="profileAuthHint">Te enviaremos un correo para confirmar tu cuenta.</p>
      <button type="submit" class="profile-action primary" id="profileAuthSend">CREAR MI CUENTA</button>
     </form>
