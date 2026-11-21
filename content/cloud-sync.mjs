@@ -310,7 +310,11 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   if(stopped)return 'guest';
   if(busy&&syncTask)await syncTask;
   if(stopped)return 'guest';
-  if(!accountUid&&(sessionActive||hasStoredSession()))await check();
+  // Sincronizar metadata y cambios de otro dispositivo antes del primer intento,
+  // salvo que exista una petición de servidor pendiente que debe reintentarse.
+  const pending=accountUid&&(localStorage.getItem('icmx-cloud-pack-request-v1:'+accountUid)||
+   localStorage.getItem('icmx-cloud-exchange-request-v1:'+accountUid));
+  if(!pending&&(accountUid||sessionActive||hasStoredSession()))await check();
   if(busy&&syncTask)await syncTask;
   if(!accountUid)return localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()?'auth_required':'guest';
   return null;
@@ -461,6 +465,21 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  }
  // El jugador confirma una colección explícita. No se acuñan ni se suman cartas.
  // Si cambia cualquiera de las dos versiones tras mostrar la revisión, se cancela.
+ function listConflictArchives(){
+  const entries=[];
+  for(let i=0;i<localStorage.length;i++){
+   const key=localStorage.key(i);
+   if(!key?.startsWith(ARCHIVE_PREFIX))continue;
+   // Nunca mostrar el archivo de otra cuenta vinculada.
+   if(!key.startsWith(ARCHIVE_PREFIX+'guest:')&&
+      (!accountUid||!key.startsWith(ARCHIVE_PREFIX+accountUid+':')))continue;
+   try{
+    const item=JSON.parse(localStorage.getItem(key));
+    entries.push({key,at:item.at,backup:assertBackup(item.backup)});
+   }catch(_){}
+  }
+  return entries.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+ }
  function getConflict(){
   if(!conflictInfo)return null;
   const {local,remote,rev}=conflictInfo;
@@ -555,7 +574,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  };
  const {data:listener}=client.auth.onAuthStateChange((_event,session)=>{
   sessionActive=Boolean(session?.user?.id);
-  if(!sessionActive)accountUid=null;
+  if(!sessionActive||session?.user?.id!==accountUid)accountUid=null;
   setTimeout(check,0);
  });
  const onFocus=()=>{if(!document.hidden)check()};
@@ -567,7 +586,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  window.addEventListener('storage',onStorage);
  interval=setInterval(()=>{if(!document.hidden)check()},15000);
  check();
- return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),canImport:()=>importAvailable,importGuest,getConflict,useCloud,requiresServer:()=>Boolean(sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()),stop(){
+ return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),canImport:()=>importAvailable,importGuest,getConflict,useCloud,listConflictArchives,requiresServer:()=>Boolean(sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()),stop(){
   stopped=true;clearTimeout(debounce);clearInterval(interval);
   listener?.subscription?.unsubscribe();
   window.removeEventListener('focus',onFocus);
