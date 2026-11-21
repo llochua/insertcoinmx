@@ -2468,11 +2468,28 @@ function showOn(){
  $('onBack').hidden=onI===0;$('onNext').textContent=onI<2?'SIGUIENTE':'SEGUIR COMO INVITADO';$('onAccount').hidden=onI!==ON.length-1;
  if(onI===ON.length-1)$('onAccount').focus({preventScroll:true});else $('onNext').focus({preventScroll:true})
 }
+/* Identidad arcade del invitado: solo en primera entrada; nunca reinicia progreso. */
+function askGuestInitials(){
+ if(ON_PREVIEW||/^[A-Z0-9]{3}$/.test(S.ini||''))return;
+ const shade=document.createElement('div');
+ shade.id='guestInitialsGate';shade.setAttribute('role','dialog');shade.setAttribute('aria-modal','true');shade.setAttribute('aria-labelledby','guestInitialsTitle');
+ shade.style.cssText='position:fixed;inset:0;z-index:110;background:rgba(4,3,15,.94);display:flex;align-items:center;justify-content:center;padding:20px';
+ shade.innerHTML='<div style="width:min(400px,100%);background:#151238;border:2px solid #ffd400;border-radius:16px;padding:28px 20px;text-align:center;box-shadow:0 15px 45px #0009"><p class="px" style="font-size:10px;color:#ffd400;margin-bottom:16px">INSERT COIN MX</p><h2 id="guestInitialsTitle" class="px" style="font-size:16px;line-height:1.7">ELIGE TUS INICIALES</h2><p style="font-size:14px;color:#c9c3e1;margin:12px 0 18px">Como en las máquinas arcade: 3 caracteres para identificarte en el juego.</p><label for="guestInitialsInput" class="px" style="font-size:10px;color:#ffd400">TU NOMBRE ARCADE</label><input id="guestInitialsInput" type="text" inputmode="text" maxlength="3" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="AAA" aria-label="Tres iniciales" style="display:block;margin:12px auto 18px;width:170px;padding:12px;text-align:center;letter-spacing:.35em;font:26px monospace;color:#ffd400;background:#080718;border:2px solid #8b88b8;border-radius:8px"><button id="guestInitialsPlay" type="button" class="big" disabled style="width:100%;opacity:.5">¡A JUGAR!</button><p style="font-size:12px;line-height:1.6;color:#c9c3e1;margin-top:18px">Tu avance se guarda en este navegador, pero podrías perderlo. Crea una cuenta para protegerlo.</p></div>';
+ document.body.append(shade);
+ const input=shade.querySelector('#guestInitialsInput'),play=shade.querySelector('#guestInitialsPlay');
+ input.addEventListener('input',()=>{input.value=input.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3);play.disabled=input.value.length!==3;play.style.opacity=play.disabled?'.5':'1'});
+ function finish(){if(input.value.length!==3)return;syncIn();S.ini=input.value;if(!save()){toast('NO SE PUDO GUARDAR');return}shade.remove();refresh();document.getElementById('home')?.focus({preventScroll:true})}
+ play.addEventListener('click',finish);
+ input.addEventListener('keydown',e=>{if(e.key==='Enter')finish()});
+ shade.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();input.focus()}});
+ input.focus();
+}
 function closeOn(){
  $('onb').classList.remove('on');$('onb').setAttribute('aria-hidden','true');
  syncIn();if(!S.seen&&!ON_PREVIEW){S.seen=1;save()}
  // Ningún sobre se emite hasta que el jugador lo elija desde Inicio.
  go('home');$('home').focus({preventScroll:true});
+ askGuestInitials();
 }
 $('onBack').onclick=()=>{if(onI>0){beep(440,.04);onI--;showOn()}};
 $('onSkip').onclick=()=>{beep(440,.04);closeOn(false)};
