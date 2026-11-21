@@ -444,7 +444,7 @@ initAccount();
 
 // Community reads use the public API, writes use the already verified account session.
 globalThis.icmxCommunityRequest=async function(name,args){
- const read=name==='icmx_community_aggregates';
+ const read=name==='icmx_community_aggregates'||name==='icmx_player_leaderboards';
  if(!read&&!['icmx_community_vote','icmx_community_reta'].includes(name))throw Error('Unknown community operation');
  if(read){
   const response=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},body:'{}'});

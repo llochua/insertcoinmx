@@ -1666,7 +1666,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-width:350px){#scores .arcade-bonus-stats{padding-inline:0}#scores .arcade-bonus-stat span{font-size:7px}#scores .arcade-bonus-stat strong{font-size:13px}}
 
 /* Rangos arcade interactivos: texto pixel, subrayado y foco visible, sin tarjetas. */
-#scores .arcade-ranking-switch{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:7px}
+#scores .arcade-ranking-switch{width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:7px}
 #scores .arcade-ranking-switch button{appearance:none;min-width:0;min-height:30px;padding:7px 1px 5px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:#aaa5ca;font:clamp(6px,1.35vw,8px)/1.4 PX,monospace;cursor:pointer;white-space:nowrap}
 #scores .arcade-ranking-switch button[aria-pressed="true"]{color:#FFD400;border-bottom-color:#FFD400;text-shadow:0 0 8px rgba(255,212,0,.28)}
 #scores .arcade-ranking-switch button:hover{color:#fff}
@@ -1949,6 +1949,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
     <span class="arcade-scoreboard-top">— TOP 10 —</span>
     <div class="arcade-ranking-switch" role="group" aria-label="Seleccionar ranking">
      <button type="button" data-score-metric="cards" aria-pressed="true">CARTAS</button>
+     <button type="button" data-score-metric="pts" aria-pressed="false">PTS</button>
      <button type="button" data-score-metric="designs" aria-pressed="false">DISEÑOS</button>
      <button type="button" data-score-metric="duplicates" aria-pressed="false">REPETIDAS</button>
      <button type="button" data-score-metric="ratings" aria-pressed="false">CALIFICADAS</button>
@@ -2388,6 +2389,7 @@ const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bo
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
 let communityValueEngine=null;
  let communityRanking=null;
+ let playerRanking=null;
  let communityWrites=Promise.resolve();
  function communityVote(id,channel,value){
   const identity=globalThis.icmxAccountIdentity?.userId;
@@ -2691,7 +2693,7 @@ function go(id){
   $('profileAccountPanel').hidden=true;
   $('profileWelcome').hidden=false;
  }
- if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh();if(id==='scores'||id==='album'||id==='pack')communityRanking?.refresh()}
+ if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh();if(id==='scores'||id==='album'||id==='pack')communityRanking?.refresh();if(id==='scores')playerRanking?.refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores,profile:renderProfile}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
@@ -2754,8 +2756,15 @@ async function openArcadeEntry(step='welcome'){
    ini:identity.ini,handle:identity.handle,
    onCreate:()=>openEntryAccount('signup'),
    onLogin:()=>openEntryAccount('login'),
-   onPlay:({ini,handle})=>{
+   onPlay:async({ini,handle})=>{
     syncIn();
+    if(VERIFIED_GUEST_PLAY){
+     if(!cloudSync?.enrollGuestIdentity){toast('CONECTANDO TU PARTIDA · REINTENTA');return false}
+     try{
+      const enrolled=await cloudSync.enrollGuestIdentity({ini,handle});
+      if(enrolled?.status!=='ready'){toast('NO SE PUDO VERIFICAR LA PARTIDA · REINTENTA');return false}
+     }catch(_){toast('IDENTIDAD NO DISPONIBLE · ELIGE OTRO @USUARIO O REINTENTA');return false}
+    }
     try{localStorage.setItem(GUEST_HANDLE_KEY,handle);if(localStorage.getItem(GUEST_HANDLE_KEY)!==handle)return false}
     catch(_){return false}
     const previous={ini:S.ini,seen:S.seen};
@@ -2770,7 +2779,7 @@ $('profileEditIdentity').onclick=()=>{go('home');openArcadeEntry('identity')};
 document.addEventListener('icmx:player-identity',()=>{
  if(globalThis.icmxAccountIdentity?.handle)guestUIModule.then(ui=>ui.hide()).catch(()=>{});
  if(cur==='profile')renderProfile();
- else if(cur==='scores')renderScores();
+ else if(cur==='scores'){renderScores();playerRanking?.refresh(true)}
  else if(cur==='home')renderHome();
  STORE.put();
 });
@@ -2793,7 +2802,7 @@ function menuArtLoad(img,m,dir){
  img.src=menuArtSrc(m,dir);
  img.closest('.fx')?.classList.toggle('menu-illustration',menuArtOK.has(m.id));
 }
-const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
+const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(playerRanking?.state.boards?.cards||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
  {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
@@ -3273,7 +3282,7 @@ ST.addEventListener('touchcancel',()=>gEnd(true));
 
 
 /* ===== title screen ===== */
-function renderTitle(){$('tiOne').textContent=uniq();const docs=(STORE.docs||[]).slice().sort((a,b)=>(b.score||0)-(a.score||0));
+function renderTitle(){$('tiOne').textContent=uniq();const docs=(playerRanking?.state.boards?.cards||[]).slice().sort((a,b)=>(b.score||0)-(a.score||0));
  const top=docs[0];$('tiHi').textContent=top?((top.ini||'???')+' '+top.score):'---';
  const list=docs.slice(0,5).map((d,i)=>`<i>${i+1}.</i> ${d.ini||'???'} ${d.score||0}`).join('   ·   ');
  $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'5 SOBRES DE BIENVENIDA · 2 DIARIOS   ·   JUNTA '+NAV+' CARTAS   ·   INSERTCOINMX.COM'}
@@ -3709,10 +3718,11 @@ window.addEventListener('message',e=>{
  }
 });
 /* ---------- récords: marcador arcade restaurado desde QA ---------- */
-function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STORE.docs.length&&S.ini)m.push({ini:S.ini,score:uniq()});return m.filter(r=>/^[A-Z0-9]{3}$/.test(r.ini)&&Number.isInteger(r.score)&&r.score>0).sort((a,b)=>b.score-a.score)}
+function board(){return playerRanking?.state.boards?.cards||[]}
 /* ---------- récords: una tabla por categoría, sin inventar jugadores ---------- */
 const RANKING_FIELDS=Object.freeze({
  cards:{field:'score',label:'CARTAS',aria:'cartas distintas'},
+ pts:{field:'pts',label:'PTS',aria:'puntos de coleccionista'},
  designs:{field:'designs',label:'DISEÑOS',aria:'diseños'},
  duplicates:{field:'duplicates',label:'REPETIDAS',aria:'repetidas'},
  ratings:{field:'ratings',label:'CALIFICADAS',aria:'calificadas'}
@@ -3722,6 +3732,7 @@ let selectedRanking='cards';
 function currentRecordScores(){
  return {
   cards:uniq(),
+  pts:collectionPointsLocal()??0,
   designs:DESIGNS.filter(d=>!d.bx&&dState(d).own).length,
   duplicates:dups(),
   ratings:Object.keys(S.rate||{}).length
@@ -3743,16 +3754,15 @@ function persistLocalRecord(){
  catch(_){return false}
 }
 function scoreBoard(metric=selectedRanking){
- const field=RANKING_FIELDS[metric]?.field||'score';
- // Cada categoría se clasifica por separado. Un cero no ocupa una posición.
- const remotely=STORE.docs.filter(r=>r&&/^[A-Z0-9]{3}$/.test(r.ini||'')&&safeRankValue(r[field])!==null&&r[field]>0)
-  .map(r=>({ini:r.ini,handle:r.handle||'',score:r[field]}));
- if(remotely.length)return {rows:remotely.sort((a,b)=>b.score-a.score||a.ini.localeCompare(b.ini)).slice(0,10),origin:'available'};
- // El marcador local representa las estadísticas actuales, no un récord antiguo.
+ // Solo el servidor decide posiciones globales. El navegador jamás sube puntajes.
+ const ranking=playerRanking?.state;
+ if(ranking?.status==='ready'&&Array.isArray(ranking.boards?.[metric]))
+  return {rows:ranking.boards[metric],origin:'available'};
+ // Los invitados sin sesión conservan su récord local provisional.
  const own=arcadeIdentity(),count=currentRecordScores()[metric];
- if(validArcadeIni(own.ini)&&safeRankValue(count)!==null&&count>0)
+ if(!own.registered&&validArcadeIni(own.ini)&&safeRankValue(count)!==null&&count>0)
   return {rows:[{ini:own.ini,handle:own.handle||'',score:count}],origin:'session'};
- return {rows:[],origin:'empty'};
+ return {rows:[],origin:ranking?.status==='loading'?'loading':'empty'};
 }
 function renderScores(){
  renderCommunityBoard();
@@ -3768,12 +3778,12 @@ function renderScores(){
  $('scorePlayerInitials').textContent=hasIni?own.ini:'---';
  $('scoreIdentityNote').textContent=own.handle?'@'+own.handle+(own.registered?' · cuenta':' · invitado'):'Configura tu identidad en Mi perfil';
  const metric=RANKING_FIELDS[selectedRanking],listing=scoreBoard(selectedRanking);
- const available=listing.rows,position=available.findIndex(r=>r.ini===own.ini&&(own.handle?r.handle===own.handle:true));
- $('sPos').textContent=stats[selectedRanking]===0?'AÚN SIN PUNTUACIÓN EN ESTA CATEGORÍA':position>=0?(listing.origin==='available'?'VAS EN EL LUGAR #':'RÉCORD LOCAL · LUGAR #')+(position+1):'TU PUNTAJE ESTÁ GUARDADO';
+ const available=listing.rows,position=available.findIndex(r=>r.mine===true||(r.ini===own.ini&&own.handle&&r.handle===own.handle));
+ $('sPos').textContent=stats[selectedRanking]===0?'AÚN SIN PUNTUACIÓN EN ESTA CATEGORÍA':position>=0?(listing.origin==='available'?'VAS EN EL LUGAR #':'RÉCORD LOCAL PROVISIONAL · LUGAR #')+(position+1):'TU PUNTAJE ESTÁ GUARDADO';
  $('scoreRankColumn').textContent=metric.label;
  $('tbl').setAttribute('aria-label','Top 10 de '+metric.aria);
  document.querySelectorAll('#scores [data-score-metric]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.scoreMetric===selectedRanking)));
- $('scoreDataScope').textContent=listing.origin==='available'?'RÉCORDS DISPONIBLES ENTRE JUGADORES':listing.origin==='session'?'RÉCORD DE ESTA SESIÓN':'AÚN NO HAY PUNTUACIONES EN ESTA CATEGORÍA';
+ $('scoreDataScope').textContent=listing.origin==='available'?'TOP 10 GLOBAL · DATOS VERIFICADOS':listing.origin==='session'?'RÉCORD SOLO DE ESTE NAVEGADOR · NO ESTÁS EN EL TOP GLOBAL':listing.origin==='loading'?'CARGANDO RÉCORDS GLOBALES…':playerRanking?.state.status==='offline'?'RÉCORDS GLOBALES TEMPORALMENTE NO DISPONIBLES':'AÚN NO HAY PUNTUACIONES VERIFICADAS EN ESTA CATEGORÍA';
  // Diez espacios reales: los huecos nunca contienen jugadores inventados.
  $('tbl').innerHTML=Array.from({length:10},(_,i)=>{
   const r=available[i],mine=!!r&&r.ini===own.ini&&(own.handle?r.handle===own.handle:true);
@@ -4136,7 +4146,9 @@ $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
- Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261121-beta2')]).then(([mod,auth])=>{
+ Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261121-beta2'),import('./content/player-ranking.mjs?v=20261121-v1')]).then(([mod,auth,players])=>{
+  playerRanking=players.createPlayerRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{if(cur==='scores')renderScores();if(cur==='home'||cur==='title')refresh()}});
+  playerRanking.refresh();
   communityRanking=mod.createCommunityRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{
    if(cur==='scores')renderCommunityBoard();
    if(cur==='album'&&!fd&&!$('zoom').open)renderAlbum();

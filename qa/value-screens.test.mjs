@@ -9,10 +9,10 @@ const css=readFileSync('content/community-value-ui.css','utf8');
 const face=readFileSync('content/card-value-overlay.js','utf8');
 const key=pat=>assert.ok(html.includes(pat),'Falta en index.html: '+pat);
 
-test('Conservar High Scores arcade con sus cuatro categorías',()=>{
+test('Conservar High Scores arcade con cinco categorías reales',()=>{
  for(const id of ['recordDesigns','recordDuplicates','recordRatings','scoreRankColumn','scoreDataScope','arcadeBonusTitle','scoreTopTitle'])
   key('id="'+id+'"');
- for(const metric of ['cards','designs','duplicates','ratings'])key('data-score-metric="'+metric+'"');
+ for(const metric of ['cards','pts','designs','duplicates','ratings'])key('data-score-metric="'+metric+'"');
  assert.match(html,/<section class="view" id="scores">[\s\S]*?HIGH SCORES[\s\S]*?TOP 10/);
  assert.match(html,/rank-empty/);
  const section=html.slice(html.indexOf('<section class="view" id="scores">'),html.indexOf('<section class="view" id="profile"'));

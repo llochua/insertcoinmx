@@ -32,6 +32,11 @@ if(process.argv.includes('--closed')){
  console.log('PASS: real anonymous JWT rejected with gate closed');
  process.exit(0);
 }
+const publicIdentity=await rpc(a.c,'icmx_register_guest_identity',{p_ini:'TST',p_handle:'qa_guest_a'});
+assert.equal(publicIdentity.handle,'qa_guest_a');
+assert.equal((await rpc(a.c,'icmx_register_guest_identity',{p_ini:'TST',p_handle:'qa_guest_a'})).status,'registered','reintento de identidad idempotente');
+assert.ok((await b.c.rpc('icmx_register_guest_identity',{p_ini:'TST',p_handle:'qa_guest_a'})).error,'@usuario de invitado único');
+assert.ok((await a.c.rpc('icmx_register_guest_identity',{p_ini:'BAD',p_handle:'changed_name'})).error,'identidad no se puede cambiar tras registrar');
 const initial=await rpc(a.c,'ensure_player_snapshot');
 assert.equal(initial.status,'created');
 assert.equal(initial.state.data.welcomeLeft,5);
@@ -46,6 +51,11 @@ assert.equal(duplicate.status,'duplicate');assert.deepEqual(duplicate.cards,pack
 assert.deepEqual(duplicate.state,pack.state);
 pack=await rpc(a.c,'issue_player_pack',{p_request_id:randomUUID(),p_expected_revision:pack.revision});
 assert.equal(count(pack.state),10);
+const guestBoard=await rpc(a.c,'icmx_player_leaderboards');
+assert.ok(guestBoard.cards.some(row=>row.handle==='qa_guest_a'&&row.score>0),'invitado entra al ranking solo con cartas verificadas');
+assert.ok(guestBoard.pts.some(row=>row.handle==='qa_guest_a'&&row.score>0),'PTS obtenidos de sobres del servidor');
+assert.ok(!JSON.stringify(guestBoard).includes(a.uid),'nunca exponer UID en respuesta');
+
 assert.equal(pack.state.data.welcomeLeft,3);
 const illegal=structuredClone(pack.state);illegal.data.have.forged_b=999;
 assert.ok((await a.c.rpc('sync_player_snapshot',{p_expected_revision:pack.revision,p_state:illegal})).error,'cannot forge cards');

@@ -45,7 +45,7 @@ try{
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-profile-mobile.png'),fullPage:true});
  await page.evaluate(()=>go('scores'));
  await page.locator('#scores.on').waitFor();
- assert.equal(await page.locator('#scores .arcade-ranking-switch button').count(),4);
+ assert.equal(await page.locator('#scores .arcade-ranking-switch button').count(),5);
  assert.equal(await page.locator('#scores .arcade-scoreboard-rows .r').count(),10);
  assert.equal(await page.locator('#scores .icmx-global-board').count(),1);
  assert.equal(await page.locator('#scores #bkExp').count(),0);

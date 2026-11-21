@@ -39,6 +39,7 @@ async function open(identity,width){
   const send=(body,status=200)=>r.fulfill({status,headers,contentType:'application/json',body:JSON.stringify(body)});
   if(req.method()==='OPTIONS')return send(null);
   if(path.endsWith('/icmx_community_aggregates'))return send(aggregates());
+  if(path.endsWith('/icmx_player_leaderboards'))return send({pts:[],cards:[],designs:[],duplicates:[],ratings:[]});
   if(path.endsWith('/icmx_community_vote')){
    const token=req.headers().authorization,person=token?.replace('Bearer test-','');
    if(!identity||person!==identity)return send({error:'no session'},403);

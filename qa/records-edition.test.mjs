@@ -1,56 +1,49 @@
-/** La clasificación pública comienza desde cero en la edición nueva. */
+/** El ranking de jugadores usa un Top 10 global verificado, nunca registros Claude antiguos. */
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
 const html=readFileSync('index.html','utf8');
-const start=html.indexOf("const RECORDS_EDITION='public-2026-launch-v1';");
-const finish=html.indexOf("/* Varias pestañas:",start);
-assert.ok(start>=0&&finish>start,'no se encontró la edición de Récords');
-const storeSnippet=html.slice(start,finish);
-const boardStart=html.indexOf('function board(){');
-const boardEnd=html.indexOf('function renderScores()',boardStart);
-assert.ok(boardStart>=0&&boardEnd>boardStart,'no se encontró la clasificación');
-const boardSnippet=html.slice(boardStart,boardEnd);
-
-test('Ignorar registros de la colección anterior y otras ediciones',async()=>{
- const stored=[
-  {v:6,ini:'OLD',score:300,rate:{}},
-  {v:7,edition:'public-2025',ini:'OLD',score:400,rate:{}},
-  {v:7,edition:'public-2026-launch-v1',ini:'NEW',score:3,rate:{}}
- ];
- let wrote=null;
- const db={
-  collection(name){assert.equal(name,'tiers');return {onSnapshot(cb){cb({docs:stored.map(value=>({data:()=>value}))})}}},
-  doc(path){assert.equal(path,'tiers/u-1');return {set(value){wrote=value;return Promise.resolve()}}}
- };
+const start=html.indexOf('function board(){');
+const finish=html.indexOf('function renderScores(){',start);
+assert.ok(start>=0&&finish>start,'no se encontró el ranking de jugadores');
+const snippet=html.slice(start,finish);
+function harness(status,boards){
  const context={
-  window:{claude:true},claude:{async use(name){if(name==='db')return db;if(name==='user')return {id:async()=> 'u-1'};return null}},
-  S:{ini:'NEW',rate:{},champ:'',duel:{}},uniq:()=>3,refresh:()=>{},icmxAccountIdentity:{ini:'NEW',handle:'qa_player',isPublic:true},validArcadeIni:v=>/^[A-Z0-9]{3}$/.test(v)
+  playerRanking:{state:{status,boards}},
+  STORE:{docs:[{ini:'OLD',handle:'legacy_player',score:99999}]},
+  S:{ini:'TST',rate:{},have:{}},uniq:()=>2,dups:()=>0,
+  collectionPointsLocal:()=>20,DESIGNS:[],dState:()=>({own:false}),
+  arcadeIdentity:()=>({ini:'TST',handle:'test_player',registered:false}),
+  validArcadeIni:s=>/^[A-Z0-9]{3}$/.test(s),
+  localStorage:{getItem:()=>null,setItem:()=>{}}
  };
  vm.createContext(context);
- vm.runInContext(storeSnippet+'\nglobalThis.store=STORE;',context);
- await context.store.init();
- assert.equal(context.store.docs.length,1);
- assert.equal(context.store.docs[0].ini,'NEW');
- context.store.put();
- assert.equal(wrote.v,7);
- assert.equal(wrote.edition,'public-2026-launch-v1');
- assert.equal(wrote.score,3);
+ vm.runInContext(snippet+'\nglobalThis.rankTest={board,scoreBoard};',context);
+ return context;
+}
+test('La clasificación global ignora STORE y conserva solo Top 10 del RPC',()=>{
+ const h=harness('ready',{cards:[{ini:'ABC',handle:'arcade_abc',score:4}],pts:[],designs:[],duplicates:[],ratings:[]});
+ assert.deepEqual([...h.rankTest.board()].map(x=>x.ini),['ABC']);
+ assert.deepEqual([...h.rankTest.scoreBoard('cards').rows].map(x=>x.ini),['ABC']);
+ assert.equal(h.rankTest.scoreBoard('cards').origin,'available');
+ assert.equal(h.rankTest.scoreBoard('pts').rows.length,0);
 });
-test('Una clasificación nueva no muestra récords previos ni marcadores sin iniciales',()=>{
- const context={
-  STORE:{docs:[
-    {ini:'???',score:15},{ini:'AA',score:20},{ini:'AAA',score:0},
-    {ini:'NEW',score:3},{ini:'ABC',score:2}
-  ]},
-  S:{ini:''},
-  uniq:()=>0
- };
- vm.createContext(context);
- vm.runInContext(boardSnippet+'\nglobalThis.boardTest=board;',context);
- assert.deepEqual([...context.boardTest()].map(x=>x.ini),['NEW','ABC']);
- context.STORE.docs=[];
- assert.equal(context.boardTest().length,0);
+test('Una edición sin datos no inventa jugadores globales',()=>{
+ const h=harness('ready',{cards:[],pts:[],designs:[],duplicates:[],ratings:[]});
+ assert.equal(h.rankTest.scoreBoard('cards').rows.length,0);
+ assert.equal(h.rankTest.scoreBoard('cards').origin,'available');
+});
+test('Un invitado sin conexión solo tiene marcador local provisional',()=>{
+ const h=harness('offline',null);
+ assert.equal(h.rankTest.scoreBoard('cards').origin,'session');
+ assert.equal(h.rankTest.scoreBoard('cards').rows[0].score,2);
+ assert.equal(h.rankTest.scoreBoard('pts').rows[0].score,20);
+});
+test('Un jugador registrado no fabrica un puesto ante un fallo de red',()=>{
+ const h=harness('offline',null);
+ h.arcadeIdentity=()=>({ini:'TST',handle:'test_player',registered:true});
+ assert.equal(h.rankTest.scoreBoard('cards').rows.length,0);
+ assert.equal(h.rankTest.scoreBoard('cards').origin,'empty');
 });
