@@ -26,6 +26,7 @@ async function account(){
  assert.ok(verified.ok&&verified.data?.id===login.data.user.id);
  return {token,id:verified.data.id};
 }
+for(let i=0;i<20;i++){if((await agg()).ok)break;await new Promise(r=>setTimeout(r,500));}
 const a=await account(),b=await account();assert.notEqual(a.id,b.id);
 if(process.argv.includes('--closed')){
 assert.deepEqual((await agg()).data,[],'closed feature exposes no aggregates');
@@ -53,3 +54,11 @@ const direct=await req('/rest/v1/community_design_votes',{token:a.token,method:'
 assert.equal(direct.ok,false,'private table unavailable to client');
 assert.equal((await rpc('icmx_community_vote',{p_design:'invalid_design',p_channel:'like',p_value:1},a.token)).ok,false);
 console.log('PASS: two real JWTs through PostgREST, replace and withdraw votes, guest write denied, private table hidden, verified aggregate rank');
+const day=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Monterrey',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const matches=['arcade','1up','aku','b','c','d','e'].map(loser=>({winner:'abuket',loser}));
+assert.ok((await rpc('icmx_community_reta',{p_day:day,p_matches:matches},a.token)).ok);
+assert.equal((await agg()).data.find(r=>r.id==='abuket').reta.wins,7);
+const replacement=['abuket','1up','aku','b','c','d','e'].map(loser=>({winner:'arcade',loser}));
+assert.ok((await rpc('icmx_community_reta',{p_day:day,p_matches:replacement},a.token)).ok);
+assert.deepEqual((await agg()).data.find(r=>r.id==='abuket').reta,{wins:0,matches:1});
+console.log('PASS: authenticated Reta replacement through REST');
