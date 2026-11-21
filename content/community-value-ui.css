@@ -21,3 +21,17 @@
 #scores .icmx-global-empty span{font:7px/1.5 PX,monospace;max-width:165px;text-align:left;color:#aaa5cd}
 #scores .icmx-global-board .icmx-global-note{font:9px/1.5 AV,system-ui,sans-serif;color:#8f8bac;margin-top:12px}
 @media(max-width:370px){#profile .icmx-player-points{padding:10px;gap:7px}#profile .icmx-player-points small{font-size:9px}}
+
+/* Global POP · misma jerarquía arcade, títulos y valores legibles. */
+#scores .icmx-global-empty[hidden],#zoom #zLikes[hidden]{display:none!important}
+#communityRankRows{display:grid;gap:4px;text-align:left}
+.community-rank-row{width:100%;min-height:46px;padding:9px 10px;display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:10px;background:#ffffff08;border:1px solid #ffffff20;border-radius:6px;color:#fff;text-align:left;font:600 13px AV,system-ui,sans-serif;cursor:pointer}
+.community-rank-row span:first-child{font:10px PX,monospace;color:#aaa5cd}
+.community-rank-row strong{font:700 12px AV,system-ui,sans-serif;color:#4ff2f3;white-space:nowrap}
+.community-rank-row:first-child{border-color:#ffd40070}
+.community-rank-row:first-child span:first-child{color:#ffd400}
+.community-rank-row:hover,.community-rank-row:focus-visible{background:#ffffff17;outline:1px solid #4ff2f3}
+#zLikes{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px;padding-top:12px;border-top:1px solid #ffffff24}
+#zLikes button{font:600 12px AV,system-ui,sans-serif;min-height:36px;padding:7px 10px;color:#fff;border:1px solid #ffffff30;background:#ffffff0d;border-radius:6px;cursor:pointer}
+#zLikes button:hover,#zLikes button:focus-visible{border-color:#4ff2f3}
+#zLikeStatus{flex-basis:100%;font:11px AV,system-ui,sans-serif;color:#c9c3df;text-align:center}
