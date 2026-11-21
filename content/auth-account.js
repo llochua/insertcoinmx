@@ -148,6 +148,8 @@ async function initAccount() {
     const img=document.getElementById('homePlayerAvatarImage');
     if(img?.decode) await img.decode().catch(()=>{});
     document.documentElement.dataset.icmxAvatarReady='true';
+    for(const element of document.querySelectorAll('#homePlayerAvatarImage,#profileAvatarImage'))
+      element.style.removeProperty('visibility');
   }
 }
 $auth('profileAuthTabSignup').addEventListener('click', () => changeAuthMode('signup'));
