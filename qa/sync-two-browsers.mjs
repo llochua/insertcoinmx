@@ -381,18 +381,10 @@ async function run(){
     'sincronización lista antes de abrir el primer sobre vinculado');
   const linkedIssue=()=>[...issued.keys()].some(key=>key.startsWith(LEGACY+':'));
   await D.page.evaluate(()=>openPack());
-  // importGuest programa una última comprobación asíncrona. Si coincide con
-  // el primer tap, issuePack devuelve "busy" SIN acuñar cartas: la UI indica
-  // reintentar. Cubrir ese reintento legítimo sin ocultar fallos persistentes
-  // ni permitir más de un sobre/revisión.
-  await until(linkedIssue,'primera petición tras vincular',1200).catch(async()=>{
-    assert.equal(count(await read(D.page)),importedCards,
-      'un intento ocupado no debe añadir cartas en el dispositivo');
-    await until(async()=>await D.page.locator('#cloudState').getAttribute('data-sync')==='synced',
-      'la última comprobación de nube debe terminar antes del reintento',5000);
-    await delay(250);
-    await D.page.evaluate(()=>openPack());
-  });
+  // La comprobación final tras importar NO debe bloquear el primer tap:
+  // issuePack espera el check en curso sin acuñar dos sobres.
+  assert.equal(count(await read(D.page)),importedCards,
+    'antes de emitir el primer sobre se conserva la colección importada');
   await until(linkedIssue,
     'el primer sobre tras vincular debe emitirse en servidor',4500).catch(async(error)=>{
     const diagnostic=await D.page.evaluate(()=>({
@@ -428,8 +420,8 @@ async function run(){
   const beforeRevision=cloud.get(USER).revision;
   await B.page.evaluate(()=>localStorage.removeItem('icmx-qa-user'));
   await check(B.page);
-  await until(async()=>await B.page.locator('#cloudState').getAttribute('data-sync')==='guest',
-    'estado invitado tras cerrar sesión');
+  await until(async()=>await B.page.locator('#cloudState').getAttribute('data-sync')==='auth_required',
+    'cuenta vinculada sin sesión debe requerir reingreso, no convertirse en invitado');
   await B.page.evaluate(()=>openPack());
   await delay(250);
   assert.deepEqual(await read(B.page),beforeRelog,
