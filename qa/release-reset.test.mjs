@@ -6,7 +6,7 @@ import vm from 'node:vm';
 
 const source=readFileSync('content/release-reset.js','utf8');
 const html=readFileSync('index.html','utf8');
-const epoch='public-2026-launch-v1';
+const epoch='public-2026-launch-v2';
 function storage(initial={}){
  const m=new Map(Object.entries(initial));
  return {
@@ -33,6 +33,7 @@ const legacy=()=>storage({
  'icmx-album2.premig':'old',
  'icmx-album2.corrupt':'invalid',
  'icmx-cloud-active-account-v1':'old-account',
+ 'icmx-local-ranking-public-2026-v1':'old-scores',
  'icmx-cloud-baseline-v1:player-A':'{"revision":3}',
  'icmx-cloud-pack-request-v1:player-A':'request-1',
  'icmx-cloud-exchange-request-v1:player-A':'request-2',
@@ -41,7 +42,7 @@ const legacy=()=>storage({
  'unrelated-setting':'keep'
 });
 test('La versión candidata prepara el reinicio en el dominio oficial',()=>{
- assert.match(html,/release-reset\.js[^>]*data-active="true"[^>]*data-game-epoch="public-2026-launch-v1"/);
+ assert.match(html,/release-reset\.js[^>]*data-active="true"[^>]*data-game-epoch="public-2026-launch-v2"/);
  const s=legacy();
  assert.equal(launch(s,false).result.status,'staged');
  assert.equal(JSON.parse(s.getItem('icmx-album2')).have.abuket_b,3);
@@ -61,7 +62,7 @@ test('Al activarse elimina juego anterior, no usuarios, Auth ni avatar',()=>{
  for(const key of [
   'icmx-album2','icmx-album2.ext','icmx-album2.bak',
   'icmx-album2.premig','icmx-album2.corrupt',
-  'icmx-cloud-active-account-v1','icmx-cloud-baseline-v1:player-A',
+  'icmx-cloud-active-account-v1','icmx-local-ranking-public-2026-v1','icmx-cloud-baseline-v1:player-A',
   'icmx-cloud-pack-request-v1:player-A','icmx-cloud-exchange-request-v1:player-A'
  ])assert.equal(s.getItem(key),null,key);
  assert.equal(s.getItem('icmx-game-epoch'),epoch);
