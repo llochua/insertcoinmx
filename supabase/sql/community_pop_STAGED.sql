@@ -19,7 +19,13 @@ ALTER TABLE private_community.community_design_votes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE private_community.community_reta_ballots ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON private_community.community_design_votes,private_community.community_reta_ballots FROM PUBLIC,anon,authenticated;
 -- Separate gate: staged migration never starts accepting live votes by itself.
-INSERT INTO private_sync.beta_access_gate(key,enabled) VALUES ('community_pop',false) ON CONFLICT(key) DO NOTHING;
+CREATE TABLE IF NOT EXISTS private_community.release_gate (
+  key text PRIMARY KEY CHECK (key='community_pop'),
+  enabled boolean NOT NULL DEFAULT false
+);
+ALTER TABLE private_community.release_gate ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON private_community.release_gate FROM PUBLIC,anon,authenticated;
+INSERT INTO private_community.release_gate(key,enabled) VALUES ('community_pop',false) ON CONFLICT(key) DO NOTHING;
 CREATE OR REPLACE FUNCTION private_community.community_can_vote()
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE uid uuid:=auth.uid();
@@ -27,7 +33,7 @@ BEGIN
  IF uid IS NULL OR coalesce((auth.jwt()->>'is_anonymous')::boolean,false) THEN
   RAISE EXCEPTION 'Registered account required' USING ERRCODE='42501';
  END IF;
- IF NOT coalesce((SELECT enabled FROM private_sync.beta_access_gate WHERE key='community_pop'),false)
+ IF NOT coalesce((SELECT enabled FROM private_community.release_gate WHERE key='community_pop'),false)
     AND NOT EXISTS(SELECT 1 FROM private_sync.sync_lab_allowlist WHERE user_id=uid) THEN
   RAISE EXCEPTION 'Community voting not enabled' USING ERRCODE='42501';
  END IF;
@@ -108,7 +114,7 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $$
  jsonb_build_object('goty',coalesce(v.goty,0),'genial',coalesce(v.genial,0),'ok',coalesce(v.ok,0),'mmm',coalesce(v.mmm,0)),
  jsonb_build_object('wins',coalesce(rr.wins,0),'matches',coalesce(rr.matches,0))
  FROM eligible e LEFT JOIN votes v ON v.design_id=e.design LEFT JOIN rr ON rr.design_id=e.design
- WHERE coalesce((SELECT enabled FROM private_sync.beta_access_gate WHERE key='community_pop'),false);
+ WHERE coalesce((SELECT enabled FROM private_community.release_gate WHERE key='community_pop'),false);
 $$;
 -- Public RPC wrappers are invokers; only narrow internal functions have elevated access.
 CREATE OR REPLACE FUNCTION public.icmx_community_aggregates()
