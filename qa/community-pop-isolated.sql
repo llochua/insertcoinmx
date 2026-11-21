@@ -8,7 +8,8 @@ CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$SELECT nullif(c
 CREATE FUNCTION auth.jwt() RETURNS jsonb LANGUAGE sql STABLE AS $$SELECT coalesce(nullif(current_setting('request.jwt.claims',true),'')::jsonb,'{}'::jsonb)$$;
 GRANT USAGE ON SCHEMA auth TO anon,authenticated;
 CREATE SCHEMA private_sync;
-CREATE TABLE private_sync.beta_access_gate(key text PRIMARY KEY,enabled boolean NOT NULL);
+CREATE TABLE private_sync.beta_access_gate(key text PRIMARY KEY CHECK(key='public_beta'),enabled boolean NOT NULL);
+INSERT INTO private_sync.beta_access_gate VALUES ('public_beta',true);
 CREATE TABLE private_sync.sync_lab_allowlist(user_id uuid PRIMARY KEY);
 CREATE TABLE private_sync.pack_pool(card_key text PRIMARY KEY,variant text NOT NULL);
 INSERT INTO auth.users VALUES ('00000000-0000-0000-0000-000000000001'),('00000000-0000-0000-0000-000000000002'),('00000000-0000-0000-0000-000000000003');
@@ -17,13 +18,13 @@ INSERT INTO private_sync.pack_pool SELECT d||'_'||v,v FROM unnest(ARRAY['a','b',
 
 CREATE FUNCTION public.qa_assert(ok boolean, label text) RETURNS void LANGUAGE plpgsql AS $$BEGIN IF ok IS DISTINCT FROM true THEN RAISE EXCEPTION 'FAIL: %',label; END IF; RAISE NOTICE 'PASS: %',label; END$$;
 
-SELECT public.qa_assert(NOT (SELECT enabled FROM private_sync.beta_access_gate WHERE key='community_pop'),'migration gate off');
+SELECT public.qa_assert(NOT (SELECT enabled FROM private_community.release_gate WHERE key='community_pop'),'migration gate off');
 SET ROLE anon;
 SELECT public.qa_assert((SELECT count(*) FROM public.icmx_community_aggregates())=0,'closed ranking empty');
 SELECT public.qa_assert(NOT has_function_privilege(current_user,'public.icmx_community_vote(text,text,integer)','EXECUTE'),'anon cannot vote');
 SELECT public.qa_assert(NOT has_table_privilege(current_user,'private_community.community_design_votes','SELECT'),'anon cannot read identities');
 RESET ROLE;
-UPDATE private_sync.beta_access_gate SET enabled=true WHERE key='community_pop';
+UPDATE private_community.release_gate SET enabled=true WHERE key='community_pop';
 SET ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',false);
 SELECT set_config('request.jwt.claims','{"is_anonymous":false}',false);
