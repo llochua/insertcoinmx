@@ -39,7 +39,7 @@ try{
  const guest=await device(false);devices.push(guest);
  await guest.page.waitForFunction(()=>document.getElementById('account').textContent.includes('No hay una sesión activa'));
  assert.equal(await guest.page.locator('#save').isDisabled(),true);
- assert.equal(await guest.page.locator('#selection').isDisabled(),true);
+ assert.equal(await guest.page.locator('#selection').evaluate(el=>el.disabled),true);
  await guest.context.close();
  const A=await device(true);devices.push(A);
  await A.page.getByText('5 cartas en la nube').waitFor();
