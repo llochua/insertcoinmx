@@ -75,6 +75,9 @@ test('Two passwords must match; only verified account can update password',async
  assert.equal(h.element('recoveryForm').hidden,true);
  assert.equal(h.element('recoveryHome').hidden,false);
  assert.match(h.element('message').textContent,/actualizada correctamente/);
+ h.auth.emit('USER_UPDATED',{user:h.user});
+ assert.equal(h.element('signed').getAttribute('aria-hidden'),'true','no mostrar vista de laboratorio tras guardar');
+ assert.equal(h.element('recoveryHome').hidden,false,'mantener botón de regreso');
  assert.equal(h.calls.storage.length,0);
 });
 
