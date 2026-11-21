@@ -26,7 +26,7 @@ test('Valor de variante y POP viven sobre la imagen; solo queda la explicación 
  key('content/card-value-overlay.js?v=');
  assert.match(html,/POPULARIDAD: LIKES 35% · TIER 35% · RETA 30%/);
  assert.doesNotMatch(html,/id="zVariantPoints"|id="zDesignPopularity"|class="icmx-card-value"/);
- assert.match(css,/\.fx>canvas\.icmx-card-face-values/);
+ assert.match(css,/\.fx>svg\.icmx-live-pop/);
  assert.match(css,/#zoom \.icmx-card-value-note/);
  assert.doesNotMatch(html,/738 POP|480 PTS/);
 });
@@ -59,12 +59,15 @@ test('El historial actual de PTS se calcula mediante el motor existente',()=>{
  ctx.S.have={arcade_f:1};assert.equal(ctx.testAPI.points(),100);
  ctx.S.have={};assert.equal(ctx.testAPI.points(),0);
 });
-test('La capa sobre imágenes cubre las cifras impresas sin afectar la ilustración',()=>{
- assert.match(face,/x1:570,x2:904,y1:142,y2:217/);
- assert.match(face,/x1:641,x2:843,y1:1252,y2:1281/);
- assert.match(face,/ctx\.clearRect\(0,0,W,H\)/);
+test('Las cartas no usan rectángulos de reparación: la tipografía se compone en el generador',()=>{
+ const generator=readFileSync('cartas/generar.py','utf8');
+ assert.match(generator,/def limpiar_rotulos_valor\(marco\):/);
+ assert.match(generator,/cv2\.inpaint\(roi, tinta, 3, cv2\.INPAINT_TELEA\)/);
+ assert.match(generator,/texto\(out, 'pop_label', 'pop_label', 'POP', tinta\)/);
+ assert.match(generator,/texto\(out, 'valor_pie', 'valor_pie', f"Valor \{PUNTOS_VARIANTE\[rareza\]\}", tinta\)/);
+ assert.match(generator,/escribir\(out, 'pie', f"Valor \{PUNTOS_VARIANTE\['full'\]\}"/);
+ assert.match(face,/document\.createElementNS\(NS,'svg'\)/);
  assert.match(face,/isPop\(pop\)\?String\(pop\):'—'/);
- assert.match(face,/img\.insertAdjacentElement\('afterend',canvas\)/);
- assert.match(face,/ctx\.fillRect\(632,868,300,137\)/,'Full usa mate dentro del velo, sin tapar la escena');
- assert.doesNotMatch(face,/img\.src\s*=/,'no reemplaza ni reescribe el arte original');
+ assert.doesNotMatch(face,/fillRect|putImageData|createImageData|drawImage|canvas|restoreBand|inpaint/i);
+ assert.doesNotMatch(css,/\.fx>canvas\.icmx-card-face-values/);
 });
