@@ -3253,14 +3253,14 @@ function claimPend(){const x=readExt();if(!x||!isObj(x))return 0;
  for(const g of ['pend','pendRate','pendDuel'])if(y[g]&&!Object.keys(y[g]).length)delete y[g];
  try{if(Object.keys(y).length)localStorage.setItem(KEY_EXT,JSON.stringify(y));else localStorage.removeItem(KEY_EXT)}catch(e){}
  return n}
-function validateBackup(text){const E=m=>({ok:false,err:m});
+function validateBackup(text,{fromCloud=false}={}){const E=m=>({ok:false,err:m});
  if(typeof text!=='string'||!text.trim())return E('El archivo está vacío.');
  if(text.length>1048576)return E('El archivo pesa más de 1 MB; no parece un respaldo.');
  let b;try{b=pj(text)}catch(e){return E('No es un respaldo válido: el texto no se pudo leer.')}
  if(!isObj(b)||b.app!=='insertcoinmx-album')return E('Este archivo no es un respaldo de Insert Coin MX.');
  if(!Number.isInteger(b.format)||b.format<1)return E('El formato del respaldo no es válido.');
  if(b.format>FORMAT)return E('Este respaldo es de una versión más nueva del álbum. Recarga la página e inténtalo otra vez.');
- if(window.ICMX_RELEASE_RESET?.active&&b.edition!==window.ICMX_RELEASE_RESET.edition)
+ if(window.ICMX_RELEASE_RESET?.active&&!fromCloud&&b.edition!==window.ICMX_RELEASE_RESET.edition)
   return E('Este respaldo pertenece a la colección anterior. La nueva edición comienza desde cero.');
  const d=b.data;if(!isObj(d))return E('El respaldo no trae datos de progreso.');
  const out=DEF(),x={pend:{},pendRate:{},pendDuel:{},unk:{}};
@@ -3332,7 +3332,7 @@ function applyCloudRestore(backup,sameProgress){
  if(saveFailed||NOWRITE||opening)return {ok:false};
  syncIn();
  const text=JSON.stringify(backup);
- const valid=validateBackup(text);
+ const valid=validateBackup(text,{fromCloud:true});
  if(!valid.ok||!isObj(backup.data))return {ok:false};
  const prevMain=LS.get(KEY),prevExt=LS.get(KEY_EXT),prevS=JSON.parse(JSON.stringify(S));
  const next=JSON.parse(JSON.stringify(backup.data));
