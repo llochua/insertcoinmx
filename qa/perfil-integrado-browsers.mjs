@@ -30,7 +30,7 @@ const sdk=[
  'onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}}},',
  'async getSession(){return {data:{session:window.__qaSigned?{user:mockUser()}:null},error:null}},',
  'async getUser(){await new Promise(done=>setTimeout(done,220));return {data:{user:window.__qaSigned?mockUser():null},error:null}},',
- 'async updateUser({data}){if(!window.__qaSigned)throw Error("Guest cannot update");window.__qaAvatar=data.icmx_avatar_id;return {data:{user:mockUser()},error:null}},',
+ 'async updateUser({data}){if(!window.__qaSigned)throw Error("Guest cannot update");window.__qaAvatar=data.icmx_avatar_id;sessionStorage.setItem("icmx-qa-avatar",window.__qaAvatar);return {data:{user:mockUser()},error:null}},',
  'async signOut(){window.__qaSigned=false;return {error:null}}',
  '}}}'
 ].join('\n');
@@ -38,7 +38,7 @@ const syncStub='export function sameProgress(){return true} export async functio
 async function device(signed){
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
  await context.addInitScript(value=>{
-  window.__qaSigned=value;window.__qaAvatar='jos';
+  window.__qaSigned=value;window.__qaAvatar=sessionStorage.getItem('icmx-qa-avatar')||'jos';
   localStorage.setItem('icmx-album2',JSON.stringify({have:{abuket_b:3,pizza_e:2},rate:{},seen:1,sv:2,mv:2}));
  },signed);
  await context.route('https://cdn.jsdelivr.net/**',route=>route.fulfill({status:200,contentType:'text/javascript',headers:{'access-control-allow-origin':'*'},body:sdk}));
@@ -77,7 +77,7 @@ try {
  assert.deepEqual(await signed.page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-album2')).have),original,'avatar save must not change cards');
  await signed.page.reload({waitUntil:'domcontentloaded'});
  await signed.page.waitForFunction(()=>document.documentElement.dataset.icmxAvatarReady==='true');
- assert.equal(await signed.page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/jos-128.webp','test stubs reload user with server-stored Jos');
+ assert.equal(await signed.page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/pizza-128.webp','account avatar survives page reload');
  assert.equal(unexpectedRemote.length,0,'no real Supabase requests');
  assert.deepEqual(errors,[],'no browser script errors');
  console.log('✓ Mi perfil integrado: invitado, cuenta, 12 avatares, guardado y álbum intacto sin conectar al servidor');
