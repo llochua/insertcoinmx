@@ -2136,7 +2136,9 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <div class="bkm" id="bkm" role="dialog" aria-modal="true" aria-label="Respaldo del progreso" aria-hidden="true"><div class="bk-frame"><button type="button" class="ic-close" id="bkX" aria-label="Cerrar respaldo" title="Cerrar respaldo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button><div class="bkin"></div></div></div>
 <button class="savew" id="saveW" hidden>NO SE PUDO GUARDAR TU PROGRESO · TOCA PARA EXPORTARLO</button>
 
-<script src="content/release-reset.js?v=20261121-launch" data-active="true" data-game-epoch="public-2026-launch-v1"></script>
+<script src="content/release-reset.js?v=20261121-launch-v2" data-active="true" data-game-epoch="public-2026-launch-v2"></script>
+<script>/* El acceso verificable empieza únicamente con la edición reiniciada. */
+window.ICMX_VERIFIED_GUEST_PLAY=/^(?:www\.)?insertcoinmx\.com$/i.test(location.hostname);</script>
 <script src="content/card-texts.js?v=20261120c"></script>
 <script src="content/card-value-overlay.js?v=20261121-template"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
@@ -2473,7 +2475,7 @@ const freePacksLeft=()=>{
 };
 const packReady=()=>PRUEBA||S.test||freePacksLeft()>0||S.extra>0;
 /* ---------- datos compartidos ---------- */
-const RECORDS_EDITION='public-2026-launch-v1';
+const RECORDS_EDITION='public-2026-launch-v2';
 const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude)return;this.db=await claude.use('db');const u=await claude.use('user');this.uid=u?await u.id():null;try{this.dl=await claude.use('downloads')}catch(e){}
  if(!this.db)return;const data=x=>x&&typeof x.data==='function'?x.data():x;
  this.db.collection('tiers').onSnapshot(s=>{const ds=s&&s.docs?s.docs:(Array.isArray(s)?s:[]);this.docs=ds.map(data).filter(d=>d&&d.v===7&&d.edition===RECORDS_EDITION);refresh()},()=>{})}catch(e){}},
@@ -2753,6 +2755,7 @@ async function openArcadeEntry(step='welcome'){
   const ui=await guestUIModule;
   const identity=arcadeIdentity();
   ui.openGuestAccess({
+   verified:VERIFIED_GUEST_PLAY,
    ini:identity.ini,handle:identity.handle,
    onCreate:()=>openEntryAccount('signup'),
    onLogin:()=>openEntryAccount('login'),
@@ -3727,7 +3730,7 @@ const RANKING_FIELDS=Object.freeze({
  duplicates:{field:'duplicates',label:'REPETIDAS',aria:'repetidas'},
  ratings:{field:'ratings',label:'CALIFICADAS',aria:'calificadas'}
 });
-const LOCAL_RANKING_KEY='icmx-local-ranking-public-2026-v1';
+const LOCAL_RANKING_KEY='icmx-local-ranking-public-2026-v2';
 let selectedRanking='cards';
 function currentRecordScores(){
  return {

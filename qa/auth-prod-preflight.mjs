@@ -1,0 +1,28 @@
+/** Check público de Auth en PRODUCCIÓN, sin crear cuentas ni alterar datos. */
+import assert from 'node:assert/strict';
+const API='https://ynugqxbtszhsupadqdkz.supabase.co';
+const SITE='https://insertcoinmx.com';
+const key='sb_publishable_3wyMm9dwLqSb9GiYTh245Q_9TukyCLK';
+const r=await fetch(API+'/auth/v1/settings',{headers:{apikey:key},signal:AbortSignal.timeout(14000)});
+assert.equal(r.status,200,'Auth settings deben ser accesibles');
+const s=await r.json();
+const safe=Object.fromEntries(['disable_signup','mailer_autoconfirm','external','sms_provider'].filter(k=>k in s).map(k=>[k,s[k]]));
+console.log('Configuración pública GoTrue:',JSON.stringify(safe));
+assert.equal(s.disable_signup,false,'Registros deshabilitados');
+assert.equal(s.mailer_autoconfirm,false,'Debe confirmar correo por seguridad');
+assert.equal(s.external?.email,true,'Email provider desactivado');
+const callback=await fetch(SITE+'/qa/registro/',{signal:AbortSignal.timeout(14000)});
+console.log('Callback HTTPS:',callback.status,callback.url);
+assert.equal(callback.status,200,'URL callback real debe servir 200');
+const content=await callback.text();
+assert.ok(/<html/i.test(content)&&/Insert Coin|insertcoinmx|Clubers|<title/i.test(content),'Callback no es página HTML');
+const anonymous=s.external?.anonymous_users??s.external?.anonymous??s.enable_anonymous_sign_ins;
+console.log('Anonymous sign-ins (public status):',anonymous===undefined?'NOT EXPOSED':anonymous);
+console.log('PRE-FLIGHT read-only; no cuentas creadas, ninguna bandera activada.');
+assert.equal(anonymous,true,'BLOQUEADO: habilitar Authentication > Providers > Anonymous Sign-Ins en Supabase antes del lanzamiento');
+console.log('✓ Anonymous Sign-Ins activo.');
+const manualKey=Object.keys(s).filter(k=>/manual.*link|link.*manual|identity.*link/i.test(k));
+const manual=manualKey.length?Object.fromEntries(manualKey.map(k=>[k,s[k]])):'not exposed by public endpoint';
+console.log('Manual Linking:',JSON.stringify(manual));
+if(manualKey.length)for(const value of Object.values(manual))assert.equal(value,true,'Manual Linking debe estar habilitado');
+console.log('✓ Prerrequisitos públicos confirmados; prueba de vínculo real de correo sigue siendo separada.');

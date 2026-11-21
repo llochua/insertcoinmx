@@ -1,0 +1,20 @@
+name: QA · Preflight Auth producción (solo lectura)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'qa/auth-prod-preflight.mjs'
+      - '.github/workflows/qa-auth-prod-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Revisar Auth y URL de callback
+        run: node qa/auth-prod-preflight.mjs

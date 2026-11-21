@@ -11,7 +11,8 @@ DO $guard$
 BEGIN
  IF NOT EXISTS(SELECT 1 FROM private_sync.beta_access_gate WHERE key='public_beta' AND enabled=false)
     OR EXISTS(SELECT 1 FROM private_sync.beta_access_gate WHERE key='verified_guest' AND enabled=true)
- THEN RAISE EXCEPTION 'Detén la beta y desactiva invitados antes del corte'; END IF;
+    OR NOT EXISTS(SELECT 1 FROM private_community.release_gate WHERE key='community_pop' AND enabled=false)
+ THEN RAISE EXCEPTION 'Cierra beta, invitados y votaciones POP antes del corte'; END IF;
  IF (SELECT count(*) FROM auth.users)>10
     OR (SELECT count(*) FROM public.player_snapshots)>10
     OR (SELECT count(*) FROM private_sync.pack_issues)>100
