@@ -192,6 +192,19 @@ try{
   assert.equal(await page.locator('#scoreTopTitle').textContent(),'HIGH SCORES');
   assert.equal(await page.locator('#arcadeBonusTitle').textContent(),'— BONUS STATS —');
   assert.equal(await page.locator('#scores .arcade-bonus-stat').count(),3,'tres estadísticas con diseño pixel');
+  assert.equal(await page.locator('#scores .arcade-ranking-switch button').count(),4,'cuatro rankings independientes');
+  assert.equal(await page.locator('#scores .arcade-ranking-switch [data-score-metric="cards"]').getAttribute('aria-pressed'),'true');
+  await page.locator('#scores .arcade-bonus-stat[data-score-metric="designs"]').click();
+  assert.equal(await page.locator('#scoreRankColumn').textContent(),'DISEÑOS');
+  assert.equal(await page.locator('#scores .arcade-ranking-switch [data-score-metric="designs"]').getAttribute('aria-pressed'),'true',
+    'el botón Diseños selecciona el ranking correspondiente');
+  assert.equal(await page.locator('#scores [data-score-entry]').count(),0,'ningún participante inventado antes de guardar');
+  await page.locator('#scores .arcade-bonus-stat[data-score-metric="duplicates"]').click();
+  assert.equal(await page.locator('#scoreRankColumn').textContent(),'REPETIDAS');
+  await page.locator('#scores .arcade-bonus-stat[data-score-metric="ratings"]').click();
+  assert.equal(await page.locator('#scoreRankColumn').textContent(),'CALIFICADAS');
+  await page.locator('#scores .arcade-ranking-switch [data-score-metric="cards"]').click();
+  assert.equal(await page.locator('#scoreRankColumn').textContent(),'CARTAS');
   const bonus=await page.evaluate(()=>({
    records:['recordDesigns','recordDuplicates','recordRatings'].map(id=>document.getElementById(id).textContent),
    profile:['profileDesigns','profileDuplicates','profileRatings'].map(id=>document.getElementById(id).textContent)
@@ -216,8 +229,77 @@ try{
   assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(2)').textContent(),'ABC');
   const actualScore=String(Number(await page.locator('#sMine').textContent())).padStart(3,'0');
   assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(3)').textContent(),actualScore,'Top 10 refleja el puntaje real sin inventarlo');
+  // Guardar las iniciales conserva la puntuación en las cuatro tablas.
+  const localRank=await page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-lab-ranking-v1')));
+  assert.equal(localRank.v,1);
+  assert.equal(localRank.ini,'ABC');
+  assert.deepEqual([localRank.cards,localRank.designs,localRank.duplicates,localRank.ratings],
+   await page.locator('#scores #sMine, #recordDesigns, #recordDuplicates, #recordRatings')
+    .evaluateAll(els=>els.map(el=>Number(el.textContent))),
+   'las cuatro puntuaciones se guardan juntas sin guardar cartas');
+  const scenarios=[
+   ['designs','DISEÑOS','recordDesigns'],
+   ['duplicates','REPETIDAS','recordDuplicates'],
+   ['ratings','CALIFICADAS','recordRatings']
+  ];
+  for(const [metric,label,id] of scenarios){
+   await page.locator('#scores .arcade-ranking-switch [data-score-metric="'+metric+'"]').click();
+   assert.equal(await page.locator('#scoreRankColumn').textContent(),label);
+   assert.equal(await page.locator('#scores [data-score-entry]').count(),1);
+   assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(2)').textContent(),'ABC');
+   assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(3)').textContent(),
+    await page.locator('#'+id).textContent(),
+    'Top 10 de '+label+' utiliza la cifra real del perfil');
+  }
+  await page.locator('#scores .arcade-ranking-switch [data-score-metric="cards"]').click();
+  const schema=await page.evaluate(()=>{
+   const previousDb=STORE.db,previousUid=STORE.uid;
+   let captured=null;
+   try{
+    STORE.uid='qa-user';
+    STORE.db={doc:path=>({set:data=>{captured={path,data};return Promise.resolve()}})};
+    STORE.put();
+   }finally{STORE.db=previousDb;STORE.uid=previousUid}
+   return captured;
+  });
+  assert.equal(schema.path,'tiers/qa-user');
+  assert.equal(schema.data.ini,'ABC');
+  assert.deepEqual([schema.data.score,schema.data.designs,schema.data.duplicates,schema.data.ratings],
+   [localRank.cards,localRank.designs,localRank.duplicates,localRank.ratings],
+   'el proveedor existente recibe todas las métricas sin cambiar colecciones de cartas');
+  assert.equal(schema.data.v,6,'conserva versión de registro compatible');
   await page.waitForTimeout(1800);
   await page.screenshot({path:'qa/screenshots/records-top10-'+width+'.png',fullPage:true});
+  await page.locator('#scores .arcade-ranking-switch [data-score-metric="duplicates"]').click();
+  await page.screenshot({path:'qa/screenshots/records-repetidas-'+width+'.png',fullPage:true});
+  await page.locator('#scores .arcade-ranking-switch [data-score-metric="ratings"]').click();
+  await page.screenshot({path:'qa/screenshots/records-calificadas-'+width+'.png',fullPage:true});
+  // Ranking real: cada columna ordena por su métrica, sin confundir registros antiguos con 0.
+  const rankingOrder=await page.evaluate(()=>{
+   const original=STORE.docs,selection=selectedRanking;
+   const seen={};
+   try{
+    STORE.docs=[
+     {v:6,ini:'AAA',score:40,designs:3,duplicates:12,ratings:1},
+     {v:6,ini:'ZZZ',score:20,designs:7,duplicates:2,ratings:8},
+     {v:6,ini:'OLD',score:100}
+    ];
+    for(const metric of ['cards','designs','duplicates','ratings']){
+     selectedRanking=metric;renderScores();
+     seen[metric]=[...document.querySelectorAll('#scores [data-score-entry]')].map(e=>e.children[1].textContent);
+    }
+   }finally{STORE.docs=original;selectedRanking=selection;renderScores()}
+   return seen;
+  });
+  assert.deepEqual(rankingOrder,{
+   cards:['OLD','AAA','ZZZ'],
+   designs:['ZZZ','AAA'],
+   duplicates:['AAA','ZZZ'],
+   ratings:['ZZZ','AAA']
+  },'los cuatro Top 10 se ordenan independientemente y omiten métricas ausentes de versiones anteriores');
+  await page.reload({waitUntil:'domcontentloaded'});
+  assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-lab-ranking-v1'))),localRank,
+    'el ranking local sobrevive a recargar el navegador');
   // El selector y los Récords no deben tocar las cartas reales, abrir sesiones ni emitir RPC.
   const saved=await page.evaluate(()=>({
     real:localStorage.getItem('icmx-album2'),
