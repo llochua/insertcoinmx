@@ -32,7 +32,7 @@ const sdk=[
  'async getUser(){await new Promise(done=>setTimeout(done,220));return {data:{user:window.__qaSigned?mockUser():null},error:null}},',
  'async updateUser({data}){if(!window.__qaSigned)throw Error("Guest cannot update");window.__qaAvatar=data.icmx_avatar_id;sessionStorage.setItem("icmx-qa-avatar",window.__qaAvatar);return {data:{user:mockUser()},error:null}},',
  'async signOut(){window.__qaSigned=false;return {error:null}}',
- '},from(table){if(table!=="player_profiles")throw Error("Unexpected table");return {select(){return this},eq(){return this},async maybeSingle(){return {data:{public_handle:"qa_player",is_public:true},error:null}}}}}'
+ '},from(table){if(table!=="player_profiles")throw Error("Unexpected table");return {select(){return this},eq(){return this},async maybeSingle(){return {data:{public_handle:"qa_player",is_public:true},error:null}}}}}}'
 ].join('\n');
 const syncStub='export function sameProgress(){return true} export async function startCloudSync({onStatus}){onStatus("synced","NUBE AL DÍA · QA SIMULADA");return {check(){},changed(){},requiresServer(){return false},isAccount(){return false},stop(){},canImport(){return false}}}';
 async function device(signed){
