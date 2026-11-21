@@ -30,6 +30,7 @@ CREATE POLICY player_profiles_update_own ON public.player_profiles FOR UPDATE TO
 \ir ../../supabase/sql/server_pack_pool.sql
 \ir ../../supabase/sql/issue_player_pack_lab.sql
 \ir ../../supabase/sql/exchange_duplicates_lab.sql
+\ir ../../supabase/sql/import_guest_collection_lab.sql
 \ir ../../supabase/sql/prepare_public_beta_CLOSED.sql
 UPDATE private_sync.beta_access_gate SET enabled=true WHERE key='public_beta';
 \ir backend-review.sql
