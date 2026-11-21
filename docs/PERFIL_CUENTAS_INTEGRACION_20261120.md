@@ -19,18 +19,20 @@ Fecha: 2026-11-20. Estado: **EN VALIDACIÓN, NO PUBLICADO**.
 ## Seguridad auditada (Supabase)
 - Proyecto `insertcoinmx-tcg` activo; tablas públicas de colección con RLS y lectura restringida al propietario. Las tablas `private_sync` tienen RLS y no conceden acceso directo a `anon`/`authenticated`: sus cuatro avisos sin políticas son informativos.
 - Cinco RPC `SECURITY DEFINER` accesibles al rol `authenticated`: `ensure_player_snapshot`, `sync_player_snapshot`, `issue_player_pack`, `exchange_duplicate_cards`, `import_guest_collection`. Tienen `search_path` cerrado, verifican `auth.uid()`, y consultan `private_sync.sync_lab_allowlist`. No se habilitarán fuera del laboratorio en esta integración.
+- Revisión SQL **solo lectura** del 20 nov: las cinco RPC coinciden en los cuatro controles auditados (sin permiso `anon`, con permiso `authenticated` restringido por función, `auth.uid()` presente y uso de `sync_lab_allowlist`), y todas fijan `search_path` vacío. Se verificó estructura, **no** se intentó suplantación de una cuenta real fuera de la allowlist.
 - El esquema permite importar una colección local inicial mediante `import_guest_collection`; antes de abrir altas generales requiere decisión y prueba adicional sobre la confianza del respaldo heredado y el posible abuso de cartas importadas.
 - Las claves de navegador son publicables, no `service_role`. No introducir claves secretas en HTML, JavaScript ni CI.
-- Aviso pendiente del asesor: **Leaked Password Protection Disabled**. Ver: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+- Aviso pendiente del asesor: **Leaked Password Protection Disabled**. La organización Insert Coin MX está en el plan **Free** y Supabase documenta esta protección como disponible en **Pro o superior**: **no es un interruptor habilitable en el plan actual**. No exigir una contratación para fusionar; antes de abrir registros públicos, verificar en Dashboard las reglas de longitud/complejidad, confirmación de correo y controles de rate limit, que sí forman parte de la estrategia de seguridad. Referencia: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
 - Confirmar manualmente en Dashboard → Auth → URL Configuration que Site URL y callbacks permitidos son exactamente los dominios de producción y QA requeridos. La cuenta real ya superó una prueba de callback, pero no se ha auditado toda la configuración desde este conector.
 - La rama `main` de GitHub no tiene protección activa. Configurar aprobación y checks obligatorios antes de fusionar. No se modificó esa configuración.
 
 ## Criterios para dejar el borrador
 1. `validacion.yml` y `qa-sync-browsers.yml` en verde con nuevo `index.html`, y comprobar que el smoke anónimo sigue bloqueando acceso no autorizado.
+   La verificación `qa/check-profile-gameplay-invariants.mjs` compara contra el ancestro común de `main`, bloquea cambios fuera del perfil y exige igualdad byte a byte en diez regiones críticas: catálogo, cuotas, aplicación de sobres, canjes, probabilidades, emisión, álbum, Tier, Reta y Récords.
 2. Comprobar en el diff que `openPack`, pesos de rareza, emisión, `applyPack`, lógica de colección, Récords y Reta no sufrieron modificaciones.
 3. Registro + correo + ingreso + cierre + segundo navegador en el dominio objetivo; comprobación de 5 cartas recuperadas y avatar Jos sin desajuste inicial.
 4. Confirmar que una cuenta no incluida en la allowlist no recibe falsa confirmación de respaldo, y que sigue siendo posible jugar como invitado sin pérdida de datos.
-5. Resolver la configuración de contraseña filtrada, revisar la estrategia de importación inicial antes de abrir el servicio, y confirmar protecciones de rama.
+5. En el plan Free, revisar los controles alternativos de contraseñas y autenticación; la protección de contraseñas filtradas exige Pro o superior. Revisar la estrategia de importación inicial antes de abrir el servicio y confirmar protecciones de rama.
 6. Autorización explícita para publicar. **No fusionar automáticamente**.
 
 ## Retorno seguro
