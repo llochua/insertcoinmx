@@ -77,6 +77,11 @@ test('Solo un cambio explícito de edición vuelve a reiniciar',()=>{
  assert.equal(s.getItem('icmx-album2'),null);
  assert.equal(s.getItem('icmx-game-epoch'),'public-2026-season-two');
 });
+test('Con la nueva edición, la nube acepta una colección fresca sin campo edition',()=>{
+ assert.match(html,/function validateBackup\(text,\{fromCloud=false\}=\{\}\)/);
+ assert.match(html,/window\.ICMX_RELEASE_RESET\?\.active&&!fromCloud&&b\.edition!==window\.ICMX_RELEASE_RESET\.edition/);
+ assert.match(html,/const valid=validateBackup\(text,\{fromCloud:true\}\)/);
+});
 test('La importación manual de respaldos anteriores se bloquea al activar',()=>{
  assert.match(html,/b\.edition!==window\.ICMX_RELEASE_RESET\.edition/);
  assert.match(html,/b\.edition=window\.ICMX_RELEASE_RESET\.edition/);
