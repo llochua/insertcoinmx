@@ -18,13 +18,19 @@ test('Conservar High Scores arcade con sus cuatro categorías',()=>{
  const section=html.slice(html.indexOf('<section class="view" id="scores">'),html.indexOf('<section class="view" id="profile"'));
  assert.doesNotMatch(section,/id="bkExp"|id="bkImp"|RESPALDO DE TU PROGRESO/);
 });
-test('Valor de variante y POP viven sobre la imagen; solo queda la explicación debajo',()=>{
+test('Valor y POP sobre la imagen, con reacciones antes de la narrativa y sin fórmula duplicada',()=>{
  key('id="profileValuePoints"');
  key('id="fDesignValue"');
  key('id="icmxGlobalTitle"');
- key('id="zCommunityFormula"');
+ for(const id of ['zVoting','zRate','zGoty','zLikeStatus','zNarrative'])key('id="'+id+'"');
  key('content/card-value-overlay.js?v=');
- assert.match(html,/POPULARIDAD: LIKES 35% · TIER 35% · RETA 30%/);
+ const zoomStart=html.indexOf('<dialog class="zoom" id="zoom"');
+ const zoom=html.slice(zoomStart,html.indexOf('</dialog>',zoomStart));
+ assert.ok(zoomStart>=0&&zoom.includes('id="zRate"')&&zoom.includes('id="zNarrative"'));
+ assert.ok(zoom.indexOf('id="zRate"')<zoom.indexOf('id="zNarrative"'),'Reacciones antes de la narrativa');
+ assert.doesNotMatch(zoom,/zCommunityFormula|zLikeYes|zLikeNo/,'Sin fórmula ni botones de Like duplicados');
+ assert.match(html,/const TN=\['GOTY','GENIAL','OK','MMM'\]/);
+ assert.match(html,/previous===r\?null:r/,'Segundo toque retira la reacción');
  assert.doesNotMatch(html,/id="zVariantPoints"|id="zDesignPopularity"|class="icmx-card-value"/);
  assert.match(css,/\.fx>svg\.icmx-live-pop/);
  assert.match(css,/#zoom \.icmx-card-value-note/);
