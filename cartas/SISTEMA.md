@@ -190,3 +190,4 @@ Las variantes **Base, Holo y Dorada extienden el fondo del JPG al escenario comp
 - **Full:** compone «POP» en el velo original y «Valor 100» en el pie, sin tapar la ilustración.
 - **Leyenda bajo la carta:** «POPULARIDAD: LIKES 35% · TIER 35% · RETA 30%»; no duplicar puntuaciones fuera de la carta.
 - **Regresión obligatoria:** comprobar Pizzcipher Base, una Holo, una Dorada y una Full ampliadas en móvil. No deben aparecer monedas o dígitos antiguos, manchas, bandas ni rectángulos en el encabezado.
+- **Validación de la biblioteca regenerada:** GitHub Actions generó y validó 126 diseños, con 0 errores de integridad; la muestra Pizzcipher Base y Abuket Full se revisó para comprobar que los valores aparecen en su espacio original. Mantener la revisión visual de Holo y Dorada como parte del control de calidad.
