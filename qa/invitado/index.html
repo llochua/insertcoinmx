@@ -1,21 +1,57 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Laboratorio · Invitado arcade · Insert Coin MX</title><style>@font-face{font-family:pixel;src:url('/ps2p.ttf') format('truetype');font-display:swap}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#25216e,#080717 70%);color:#f8f6ff;font-family:system-ui;min-height:100dvh;display:grid;place-items:center;padding:22px}.shell{width:min(430px,100%);border:3px solid #ffd400;background:#12102e;border-radius:18px;padding:26px 22px;text-align:center;box-shadow:0 20px 70px #0009}.pixel{font-family:pixel,monospace}h1{font-size:20px;color:#ffd400;line-height:1.6}h2{font-size:18px}p{line-height:1.6;color:#cbc7e0}.eyebrow{font-size:11px;color:#ffd400}.btn{display:block;width:100%;padding:16px;margin:12px 0;border:2px solid #ffd400;border-radius:8px;background:#ffd400;color:#090817;font:12px pixel,monospace;cursor:pointer}.btn.alt{background:transparent;color:#ffd400}.btn:disabled{opacity:.45;cursor:not-allowed}input{display:block;width:190px;margin:18px auto;text-align:center;font:32px monospace;letter-spacing:.35em;padding:12px;background:#070613;border:2px solid #aaa4ce;border-radius:8px;color:#ffd400;text-transform:uppercase}.note{font-size:12px}.warn{padding:12px;background:#27213c;border-radius:8px;text-align:left}.hidden{display:none}.badge{display:inline-block;background:#ffd400;color:#111;padding:7px 10px;border-radius:5px;font:11px pixel,monospace}.demo{border:1px dashed #777098;border-radius:10px;padding:18px;margin-top:18px}a{color:#ffd400}/* En este laboratorio toda la interfaz conserva la tipografía arcade del juego. */
-body,button,input{font-family:pixel,monospace}
-p{font-size:11px;line-height:2}
-.note{font-size:10px;line-height:1.9}
-input{font-size:26px;letter-spacing:.12em}
-
-.handle-field{width:min(280px,100%);margin:14px auto 18px;display:flex;align-items:center;gap:8px;border:2px solid #aaa4ce;border-radius:8px;background:#070613;padding:0 12px;color:#ffd400}
-.handle-field>span{font:18px pixel,monospace}
-#handle{min-width:0;width:100%;margin:0;border:0;border-radius:0;padding:14px 0;font:13px pixel,monospace;text-align:left;letter-spacing:0;text-transform:none;outline:none}
-.handle-field:focus-within{border-color:#ffd400}
-.player-handle{font:12px pixel,monospace;color:#bdb8d1;overflow-wrap:anywhere;margin:8px 0 18px}
-#identityError:not(:empty){color:#ffb9bc}
-</style></head><body><main class="shell"><div class="eyebrow pixel">INSERT COIN MX · LABORATORIO</div><section id="welcome"><h1 class="pixel">PRESS START</h1><p>Tu colección comienza aquí.</p><button class="btn" id="create">CREAR MI CUENTA</button><button class="btn alt" id="guest">JUGAR COMO INVITADO</button><p class="warn note">⚠ Como invitado, tu avance solo se guarda en este navegador. Podrías perderlo si borras sus datos o cambias de dispositivo.</p></section><section id="identity" class="hidden"><h1 class="pixel">ENTER YOUR INITIALS</h1><p>Elige 3 caracteres para tu identidad arcade. Pueden repetirse entre jugadores.</p><label for="ini" class="eyebrow pixel">TUS INICIALES</label><input id="ini" maxlength="3" autocomplete="off" spellcheck="false" placeholder="AAA" aria-label="Tres iniciales">
-<label for="handle" class="eyebrow pixel">NOMBRE DE USUARIO</label>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Laboratorio · Invitado arcade · Insert Coin MX</title><style>
+@font-face{font-family:ICAV;src:url('/f/AvenirNextLTPro-Demi.otf') format('opentype');font-weight:500 600;font-display:swap}
+@font-face{font-family:ICAV;src:url('/f/AvenirNextLTPro-Bold.otf') format('opentype');font-weight:700 900;font-display:swap}
+@font-face{font-family:ICPixel;src:url('/ps2p.ttf') format('truetype');font-display:swap}
+:root{color-scheme:dark;--yellow:#ffd400;--white:#f3f1ff;--muted:#bdb8d1;--line:rgba(255,255,255,.2);--surface:#14102b;--input:#120e29}
+*{box-sizing:border-box}
+html{background:#07060b}
+body{margin:0;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom));background:radial-gradient(120% 100% at 50% 40%,#1a1666 0,#0c0b2a 68%,#05041a 100%);color:var(--white);font:600 14px/1.5 ICAV,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 2px,transparent 2px 4px)}
+button,input{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.shell{position:relative;width:min(100%,440px);padding:25px clamp(18px,5vw,28px) 18px;border:1px solid rgba(255,212,0,.32);border-radius:18px;background:linear-gradient(145deg,#292252,#14102b 80%);box-shadow:0 0 0 6px #0b0921,0 26px 60px rgba(0,0,0,.5);text-align:center}
+.brand{display:flex;flex-direction:column;align-items:center;gap:12px;margin:0 0 22px}
+.brand img{width:100px;max-width:50%;height:auto;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}
+.eyebrow{font:800 10px/1.45 ICAV,system-ui,sans-serif;letter-spacing:.11em;color:var(--yellow)}
+section{animation:reveal .2s ease-out}
+@keyframes reveal{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:none}}
+h1{margin:0 0 10px;color:#fff;font:800 clamp(23px,5.6vw,28px)/1.13 ICAV,system-ui,sans-serif;letter-spacing:-.02em;text-wrap:balance}
+h2{margin:0 0 8px;font:800 17px/1.25 ICAV,system-ui,sans-serif;color:#fff}
+p{margin:0 0 18px;font:500 13px/1.5 ICAV,system-ui,sans-serif;color:#d9d4e7;text-wrap:pretty}
+.note{margin:10px 0 15px;color:var(--muted);font:500 12px/1.55 ICAV,system-ui,sans-serif}
+label.eyebrow{display:block;margin:13px 0 7px;text-align:left;font:700 11px/1.35 ICAV,system-ui,sans-serif;letter-spacing:.03em;color:#f3eefa}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:46px;padding:11px 15px;margin:10px 0 0;border:1px solid var(--yellow);border-radius:10px;background:var(--yellow);color:#141026;font:800 12px/1.2 ICAV,system-ui,sans-serif;letter-spacing:.015em;text-align:center;transition:background .15s,border-color .15s,transform .12s}
+.btn:hover:not(:disabled){background:#ffe267;border-color:#ffe267}
+.btn:active:not(:disabled){transform:scale(.985)}
+.btn.alt{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.06);color:#fff}
+.btn.alt:hover:not(:disabled){background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.5)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+input{width:100%;height:46px;min-width:0;padding:11px 12px;border:1px solid rgba(255,255,255,.27);border-radius:10px;background:var(--input);color:#fff;font:600 15px ICAV,system-ui,sans-serif}
+input::placeholder{color:#837b9c;opacity:1}
+#ini{display:block;margin:0 0 15px;text-align:center;font:23px/1 ICPixel,monospace;letter-spacing:.23em;padding-left:calc(12px + .23em);color:var(--yellow);text-transform:uppercase}
+.handle-field{display:flex;align-items:center;gap:6px;margin:0 0 8px;padding:0 12px;border:1px solid rgba(255,255,255,.27);border-radius:10px;background:var(--input);color:var(--yellow)}
+.handle-field>span{font:800 17px ICAV,system-ui,sans-serif}
+#handle{width:100%;margin:0;padding:10px 0;border:0;background:transparent;border-radius:0;outline:none;text-align:left;font:600 15px ICAV,system-ui,sans-serif;letter-spacing:0;text-transform:none}
+.handle-field:focus-within{outline:2px solid var(--yellow);outline-offset:2px}
+#handle:focus-visible{outline:none}
+.warn{margin:18px 0 0;padding:14px;border:1px solid rgba(255,212,0,.26);border-radius:11px;background:rgba(255,212,0,.08);text-align:left;color:#d9d4e7}
+.badge{display:inline-block;margin-bottom:13px;padding:5px 10px;border-radius:6px;background:rgba(255,212,0,.14);color:var(--yellow);font:800 11px ICAV,system-ui,sans-serif;letter-spacing:.07em}
+#player{display:block;margin:3px auto 5px;color:var(--yellow);font:clamp(28px,8vw,39px)/1.45 ICPixel,monospace;letter-spacing:.2em;padding-left:.2em}
+.player-handle{margin:0 0 17px;color:#d4cfe6;font:700 14px/1.4 ICAV,system-ui,sans-serif;overflow-wrap:anywhere}
+.demo{margin:16px 0 19px;padding:17px 15px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.14);text-align:left}
+.demo p{margin:0;font-size:12px}
+#identityError:not(:empty){color:#ffb6b6}
+.shell>.note{margin:19px 0 0;padding-top:14px;border-top:1px solid rgba(255,255,255,.13);font-size:11px;color:#a9a2c5}
+@media(max-width:380px){.shell{padding-inline:17px}.brand{margin-bottom:18px}h1{font-size:22px}}
+@media(prefers-reduced-motion:reduce){section{animation:none}.btn{transition:none}}
+</style></head><body><main class="shell"><header class="brand"><img src="/logo.png" alt="Insert Coin MX"><div class="eyebrow">EL ÁLBUM · LABORATORIO</div></header><section id="welcome"><h1 >PRESS START</h1><p>Tu colección comienza aquí.</p><button class="btn" id="create">CREAR MI CUENTA</button><button class="btn alt" id="guest">JUGAR COMO INVITADO</button><p class="warn note">⚠ Como invitado, tu avance solo se guarda en este navegador. Podrías perderlo si borras sus datos o cambias de dispositivo.</p></section><section id="identity" class="hidden"><h1 >ENTER YOUR INITIALS</h1><p>Elige 3 caracteres para tu identidad arcade. Pueden repetirse entre jugadores.</p><label for="ini" class="eyebrow">TUS INICIALES</label><input id="ini" maxlength="3" autocomplete="off" spellcheck="false" placeholder="AAA" aria-label="Tres iniciales">
+<label for="handle" class="eyebrow">NOMBRE DE USUARIO</label>
 <div class="handle-field"><span aria-hidden="true">@</span><input id="handle" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="josplayer" aria-label="Nombre de usuario sin arroba"></div>
 <p class="note">De 3 a 20 caracteres: letras, números o guion bajo. Como invitado es provisional; al crear una cuenta se comprobará que esté disponible.</p>
 <p class="note" id="identityError" role="status" aria-live="polite"></p>
-<button class="btn" id="play" disabled>¡A JUGAR!</button><button class="btn alt" id="back">VOLVER</button><p class="note">Tu avance se guardará localmente, pero no estará respaldado.</p></section><section id="playing" class="hidden"><div class="badge">1UP</div><h1 id="player" class="pixel"></h1><div id="playerHandle" class="player-handle" aria-label="Nombre de usuario"></div><p>¡Ya tienes identidad arcade!</p><div class="demo"><h2>Prueba del flujo completada</h2><p>Este laboratorio comprueba las iniciales y el nombre de usuario, y recuerda ambos al regresar. No abre sobres ni modifica la colección real.</p></div><button class="btn alt" id="return">VOLVER A ENTRAR</button><button class="btn alt" id="reset">REINICIAR SOLO ESTA PRUEBA</button><p class="note">⚠ Este @usuario es provisional y no está reservado globalmente. Se confirmará su disponibilidad al crear la cuenta.</p></section><p class="note">Prueba aislada · No afecta tu cuenta ni tus cartas reales.</p></main><script>
+<button class="btn" id="play" disabled>¡A JUGAR!</button><button class="btn alt" id="back">VOLVER</button><p class="note">Tu avance se guardará localmente, pero no estará respaldado.</p></section><section id="playing" class="hidden"><div class="badge">1UP</div><h1 id="player" ></h1><div id="playerHandle" class="player-handle" aria-label="Nombre de usuario"></div><p>¡Ya tienes identidad arcade!</p><div class="demo"><h2>Prueba del flujo completada</h2><p>Este laboratorio comprueba las iniciales y el nombre de usuario, y recuerda ambos al regresar. No abre sobres ni modifica la colección real.</p></div><button class="btn alt" id="return">VOLVER A ENTRAR</button><button class="btn alt" id="reset">REINICIAR SOLO ESTA PRUEBA</button><p class="note">⚠ Este @usuario es provisional y no está reservado globalmente. Se confirmará su disponibilidad al crear la cuenta.</p></section><p class="note">Prueba aislada · No afecta tu cuenta ni tus cartas reales.</p></main><script>
 const KEY='icmx-qa-guest-identity-v2';
 const LEGACY_KEY='icmx-qa-guest-initials-v1';
 const $=id=>document.getElementById(id);
