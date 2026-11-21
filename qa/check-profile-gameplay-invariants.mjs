@@ -26,6 +26,7 @@ const allowed=new Set([
   'index.html',
   'qa/profile-auth-unit.test.mjs',
   'qa/profile-browsers.mjs',
+  'qa/sync-two-browsers.mjs',
   'qa/perfil-main-browsers.mjs',
   'qa/check-profile-gameplay-invariants.mjs',
   '.github/workflows/validacion.yml',
