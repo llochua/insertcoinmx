@@ -948,7 +948,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 /* Abrir: lupa + sobre la miniatura. Cerrar: lupa - en el mismo sistema. */
 #zClose{background:#FFD400;color:#120F1A;border-color:#FFD400}
 #zClose:hover{background:#ffe566;border-color:#ffe566}
-.z-bar .btn,#zToggle{min-height:44px}
+.z-bar .btn{min-height:44px}
 #zoom .fx{width:min(100%,600px)!important;touch-action:pan-y pinch-zoom}
 #zVoting{width:min(100%,480px);scroll-margin-bottom:12px}
 @media(max-height:530px){
@@ -979,7 +979,6 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @keyframes icCard{from{opacity:0;transform:translateY(24px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes icInfo{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .dx-holo,.dx-mat.holo{background:linear-gradient(115deg,transparent 15%,#84dcff1f 35%,#fff3d74a 50%,#f4b2e11f 64%,transparent 80%) 0 0/230% 230%;mix-blend-mode:screen;opacity:.52;animation:dxHolo 8s ease-in-out infinite alternate}
-.zoom #zToggle{display:none!important}
 .zoom #zVoting{box-sizing:border-box;width:min(100%,480px);margin:16px auto 0;padding:15px;border:1px solid #ffffff29;border-radius:14px;background:#ffffff0e}
 .zoom #zVoting[hidden]{display:none}
 .zoom #zRate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
@@ -1355,10 +1354,20 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .disc.dx-art-only .dx-top .sound-toggle{position:relative;z-index:7}
 .disc.dx-art-only .dx-controls,.disc.dx-art-only .dx-info,.disc.dx-art-only .dx-fade,.disc.dx-art-only .dx-card{visibility:hidden!important;pointer-events:none!important}
 /* Emojis sólo en zoom; sigue siendo la misma clasificación guardada del Tier. */
-#zoom #zVoting{margin:12px auto 10px;padding:10px 12px 12px}
-#zoom #zRate{gap:8px}
-#zoom #zRate .rb.zr-emoji{min-height:52px;padding:6px 2px!important;font:27px/1 system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif!important}
-#zoom #zRate .rb.zr-emoji.on::after{top:2px;right:5px;font:800 12px AV,system-ui,sans-serif}
+#zoom{gap:8px}
+#zoom #zVoting{display:flex;flex:none;flex-direction:column;align-items:center;gap:8px;width:min(100%,600px);margin:2px auto 0;padding:10px 0 4px;border:0;border-radius:0;background:transparent;text-align:center}
+#zoom #zVoting[hidden]{display:none}
+#zoom .z-rate-title{margin:0;font:600 13px/1.4 AV,system-ui,sans-serif;color:#f3f1ff}
+#zoom #zRate{width:min(100%,272px);gap:8px}
+#zoom #zRate .rb.zr-emoji{min-height:44px;height:44px;padding:4px 2px!important;border:1px solid #ffffff2e!important;border-radius:10px!important;font:25px/1 system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif!important}
+#zoom #zRate .rb.zr-emoji.on{background:#ffd4001a!important;border-color:#FFD400!important}
+#zoom #zRate .rb.zr-emoji.on::after{top:2px;right:4px;color:#FFD400;font:800 10px AV,system-ui,sans-serif}
+#zoom #zGoty{font:500 11px/1.4 AV,system-ui,sans-serif!important;color:#bcb7d4!important}
+#zoom #zLikeStatus{margin:0;font:11px/1.4 AV,system-ui,sans-serif;color:#c9c3df}
+#zoom #zLikeStatus:empty{display:none}
+#zoom .z-narrative{box-sizing:border-box;margin:0 auto 6px;padding:12px 2px 8px}
+#zoom .z-narrative-kicker{margin-bottom:6px}
+#zoom .z-narrative p{margin:0;font:500 14px/1.55 AV,system-ui,sans-serif}
 @media(max-width:350px){.dx-top{padding-inline:12px;gap:5px}.disc.dx .dx-controls,.disc.dx:not(.cov) .dx-controls{width:calc(100% - 24px)}}
 /* Sello coleccionable de revelación, junto a la carta y fuera del arte de fondo. */
 .ic-award{
@@ -2112,9 +2121,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx" role="button" tabindex="0" aria-label="Tocar carta para regresar" title="Tocar para regresar"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <p class="z-return-hint" aria-hidden="true">TOCA LA CARTA PARA VOLVER</p>
- <p class="icmx-card-value-note" id="zCommunityFormula">POPULARIDAD: LIKES 35% · TIER 35% · RETA 30% · VALOR GLOBAL PENDIENTE</p>
- <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
- <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><div id="zLikes" role="group" aria-label="Vota por este diseño" hidden><button type="button" data-like="1">Me gusta</button><button type="button" data-like="0">No me gusta</button><button type="button" data-like="clear">Retirar voto</button><span id="zLikeStatus" role="status"></span></div></div>
+ <div id="zVoting" hidden><p class="z-rate-title">¿Qué te parece este diseño?</p><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><div id="zGoty"></div><p id="zLikeStatus" role="status" aria-live="polite"></p></div>
  <section class="z-narrative" id="zNarrative" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
 </dialog>
 <div class="toast" id="toast"></div>
@@ -3453,7 +3460,7 @@ let zk=null,zLoadToken=0,zReturnFocus=null;
 /* acepta una clave de carta o un id de diseño (desde el Tier): muestra la versión que tienes; si no, la que ya tiene imagen */
 function cardFor(k){if(CB[k])return CB[k];const d=designId(k);if(!d)return null;const L=VL.map(v=>CB[d+'_'+v]);return L.find(c=>c.img&&S.have[c.k])||L.find(c=>S.have[c.k])||L.find(c=>c.img)||L[0]}
 const zd=()=>CB[zk]?CB[zk].d:zk; // las calificaciones son por diseño, no por versión
-const zGo=()=>{const t=communityRanking?.state.status==='ready'?communityRanking.state.aggregates.find(r=>r.id===zd())?.tiers:null;const total=t?Object.values(t).reduce((a,b)=>a+b,0):0;$('zGoty').textContent=total?Math.round(100*t.goty/total)+'% LA PONE GOTY':communityRanking?.state.status==='ready'?'AÚN SIN CALIFICACIONES GLOBALES':'CALIFICACIONES GLOBALES NO DISPONIBLES'};
+const zGo=()=>{const t=communityRanking?.state.status==='ready'?communityRanking.state.aggregates.find(r=>r.id===zd())?.tiers:null;const total=t?Object.values(t).reduce((a,b)=>a+b,0):0;$('zGoty').textContent=total?Math.round(100*t.goty/total)+'% la pone GOTY':communityRanking?.state.status==='ready'?'Sin calificaciones globales todavía':communityRanking?.state.status==='loading'?'Cargando calificaciones…':'Calificaciones globales no disponibles'};
 function openCard(k){
  const cc=cardFor(k);if(!cc)return;
  const token=++zLoadToken,zoom=$('zoom'),img=$('zImg'),fx=$('zFx'),status=$('zLoad');
@@ -3492,19 +3499,27 @@ function openCard(k){
  else if(img.complete)(img.naturalWidth?ready():failed());
 }
 function setVoting(on){
- $('zToggle').setAttribute('aria-expanded',String(on));
  $('zVoting').hidden=!on;
- if(on){paintRate();zGo();$('zLikes').hidden=!globalThis.icmxAccountIdentity?.userId||!!DB[zd()]?.bx;$('zLikeStatus').textContent='';/* sin desplazamiento automático */}
+ if(on){paintRate();zGo();$('zLikeStatus').textContent='';}
 }
-$('zToggle').onclick=()=>setVoting($('zVoting').hidden);
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb zr-emoji ${S.rate[zd()]===i?'on':''}" data-r="${i}" type="button" aria-label="${n}" title="${n}" aria-pressed="${S.rate[zd()]===i}">${REACTION_EMOJI[i]}</button>`).join('')}
-$('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zd()]=+b.dataset.r;if(save()&&globalThis.icmxAccountIdentity?.userId){const id=zd();communityVote(id,'tier',+b.dataset.r).then(ok=>{if(!ok&&$('zoom').open&&zd()===id)$('zLikeStatus').textContent='Calificación local guardada; no se publicó globalmente.'})}beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();zGo();if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
-$('zLikes').onclick=async e=>{
-  const b=e.target.closest('[data-like]');if(!b)return;
-  const id=zd();$('zLikeStatus').textContent='Guardando voto…';
-  const ok=await communityVote(id,'like',b.dataset.like==='clear'?null:Number(b.dataset.like));
-  if($('zoom').open&&zd()===id)$('zLikeStatus').textContent=ok?'Voto actualizado':'No se pudo registrar el voto global';
- };
+$('zRate').onclick=e=>{
+ const b=e.target.closest('[data-r]');if(!b)return;
+ syncIn();const id=zd(),r=+b.dataset.r,previous=S.rate[id],next=previous===r?null:r;
+ if(next===null)delete S.rate[id];else S.rate[id]=next;
+ const saved=save();$('zLikeStatus').textContent='';
+ if(saved&&globalThis.icmxAccountIdentity?.userId&&!DB[id]?.bx){
+  // Una interacción: GOTY/GENIAL = positivo, OK = neutral, MMM = negativo.
+  // Retirar una reacción retira ambos votos; el cálculo global conserva sus ponderaciones.
+  const like=next===null||next===2?null:next===3?0:1;
+  Promise.all([communityVote(id,'tier',next),communityVote(id,'like',like)]).then(results=>{
+   if(results.some(ok=>!ok)&&$('zoom').open&&zd()===id&&(S.rate[id]??null)===next)$('zLikeStatus').textContent='Calificación local guardada; no se publicó completamente.';
+  });
+ }
+ beep(next===null?330:[1319,1047,784,523][r],.08);paintRate();zGo();
+ if(cur==='album')renderAlbum();if(cur==='tier')renderTier();
+ const current=$('zRate').querySelector('[data-r="'+r+'"]');if(current)current.focus({preventScroll:true});
+};
  $('zClose').onclick=()=>$('zoom').close();
 function closeZoomByCard(){if($('zoom').open)$('zoom').close()}
 $('zFx').addEventListener('click',closeZoomByCard);
