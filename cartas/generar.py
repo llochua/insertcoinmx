@@ -32,6 +32,8 @@ FUENTES = {
     'linea':  (os.path.join(C, 'fuentes/Carlito-Regular.ttf'), 37.2),   # +25 % (19 nov): se lee en celular
     'frase':  (os.path.join(C, 'fuentes/Carlito-Italic.ttf'), 29.7),    # +15 % (19 nov)
     'numero': (os.path.join(RAIZ, 'f/AvenirNextLTPro-Bold.otf'), 23.4),
+    'pop_label': (os.path.join(RAIZ, 'f/AvenirNextLTPro-Bold.otf'), 23.4),
+    'valor_pie': (os.path.join(RAIZ, 'f/AvenirNextLTPro-Bold.otf'), 23.4),
 }
 #            x, tope de mayúsculas, ancho máximo
 CAJA = {
@@ -42,6 +44,8 @@ CAJA = {
     'linea2': (86, 1045, 800),         # cuando la referencia ocupa 2 renglones
     'frase':  (75, 1132, 620),
     'numero': (148, 1250, 200),
+    'pop_label': (594, 161, 95),
+    'valor_pie': (651, 1250, 194),
 }
 BAJA_2RENGLONES = 28                   # ícono y "— GOTY" bajan esto con referencia de 2 renglones
 ICONO_CENTRO = (125.5, 929.5)
@@ -52,12 +56,46 @@ LETRA = {'comun': 'b', 'holo': 'e', 'dorada': 'r'}
 RAREZAS = ('comun', 'holo', 'dorada')
 WEBP_CALIDAD = 90
 ARTE_WEBP_CALIDAD = 88
+# El valor de colección es por primera variante; el POP es por diseño y
+# llegará dinámicamente desde agregados verificables de la comunidad.
+PUNTOS_VARIANTE = {'comun': 10, 'holo': 25, 'dorada': 50, 'full': 100}
+
+
+
+
+def limpiar_rotulos_valor(marco):
+    """Retira SOLO las letras de VALOR/100 y Valor — impresas en el marco.
+
+    Se procesa la plantilla ANTES de componer cualquier carta, no en CSS ni
+    Canvas de navegador. Una máscara de trazos oscuros conserva los píxeles
+    originales de textura, relieve y degradado fuera de las letras.
+    """
+    imagen = np.clip(marco, 0, 255).astype(np.uint8).copy()
+    # Coordenadas en el lienzo original 960×1340. Lejos de filetes/divisores.
+    zonas = ((578, 139, 922, 225), (640, 1245, 894, 1290))
+    for x0, y0, x1, y1 in zonas:
+        roi = imagen[y0:y1, x0:x1].copy()
+        gris = cv2.cvtColor(roi, cv2.COLOR_RGB2GRAY)
+        # Median de tamaño grande reconstruye el nivel local del fondo
+        # sin eliminar sus matices horizontales ni el grano impreso.
+        fondo = cv2.medianBlur(gris, 41)
+        oscurecimiento = fondo.astype(np.int16) - gris.astype(np.int16)
+        tinta = np.uint8(oscurecimiento > 23) * 255
+        tinta = cv2.morphologyEx(tinta, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+        tinta = cv2.dilate(tinta, np.ones((3, 3), np.uint8), iterations=1)
+        if not np.any(tinta):
+            raise ValueError('No se detectó la tinta anterior de valor en la plantilla')
+        # Reconstrucción local de las letras, nunca un rectángulo encima del
+        # fondo; el área circundante permanece bit a bit sin modificar.
+        limpio = cv2.inpaint(roi, tinta, 3, cv2.INPAINT_TELEA)
+        imagen[y0:y1, x0:x1] = limpio
+    return imagen.astype(np.float32)
 
 
 def cargar_plantillas():
     T = {}
     for r in RAREZAS:
-        T['marco_' + r] = np.asarray(Image.open(os.path.join(PL, f'marco_{r}.png')).convert('RGB')).astype(np.float32)
+        T['marco_' + r] = limpiar_rotulos_valor(np.asarray(Image.open(os.path.join(PL, f'marco_{r}.png')).convert('RGB')).astype(np.float32))
     T['icono'] = np.asarray(Image.open(os.path.join(PL, 'icono.png'))).astype(np.float32)
     for k in ('habilidad', 'goty'):
         T[k] = np.asarray(Image.open(os.path.join(PL, f'etiqueta_{k}.png'))).astype(np.float32) / 255
@@ -200,6 +238,10 @@ def carta(T, d, rareza, ventana_arte):
     texto_habilidad(out, 'linea2' if r2 else 'linea', d['linea'], tinta)
     texto(out, 'frase', 'frase', d['frase'], tinta)
     texto(out, 'numero', 'numero', d['numero'] if d['tipo'] == 'Álbum' else 'BONUS', tinta)
+    # Ambos espacios originales: el POP será dinámico; los PTS quedan
+    # impresos con la fuente EXACTA del resto de la plantilla.
+    texto(out, 'pop_label', 'pop_label', 'POP', tinta)
+    texto(out, 'valor_pie', 'valor_pie', f"Valor {PUNTOS_VARIANTE[rareza]}", tinta)
     # arte
     x0, y0, x1, y1 = VENTANA
     out[y0:y1, x0:x1] = dorar(ventana_arte, T['oro']) if rareza == 'dorada' else ventana_arte
@@ -304,11 +346,11 @@ def carta_full(T, d, total):
     # arriba: pestaña de marca y pastilla de categoría
     pegar_alfa(out, T['full_marca'], 0, 0)
     pegar_alfa(out, T['pastillas'][d['categoria']], 32, 30)
-    # nombre y valor
+    # Nombre y etiqueta POP, sobre el velo original de la ilustración Full.
+    # El número POP lo inserta una capa de TEXTO transparente en el juego:
+    # el diseño no almacena cotizaciones obsoletas ni números inventados.
     escribir(out, 'nombre', d['nombre'], 48, 922, F_BLANCO, maxw=590)
-    escribir(out, 'etq', 'VALOR', 910, 892, F_BLANCO, align='r', alfa=0.7, track=4)
-    wv = escribir(out, 'valor', '100', 910, 932, F_BLANCO, align='r')
-    mo = T['full_moneda']; pegar_alfa(out, mo, int(910 - wv - 14 - mo.shape[1]), int(932 + 28 - mo.shape[0] / 2))
+    escribir(out, 'etq', 'POP', 910, 892, F_BLANCO, align='r', alfa=0.7, track=4)
     # habilidad
     hab = T['habilidad']
     pegar_alfa(out, hab * 0.72, 48, 1006, F_BLANCO)
@@ -332,7 +374,7 @@ def carta_full(T, d, total):
     cx = 480 + 28; escribir(out, 'pie', 'Arte Especial', cx, 1262, F_BLANCO, align='c')
     for i in range(2):
         estrella(out, cx - wi / 2 - 46 + i * 24, 1274, 11, F_AMARILLO)
-    escribir(out, 'pie', 'Valor –', 912, 1262, F_BLANCO, align='r')
+    escribir(out, 'pie', f"Valor {PUNTOS_VARIANTE['full']}", 912, 1262, F_BLANCO, align='r')
     # esquinas redondas
     M = Image.new('L', (W * 2, H * 2), 0)
     ImageDraw.Draw(M).rounded_rectangle((0, 0, W * 2 - 1, H * 2 - 1), F_RADIO * 2, fill=255)
