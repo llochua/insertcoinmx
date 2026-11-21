@@ -414,7 +414,7 @@ el("recoveryForm").addEventListener("submit",async e=>{
   el("recoveryForm").hidden=true;el("recoveryHome").hidden=false;
   el("recoveryIntro").textContent="Tu nueva contraseña quedó guardada. Ya puedes volver a Insert Coin MX.";
   message("Contraseña actualizada correctamente. Tu colección está intacta.","success");
-  recoveryActive=false;
+  // Mantener la vista de éxito aunque Auth emita USER_UPDATED después de guardar.
  }catch(err){
   message(errorText(err),"error");
  }finally{busy=false;el("recoverySave").disabled=false}
