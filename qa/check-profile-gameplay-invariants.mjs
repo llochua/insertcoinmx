@@ -29,6 +29,7 @@ const allowed=new Set([
   'qa/sync-two-browsers.mjs',
   'qa/release-reset.test.mjs',
   'qa/auth-public-settings.mjs',
+  'supabase/sql/reset_for_public_launch_STAGED.sql',
   'content/release-reset.js',
   'qa/perfil-main-browsers.mjs',
   'qa/check-profile-gameplay-invariants.mjs',
