@@ -200,12 +200,14 @@ try{
   assert.ok((await page.locator('#scores .wrap > .px').first().textContent()).includes('TU PUNTAJE: CARTAS DISTINTAS'),'marcador original');
   const inputLook=await page.locator('#iniIn').evaluate(el=>({font:getComputedStyle(el).fontSize,field:Math.round(el.getBoundingClientRect().width),border:getComputedStyle(el).borderTopWidth}));
   assert.deepEqual(inputLook,{font:'30px',field:200,border:'2px'},'campo de iniciales idéntico al original');
+  await page.screenshot({path:'qa/screenshots/records-arcade-inicial-'+width+'.png',fullPage:true});
   await page.locator('#iniIn').fill('ABC');
   await page.locator('#sSave').click();
   assert.equal(await page.locator('#scores [data-score-entry]').count(),1,'guardar iniciales crea un solo registro');
   assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(2)').textContent(),'ABC');
   const actualScore=String(Number(await page.locator('#sMine').textContent())).padStart(3,'0');
   assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(3)').textContent(),actualScore,'Top 10 refleja el puntaje real sin inventarlo');
+  await page.waitForTimeout(1800);
   await page.screenshot({path:'qa/screenshots/records-top10-'+width+'.png',fullPage:true});
   // El selector y los Récords no deben tocar las cartas reales, abrir sesiones ni emitir RPC.
   const saved=await page.evaluate(()=>({
