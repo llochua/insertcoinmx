@@ -10,6 +10,9 @@ const $auth = id => document.getElementById(id);
 let authClient = null;
 let authMode = 'signup';
 let authBusy = false;
+let identityCheckVersion = 0;
+const iniOK = v => /^[A-Z0-9]{3}$/.test(v || '');
+const handleOK = v => /^[a-z0-9_]{3,20}$/.test(v || '');
 const enteredFromEmail = /(?:^|[?&#])(?:access_token|code)=/.test(location.hash + '&' + location.search);
 
 function authMessage(text, kind = 'info') {
@@ -46,6 +49,12 @@ function showAuthUser(user) {
   $auth('profilePlayerState').textContent = active
     ? 'Sesión activa · comprueba el estado de la nube'
     : 'Invitado · progreso solo en este dispositivo';
+  if (!active) {
+    identityCheckVersion++;
+    globalThis.icmxAccountIdentity = null;
+    $auth('profileSignedIdentityForm').hidden = true;
+    document.dispatchEvent(new Event('icmx:player-identity'));
+  }
   globalThis.icmxAvatarAuthUser = user || null;
   document.dispatchEvent(new Event('icmx:avatar-auth'));
 
@@ -63,12 +72,131 @@ globalThis.icmxAvatarSaveForUser = async function(id) {
   return data.user;
 };
 
+
+/* La identidad pública se comprueba contra la fila del propio usuario.
+   La unicidad real está protegida por el índice lower(public_handle) de Postgres.
+   Nunca se confía en datos locales o en user_metadata para publicar récords. */
+function guestDraft() {
+  const draft = globalThis.icmxGuestIdentity?.get?.() || {};
+  return {
+    ini:iniOK(draft.ini)?draft.ini:'',
+    handle:handleOK(draft.handle)?draft.handle:''
+  };
+}
+function fillRegistrationFromGuest() {
+  const draft=guestDraft();
+  if (!$auth('profileAuthInitials').value) $auth('profileAuthInitials').value=draft.ini;
+  if (!$auth('profileAuthHandle').value) $auth('profileAuthHandle').value=draft.handle;
+}
+function showMissingIdentity(ini,handle,message) {
+  const form=$auth('profileSignedIdentityForm');
+  form.hidden=false;
+  $auth('profileSignedInitials').value=iniOK(ini)?ini:'';
+  $auth('profileSignedHandle').value=handleOK(handle)?handle:'';
+  $auth('profileSignedIdentityStatus').textContent=message||'Completa tu identidad para participar en Récords públicos.';
+}
+async function loadAccountIdentity(expectedId) {
+  const version=++identityCheckVersion;
+  if(!authClient||!expectedId)return;
+  const {data:authData,error:authError}=await authClient.auth.getUser();
+  if(version!==identityCheckVersion)return;
+  const user=authData?.user;
+  if(authError||!user||user.id!==expectedId)return;
+  const meta=user.user_metadata||{};
+  const draft=guestDraft();
+  const wantedHandle=handleOK(meta.icmx_handle)?meta.icmx_handle.toLowerCase():'';
+  let ini=iniOK(meta.icmx_initials)?meta.icmx_initials:(draft.ini||'');
+  let {data:profile,error:readError}=await authClient
+    .from('player_profiles').select('public_handle,is_public').eq('user_id',user.id).maybeSingle();
+  if(version!==identityCheckVersion)return;
+  if(profile?.public_handle&&!iniOK(meta.icmx_initials))ini=''; // Una cuenta existente no adopta iniciales ajenas del navegador.
+  if(readError){
+    showMissingIdentity(ini,wantedHandle||draft.handle,'No se pudo consultar tu identidad. Tu colección sigue intacta.');
+    return;
+  }
+  if(!profile?.public_handle&&wantedHandle){
+    const {error:insertError}=await authClient.from('player_profiles')
+      .insert({user_id:user.id,public_handle:wantedHandle,is_public:true});
+    if(version!==identityCheckVersion)return;
+    if(!insertError)profile={public_handle:wantedHandle,is_public:true};
+    else if(insertError.code==='23505'){
+      showMissingIdentity(ini,'','Ese nombre ya está registrado. Elige otro para completar tu cuenta.');
+    }else{
+      showMissingIdentity(ini,wantedHandle,'No pudimos registrar tu identidad. Puedes intentar nuevamente.');
+    }
+  }
+  if(profile?.public_handle&&handleOK(profile.public_handle.toLowerCase())&&iniOK(ini)){
+    globalThis.icmxAccountIdentity={
+      userId:user.id,
+      ini,
+      handle:profile.public_handle.toLowerCase(),
+      isPublic:profile.is_public===true
+    };
+    $auth('profileSignedIdentityForm').hidden=true;
+    $auth('profileSignedIdentityStatus').textContent='JUGADOR '+ini+' · @'+profile.public_handle.toLowerCase();
+    globalThis.icmxGuestIdentity?.markSeenForAccount?.(ini);
+  }else{
+    globalThis.icmxAccountIdentity=null;
+    if(!$auth('profileSignedIdentityStatus').textContent.startsWith('Ese nombre ya'))
+      showMissingIdentity(ini,wantedHandle||draft.handle,'Completa tus iniciales y un @usuario único.');
+  }
+  document.dispatchEvent(new Event('icmx:player-identity'));
+}
+function normalizeIdentityField(id,type) {
+  const input=$auth(id);
+  input.addEventListener('input',()=>{
+    input.value=type==='ini'
+      ?input.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3)
+      :input.value.toLowerCase().replace(/[^a-z0-9_]/g,'').slice(0,20);
+  });
+}
+for(const id of ['profileAuthInitials','profileSignedInitials'])normalizeIdentityField(id,'ini');
+for(const id of ['profileAuthHandle','profileSignedHandle'])normalizeIdentityField(id,'handle');
+$auth('profileSignedIdentityForm').addEventListener('submit',async event=>{
+  event.preventDefault();
+  if(!authClient||authBusy)return;
+  const ini=$auth('profileSignedInitials').value.toUpperCase();
+  const handle=$auth('profileSignedHandle').value.toLowerCase();
+  if(!iniOK(ini)||!handleOK(handle)){
+    $auth('profileSignedIdentityStatus').textContent='Necesitamos 3 iniciales y un usuario de 3 a 20 caracteres.';
+    return;
+  }
+  const button=$auth('profileSignedSave');
+  button.disabled=true;
+  try{
+    const {data,error:verifyError}=await authClient.auth.getUser();
+    if(verifyError||!data?.user?.id)throw Error('Sesión no verificada');
+    const {error:writeError}=await authClient.from('player_profiles')
+      .upsert({user_id:data.user.id,public_handle:handle,is_public:true},{onConflict:'user_id'});
+    if(writeError){
+      $auth('profileSignedIdentityStatus').textContent=writeError.code==='23505'
+        ?'Ese @usuario ya está ocupado. Elige otro.'
+        :'No se pudo registrar el @usuario. Inténtalo nuevamente.';
+      return;
+    }
+    const {error:metaError}=await authClient.auth.updateUser({data:{icmx_initials:ini,icmx_handle:handle}});
+    if(metaError){
+      $auth('profileSignedIdentityStatus').textContent='Tu usuario está reservado, pero faltó guardar las iniciales. Inténtalo de nuevo.';
+      return;
+    }
+    await loadAccountIdentity(data.user.id);
+  }catch(_){
+    $auth('profileSignedIdentityStatus').textContent='No se pudo confirmar tu sesión. Tu progreso local está a salvo.';
+  }finally{button.disabled=false}
+});
+
 function changeAuthMode(mode) {
   if (authBusy || (mode !== 'signup' && mode !== 'login')) return;
   authMode = mode;
   $auth('profileAuthTabSignup').setAttribute('aria-pressed', String(mode === 'signup'));
   $auth('profileAuthTabLogin').setAttribute('aria-pressed', String(mode === 'login'));
   $auth('profileAuthSend').textContent = mode === 'signup' ? 'CREAR MI CUENTA' : 'INICIAR SESIÓN';
+  for(const [container,id] of [['profileSignupInitialsField','profileAuthInitials'],['profileSignupHandleField','profileAuthHandle']]){
+    const visible=mode==='signup';
+    $auth(container).hidden=!visible;
+    $auth(id).required=visible;
+  }
+  if(mode==='signup')fillRegistrationFromGuest();
   $auth('profileAuthPassword').setAttribute('autocomplete', mode === 'signup' ? 'new-password' : 'current-password');
   $auth('profileAuthHint').textContent = mode === 'signup'
     ? 'Te enviaremos un correo para confirmar tu cuenta.'
@@ -115,8 +243,11 @@ async function initAccount() {
     });
     authClient.auth.onAuthStateChange((_event, session) => {
       showAuthUser(session?.user || null);
-      // El motor de sincronización usa su propia instancia: pedir relectura explícita.
-      setTimeout(() => document.dispatchEvent(new Event('icmx:auth-changed')), 0);
+      // Evitar operaciones Supabase desde dentro del bloqueo de Auth.
+      setTimeout(() => {
+        if(session?.user?.id)loadAccountIdentity(session.user.id);
+        document.dispatchEvent(new Event('icmx:auth-changed'));
+      }, 0);
     });
     const {data:sessionData, error:sessionError} = await authClient.auth.getSession();
     if (sessionError) throw sessionError;
@@ -124,6 +255,7 @@ async function initAccount() {
       const {data:verified, error:verifyError} = await authClient.auth.getUser();
       if (!verifyError && verified?.user) {
         showAuthUser(verified.user);
+        loadAccountIdentity(verified.user.id);
         authMessage('Sesión activa. Confirma el estado NUBE AL DÍA antes de confiar en la recuperación de cartas.', 'success');
       } else {
         showAuthUser(null);
@@ -175,6 +307,16 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
     passEl.focus();
     return;
   }
+  let signupIdentity=null;
+  if(authMode==='signup'){
+    const ini=$auth('profileAuthInitials').value.toUpperCase();
+    const handle=$auth('profileAuthHandle').value.toLowerCase();
+    if(!iniOK(ini)||!handleOK(handle)){
+      authMessage('Elige 3 iniciales y un @usuario de 3 a 20 caracteres.', 'error');
+      return;
+    }
+    signupIdentity={ini,handle};
+  }
   setAuthBusy(true);
   authMessage(authMode === 'signup' ? 'Preparando tu registro...' : 'Iniciando sesión...');
   try {
@@ -182,12 +324,14 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
       const {data, error} = await authClient.auth.signUp({
         email,
         password,
-        options: {emailRedirectTo: REDIRECT_URL}
+        options: {emailRedirectTo: REDIRECT_URL,
+          data:{icmx_initials:signupIdentity.ini,icmx_handle:signupIdentity.handle}}
       });
       if (error) throw error;
       if (data?.session) {
         showAuthUser(data.session.user);
-        authMessage('Cuenta creada. Revisa el estado de la nube; no se migraron cartas automáticamente.', 'success');
+        loadAccountIdentity(data.session.user.id);
+        authMessage('Cuenta creada. Revisa el estado de la nube; las cartas no se vinculan sin tu confirmación.', 'success');
       } else {
         authMessage('Solicitud recibida. Si este correo todavía no tiene cuenta, recibirás un mensaje para confirmarla. Si ya tienes cuenta, elige INICIAR SESIÓN.', 'success');
       }
@@ -195,6 +339,7 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
       const {data, error} = await authClient.auth.signInWithPassword({email, password});
       if (error) throw error;
       showAuthUser(data?.user || null);
+      if(data?.user?.id)loadAccountIdentity(data.user.id);
       authMessage('Sesión iniciada. Comprueba la nube antes de cambiar de dispositivo.', 'success');
     }
   } catch (error) {
@@ -219,5 +364,6 @@ $auth('profileAuthSignOut').addEventListener('click', async () => {
   }
 });
 showAuthUser(null);
+fillRegistrationFromGuest();
 authMessage('Conectando...');
 initAccount();
