@@ -33,21 +33,21 @@ try{
  await page.route('**/cdn.jsdelivr.net/**',r=>r.abort());
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.locator('#title').click();
- await page.locator('#onNext').click();
- await page.locator('#onNext').click();
- await page.locator('#onAccount').waitFor({state:'visible'});
- assert.equal(await page.locator('#onNext').textContent(),'SEGUIR COMO INVITADO');
- assert.equal(await page.locator('.on-save').isVisible(),true,'nueva ilustración visual de respaldo');
- assert.match(await page.locator('#onP').textContent(),/invitado|navegador/i);
- await page.locator('#onAccount').click();
- assert.equal(await page.locator('#profile').evaluate(e=>e.classList.contains('on')),true,
-  'crear cuenta desde bienvenida debe abrir Mi perfil');
- await page.locator('#profileAuthTabSignup').click();
- assert.equal(await page.locator('#profileAccountPanel').isVisible(),true,'registro revelado al elegir crear cuenta');
- assert.equal(await page.locator('#profileAuthForm').isVisible(),true);
- assert.equal(await page.locator('#profileBackup').evaluate(e=>e.open),false,'respaldo manual oculto hasta que el jugador lo solicite');
+ await page.locator('#icmxGuestCreate').click();
+ await page.locator('#entryAccount').waitFor({state:'visible'});
+ assert.equal(await page.locator('#profileAuthInitials').isVisible(),true,'arcade identity is required for signup');
+ assert.equal(await page.locator('#profileAuthHandle').isVisible(),true);
  assert.equal(await page.locator('#profileAuthEmail').isVisible(),true);
  assert.equal(await page.locator('#profileAuthPassword').isVisible(),true);
+ await page.locator('#entryAccountBack').click();
+ await page.locator('#icmxGuestChoose').click();
+ await page.locator('#icmxGuestIni').fill('TST');
+ await page.locator('#icmxGuestHandle').fill('qa_guest');
+ await page.locator('#icmxGuestPlay').click();
+ await page.locator('#icmxGuestGate').waitFor({state:'hidden'});
+ await page.locator('#home .home-player-card').click();
+ await page.locator('#profile.on').waitFor();
+ assert.equal(await page.locator('#profileBackup').evaluate(e=>e.open),false);
  const cardsBefore=await page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-album2')||'{}').have||{});
  await page.locator('#profile [data-home]').click();
  assert.equal(await page.locator('#home .home-player-card').isVisible(),true,'tarjeta visible en menú principal');
@@ -66,7 +66,7 @@ try{
  // Preferencia de avatar del invitado: separada de la colección real.
  const back=page.locator('#profileAccountBack');
  if(await back.isVisible())await back.click();
- await page.locator('#profileAvatarChange').click();
+ await page.locator('#profileAvatarButton').click();
  assert.equal(await page.locator('#avatarSelect.on').isVisible(),true);
  assert.equal(await page.locator('#avatarGrid .avatar-option').count(),12);
  const pizza=page.locator('#avatarGrid [data-avatar="pizza"]');
