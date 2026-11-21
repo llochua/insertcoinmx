@@ -2375,11 +2375,12 @@ const ga=(n,p)=>{try{if(window.gtag)gtag('event',n,p||{})}catch(e){}};
 try{if(S.last&&S.last<today())ga('regreso',{dias_desde_ultimo_sobre:Math.round((new Date(today())-new Date(S.last))/864e5)})}catch(e){}
 const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
-let communityValueEngine=null,communityRanking=null;
+let communityValueEngine=null;
+ let communityRanking=null;
  let communityWrites=Promise.resolve();
  function communityVote(id,channel,value){
   const identity=globalThis.icmxAccountIdentity?.userId;
-  if(!identity||!communityRanking||DB[id]?.bx)return Promise.resolve(false);
+  if(!identity||!communityRanking||!DB[id]||DB[id].bx)return Promise.resolve(false);
   const controller=communityRanking;
   const promise=communityWrites.then(async()=>{
    if(globalThis.icmxAccountIdentity?.userId!==identity)return false;
@@ -4098,7 +4099,7 @@ $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
  Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261121-global')]).then(([mod,auth])=>{
-  communityRanking=mod.createCommunityRanking({request:auth.communityRequest,onChange:()=>{
+  communityRanking=mod.createCommunityRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{
    if(cur==='scores')renderCommunityBoard();
    if(cur==='album'&&!fd&&!$('zoom').open)renderAlbum();
    if(fd)renderFicha();
