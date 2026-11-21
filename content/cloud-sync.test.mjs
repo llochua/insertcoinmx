@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {assertBackup,progressSignature,sameProgress,hasGameProgress,decideSync,reconcileMetadata,archiveConflict} from './cloud-sync.mjs';
+import {assertBackup,progressSignature,sameProgress,hasGameProgress,decideSync,reconcileMetadata,archiveConflict,isFreshGuest} from './cloud-sync.mjs';
 
 const backup=(have={},extra={})=>({
  app:'insertcoinmx-album',format:2,exportedAt:new Date().toISOString(),
@@ -92,4 +92,71 @@ test('Archivo de conflicto independiente no sobrescribe una copia anterior',()=>
  assert.deepEqual(JSON.parse(store.get(a)).backup,first);
  assert.deepEqual(JSON.parse(store.get(b)).backup,second);
  assert.throws(()=>archiveConflict({getItem:()=>null,setItem(){}},{owner:'qa',local:first}));
+});
+
+import {ensureVerifiedGuest,beginGuestUpgrade,finishGuestUpgrade,upgradeStage,GUEST_BINDING} from './verified-guest.mjs';
+test('Invitado sin cartas puede conservar identidad inicial, progreso real nunca se reinicia',()=>{
+ assert.equal(isFreshGuest(backup({}, {ini:'JOS',seen:1,fg:0,pk:[],freeCycle:0})),true);
+ assert.equal(isFreshGuest(backup({gato_b:1})),false);
+ assert.equal(isFreshGuest(backup({}, {pk:['abcdef12']})),false);
+ assert.equal(isFreshGuest(backup({}, {welcomeLeft:4})),false);
+ assert.equal(isFreshGuest(backup({}, {rate:{gato:1}})),false);
+ assert.equal(isFreshGuest(backup({}, {reta2:{round:1}})),false);
+});
+const guestAuthHarness=()=>{
+ let user=null,created=0,updates=[];
+ const auth={
+  async getSession(){return {data:{session:user?{user}:null},error:null}},
+  async getUser(){return {data:{user},error:null}},
+  async signInAnonymously(args){
+   assert.equal(args.options.captchaToken,'qa-token');created++;
+   user={id:'guest-uid',is_anonymous:true,user_metadata:{}};
+   return {data:{user,session:{user}},error:null};
+  },
+  async updateUser(args){
+   updates.push(args);
+   if(args.email){user={...user,user_metadata:{...user.user_metadata,...args.data},new_email:args.email}}
+   if(args.password){user={...user,user_metadata:{...user.user_metadata,...args.data}}}
+   return {data:{user},error:null}
+  }
+ };
+ const map=new Map();
+ const storage={getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v)};
+ const params={auth,storage,exclusive:task=>task(),captchaToken:async()=> 'qa-token'};
+ return {params,storage,auth,updates,get user(){return user},get created(){return created},
+  verifyEmail(){user={...user,email:user.new_email,is_anonymous:false,email_confirmed_at:'2026-11-21T00:00:00Z'}}};
+};
+test('Invitado verificado reutiliza UID y no vuelve a crear identidad',async()=>{
+ const h=guestAuthHarness();
+ const first=await ensureVerifiedGuest(h.params);
+ h.storage.setItem(GUEST_BINDING,first.id);
+ const second=await ensureVerifiedGuest(h.params);
+ assert.equal(second.id,first.id);assert.equal(h.created,1);
+});
+test('Sin CAPTCHA o sin sesión vinculada no se crea una identidad nueva',async()=>{
+ const h=guestAuthHarness();
+ await assert.rejects(()=>ensureVerifiedGuest({...h.params,captchaToken:async()=>''}),/guest_captcha_required/);
+ h.storage.setItem(GUEST_BINDING,'old-uid');
+ await assert.rejects(()=>ensureVerifiedGuest(h.params),/guest_session_lost/);
+ assert.equal(h.created,0);
+});
+test('Conversión mantiene UID: correo primero y contraseña únicamente después de verificación',async()=>{
+ const h=guestAuthHarness();
+ const first=await ensureVerifiedGuest(h.params);
+ const linked=await beginGuestUpgrade({auth:h.auth,expectedUid:first.id,email:'qa@example.invalid',ini:'JOS',handle:'qa_guest',redirectTo:'https://example.invalid'});
+ assert.equal(linked.id,first.id);
+ assert.equal(h.updates[0].password,undefined);
+ assert.equal(upgradeStage(linked),'email');
+ await assert.rejects(()=>finishGuestUpgrade({auth:h.auth,expectedUid:first.id,password:'qa-password'}),/guest_email_not_verified/);
+ h.verifyEmail();
+ assert.equal(upgradeStage(h.user),'password');
+ const finished=await finishGuestUpgrade({auth:h.auth,expectedUid:first.id,password:'qa-password'});
+ assert.equal(finished.id,first.id);
+ assert.equal(upgradeStage(finished),'none');
+ assert.equal(h.created,1);
+});
+test('No convertir ni cambiar contraseña de una sesión distinta',async()=>{
+ const h=guestAuthHarness();await ensureVerifiedGuest(h.params);
+ await assert.rejects(()=>beginGuestUpgrade({auth:h.auth,expectedUid:'other',email:'qa@example.invalid',ini:'JOS',handle:'qa_guest'}),/guest_identity_changed/);
+ assert.equal(h.updates.length,0);
 });
