@@ -1701,6 +1701,12 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #scores .score-identity-note{text-align:center;font:600 11px/1.5 AV,system-ui,sans-serif;color:#c7c1dd}
 #scores #iniIn[readonly]{opacity:.75}
 #scores .rank-handle{display:block;font:600 10px/1.4 AV,system-ui,sans-serif;letter-spacing:normal;color:#bdb8d1;margin-top:5px}
+
+#profile #profileAuthInitials,#profile #profileAuthHandle,#profile #profileSignedInitials,#profile #profileSignedHandle{display:block;width:100%;min-height:46px;border:1px solid rgba(255,255,255,.27);border-radius:10px;background:#120e29;color:#fff;font:600 15px AV,system-ui,sans-serif;padding:10px 12px}
+#profile #profileAuthInitials,#profile #profileSignedInitials{font:16px PX,monospace;letter-spacing:.2em;color:#ffd400;text-transform:uppercase}
+#profile #profileAuthHandle,#profile #profileSignedHandle{text-transform:lowercase}
+#profile #profileSignedIdentityForm{display:flex;flex-direction:column;gap:10px}
+#profile #profileSignedIdentityForm[hidden],#profile #profileSignupInitialsField[hidden],#profile #profileSignupHandleField[hidden]{display:none!important}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1848,13 +1854,24 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
      <button type="button" id="profileAuthTabLogin" aria-pressed="false">INICIAR SESIÓN</button>
     </div>
     <form id="profileAuthForm" autocomplete="on">
+     <div class="profile-auth-field" id="profileSignupInitialsField"><label for="profileAuthInitials">Tus 3 iniciales arcade</label><input id="profileAuthInitials" type="text" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="JOS" required></div>
+     <div class="profile-auth-field" id="profileSignupHandleField"><label for="profileAuthHandle">Nombre de usuario único</label><input id="profileAuthHandle" type="text" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="josplayer" required><p class="profile-auth-help">Entre 3 y 20 caracteres: letras, números y guion bajo. Se confirmará al activar tu cuenta.</p></div>
      <div class="profile-auth-field"><label for="profileAuthEmail">Correo electrónico</label><input type="email" id="profileAuthEmail" name="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="tu@correo.com"></div>
      <div class="profile-auth-field"><label for="profileAuthPassword">Contraseña</label><input type="password" id="profileAuthPassword" name="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Mínimo 8 caracteres"></div>
      <p class="profile-auth-help" id="profileAuthHint">Te enviaremos un correo para confirmar tu cuenta.</p>
      <button type="submit" class="profile-action primary" id="profileAuthSend">CREAR MI CUENTA</button>
     </form>
    </div>
-   <div id="profileAuthSigned" hidden><p class="profile-auth-email" id="profileAuthUser"></p><p class="profile-auth-hint">Comprueba el estado de la nube antes de cambiar de dispositivo.</p><button type="button" class="profile-action secondary" id="profileAuthSignOut">CERRAR SESIÓN</button></div>
+   <div id="profileAuthSigned" hidden>
+    <p class="profile-auth-email" id="profileAuthUser"></p>
+    <p class="profile-auth-hint" id="profileSignedIdentityStatus">Comprobando tu identidad de jugador…</p>
+    <form id="profileSignedIdentityForm" hidden>
+     <div class="profile-auth-field"><label for="profileSignedInitials">Tus 3 iniciales arcade</label><input id="profileSignedInitials" type="text" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="JOS" required></div>
+     <div class="profile-auth-field"><label for="profileSignedHandle">Nombre de usuario único</label><input id="profileSignedHandle" type="text" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="josplayer" required></div>
+     <button class="profile-action primary" type="submit" id="profileSignedSave">GUARDAR MI IDENTIDAD</button>
+    </form>
+    <p class="profile-auth-hint">Tus cartas estarán protegidas cuando aparezca «NUBE AL DÍA».</p>
+    <button type="button" class="profile-action secondary" id="profileAuthSignOut">CERRAR SESIÓN</button></div>
    <p class="profile-auth-message" id="profileAuthMessage" role="status" aria-live="polite"></p>
    <div id="profileCloudStatus" class="profile-sync-box" role="status" aria-live="polite">CONSULTANDO ESTADO DE LA NUBE…</div>
    <button type="button" class="profile-action secondary" id="profileLinkCollection" hidden>VINCULAR MI COLECCIÓN LOCAL</button>
@@ -2502,7 +2519,14 @@ function arcadeIdentity(){
 }
 globalThis.icmxGuestIdentity={
  get:()=>({ini:S.ini||'',handle:storedGuestHandle()}),
- markSeenForAccount:()=>{syncIn();if(S.seen)return true;S.seen=1;return save()}
+ markSeenForAccount:ini=>{
+  syncIn();const prev={ini:S.ini,seen:S.seen};
+  if(!validArcadeIni(S.ini)&&validArcadeIni(ini)&&!Object.keys(S.have||{}).length)S.ini=ini;
+  S.seen=1;
+  if(prev.ini===S.ini&&prev.seen===S.seen)return true;
+  if(save())return true;
+  S.ini=prev.ini;S.seen=prev.seen;return false;
+ }
 };
 const guestUIModule=import('./content/guest-access.mjs');
 async function openArcadeEntry(step='welcome'){
