@@ -3168,6 +3168,7 @@ $('zFx').addEventListener('keydown',e=>{
 });
 
 $('zoom').addEventListener('close',()=>{
+ if($('zoom').open)return; // un cierre anterior no debe limpiar la carta que acaba de reabrirse
  ++zLoadToken; // invalida cargas previas, también si se cierra con Escape
  const img=$('zImg');img.onload=null;img.onerror=null;img.removeAttribute('src');
  $('zFx').className='fx';$('zLoad').textContent='';
