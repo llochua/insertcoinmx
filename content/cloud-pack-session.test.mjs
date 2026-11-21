@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
 const source=readFileSync(new URL('./cloud-sync.mjs',import.meta.url),'utf8');
+const gameHtml=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const needle="const sdk=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm');";
 assert.ok(source.includes(needle),'Debe mantenerse el SDK original');
 const mockSource=source.replace(needle,'const sdk=globalThis.__icmxSdkMock;');
@@ -75,6 +76,11 @@ async function harness({uid='qa-user',local=backup(),remote=backup()}={}){
  h.stop=()=>{h.controller.stop();delete globalThis.__icmxSdkMock};
  return h;
 }
+
+test('El juego bloquea la apertura local si el módulo nube falla al cargar',()=>{
+ assert.match(gameHtml,/if\(!cloudSync&&\(localStorage\.getItem\('icmx-cloud-active-account-v1'\)/);
+ assert.match(gameHtml,/NO SE CONSUMIÓ EL SOBRE/);
+});
 
 test('Al cerrar sesión una colección vinculada NO abre como invitado ni toca las cartas',{concurrency:false},async()=>{
  const h=await harness();
