@@ -162,7 +162,13 @@ try{
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('icmx-preview-avatar-20261120')),'cartucho');
   await page.reload({waitUntil:'domcontentloaded'});
   assert.equal(await page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/cartucho-128.webp','avatar persiste en sesión');
-  await page.locator('#onSkip').click();
+  // Finalizar los tres pasos nunca entrega un sobre ni salta al escenario.
+  assert.equal(await page.locator('#onb.on').isVisible(),true);
+  for(let step=0;step<3;step++)await page.locator('#onNext').click();
+  assert.equal(await page.locator('#onb.on').count(),0,'onboarding cerrado');
+  assert.equal(await page.locator('#home.on').count(),1,'tras onboarding se abre el menú');
+  assert.equal(await page.locator('#pack.on').count(),0,'sin apertura automática de sobre');
+  assert.equal(await page.evaluate(()=>S.fg),0,'completar bienvenida no consume primer sobre');
   await page.locator('#home .home-player-card').click();
   await page.locator('#profileAvatarChange').click();
   assert.equal(await page.locator('#avatarPreviewName').textContent(),'Cartucho');
@@ -310,8 +316,53 @@ try{
   assert.ok(saved.preview===null||typeof saved.preview==='string', 'preview remains isolated from the real game');
   assert.equal(saved.accidental,null);
   assert.deepEqual(supabaseCalls,[],'preview must not reach Supabase');
-  assert.deepEqual(exceptions,[],'no uncaught JavaScript errors');
-  console.log('✓ Vista Mi perfil en '+width+'px, bienvenida, navegación y progreso real intacto');
+  // Probar el motor de presentación con cartas sintéticas SIN abrir ni emitir sobres.
+  await page.locator('#onSkip').click();
+  const packState=await page.evaluate(()=>{
+   const state=JSON.stringify(S.have);
+   go('pack');
+   return {state,variant:document.getElementById('pk').dataset.packVariant,
+    variants:Object.keys(PACK_PRESENTATIONS)};
+  });
+  assert.equal(packState.variant,'standard','sobre normal en todas las aperturas reales');
+  assert.deepEqual(packState.variants,['standard','gold'],'la piel dorada está preparada para el futuro');
+  await page.evaluate(()=>setPackPresentation('gold'));
+  assert.equal(await page.locator('#pk').getAttribute('data-pack-variant'),'gold');
+  assert.match(await page.locator('#pk .pkimg').getAttribute('alt'),/Sobre dorado/);
+  assert.notEqual(await page.locator('#pk .pkimg').evaluate(el=>getComputedStyle(el).filter),'none','sobre dorado visualmente diferenciado');
+  await page.screenshot({path:'qa/screenshots/sobre-dorado-reservado-'+width+'.png',fullPage:true});
+  await page.evaluate(()=>resetPack());
+  assert.equal(await page.locator('#pk').getAttribute('data-pack-variant'),'standard','la vista dorada no afecta la siguiente apertura');
+
+  for(const [variant,title] of [['e','HOLO'],['r','DORADA'],['f','ILUSTRACIÓN']]){
+   const prepared=await page.evaluate(v=>{
+    const card=CARDS.find(c=>c.v===v&&c.img&&DB[c.d]&&!DB[c.d].bx);
+    if(!card)return null;
+    hand=[{...card,_new:true,_dnew:true,_prev:[],_doneB:false}];
+    idx=0;REV=new Set([0]);CINEMATIC_SHOWN.clear();icAwardsSeen.clear();
+    showCard();
+    return {id:card.k,title:document.querySelector('.dx-cinema-overlay strong')?.textContent};
+   },variant);
+   assert.ok(prepared,'hay carta ilustrada de clase '+variant);
+   assert.equal(prepared.title,title,'presentación propia para '+title);
+   assert.equal(await page.locator('#disc.dx-cinema .dx-cinema-overlay').count(),1,'animación disparada una vez');
+   await page.waitForTimeout(330);
+   await page.screenshot({path:'qa/screenshots/revelacion-'+variant+'-'+width+'.png',fullPage:true});
+   await page.evaluate(()=>showCard());
+   assert.equal(await page.locator('#disc .dx-cinema-overlay').count(),0,'no repite la animación al regresar a la carta');
+   await page.locator('#dcCard').click();
+   assert.equal(await page.locator('#zoom[open]').count(),1,'la miniatura abre carta grande');
+   assert.equal(await page.locator('#zFx').getAttribute('role'),'button');
+   await page.locator('#zFx').click();
+   assert.equal(await page.locator('#zoom[open]').count(),0,'tocar la misma carta grande regresa a la revelación');
+  }
+  await page.locator('#dcCard').click();
+  await page.locator('#zFx').focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#zoom[open]').count(),0,'el teclado también regresa tocando la carta');
+  assert.equal(await page.evaluate(()=>JSON.stringify(S.have)),packState.state,'animaciones y sobre dorado no modifican el inventario');
+  assert.deepEqual(exceptions,[],'sin excepciones en onboarding, zoom, rarezas ni envolturas');
+  console.log('✓ Vista Mi perfil en '+width+'px, bienvenida, sobre dorado reservado, zoom reversible y rarezas animadas');
   await page.close();
  }
 }finally{
