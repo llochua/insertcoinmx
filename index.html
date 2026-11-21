@@ -2103,10 +2103,11 @@ const freePacksLeft=()=>{
 };
 const packReady=()=>PRUEBA||S.test||freePacksLeft()>0||S.extra>0;
 /* ---------- datos compartidos ---------- */
+const RECORDS_EDITION='public-2026-launch-v1';
 const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude)return;this.db=await claude.use('db');const u=await claude.use('user');this.uid=u?await u.id():null;try{this.dl=await claude.use('downloads')}catch(e){}
  if(!this.db)return;const data=x=>x&&typeof x.data==='function'?x.data():x;
- this.db.collection('tiers').onSnapshot(s=>{const ds=s&&s.docs?s.docs:(Array.isArray(s)?s:[]);this.docs=ds.map(data).filter(d=>d&&d.v===6);refresh()},()=>{})}catch(e){}},
- put(){if(this.db&&this.uid)this.db.doc('tiers/'+this.uid).set({v:6,ini:S.ini||'???',score:uniq(),rate:S.rate,champ:S.champ||'',duel:S.duel||{}}).catch(()=>{})}};
+ this.db.collection('tiers').onSnapshot(s=>{const ds=s&&s.docs?s.docs:(Array.isArray(s)?s:[]);this.docs=ds.map(data).filter(d=>d&&d.v===7&&d.edition===RECORDS_EDITION);refresh()},()=>{})}catch(e){}},
+ put(){if(this.db&&this.uid)this.db.doc('tiers/'+this.uid).set({v:7,edition:RECORDS_EDITION,ini:S.ini||'???',score:uniq(),rate:S.rate,champ:S.champ||'',duel:S.duel||{}}).catch(()=>{})}};
 /* Varias pestañas: lo guardado manda. Antes de cada acción se adopta lo que otra pestaña haya escrito,
    y save() solo escribe si lo guardado sigue siendo lo último que esta pestaña leyó o escribió.
    Adoptar nunca interrumpe: refresh() no toca sobre, reta ni un arrastre en curso. */
@@ -3210,7 +3211,7 @@ window.addEventListener('message',e=>{
  }
 });
 /* ---------- récords ---------- */
-function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STORE.docs.length&&S.ini)m.push({ini:S.ini,score:uniq()});return m.filter(r=>r.ini).sort((a,b)=>b.score-a.score)}
+function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STORE.docs.length&&S.ini)m.push({ini:S.ini,score:uniq()});return m.filter(r=>/^[A-Z0-9]{3}$/.test(r.ini)&&Number.isInteger(r.score)&&r.score>0).sort((a,b)=>b.score-a.score)}
 function renderScores(){$('sMine').textContent=uniq();$('iniIn').value=S.ini;const b=board();const pos=b.findIndex(r=>r.ini===S.ini);
  $('sPos').textContent=pos>=0?'VAS EN EL LUGAR #'+(pos+1):'PON TUS INICIALES PARA ENTRAR';
  $('tbl').innerHTML=b.slice(0,10).map((r,i)=>`<div class="r ${r.ini===S.ini?'me':''}"><span>${i+1}</span><span>${r.ini}</span><span>${r.score}</span></div>`).join('')||'<div class="r"><span></span><span>SIN RECORDS AUN</span></div>'}
