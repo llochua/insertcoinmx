@@ -105,10 +105,11 @@ async function loadAccountIdentity(expectedId) {
   const meta=user.user_metadata||{};
   const draft=guestDraft();
   const wantedHandle=handleOK(meta.icmx_handle)?meta.icmx_handle.toLowerCase():'';
-  const ini=iniOK(meta.icmx_initials)?meta.icmx_initials:(draft.ini||'');
+  let ini=iniOK(meta.icmx_initials)?meta.icmx_initials:(draft.ini||'');
   let {data:profile,error:readError}=await authClient
     .from('player_profiles').select('public_handle,is_public').eq('user_id',user.id).maybeSingle();
   if(version!==identityCheckVersion)return;
+  if(profile?.public_handle&&!iniOK(meta.icmx_initials))ini=''; // Una cuenta existente no adopta iniciales ajenas del navegador.
   if(readError){
     showMissingIdentity(ini,wantedHandle||draft.handle,'No se pudo consultar tu identidad. Tu colección sigue intacta.');
     return;
