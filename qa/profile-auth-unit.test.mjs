@@ -43,7 +43,13 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
  const ctx={console,document,location:{origin:'https://insertcoinmx.com',
   hash:callback?'#access_token=lab-token':'',search:''},
   setTimeout(fn){fn()},Event:class{constructor(type){this.type=type}},CustomEvent:class{constructor(type,opts){this.type=type;this.detail=opts?.detail}},
-  __sdk:{createClient:(_u,_key,opts)=>{calls.opts.push(opts);return {auth,from(table){assert.equal(table,'player_profiles');return {select(){return this},eq(){return this},async maybeSingle(){return {data:{public_handle:'qa_player',is_public:true},error:null}}}}} },
+  __sdk:{createClient(_u,_key,opts){
+   calls.opts.push(opts);
+   return {auth,from(table){
+    assert.equal(table,'player_profiles');
+    return {select(){return this},eq(){return this},async maybeSingle(){return {data:{public_handle:'qa_player',is_public:true},error:null}}};
+   }};
+  }},
   localStorage:{setItem(...args){calls.storageWrites.push(args)}}
  };
  const runnable=code.replace('await import(SDK_URL)','globalThis.__sdk');
