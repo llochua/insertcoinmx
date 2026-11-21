@@ -64,6 +64,13 @@ try{
  await page.waitForFunction(()=>!document.getElementById('zImg').getAttribute('src'));
  await page.evaluate(()=>openCard('abuket_e'));
  await page.locator('#zFx svg.icmx-live-pop[data-ready="true"][data-points="25"]').waitFor();
+ await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-holo-mobile.png'),fullPage:true});
+ await page.locator('#zClose').click();
+ await page.locator('#zoom[open]').waitFor({state:'hidden'});
+ await page.waitForFunction(()=>!document.getElementById('zImg').getAttribute('src'));
+ await page.evaluate(()=>openCard('abuket_r'));
+ await page.locator('#zFx svg.icmx-live-pop[data-ready="true"][data-points="50"]').waitFor();
+ await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-gold-mobile.png'),fullPage:true});
  await page.locator('#zClose').click();
  await page.locator('#zoom[open]').waitFor({state:'hidden'});
  await page.waitForFunction(()=>!document.getElementById('zImg').getAttribute('src'));
