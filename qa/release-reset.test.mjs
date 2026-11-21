@@ -41,7 +41,7 @@ const legacy=()=>storage({
  'unrelated-setting':'keep'
 });
 test('La PR mantiene el reinicio desactivado hasta autorizar la publicación',()=>{
- assert.match(html,/release-reset\\.js[^>]*data-active="false"[^>]*data-game-epoch="public-2026-launch-v1"/);
+ assert.match(html,/release-reset\.js[^>]*data-active="false"[^>]*data-game-epoch="public-2026-launch-v1"/);
  const s=legacy();
  assert.equal(launch(s,false).result.status,'staged');
  assert.equal(JSON.parse(s.getItem('icmx-album2')).have.abuket_b,3);
@@ -78,6 +78,6 @@ test('Solo un cambio explícito de edición vuelve a reiniciar',()=>{
  assert.equal(s.getItem('icmx-game-epoch'),'public-2026-season-two');
 });
 test('La importación manual de respaldos anteriores se bloquea al activar',()=>{
- assert.match(html,/b\\.edition!==window\\.ICMX_RELEASE_RESET\\.edition/);
- assert.match(html,/b\\.edition=window\\.ICMX_RELEASE_RESET\\.edition/);
+ assert.match(html,/b\.edition!==window\.ICMX_RELEASE_RESET\.edition/);
+ assert.match(html,/b\.edition=window\.ICMX_RELEASE_RESET\.edition/);
 });
