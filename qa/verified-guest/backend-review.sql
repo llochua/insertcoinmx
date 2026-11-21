@@ -3,6 +3,11 @@
 -- en producción hasta configurar protección antibots y validar conversión de identidad.
 -- Las cuatro RPC conservan el motor, CAS, idempotencia, cuotas y restricciones de economía existentes.
 BEGIN;
+-- La restricción anterior solo admitía public_beta. Ampliar explícitamente,
+-- sin cambiar ni reiniciar el estado de la compuerta ya existente.
+ALTER TABLE private_sync.beta_access_gate DROP CONSTRAINT beta_access_gate_key_check;
+ALTER TABLE private_sync.beta_access_gate ADD CONSTRAINT beta_access_gate_key_check
+ CHECK (key IN ('public_beta','verified_guest'));
 INSERT INTO private_sync.beta_access_gate(key,enabled)
 VALUES ('verified_guest',false) ON CONFLICT (key) DO NOTHING;
 
