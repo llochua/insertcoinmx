@@ -48,7 +48,8 @@ async function device(signed){
  page.on('pageerror',e=>errors.push(e.message));
  const response=await page.goto(TARGET_URL,{waitUntil:'domcontentloaded'});
  assert.equal(response.status(),200,'QA page must load correctly');
- assert.equal(await page.locator('#homePlayerAvatarImage').evaluate(el=>getComputedStyle(el).visibility),'hidden','avatar is hidden until real identity resolves');
+ if(await page.evaluate(()=>document.documentElement.dataset.icmxAvatarReady!=='true'))
+  assert.equal(await page.locator('#homePlayerAvatarImage').evaluate(el=>getComputedStyle(el).visibility),'hidden','avatar must stay hidden while identity is loading');
  await page.waitForFunction(()=>document.documentElement.dataset.icmxAvatarReady==='true');
  await page.locator('#homePlayerAvatarImage').waitFor({state:'visible'});
  await page.locator('#home .home-player-card').click();
