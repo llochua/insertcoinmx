@@ -136,6 +136,7 @@ function showRecovery(user){
  el("guest").hidden=true;
  el("signed").setAttribute("aria-hidden","true");
  el("recovery").hidden=false;
+ document.title="Recuperar contraseña · Insert Coin MX";
  document.querySelector(".kicker").textContent="INSERT COIN MX · SEGURIDAD";
  document.querySelector("main > h1").textContent="Recupera tu cuenta";
  document.querySelector("main > .intro").textContent="Establece una nueva contraseña para regresar a tu álbum.";
@@ -144,6 +145,22 @@ function showRecovery(user){
  // El SDK ya consumió el enlace: no conservar tokens de acceso en el historial.
  if(fromRecoveryLink)history.replaceState(null,"",location.pathname);
  return true;
+}
+function invalidRecovery(){
+ recoveryActive=false;recoveryUserId=null;
+ el("guest").hidden=true;
+ el("signed").setAttribute("aria-hidden","true");
+ el("recovery").hidden=false;
+ el("recoveryForm").hidden=true;
+ el("recoveryHome").hidden=false;
+ el("recoveryHome").textContent="VOLVER A INICIAR SESIÓN";
+ document.title="Enlace vencido · Insert Coin MX";
+ document.querySelector(".kicker").textContent="INSERT COIN MX · SEGURIDAD";
+ document.querySelector("main > h1").textContent="Enlace no disponible";
+ document.querySelector("main > .intro").textContent="Puedes solicitar otro enlace desde Iniciar sesión.";
+ document.querySelector(".foot").textContent="Tu cuenta y tus cartas no cambian porque el enlace haya expirado.";
+ message("El enlace expiró o ya se utilizó. Solicita uno nuevo desde INICIAR SESIÓN.","error");
+ history.replaceState(null,"",location.pathname);
 }
 function setMode(next){
  if(busy||!["signup","login"].includes(next))return;
@@ -441,12 +458,13 @@ async function init(){
    await refreshBackupSavedState(verified.user.id);
    message(fromConfirmation?"¡Correo confirmado! La cuenta ya está activa.":"Sesión activa. Ya puedes probar cerrar sesión.","success");
   }else if(fromRecoveryLink){
-   el("guest").hidden=true;
-   el("signed").setAttribute("aria-hidden","true");
-   message("El enlace expiró o ya se utilizó. Solicita uno nuevo desde INICIAR SESIÓN.","error");
-   history.replaceState(null,"",location.pathname);
+   invalidRecovery();
   }else{display(null);message("Listo para registrar una cuenta de prueba.")}
- }catch(e){client=null;display(null);message("No pudimos conectar con Supabase. Revisa la conexión.","error")}
+ }catch(e){
+  client=null;
+  if(fromRecoveryLink)invalidRecovery();
+  else{display(null);message("No pudimos conectar con Supabase. Revisa la conexión.","error")}
+ }
 }
 init();
 </script>
