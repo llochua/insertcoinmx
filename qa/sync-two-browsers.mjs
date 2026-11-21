@@ -358,9 +358,11 @@ async function run(){
   assert.equal(cloud.has(LEGACY),false);
   console.log('✓ Colección local previa permanece intacta, sin migración automática ni sobres locales');
   assert.equal(await D.page.evaluate(()=>cloudSync.canImport()),true);
-  await D.page.evaluate(()=>{document.getElementById('title').classList.remove('on');go('scores')});
+  // El respaldo y la vinculación ya no viven en Récords: se accionan desde Mi perfil.
+  await D.page.evaluate(()=>{document.getElementById('title').classList.remove('on');go('profile');revealProfileAuth('login')});
+  await D.page.locator('#profileLinkCollection').waitFor({state:'visible'});
   D.page.once('dialog',dialog=>dialog.accept());
-  await D.page.locator('#cloudImport').click();
+  await D.page.locator('#profileLinkCollection').click();
   await until(()=>cloud.has(LEGACY),'importación de colección local');
   await until(async()=>await D.page.locator('#cloudState').getAttribute('data-sync')==='synced',
     'estado sincronizado tras importación');
