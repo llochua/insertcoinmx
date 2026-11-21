@@ -274,6 +274,29 @@ try{
   await page.screenshot({path:'qa/screenshots/records-repetidas-'+width+'.png',fullPage:true});
   await page.locator('#scores .arcade-ranking-switch [data-score-metric="ratings"]').click();
   await page.screenshot({path:'qa/screenshots/records-calificadas-'+width+'.png',fullPage:true});
+  // Ranking real: cada columna ordena por su métrica, sin confundir registros antiguos con 0.
+  const rankingOrder=await page.evaluate(()=>{
+   const original=STORE.docs,selection=selectedRanking;
+   const seen={};
+   try{
+    STORE.docs=[
+     {v:6,ini:'AAA',score:40,designs:3,duplicates:12,ratings:1},
+     {v:6,ini:'ZZZ',score:20,designs:7,duplicates:2,ratings:8},
+     {v:6,ini:'OLD',score:100}
+    ];
+    for(const metric of ['cards','designs','duplicates','ratings']){
+     selectedRanking=metric;renderScores();
+     seen[metric]=[...document.querySelectorAll('#scores [data-score-entry]')].map(e=>e.children[1].textContent);
+    }
+   }finally{STORE.docs=original;selectedRanking=selection;renderScores()}
+   return seen;
+  });
+  assert.deepEqual(rankingOrder,{
+   cards:['OLD','AAA','ZZZ'],
+   designs:['ZZZ','AAA'],
+   duplicates:['AAA','ZZZ'],
+   ratings:['ZZZ','AAA']
+  },'los cuatro Top 10 se ordenan independientemente y omiten métricas ausentes de versiones anteriores');
   await page.reload({waitUntil:'domcontentloaded'});
   assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-lab-ranking-v1'))),localRank,
     'el ranking local sobrevive a recargar el navegador');
