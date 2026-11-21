@@ -71,7 +71,7 @@ test('signup uses official callback and shared auth storage, no local collection
  h.elements.profileAuthPassword.value='secure-pass-123';
  await h.elements.profileAuthForm.listeners.submit({preventDefault(){}});
  assert.equal(h.calls.signup.length,1);
- assert.equal(h.calls.signup[0].options.emailRedirectTo,'https://insertcoinmx.com/');
+ assert.equal(h.calls.signup[0].options.emailRedirectTo,'https://insertcoinmx.com/qa/registro/');
  assert.match(h.elements.profileAuthMessage.textContent,/Solicitud recibida/);
  assert.equal(h.calls.storageWrites.length,0);
 });
