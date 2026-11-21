@@ -1822,6 +1822,37 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile #profileAuthHandle,#profile #profileSignedHandle{text-transform:lowercase}
 #profile #profileSignedIdentityForm{display:flex;flex-direction:column;gap:10px}
 #profile #profileSignedIdentityForm[hidden],#profile #profileSignupInitialsField[hidden],#profile #profileSignupHandleField[hidden]{display:none!important}
+
+/* Acceso independiente al iniciar, con el mismo lenguaje visual que la bienvenida. */
+#entryAccount{position:fixed;inset:0;z-index:151;display:flex;justify-content:center;align-items:center;overflow:auto;padding:clamp(16px,4vw,30px);background:radial-gradient(120% 100% at 50% 40%,#1a1666 0,#0c0b2a 68%,#05041a 100%);font:600 14px/1.5 AV,system-ui,sans-serif;color:#f3f1ff}
+#entryAccount[hidden],#entryAccount [hidden]{display:none!important}
+#entryAccount .entry-account-shell{width:min(440px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:22px clamp(18px,5vw,28px);border:1px solid rgba(255,212,0,.36);border-radius:17px;background:linear-gradient(145deg,#292252,#14102b 80%);box-shadow:0 24px 62px #0008}
+#entryAccountBack{display:flex;align-items:center;gap:6px;padding:6px 0 10px;color:#c9c4dc;background:none;font:800 11px AV,system-ui,sans-serif}
+#entryAccount .entry-account-brand{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0 0 17px}
+#entryAccount .entry-account-brand img{width:84px;height:auto}
+#entryAccount .entry-account-brand small{font:800 10px AV,system-ui,sans-serif;letter-spacing:.12em;color:#ffd400}
+#entryAccountHeading{text-align:center;font:800 25px/1.25 AV,system-ui,sans-serif;margin:0 0 18px;color:#fff}
+#entryAccount #profileAccountPanel{display:block!important;background:none;border:0;padding:0;box-shadow:none;outline:none}
+#entryAccount #profileAccountBack,#entryAccount #profileAccountPanel>.profile-kicker,#entryAccount #profileAccountTitle,#entryAccount .profile-account-intro,#entryAccount #profileCloudStatus,#entryAccount #profileLinkCollection,#entryAccount .profile-footnote{display:none!important}
+#entryAccount .profile-auth-modes{display:flex;gap:8px;margin:0 0 16px}
+#entryAccount .profile-auth-modes button{flex:1;min-height:36px;border:1px solid #ffffff30;border-radius:8px;color:#c7c1dc;background:none;font:700 10px AV,system-ui,sans-serif}
+#entryAccount .profile-auth-modes button[aria-pressed=true]{border-color:#ffd40080;background:#ffd40013;color:#ffd400}
+#entryAccount form{display:flex;flex-direction:column;gap:12px}
+#entryAccount label{display:block;color:#f3eefa;font:700 11px/1.3 AV,system-ui,sans-serif;margin:0 0 6px}
+#entryAccount input{display:block;width:100%;min-height:46px;border:1px solid #ffffff45;border-radius:10px;background:#120e29;color:#fff;padding:10px 12px;font:600 15px AV,system-ui,sans-serif}
+#entryAccount #profileAuthInitials,#entryAccount #profileSignedInitials{font:20px/1.3 PX,monospace;letter-spacing:.17em;color:#ffd400;text-transform:uppercase;text-align:center}
+#entryAccount .profile-auth-help,#entryAccount .profile-auth-hint,#entryAccount .profile-auth-message,#entryAccount .profile-auth-email{font:500 12px/1.5 AV,system-ui,sans-serif;color:#cbc4df;margin:8px 0}
+#entryAccount .profile-auth-message[data-type=error]{color:#ffc0c0}
+#entryAccount .profile-auth-message[data-type=success]{color:#a6edb9}
+#entryAccount .profile-action{width:100%;min-height:46px;margin:6px 0 0;border:1px solid #ffd400;border-radius:10px;padding:12px;color:#141026;background:#ffd400;font:800 12px AV,system-ui,sans-serif}
+#entryAccount .profile-action.secondary{border-color:#ffffff4d;background:#ffffff0e;color:#fff}
+#entryAccount button:disabled{opacity:.5}
+#entryAccount button:focus-visible,#entryAccount input:focus-visible{outline:2px solid #ffd400;outline-offset:3px}
+#home #mGo.pack-wait{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:238px;min-height:64px;padding:11px 24px;cursor:default;border:1px solid rgba(255,212,0,.45);border-radius:12px;letter-spacing:0;box-shadow:none!important;background:rgba(255,212,0,.10)!important;color:#ffd400!important;opacity:1}
+#home #mGo.pack-wait span{font:800 10px/1.3 AV,system-ui,sans-serif;letter-spacing:.07em}
+#home #mGo.pack-wait time{font:800 22px/1.15 AV,system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+#home #mGo.pack-wait:active{transform:none}
+@media(max-height:650px){#entryAccount .entry-account-brand img{width:64px}#entryAccount .entry-account-brand{margin-bottom:10px}#entryAccount .entry-account-shell{padding-top:12px;padding-bottom:17px}}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -2020,6 +2051,14 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
     <button type="button" id="cloudImport" hidden>Vincular</button>
    </div>
   </details>
+ </div>
+</section>
+<section id="entryAccount" role="dialog" aria-modal="true" aria-labelledby="entryAccountHeading" hidden>
+ <div class="entry-account-shell">
+  <button id="entryAccountBack" type="button" aria-label="Volver al acceso"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg> VOLVER</button>
+  <header class="entry-account-brand"><img src="logo.png" alt="Insert Coin MX"><small>EL ÁLBUM</small></header>
+  <h2 id="entryAccountHeading">Crear cuenta</h2>
+  <div id="entryAccountFormHost"></div>
  </div>
 </section>
 <section class="view" id="avatarSelect" aria-label="Selección de avatar">
@@ -2657,14 +2696,15 @@ globalThis.icmxGuestIdentity={
   S.ini=prev.ini;S.seen=prev.seen;return false;
  }
 };
-const guestUIModule=import('./content/guest-access.mjs');
+const guestUIModule=import('./content/guest-access.mjs?v=20261121tres');
 async function openArcadeEntry(step='welcome'){
  try{
   const ui=await guestUIModule;
   const identity=arcadeIdentity();
   ui.openGuestAccess({
    ini:identity.ini,handle:identity.handle,
-   onCreate:()=>{go('profile');revealProfileAuth('signup')},
+   onCreate:()=>openEntryAccount('signup'),
+   onLogin:()=>openEntryAccount('login'),
    onPlay:({ini,handle})=>{
     syncIn();
     try{localStorage.setItem(GUEST_HANDLE_KEY,handle);if(localStorage.getItem(GUEST_HANDLE_KEY)!==handle)return false}
@@ -2672,7 +2712,6 @@ async function openArcadeEntry(step='welcome'){
     const previous={ini:S.ini,seen:S.seen};
     S.ini=ini;S.seen=1;
     if(!save()){S.ini=previous.ini;S.seen=previous.seen;return false}
-    persistLocalRecord();
     persistLocalRecord();refresh();return true;
    }
   },step);
@@ -2707,11 +2746,11 @@ function menuArtLoad(img,m,dir){
 }
 const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(STORE.docs||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Próximos 2 sobres en '+nextPackCountdown(),img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'VER OPCIONES',off:!r},
+ {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
- {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Pon tus iniciales',img:'F_samus',rr:'full',go:'VER'}]};
+ {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Tu identidad arcade y tus récords',img:'F_samus',rr:'full',go:'VER'}]};
 function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,imgDir=light?'c':'c2';
  $('hCount').textContent=u+' / '+N;
  $('homePlayerCards').textContent=u;
@@ -2725,11 +2764,21 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,i
  const tabs=$('mTabs');
  if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
  [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
- const m=M[mi];$('mGo').textContent=m.go;$('mGo').classList.toggle('off',!!(m.lock||m.off));$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.webp'})`;
+ const m=M[mi];updateHomePackCTA(m);$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.webp'})`;
  const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
  $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
+function updateHomePackCTA(m=MODES()[mi]){
+ const button=$('mGo'),waiting=m.id==='pack'&&m.off;
+ if(waiting){
+  if(!button.classList.contains('pack-wait'))button.innerHTML='<span>2 SOBRES DISPONIBLES EN</span><time>00:00:00</time>';
+  button.querySelector('time').textContent=nextPackCountdown();
+ }else if(button.textContent!==m.go||button.classList.contains('pack-wait'))button.textContent=m.go;
+ button.classList.toggle('pack-wait',!!waiting);
+ button.classList.toggle('off',!!(m.lock||m.off));
+ button.disabled=!!waiting;
+}
 function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
- if(m.id==='pack'&&m.off){beep(440,.05);uxEmptyPacks();return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
+ if(m.id==='pack'&&m.off){updateHomePackCTA(m);return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
 let mMoved=false,msx=null,msy=null;
 $('mGo').onclick=mEnter;
 $('mTabs').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;mi=+b.dataset.i;beep(660,.03);renderHome()};
@@ -2739,7 +2788,7 @@ $('home').addEventListener('touchmove',e=>{if(msx!==null&&Math.abs(e.touches[0].
 $('home').addEventListener('touchend',e=>{if(msx===null)return;const dx=e.changedTouches[0].clientX-msx;msx=null;if(Math.abs(dx)>40){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
 let mmd=null;$('home').addEventListener('mousedown',e=>mmd=e.clientX);$('home').addEventListener('mouseup',e=>{if(mmd===null)return;const dx=e.clientX-mmd;mmd=null;if(Math.abs(dx)>40){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
 function countdown(){const n=new Date();const m=new Date(n);m.setHours(24,0,0,0);const s=Math.floor((m-n)/1000);return String(s/3600|0).padStart(2,'0')+':'+String((s%3600)/60|0).padStart(2,'0')}
-setInterval(()=>{if(cur==='home'&&!packReady())renderHome()},30000);
+setInterval(()=>{if(cur!=='home'||mi!==0)return;const waiting=$('mGo').classList.contains('pack-wait');const available=!!packReady();if(waiting===available)renderHome();else if(waiting)updateHomePackCTA();},1000);
 /* cambio de día sin recargar: a medianoche local, cada 30 s y al volver a la pestaña o la app */
 let dayNow=today(),retaOver=false;
 function dayTick(){const d=today();if(d===dayNow)return;dayNow=d;
@@ -3176,7 +3225,7 @@ $('title').addEventListener('click',e=>{
  if(!globalThis.icmxAccountIdentity?.handle&&(!validArcadeIni(identity.ini)||!validArcadeHandle(identity.handle))){
    // Una colección antigua nunca se reinicia: solo se solicita la identidad faltante.
    const hasProgress=!!(S.seen||S.ini||S.last||Object.keys(S.have||{}).length||(Array.isArray(S.pk)&&S.pk.length));
-   openArcadeEntry(hasProgress?'identity':'welcome');
+   openArcadeEntry('welcome');
  }
 });
 document.addEventListener('pointermove',e=>{if(!$('title').classList.contains('on'))return;const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;$('tiHero').style.transform=`rotateY(${x*14}deg) rotateX(${-y*10}deg)`});
@@ -3934,6 +3983,54 @@ function renderProfile(){
 $('profileExport').onclick=()=>$('bkExp').click();
 $('profileImport').onclick=()=>$('bkImp').click();
 $('profileLinkCollection').onclick=()=>{$('cloudImport').click()};
+
+/* Entrada independiente: reutiliza el formulario real, sin cambiar de pantalla a Perfil. */
+let entryAccountAnchor=null;
+function openEntryAccount(mode='signup'){
+ const modal=$('entryAccount'),panel=$('profileAccountPanel');
+ if(!entryAccountAnchor){entryAccountAnchor=document.createComment('Ubicación de cuenta en perfil');panel.before(entryAccountAnchor)}
+ $('entryAccountFormHost').appendChild(panel);
+ modal.hidden=false;panel.hidden=false;
+ $('entryAccountHeading').textContent=mode==='login'?'Iniciar sesión':'Crear cuenta';
+ $('profileAccountBack').hidden=true;
+ const tab=$(mode==='login'?'profileAuthTabLogin':'profileAuthTabSignup');
+ globalThis.icmxInitialAuthMode=mode;
+ if(tab&&!tab.disabled)tab.click();
+ requestAnimationFrame(()=>{if(!modal.hidden){panel.hidden=false;modal.scrollTop=0;panel.focus({preventScroll:true})}});
+}
+function closeEntryAccount(signed=false){
+ const modal=$('entryAccount'),panel=$('profileAccountPanel');
+ if(modal.hidden)return;
+ modal.hidden=true;
+ if(entryAccountAnchor)entryAccountAnchor.after(panel);
+ panel.hidden=!signed;
+ $('profileWelcome').hidden=signed;
+ $('profileAccountBack').hidden=signed;
+ $('profile').classList.remove('account-focus');
+ $('profileAuthPassword').value='';
+ globalThis.icmxInitialAuthMode=null;
+ if(signed){go('home');$('home').focus({preventScroll:true})}
+ else openArcadeEntry('welcome');
+}
+$('entryAccountBack').onclick=()=>{
+ if($('profileAuthSend').disabled||$('profileSignedSave').disabled&&globalThis.icmxAvatarAuthUser?.id)return;
+ closeEntryAccount(!!globalThis.icmxAvatarAuthUser?.id);
+};
+document.addEventListener('icmx:auth-entry-mode',e=>{
+ if(!$('entryAccount').hidden)$('entryAccountHeading').textContent=e.detail==='login'?'Iniciar sesión':'Crear cuenta';
+});
+document.addEventListener('icmx:entry-auth-state',()=>{
+ if($('entryAccount').hidden)return;
+ $('profileAccountPanel').hidden=false;
+ if(globalThis.icmxAvatarAuthUser?.id){
+  $('entryAccountHeading').textContent='Tu identidad arcade';
+  if(globalThis.icmxAccountIdentity?.handle)closeEntryAccount(true);
+ }
+});
+document.addEventListener('icmx:player-identity',()=>{
+ if(!$('entryAccount').hidden&&globalThis.icmxAvatarAuthUser?.id&&globalThis.icmxAccountIdentity?.handle)closeEntryAccount(true);
+});
+
 function revealProfileAuth(mode='signup'){
  const panel=$('profileAccountPanel');
  $('profile').classList.add('account-focus');
@@ -4007,4 +4104,4 @@ import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCl
  cloudSync.check();
 })
 .catch(()=>{for(const id of ['cloudState','profileCloudStatus']){const e=$(id);if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}}});
-</script><script type="module" src="content/auth-account.js?v=20261121acceso"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
+</script><script type="module" src="content/auth-account.js?v=20261121tres"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
