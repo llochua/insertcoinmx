@@ -18,7 +18,7 @@ const user=()=>({id:'qa-user',email:'qa@example.test',user_metadata:{icmx_avatar
 const sdk=[
 'export function createClient(){return {',
 'auth:{',
-'async getUser(){return {data:{user:window.__QA_SIGNED?await window.__qaUser():null},error:null}},',
+'async getUser(){await new Promise(done=>setTimeout(done,300));return {data:{user:window.__QA_SIGNED?await window.__qaUser():null},error:null}},',
 'async updateUser(payload){return await window.__qaSave(payload)}',
 '},',
 'from(table){if(table!=="player_snapshots")throw Error("Unexpected table "+table);return {select(){return {eq(){return {async maybeSingle(){return {data:{user_id:"qa-user",state:{data:{have:{abuket_b:3,pizza_e:2}}}},error:null}}}}}}}}',
@@ -32,7 +32,11 @@ async function device(signed){
  await context.route('https://cdn.jsdelivr.net/**',route=>route.fulfill({status:200,contentType:'text/javascript',headers:{'access-control-allow-origin':'*'},body:sdk}));
  const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>localStorage.setItem('icmx-album2','{"have":{"local_b":4},"seen":1}'));
- await page.goto(url,{waitUntil:'domcontentloaded'});return {context,page};
+ await page.goto(url,{waitUntil:'domcontentloaded'});
+ assert.equal(await page.locator('#preview').getAttribute('src'),null,'never hardcode a fallback avatar before auth');
+ assert.equal(await page.locator('#selectedName').innerText(),'Cargando…','show a neutral loading state');
+ assert.equal(await page.locator('#avatarHolder').getAttribute('aria-busy'),'true');
+ return {context,page};
 }
 const devices=[];
 try{
@@ -40,9 +44,12 @@ try{
  await guest.page.waitForFunction(()=>document.getElementById('account').textContent.includes('No hay una sesión activa'));
  assert.equal(await guest.page.locator('#save').isDisabled(),true);
  assert.equal(await guest.page.locator('#selection').evaluate(el=>el.disabled),true);
+ assert.equal(await guest.page.locator('#selectedName').innerText(),'Sin sesión');
  await guest.context.close();
  const A=await device(true);devices.push(A);
  await A.page.getByText('5 cartas en la nube').waitFor();
+ await A.page.locator('#preview').waitFor({state:'visible'});
+ assert.equal(await A.page.locator('#preview').getAttribute('src'),'/assets/avatars/moneda-320.webp');
  assert.equal(await A.page.locator('#grid [data-avatar]').count(),12);
  const images=await A.page.locator('#grid img').evaluateAll(items=>items.map(el=>el.getAttribute('src')));
  assert.equal(new Set(images).size,12);
@@ -55,6 +62,8 @@ try{
  const B=await device(true);devices.push(B);
  await B.page.getByText('5 cartas en la nube').waitFor();
  assert.equal(await B.page.locator('#selectedName').innerText(),'Pizza');
+ await B.page.locator('#preview').waitFor({state:'visible'});
+ assert.equal(await B.page.locator('#preview').getAttribute('src'),'/assets/avatars/pizza-320.webp','other device never flashed Moneda');
  assert.equal(await B.page.locator('#save').isDisabled(),true);
  await B.page.locator('[data-avatar="control"]').click();await B.page.locator('#save').click();
  await B.page.getByText('¡Avatar guardado en tu cuenta!',{exact:false}).waitFor();

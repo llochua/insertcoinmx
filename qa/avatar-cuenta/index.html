@@ -28,7 +28,9 @@ h1{margin:0;font-size:clamp(24px,4vw,33px);line-height:1.14;letter-spacing:-.02e
 .status{padding:12px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:24px}
 .status strong{font-size:13px;overflow-wrap:anywhere}.status small{font-size:12px;color:var(--muted)}
 .current{display:flex;align-items:center;gap:20px;padding:15px;border-radius:15px;background:#0a0924;border:1px solid #343068;margin-bottom:22px}
-.current img{width:clamp(116px,23vw,160px);aspect-ratio:1;object-fit:contain;border-radius:16px;background:#15113a;flex:none}
+.avatar-holder{width:clamp(116px,23vw,160px);aspect-ratio:1;flex:none;border-radius:16px;background:linear-gradient(135deg,#201a4d,#161037);overflow:hidden}
+.avatar-holder img{width:100%;height:100%;object-fit:contain;display:block}
+.avatar-holder img[hidden]{display:none}
 .current .label{color:var(--yellow);font:10px/1.7 ICPixel,monospace}
 .current h2{font-size:22px;margin:5px 0 8px}
 .current p{font-size:12px;color:var(--muted);margin:0}
@@ -59,8 +61,8 @@ fieldset{margin:0;padding:0;border:0;min-width:0}
 <p class="intro">Tu personaje se guarda en tu cuenta. Esta prueba no abre sobres ni cambia tu colección.</p>
 <div class="status"><strong id="account">Comprobando tu sesión…</strong><small id="cards" aria-live="polite">Leyendo respaldo…</small></div>
 <div class="current">
-<img id="preview" src="/assets/avatars/moneda-320.webp" alt="Vista previa del avatar" width="320" height="320">
-<div><span class="label">TU PERSONAJE</span><h2 id="selectedName">Moneda</h2><p id="savedName">Sin cambios guardados</p></div>
+<div class="avatar-holder" id="avatarHolder" aria-busy="true"><img id="preview" hidden alt="Vista previa del avatar" width="320" height="320"></div>
+<div><span class="label">TU PERSONAJE</span><h2 id="selectedName">Cargando…</h2><p id="savedName">Consultando avatar de tu cuenta</p></div>
 </div>
 <fieldset id="selection" disabled><legend>12 AVATARES DISPONIBLES</legend><div class="grid" id="grid" aria-label="Personajes"></div></fieldset>
 <div class="actions"><button type="button" class="primary" id="save" disabled>GUARDAR AVATAR</button><p class="msg" id="message" data-type="info" role="status" aria-live="polite">Conectando con Supabase…</p></div>
@@ -78,10 +80,33 @@ const $=id=>document.getElementById(id);
 let client=null,user=null,current='moneda',chosen='moneda',saving=false;
 const avatar=(id,size)=>'/assets/avatars/'+(allowed.has(id)?id:'moneda')+'-'+size+'.webp';
 function note(message,type='info'){$('message').textContent=message;$('message').dataset.type=type}
+let renderedAvatarUrl='',loadingAvatarUrl='',previewVersion=0;
 function paint(){
  const entry=ITEMS.find(x=>x[0]===chosen)||ITEMS[0];
- $('preview').src=avatar(chosen,320);
- $('preview').alt='Vista previa de '+entry[1];
+ const nextUrl=avatar(chosen,320);
+ // No mostrar Moneda (ni ningún avatar anterior) mientras Supabase recupera la identidad.
+ if(renderedAvatarUrl!==nextUrl&&loadingAvatarUrl!==nextUrl){
+  const version=++previewVersion;
+  loadingAvatarUrl=nextUrl;
+  $('preview').hidden=true;
+  $('avatarHolder').setAttribute('aria-busy','true');
+  const ready=new Image();
+  ready.onload=()=>{
+   if(version!==previewVersion)return;
+   $('preview').src=nextUrl;
+   $('preview').alt='Vista previa de '+entry[1];
+   $('preview').hidden=false;
+   renderedAvatarUrl=nextUrl;loadingAvatarUrl='';
+   $('avatarHolder').setAttribute('aria-busy','false');
+  };
+  ready.onerror=()=>{
+   if(version!==previewVersion)return;
+   loadingAvatarUrl='';
+   $('avatarHolder').setAttribute('aria-busy','false');
+   note('No pudimos cargar la imagen de este avatar. Puedes intentarlo de nuevo.','error');
+  };
+  ready.src=nextUrl;
+ }
  $('selectedName').textContent=entry[1];
  $('savedName').textContent=chosen===current?'Avatar actual de tu cuenta':'Vista previa, sin guardar';
  for(const button of $('grid').querySelectorAll('[data-avatar]'))button.setAttribute('aria-pressed',String(button.dataset.avatar===chosen));
@@ -116,6 +141,8 @@ async function init(){
   if(error||!data?.user?.id){
    $('account').textContent='No hay una sesión activa en este navegador';
    $('cards').textContent='Acceso pendiente';
+   $('selectedName').textContent='Sin sesión';
+   $('savedName').textContent='Inicia sesión para consultar tu avatar.';
    note('Primero inicia sesión desde «Ir a mi cuenta».','error');return;
   }
   user=data.user;
@@ -129,7 +156,7 @@ async function init(){
   const have=row?.state?.data?.have;
   const total=have&&typeof have==='object'?Object.values(have).reduce((sum,q)=>sum+(Number.isFinite(Number(q))?Number(q):0),0):0;
   $('cards').textContent=row?String(total)+' cartas en la nube':'Sin respaldo de cartas';
- }catch(_){if(!user){$('account').textContent='No se pudo verificar la cuenta';$('cards').textContent='Sin conexión'}else{$('cards').textContent='Respaldo no disponible'}note('No se pudo completar la consulta. Tus cartas permanecen intactas.','error')}
+ }catch(_){if(!user){$('account').textContent='No se pudo verificar la cuenta';$('cards').textContent='Sin conexión';$('selectedName').textContent='No disponible';$('savedName').textContent='No se pudo consultar el avatar.'}else{$('cards').textContent='Respaldo no disponible'}note('No se pudo completar la consulta. Tus cartas permanecen intactas.','error')}
 }
 init();
 </script>
