@@ -66,7 +66,9 @@ const devices=[];
 try {
  const guest=await device(false);devices.push(guest);
  assert.equal(await guest.page.locator('#profileAuthGuest').isVisible(),false,'signup section is progressive');
- assert.equal(await guest.page.locator('#profilePlayerName').innerText(),'Jugador invitado');
+ assert.equal(await guest.page.locator('#profilePlayerName').innerText(),'TST');
+ assert.match(await guest.page.locator('#profilePlayerState').innerText(),/Invitado/);
+ assert.match(await guest.page.locator('#profileInitials').innerText(),/@qa_guest · provisional/);
  assert.equal(await guest.page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/moneda-128.webp');
  await guest.context.close();
 
