@@ -2661,6 +2661,12 @@ function openServerPack(){
 function openPack(){
  if(opening||serverPackBusy)return;
  if(cloudSync?.requiresServer?.()){openServerPack();return}
+ // No emitir sobres locales si falla la carga de nube para una cuenta vinculada.
+ if(!cloudSync&&(localStorage.getItem('icmx-cloud-active-account-v1')||
+    localStorage.getItem('icmx-auth-qa-nov2026'))){
+  toast('VERIFICANDO TU CUENTA<br>NO SE CONSUMIÓ EL SOBRE');
+  return;
+ }
  opening=true;clearTimeout(hintT);
  withLock(()=>{syncIn();if(!packReady()){opening=false;go('home');uxEmptyPacks(true);return}
   const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,welcome:0,daily:0,dailyDay:'',dailyCycle:null,saved:false,t:0};
