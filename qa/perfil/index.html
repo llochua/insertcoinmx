@@ -3259,7 +3259,7 @@ function renderScores(){
  $('iniIn').value=S.ini;
  const metric=RANKING_FIELDS[selectedRanking],listing=scoreBoard(selectedRanking);
  const available=listing.rows,position=available.findIndex(r=>r.ini===S.ini&&S.ini);
- $('sPos').textContent=position>=0?'VAS EN EL LUGAR #'+(position+1):'PON TUS INICIALES PARA ENTRAR';
+ $('sPos').textContent=position>=0?(listing.origin==='available'?'VAS EN EL LUGAR #':'RÉCORD LOCAL · LUGAR #')+(position+1):'PON TUS INICIALES PARA ENTRAR';
  $('scoreRankColumn').textContent=metric.label;
  $('tbl').setAttribute('aria-label','Top 10 de '+metric.aria);
  document.querySelectorAll('#scores [data-score-metric]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.scoreMetric===selectedRanking)));
