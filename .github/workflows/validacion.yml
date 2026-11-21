@@ -40,6 +40,8 @@ jobs:
           node --check content/card-texts.js
           node --check content/validate.mjs
           node --check content/cloud-sync.mjs
+          node --check content/community-value.mjs
+          node --check qa/community-value.test.mjs
           node --check content/auth-account.js
           node --check content/avatar-profile.js
           node --check content/release-reset.js
@@ -59,6 +61,7 @@ jobs:
           node --test qa/profile-auth-unit.test.mjs
           node --test qa/release-reset.test.mjs
           node --test qa/records-edition.test.mjs
+          node --test qa/community-value.test.mjs
           node - <<'NODE'
           const fs = require('node:fs');
           const vm = require('node:vm');
