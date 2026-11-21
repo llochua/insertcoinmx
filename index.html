@@ -2176,6 +2176,21 @@ const ga=(n,p)=>{try{if(window.gtag)gtag('event',n,p||{})}catch(e){}};
 try{if(S.last&&S.last<today())ga('regreso',{dias_desde_ultimo_sobre:Math.round((new Date(today())-new Date(S.last))/864e5)})}catch(e){}
 const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
+let communityValueEngine=null;
+const validValueCards=()=>CARDS.filter(c=>!c.bx&&c.img).map(c=>c.k);
+function collectionPointsLocal(){
+ if(!communityValueEngine)return null;
+ try{return communityValueEngine.collectionPoints(Object.keys(S.have||{}),validValueCards()).points}
+ catch(_){return null}
+}
+const valueVariantPoints=v=>communityValueEngine?.VARIANT_POINTS?.[v]??null;
+function updateCardValueUI(card){
+ const value=valueVariantPoints(card.v);
+ $('zVariantPoints').textContent=card.bx?'—':value===null?'— PTS':value+' PTS';
+ $('zVariantOwned').textContent=S.have[card.k]?'Descubierta en tu colección':'Al descubrirla por primera vez';
+ $('zDesignPopularity').textContent='— POP';
+ $('zGlobalPosition').textContent='Sin clasificar';
+}
 const PRUEBA=false; // quitar al lanzar: sobres ilimitados para revisar
 /* Regla pactada: 5 sobres de bienvenida, luego 2 cada 6 horas.
    La bienvenida se conserva hasta gastarla; los ciclos de 6 horas
@@ -2858,6 +2873,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   <div class="dx-fade"></div>
   ${dxTop()}${dxControls()}
   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${baseHtml(c)}
+   <div class="dx-value-earn ${c._new?"":"is-duplicate"}">${c._new?(valueVariantPoints(v)===null?"PUNTOS EN PREPARACIÓN":"+"+valueVariantPoints(v)+" PTS · NUEVA VARIANTE"):"REPETIDA · 0 PTS"}</div>
    <div class="dx-tags"><span class="dx-v">${VSHORT[v].toUpperCase()}</span>${c._new?`<span class="dx-s">${c._dnew?'NUEVA':'NUEVA VARIANTE'}</span>`:`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
   <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span>${icAward(c)}</button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
  resolveArtworkBackground(d,D);
@@ -3053,6 +3069,7 @@ function openFicha(id){if(!DB[id])return;fd=id;ga('ver_ficha',{diseno:id});rende
 function closeFicha(){fd=null;$('ficha').classList.remove('on');$('ficha').setAttribute('aria-hidden','true')}
 function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(d);
  $('fMeta').innerHTML=d.cat+(d.bx?' · BONUS':d.no?' · #'+String(d.no).padStart(3,'0'):'')+(st.done?'<span class="fdone">★ COMPLETO</span>':st.was?'<span class="fdone was">★ COMPLETADO '+fday(S.logro[d.id]).toUpperCase()+' · NUEVA VERSIÓN</span>':'');$('fName').textContent=d.n;
+ $('fDesignValue').textContent='POPULARIDAD GLOBAL · SIN CLASIFICAR';
  const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
  const col=st.vs.filter(x=>x.st==='have'||x.st==='av');$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
@@ -3073,6 +3090,7 @@ function openCard(k){
  const token=++zLoadToken,zoom=$('zoom'),img=$('zImg'),fx=$('zFx'),status=$('zLoad');
  zReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
  zk=cc.k;
+ updateCardValueUI(cc);
  $('zName').textContent=cc.n+' · '+VN[cc.v];
  const stxt=storyFor(cc),sn=$('zNarrative');sn.hidden=!stxt;$('zNarrativeKicker').textContent=stxt?storyLabel(cc):'';$('zNarrativeText').textContent=stxt;
  // Ocultar arte anterior ANTES de asignar el src o abrir el diálogo.
@@ -3633,6 +3651,8 @@ async function shareTier(){toast('PREPARANDO IMAGEN...');await document.fonts.re
 function renderProfile(){
  syncIn();
  const cards=uniq(),total=NAV,progress=$('profileProgress');
+ const pts=collectionPointsLocal();
+ $('profileValuePoints').textContent=pts===null?'— PTS':pts.toLocaleString('es-MX')+' PTS';
  $('profileCards').textContent=cards;
  $('profileTotal').textContent=total;
  $('profileDial').style.setProperty('--profile-fill',(total?Math.min(100,cards/total*100):0)+'%');
@@ -3675,6 +3695,12 @@ $('profileAccountBack').onclick=()=>{
 $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
+import('./content/community-value.mjs').then(mod=>{
+ communityValueEngine=mod;
+ if(cur==='profile')renderProfile();
+ if($('zoom').open&&CB[zk])updateCardValueUI(CB[zk]);
+ if(cur==='pack'&&$('disc').classList.contains('on'))showCard();
+}).catch(()=>{/* El juego sigue utilizable si el módulo de puntos no carga. */});
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
 claimPend();initSound();go('home');STORE.init();
 if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
