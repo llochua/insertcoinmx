@@ -53,12 +53,21 @@ try{
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-records-mobile.png'),fullPage:true});
  await page.evaluate(()=>openCard('abuket_b'));
  await page.locator('#zoom[open]').waitFor();
- assert.equal(await page.locator('#zVariantPoints').innerText(),'10 PTS');
- assert.equal(await page.locator('#zDesignPopularity').innerText(),'— POP');
- assert.match(await page.locator('#zVariantOwned').innerText(),/Descubierta/);
+ await page.locator('#zFx canvas.icmx-card-face-values[data-ready="true"]').waitFor();
+ assert.equal(await page.locator('#zFx canvas.icmx-card-face-values').getAttribute('data-points'),'10');
+ assert.equal(await page.locator('#zFx canvas.icmx-card-face-values').getAttribute('data-pop'),'—');
+ assert.match(await page.locator('#zCommunityFormula').innerText(),/LIKES 35% · TIER 35% · RETA 30%/);
+ assert.equal(await page.locator('#zoom .icmx-card-value').count(),0,'no duplicar cifras debajo de la carta');
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-mobile.png'),fullPage:true});
+ await page.locator('#zClose').click();
+ await page.evaluate(()=>openCard('abuket_e'));
+ await page.locator('#zFx canvas.icmx-card-face-values[data-ready="true"][data-points="25"]').waitFor();
+ await page.locator('#zClose').click();
+ await page.evaluate(()=>openCard('arcade_f'));
+ await page.locator('#zFx canvas.icmx-card-face-values[data-ready="true"][data-points="100"]').waitFor();
+ await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-full-mobile.png'),fullPage:true});
  assert.deepEqual(errors,[],'sin errores JavaScript al navegar');
- console.log('✓ Pantallas reales: perfil '+pts+', Récords arcade y detalle con 10 PTS / — POP');
+ console.log('✓ Pantallas reales: Récords arcade, PTS incrustados de Base/Holo/Full y POP sin datos ficticios');
 }finally{
  await page.close();
  await browser.close();
