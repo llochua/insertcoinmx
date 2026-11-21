@@ -18,7 +18,7 @@ const backup=(have={})=>({app:'insertcoinmx-album',format:2,
  data:{have,rate:{},welcomeLeft:5,freeUsed:0,fg:0,pk:[],last:''}});
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 
-async function harness({uid='qa-user',local=backup(),remote=backup()}={}){
+async function harness({uid='qa-user',local=backup(),remote=backup(),verifiedGuests=false,anonymous=false}={}){
  const store=new Map();
  const storage={
   get length(){return store.size},key:i=>[...store.keys()][i]??null,
@@ -26,10 +26,10 @@ async function harness({uid='qa-user',local=backup(),remote=backup()}={}){
   setItem:(k,v)=>store.set(k,String(v)),
   removeItem:k=>store.delete(k)
  };
- const h={uid,local:copy(local),remote:remote?copy(remote):null,
+ const h={uid,anonymous,guestCreations:0,local:copy(local),remote:remote?copy(remote):null,
   revision:1,issueCalls:0,exchangeCalls:0,issued:null,gate:null,statuses:[],authEvent:null};
  const auth={
-  async getUser(){if(h.gate)await h.gate;return {data:{user:h.uid?{id:h.uid}:null},error:null}},
+  async getUser(){if(h.gate)await h.gate;return {data:{user:h.uid?{id:h.uid,is_anonymous:h.anonymous}:null},error:null}},
   async getSession(){return {data:{session:h.uid?{user:{id:h.uid}}:null},error:null}},
   onAuthStateChange(fn){h.authEvent=fn;return {data:{subscription:{unsubscribe(){}}}}}
  };
@@ -76,6 +76,12 @@ async function harness({uid='qa-user',local=backup(),remote=backup()}={}){
  globalThis.window={addEventListener(){},removeEventListener(){}};
  globalThis.document={hidden:false,addEventListener(){},removeEventListener(){}};
  h.controller=await startCloudSync({
+  verifiedGuests,
+  guestSession:async()=>{
+   h.guestCreations++;
+   h.uid='guest-stable-uid';h.anonymous=true;
+   return {id:h.uid,is_anonymous:true};
+  },
   readLocal:()=>copy(h.local),
   restoreLocal:value=>{h.local=copy(value);return {ok:true}},
   onStatus:(code,message)=>h.statuses.push({code,message})
@@ -205,5 +211,42 @@ test('Progreso invitado con cuenta nueva: copia separada y alta sin acuñar cart
   assert.deepEqual(h.local.data.have,{});
   assert.deepEqual(h.controller.listConflictArchives()[0].backup,local);
   assert.equal(h.issueCalls,0);
+ }finally{h.stop()}
+});
+
+test('Primer sobre de invitado se emite en servidor y convertir UID no reinicia nada',{concurrency:false},async()=>{
+ const local=backup();
+ local.data.ini='JOS';local.data.seen=1;
+ const h=await harness({uid:null,local,remote:null,verifiedGuests:true});
+ try{
+  assert.equal(h.controller.requiresServer(),true);
+  const first=await h.controller.issuePack();
+  assert.equal(first.status,'issued');
+  assert.equal(h.guestCreations,1);
+  assert.equal(h.uid,'guest-stable-uid');
+  assert.equal(h.local.data.ini,'JOS');
+  assert.equal(h.local.data.welcomeLeft,4);
+  assert.equal(h.issueCalls,1);
+  const before=copy(h.remote);
+  h.anonymous=false;
+  h.authEvent('USER_UPDATED',{user:{id:h.uid,is_anonymous:false}});
+  await h.controller.check();
+  await pause(110);
+  assert.deepEqual(h.local,before);
+  assert.deepEqual(h.remote,before);
+  assert.equal(h.guestCreations,1);
+  assert.equal(h.issueCalls,1);
+  assert.equal(localStorage.getItem('icmx-cloud-active-account-v1'),h.uid);
+ }finally{h.stop()}
+});
+test('Invitado verificado con cartas locales antiguas no las acuña en servidor',{concurrency:false},async()=>{
+ const local=backup({gato_b:7});
+ const h=await harness({uid:null,local,remote:null,verifiedGuests:true});
+ try{
+  assert.equal((await h.controller.issuePack()).status,'pending');
+  assert.equal(h.issueCalls,0);
+  assert.deepEqual(h.local,local);
+  assert.equal(h.remote,null);
+  assert.ok(h.controller.getConflict());
  }finally{h.stop()}
 });
