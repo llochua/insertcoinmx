@@ -10,7 +10,7 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
  const ids=['profileAuthMessage','profileAuthGuest','profileAuthSigned','profileAuthUser',
   'profilePlayerName','profilePlayerState','profileAuthTabSignup','profileAuthTabLogin',
   'profileAuthSend','profileAuthForm','profileAuthPassword','profileAuthEmail',
-  'profileAuthHint','profileAuthSignOut','profileAuthInitials','profileAuthHandle','profileSignedInitials','profileSignedHandle','profileSignedIdentityForm','profileSignedIdentityStatus','profileSignedSave','profileSignupInitialsField','profileSignupHandleField'];
+  'profileAuthHint','profileAuthSignOut','profileAuthForgot','profileAuthInitials','profileAuthHandle','profileSignedInitials','profileSignedHandle','profileSignedIdentityForm','profileSignedIdentityStatus','profileSignedSave','profileSignupInitialsField','profileSignupHandleField'];
  const elements=Object.fromEntries(ids.map(id=>[id,{
   id,listeners:{},dataset:{},value:'',hidden:false,disabled:false,textContent:'',attrs:{},
   addEventListener(type,fn){this.listeners[type]=fn},
@@ -18,7 +18,7 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
   checkValidity(){return this.id!=='profileAuthPassword'||this.value.length>=8},
   focus(){this.focused=true}
  }]));
- const calls={signup:[],signin:[],signout:[],avatarUpdates:[],events:[],opts:[],clicked:0,titleRemoved:0,storageWrites:[]};
+ const calls={signup:[],signin:[],recovery:[],signout:[],avatarUpdates:[],events:[],opts:[],clicked:0,titleRemoved:0,storageWrites:[]};
  const user={id:'user-lab',email:'qa@example.test',user_metadata:{icmx_initials:'TST',icmx_handle:'qa_player'}};
  const auth={
   onAuthStateChange(fn){this.emit=fn;return {data:{subscription:{unsubscribe(){}}}};},
@@ -27,6 +27,7 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
   async signUp(args){calls.signup.push(args);return signUpError?
     {data:null,error:signUpError}:{data:{user,session:null},error:null};},
   async signInWithPassword(args){calls.signin.push(args);return {data:{user,session:{user}},error:null};},
+  async resetPasswordForEmail(email,options){calls.recovery.push({email,options});return {data:{},error:null};},
   async updateUser(args){calls.avatarUpdates.push(args);return {data:{user:{...user,user_metadata:args.data}},error:null};},
   async signOut(args){calls.signout.push(args);return {error:null};}
  };
@@ -119,4 +120,34 @@ test('avatar saved as cosmetic user metadata, never as collection or authorizati
  assert.equal(h.calls.storageWrites.length,0,'no write to album storage');
  await assert.rejects(()=>h.saveAvatar('admin'),/Avatar/,'unknown avatar rejected');
  assert.equal(h.calls.avatarUpdates.length,1);
+});
+
+test('Password recovery appears only on sign-in and sends a neutral email request',async()=>{
+ const h=harness();await h.flush();
+ assert.equal(h.elements.profileAuthForgot.hidden,true,'register form must not suggest reset');
+ h.elements.profileAuthTabLogin.listeners.click();
+ assert.equal(h.elements.profileAuthForgot.hidden,false,'sign in must expose recovery');
+ h.elements.profileAuthEmail.value='test-recovery@example.test';
+ await h.elements.profileAuthForgot.listeners.click();
+ assert.equal(h.calls.recovery.length,1);
+ assert.deepEqual(JSON.parse(JSON.stringify(h.calls.recovery[0])),{
+  email:'test-recovery@example.test',
+  options:{redirectTo:'https://insertcoinmx.com/qa/registro/'}
+ });
+ assert.match(h.elements.profileAuthMessage.textContent,/Si ese correo tiene una cuenta/);
+ assert.equal(h.calls.signup.length,0);
+ assert.equal(h.calls.signin.length,0);
+ assert.equal(h.calls.storageWrites.length,0);
+ h.elements.profileAuthTabSignup.listeners.click();
+ assert.equal(h.elements.profileAuthForgot.hidden,true);
+});
+
+test('Recovery rejects missing email without sending a request',async()=>{
+ const h=harness();await h.flush();
+ h.elements.profileAuthTabLogin.listeners.click();
+ h.elements.profileAuthEmail.value='';
+ await h.elements.profileAuthForgot.listeners.click();
+ assert.equal(h.calls.recovery.length,0);
+ assert.match(h.elements.profileAuthMessage.textContent,/Escribe tu correo/);
+ assert.equal(h.elements.profileAuthEmail.focused,true);
 });
