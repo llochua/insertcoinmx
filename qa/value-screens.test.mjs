@@ -61,7 +61,7 @@ test('El historial actual de PTS se calcula mediante el motor existente',()=>{
 });
 test('La capa sobre imágenes cubre las cifras impresas sin afectar la ilustración',()=>{
  assert.match(face,/x1:570,x2:904,y1:142,y2:217/);
- assert.match(face,/x1:777,x2:916,y1:1245,y2:1285/);
+ assert.match(face,/x1:641,x2:843,y1:1252,y2:1281/);
  assert.match(face,/ctx\.clearRect\(0,0,W,H\)/);
  assert.match(face,/isPop\(pop\)\?String\(pop\):'—'/);
  assert.match(face,/img\.insertAdjacentElement\('afterend',canvas\)/);
