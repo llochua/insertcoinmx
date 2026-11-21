@@ -2755,6 +2755,7 @@ async function openArcadeEntry(step='welcome'){
   const ui=await guestUIModule;
   const identity=arcadeIdentity();
   ui.openGuestAccess({
+   verified:VERIFIED_GUEST_PLAY,
    ini:identity.ini,handle:identity.handle,
    onCreate:()=>openEntryAccount('signup'),
    onLogin:()=>openEntryAccount('login'),
