@@ -25,7 +25,9 @@ const errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 try{
  await page.route('https://cdn.jsdelivr.net/**',r=>r.abort());
+ await page.route('**/rest/v1/rpc/icmx_community_aggregates',r=>r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'[]'}));
  await page.addInitScript(()=>{
+  localStorage.setItem('icmx-guest-handle-v1','qa_guest');
   localStorage.setItem('icmx-album2',JSON.stringify({
    have:{abuket_b:3,abuket_e:2,arcade_f:1},rate:{abuket:0},ini:'TST',seen:1,sv:2,mv:2,welcomeLeft:0
   }));
