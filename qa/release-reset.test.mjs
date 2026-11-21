@@ -23,7 +23,7 @@ function launch(s,active,version=epoch){
  const document={currentScript:{getAttribute(name){
   return {'data-active':active?'true':'false','data-game-epoch':version}[name]??null;
  }}};
- vm.runInNewContext(source,{localStorage:s,window,document});
+ vm.runInNewContext(source,{localStorage:s,window,document,location:{hostname:'insertcoinmx.com'}});
  return window.ICMX_RELEASE_RESET;
 }
 const legacy=()=>storage({
