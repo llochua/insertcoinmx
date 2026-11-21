@@ -45,6 +45,7 @@ jobs:
           node --check qa/profile-browsers.mjs
           node --check qa/perfil-main-browsers.mjs
           node --check qa/profile-auth-unit.test.mjs
+          node --check qa/check-profile-gameplay-invariants.mjs
           node --check qa/live-auth-two-browsers.mjs
           node --check qa/live-experience-browsers.mjs
           python -m py_compile cartas/generar.py cartas/actualizar.py cartas/qa.py
@@ -79,6 +80,10 @@ jobs:
           node content/validate.mjs
           node qa/check-server-pack-pool.mjs
           node qa/check-beta-gate.mjs
+
+      - name: Proteger sobres, probabilidades, álbum, Reta y Récords en esta integración
+        if: github.event_name == 'pull_request' && github.head_ref == 'integration/perfil-cuentas-validacion-20261120'
+        run: node qa/check-profile-gameplay-invariants.mjs
 
       - name: Probar actualización completa de una carta sin publicarla
         if: github.event_name == 'pull_request'
