@@ -2756,8 +2756,15 @@ async function openArcadeEntry(step='welcome'){
    ini:identity.ini,handle:identity.handle,
    onCreate:()=>openEntryAccount('signup'),
    onLogin:()=>openEntryAccount('login'),
-   onPlay:({ini,handle})=>{
+   onPlay:async({ini,handle})=>{
     syncIn();
+    if(VERIFIED_GUEST_PLAY){
+     if(!cloudSync?.enrollGuestIdentity){toast('CONECTANDO TU PARTIDA · REINTENTA');return false}
+     try{
+      const enrolled=await cloudSync.enrollGuestIdentity({ini,handle});
+      if(enrolled?.status!=='ready'){toast('NO SE PUDO VERIFICAR LA PARTIDA · REINTENTA');return false}
+     }catch(_){toast('IDENTIDAD NO DISPONIBLE · ELIGE OTRO @USUARIO O REINTENTA');return false}
+    }
     try{localStorage.setItem(GUEST_HANDLE_KEY,handle);if(localStorage.getItem(GUEST_HANDLE_KEY)!==handle)return false}
     catch(_){return false}
     const previous={ini:S.ini,seen:S.seen};
@@ -3725,7 +3732,7 @@ let selectedRanking='cards';
 function currentRecordScores(){
  return {
   cards:uniq(),
-  pts:collectionPointsLocal(),
+  pts:collectionPointsLocal()??0,
   designs:DESIGNS.filter(d=>!d.bx&&dState(d).own).length,
   duplicates:dups(),
   ratings:Object.keys(S.rate||{}).length
