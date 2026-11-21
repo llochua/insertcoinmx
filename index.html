@@ -1802,6 +1802,13 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  #profile .profile-metrics-spaced div{padding:12px 4px}
 }
 
+
+/* Récords toma las iniciales guardadas del jugador: sin segunda edición. */
+#scores #scorePlayerIdentity[hidden],#scores #scoreLegacySetup[hidden]{display:none!important}
+#scores .score-player-identity{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:min(100%,300px);margin:9px auto 18px;padding:14px 16px;border:1px solid rgba(255,212,0,.28);border-radius:12px;background:rgba(255,212,0,.07);text-align:center}
+#scores .score-player-identity strong{color:#ffd400;font:clamp(16px,4vw,21px)/1.5 PX,monospace;letter-spacing:.12em}
+#scores .score-player-identity span{font:700 10px/1.35 AV,system-ui,sans-serif;color:#c7c1dc}
+#scores .score-legacy-label{margin:9px 0;text-align:center;font:600 11px/1.4 AV,system-ui,sans-serif;color:#bdb8d1}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1869,8 +1876,14 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="wrap">
   <div class="px" style="font-size:9px;color:var(--dim);text-align:center;line-height:1.8">TU PUNTAJE: CARTAS DISTINTAS<br><span style="color:var(--y);font-size:26px" id="sMine">0</span></div>
   <div class="px" id="sPos" style="font-size:9px;color:var(--y)"></div>
-  <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
-  <button class="btn y" id="sSave">GUARDAR</button>
+  <div class="score-player-identity" id="scorePlayerIdentity" aria-label="Mis iniciales arcade" hidden>
+   <strong id="scorePlayerInitials">---</strong><span>IDENTIDAD DE JUGADOR</span>
+  </div>
+  <div id="scoreLegacySetup">
+   <p class="score-legacy-label">Configura tus iniciales una sola vez</p>
+   <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" aria-label="Tres iniciales arcade" placeholder="AAA">
+   <button class="btn y" id="sSave">GUARDAR INICIALES</button>
+  </div>
   <section class="arcade-bonus-stats" aria-labelledby="arcadeBonusTitle">
    <h2 id="arcadeBonusTitle">— BONUS STATS —</h2>
    <div class="arcade-bonus-grid">
@@ -3536,10 +3549,14 @@ function renderScores(){
   el.textContent=String(n).padStart(3,'0');
   el.setAttribute('aria-label',n+' '+label);
  }
+ const hasIni=/^[A-Z0-9]{3}$/.test(S.ini||'');
  $('iniIn').value=S.ini;
+ $('scorePlayerIdentity').hidden=!hasIni;
+ $('scoreLegacySetup').hidden=hasIni;
+ $('scorePlayerInitials').textContent=hasIni?S.ini:'---';
  const metric=RANKING_FIELDS[selectedRanking],listing=scoreBoard(selectedRanking);
  const available=listing.rows,position=available.findIndex(r=>r.ini===S.ini&&S.ini);
- $('sPos').textContent=position>=0?(listing.origin==='available'?'VAS EN EL LUGAR #':'RÉCORD LOCAL · LUGAR #')+(position+1):'PON TUS INICIALES PARA ENTRAR';
+ $('sPos').textContent=position>=0?(listing.origin==='available'?'VAS EN EL LUGAR #':'RÉCORD LOCAL · LUGAR #')+(position+1):(hasIni?'TU IDENTIDAD ARCADE YA ESTÁ GUARDADA':'ELIGE TUS INICIALES UNA SOLA VEZ');
  $('scoreRankColumn').textContent=metric.label;
  $('tbl').setAttribute('aria-label','Top 10 de '+metric.aria);
  document.querySelectorAll('#scores [data-score-metric]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.scoreMetric===selectedRanking)));
@@ -3564,6 +3581,8 @@ $('scores').addEventListener('click',e=>{
 });
 $('iniIn').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3)};
 $('sSave').onclick=()=>{
+ syncIn();
+ if(/^[A-Z0-9]{3}$/.test(S.ini||'')){renderScores();return}
  const value=$('iniIn').value;
  if(value.length<3){toast('3 LETRAS');return}
  syncIn();S.ini=value;
