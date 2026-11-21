@@ -8,6 +8,7 @@ on:
       - 'index.html'
       - 'qa/perfil/index.html'
       - 'qa/perfil-preview-browsers.mjs'
+      - 'qa/live-experience-browsers.mjs'
       - 'qa/sync-two-browsers.mjs'
       - 'qa/supabase-live-anon.mjs'
       - 'qa/live-auth-two-browsers.mjs'
@@ -64,6 +65,32 @@ jobs:
         with:
           name: perfil-avatares-capturas
           path: qa/screenshots/*.png
+          if-no-files-found: ignore
+          retention-days: 7
+
+  qa-experiencia-publica:
+    name: Onboarding y sobres públicos · móvil y escritorio
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar Playwright
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Instalar Chromium
+        run: npx playwright install chromium
+      - name: Probar experiencia pública y proteger progreso
+        run: node qa/live-experience-browsers.mjs
+      - name: Capturas para revisión de experiencia pública
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiencia-publica-capturas
+          path: qa/screenshots/live-experience-*.png
           if-no-files-found: ignore
           retention-days: 7
 
