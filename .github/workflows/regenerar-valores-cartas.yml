@@ -1,4 +1,4 @@
-name: Rehacer cartas con valores integrados (rama de corrección)
+name: Rehacer cartas con valores integrados (rama de corrección v2)
 
 on:
   push:
@@ -56,6 +56,17 @@ jobs:
                       with Image.open(path) as im:
                           assert im.size==wh,(str(path),im.size)
           print('✓ Cartas renderizadas con sus cuatro variantes y dimensiones correctas')
+          # Regression visual: no debe quedar moneda ni 100 antiguos
+          # en el campo superior de la carta Base, que tiene fondo amarillo.
+          import numpy as np
+          from PIL import Image
+          img=np.asarray(Image.open('c2/pizzcipher.webp').convert('RGB'))
+          roi=img[151:211,675:897]
+          luminancia=roi @ np.array([0.299,0.587,0.114])
+          assert np.percentile(luminancia,1)>170, (
+              'Sigue visible tinta oscura del valor antiguo en Pizzcipher',
+              np.percentile(luminancia,1))
+          print('✓ Sin rastro de la moneda ni del 100 anterior en la plantilla')
           PY
 
       - name: Actualizar únicamente hashes de salidas del manifiesto si existe
