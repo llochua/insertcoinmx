@@ -58,7 +58,17 @@ try{
  await page.locator('#zFx svg.icmx-live-pop[data-ready="true"]').waitFor();
  assert.equal(await page.locator('#zFx svg.icmx-live-pop').getAttribute('data-points'),'10');
  assert.equal(await page.locator('#zFx svg.icmx-live-pop').getAttribute('data-pop'),'—');
- assert.match(await page.locator('#zCommunityFormula').innerText(),/LIKES 35% · TIER 35% · RETA 30%/);
+ await page.locator('#zVoting').waitFor({state:'visible'});
+ assert.deepEqual(await page.locator('#zRate button[data-r]').evaluateAll(buttons=>buttons.map(b=>b.getAttribute('aria-label'))),
+  ['GOTY','GENIAL','OK','MMM'],'Solo cuatro reacciones compactas');
+ assert.equal(await page.locator('#zCommunityFormula').count(),0,'No mostrar la fórmula POP retirada');
+ assert.equal(await page.locator('#zoom #zLikeStatus').count(),1,'Un solo estado de publicación');
+ const goty=page.locator('#zRate button[data-r="0"]');
+ assert.equal(await goty.getAttribute('aria-pressed'),'true','Reacción previa seleccionada');
+ await goty.click();
+ assert.equal(await goty.getAttribute('aria-pressed'),'false','Segundo toque retira la reacción');
+ await goty.click();
+ assert.equal(await goty.getAttribute('aria-pressed'),'true','Se puede volver a seleccionar');
  assert.equal(await page.locator('#zoom .icmx-card-value').count(),0,'no duplicar cifras debajo de la carta');
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-mobile.png'),fullPage:true});
  await page.locator('#zClose').click();
