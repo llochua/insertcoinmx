@@ -1694,7 +1694,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 
 
 
-</style></head><body>
+</style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
 <section id="title" class="on">
@@ -1787,6 +1787,14 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <div class="tbl arcade-scoreboard-rows" id="tbl" aria-label="Top 10 de cartas distintas" aria-live="polite" aria-relevant="additions text"></div>
    <p class="arcade-scoreboard-source" id="scoreDataScope">RÉCORDS DE ESTA EDICIÓN</p>
   </section>
+  <section class="icmx-global-board" aria-labelledby="icmxGlobalTitle">
+   <span class="icmx-global-eyebrow">POPULARIDAD · INSERT COIN MX</span>
+   <h2 id="icmxGlobalTitle">RANKING GLOBAL DE DISEÑOS</h2>
+   <p>Los diseños favoritos de la comunidad reunirán votos de Likes, Tier Lists y Reta.</p>
+   <div class="icmx-global-weights" aria-label="Cómo se calcula el valor comunitario"><span>LIKES <b>35%</b></span><span>TIER <b>35%</b></span><span>RETA <b>30%</b></span></div>
+   <div class="icmx-global-empty" role="status"><strong>— POP</strong><span>SIN RESULTADOS GLOBALES VERIFICADOS</span></div>
+   <p class="icmx-global-note">El ranking aparecerá aquí cuando esté conectado a los votos compartidos. No mostramos puntos simulados.</p>
+  </section>
  </div>
 </section>
 <section class="view" id="profile" aria-label="Mi perfil de jugador">
@@ -1807,6 +1815,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
     </div>
    </div>
    <div class="profile-avatar-strip"><span>Tu personaje de Insert Coin MX</span><button type="button" id="profileAvatarChange">CAMBIAR AVATAR</button></div>
+   <div class="icmx-player-points" aria-label="Puntos acumulados de colección"><div><span>PUNTOS DE COLECCIÓN</span><strong id="profileValuePoints" aria-live="polite">— PTS</strong></div><small>Por descubrir variantes nuevas. Las repetidas no suman.</small></div>
   </section>
   <div class="profile-metrics" aria-label="Resumen de mi colección">
    <div><span class="profile-metric-icon" aria-hidden="true">✦</span><strong id="profileDesigns">0</strong><span>Diseños</span></div>
@@ -1896,11 +1905,12 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  </div>
 </div>
 </div>
-<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
+<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div><p id="fDesignValue" class="icmx-ficha-pop">POPULARIDAD GLOBAL · SIN CLASIFICAR</p></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
 <dialog class="zoom" id="zoom" aria-labelledby="zName">
  <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx" role="button" tabindex="0" aria-label="Tocar carta para regresar" title="Tocar para regresar"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <p class="z-return-hint" aria-hidden="true">TOCA LA CARTA PARA VOLVER</p>
+ <section class="icmx-card-value" aria-label="Puntos de la carta y popularidad del diseño"><div><span class="value-label">VALOR DE VARIANTE</span><strong id="zVariantPoints">— PTS</strong><small id="zVariantOwned">Primera obtención</small></div><div class="value-pop"><span class="value-label">POPULARIDAD GLOBAL</span><strong id="zDesignPopularity">— POP</strong><small id="zGlobalPosition">Sin clasificar</small></div><p class="icmx-card-value-note">POPULARIDAD: LIKES 35% · TIER 35% · RETA 30%. Pendiente de conectar votos globales.</p></section>
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
  <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div></div>
  <section class="z-narrative" id="zNarrative" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
