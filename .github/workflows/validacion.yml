@@ -44,6 +44,7 @@ jobs:
           node --check content/avatar-profile.js
           node --check content/release-reset.js
           node --check qa/release-reset.test.mjs
+          node --check qa/records-edition.test.mjs
           node --check qa/profile-browsers.mjs
           node --check qa/perfil-main-browsers.mjs
           node --check qa/profile-auth-unit.test.mjs
@@ -57,6 +58,7 @@ jobs:
           node --test content/cloud-sync.test.mjs content/cloud-restore.test.mjs qa/registro/cloud-snapshot.test.mjs
           node --test qa/profile-auth-unit.test.mjs
           node --test qa/release-reset.test.mjs
+          node --test qa/records-edition.test.mjs
           node - <<'NODE'
           const fs = require('node:fs');
           const vm = require('node:vm');
