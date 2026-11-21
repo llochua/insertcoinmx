@@ -141,6 +141,8 @@ async function init(){
   if(error||!data?.user?.id){
    $('account').textContent='No hay una sesión activa en este navegador';
    $('cards').textContent='Acceso pendiente';
+   $('selectedName').textContent='Sin sesión';
+   $('savedName').textContent='Inicia sesión para consultar tu avatar.';
    note('Primero inicia sesión desde «Ir a mi cuenta».','error');return;
   }
   user=data.user;
@@ -154,7 +156,7 @@ async function init(){
   const have=row?.state?.data?.have;
   const total=have&&typeof have==='object'?Object.values(have).reduce((sum,q)=>sum+(Number.isFinite(Number(q))?Number(q):0),0):0;
   $('cards').textContent=row?String(total)+' cartas en la nube':'Sin respaldo de cartas';
- }catch(_){if(!user){$('account').textContent='No se pudo verificar la cuenta';$('cards').textContent='Sin conexión'}else{$('cards').textContent='Respaldo no disponible'}note('No se pudo completar la consulta. Tus cartas permanecen intactas.','error')}
+ }catch(_){if(!user){$('account').textContent='No se pudo verificar la cuenta';$('cards').textContent='Sin conexión';$('selectedName').textContent='No disponible';$('savedName').textContent='No se pudo consultar el avatar.'}else{$('cards').textContent='Respaldo no disponible'}note('No se pudo completar la consulta. Tus cartas permanecen intactas.','error')}
 }
 init();
 </script>
