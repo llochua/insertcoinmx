@@ -1,4 +1,4 @@
-name: Rehacer cartas con valores integrados (rama de corrección v3)
+name: Rehacer cartas con valores integrados (rama de corrección v4)
 
 on:
   push:
@@ -96,6 +96,11 @@ jobs:
             git commit -m "chore(cards): regenerar WebP sin parches y con valor integrado [skip ci]"
             # Si se añadieron pruebas/documentación durante la regeneración,
             # preservar ambos historiales sin forzar la rama ni perder datos.
+            # El generador puede dejar muestras o archivos auxiliares fuera
+            # de c/c2; el commit de WebP ya está guardado y esos residuos no
+            # pertenecen al cambio. Limpiar el runner antes de rebase.
+            git reset --hard HEAD
+            git clean -fd
             git fetch origin "$GITHUB_REF_NAME"
             git rebase "origin/$GITHUB_REF_NAME"
             git push origin "HEAD:$GITHUB_REF_NAME"
