@@ -54,6 +54,9 @@ async function device(signed){
   assert.equal(avatarProbe.computed,'hidden','avatar must stay hidden while identity is loading');
  await page.waitForFunction(()=>document.documentElement.dataset.icmxAvatarReady==='true');
  await page.locator('#homePlayerAvatarImage').waitFor({state:'visible'});
+ // El juego siempre abre en su pantalla START; entrar primero como jugador real.
+ await page.locator('#title .tstart').click();
+ await page.locator('#title.on').waitFor({state:'hidden'});
  await page.locator('#home .home-player-card').click();
  await page.locator('#profile.on').waitFor();
  return {context,page};
