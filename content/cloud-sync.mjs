@@ -385,6 +385,22 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus,verifiedGu
   * un reintento tras perder la respuesta HTTP no entrega otras cinco cartas.
   * No existen parámetros de cartas o cuotas controlables por el navegador.
   */
+ async function enrollGuestIdentity({ini,handle}){
+  if(!verifiedGuests||typeof guestSession!=='function')return {status:'disabled'};
+  if(!/^[A-Z0-9]{3}$/.test(ini||'')||!/^[a-z0-9_]{3,20}$/.test(handle||''))return {status:'invalid'};
+  if(localStorage.getItem(ACCOUNT_BINDING)&&!hasStoredSession())return {status:'auth_required'};
+  // Mismo UID de Auth para la cuenta futura. No inventar identidades o subir cartas locales.
+  const user=await guestSession(client.auth);
+  if(!user?.id||user.is_anonymous!==true)return {status:'auth_required'};
+  const {data:record,error:registerError}=await client.rpc('icmx_register_guest_identity',{p_ini:ini,p_handle:handle});
+  if(registerError)throw registerError;
+  if(record?.status!=='registered'||record.ini!==ini||record.handle!==handle)throw Error('No se verificó la identidad de invitado');
+  const {data:updated,error:updateError}=await client.auth.updateUser({data:{icmx_initials:ini,icmx_handle:handle}});
+  if(updateError||updated?.user?.id!==user.id)throw Error('No se pudo preservar la identidad de invitado');
+  await check();
+  if(accountUid!==user.id)return {status:'pending'};
+  return {status:'ready',userId:user.id};
+ }
  async function issuePack(){
   if(issuing)return {status:'busy'};
   const gate=await readyForMutation();
@@ -647,7 +663,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus,verifiedGu
  window.addEventListener('storage',onStorage);
  interval=setInterval(()=>{if(!document.hidden)check()},15000);
  check();
- return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),canImport:()=>importAvailable,importGuest,getConflict,useCloud,listConflictArchives,requiresServer:()=>Boolean(verifiedGuests||sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()),stop(){
+ return {changed,check,enrollGuestIdentity,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),canImport:()=>importAvailable,importGuest,getConflict,useCloud,listConflictArchives,requiresServer:()=>Boolean(verifiedGuests||sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()),stop(){
   stopped=true;clearTimeout(debounce);clearInterval(interval);
   listener?.subscription?.unsubscribe();
   window.removeEventListener('focus',onFocus);
