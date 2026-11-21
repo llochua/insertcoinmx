@@ -3663,18 +3663,15 @@ function persistLocalRecord(){
 }
 function scoreBoard(metric=selectedRanking){
  const field=RANKING_FIELDS[metric]?.field||'score';
- // Documentos anteriores solo tienen «score»; desconocido nunca equivale a cero.
- const remotely=STORE.docs.filter(r=>r&&/^[A-Z0-9]{3}$/.test(r.ini||'')&&safeRankValue(r[field])!==null)
+ // Cada categoría se clasifica por separado. Un cero no ocupa una posición.
+ const remotely=STORE.docs.filter(r=>r&&/^[A-Z0-9]{3}$/.test(r.ini||'')&&safeRankValue(r[field])!==null&&r[field]>0)
   .map(r=>({ini:r.ini,handle:r.handle||'',score:r[field]}));
  if(remotely.length)return {rows:remotely.sort((a,b)=>b.score-a.score||a.ini.localeCompare(b.ini)).slice(0,10),origin:'available'};
- const mine=localRankRecord();
- if(mine)return {rows:[{ini:mine.ini,handle:mine.handle||'',score:mine[metric]}],origin:'local'};
- // La sesión en curso aún puede tener iniciales sin un registro local recuperable.
- if(S.ini&&/^[A-Z0-9]{3}$/.test(S.ini)){
-  const count=currentRecordScores()[metric];
-  return {rows:[{ini:S.ini,handle:arcadeIdentity().handle,score:count}],origin:'session'};
- }
- return {rows:[],origin:STORE.docs.length?'missing':'empty'};
+ // El marcador local representa las estadísticas actuales, no un récord antiguo.
+ const own=arcadeIdentity(),count=currentRecordScores()[metric];
+ if(validArcadeIni(own.ini)&&safeRankValue(count)!==null&&count>0)
+  return {rows:[{ini:own.ini,handle:own.handle||'',score:count}],origin:'session'};
+ return {rows:[],origin:'empty'};
 }
 function renderScores(){
  const stats=currentRecordScores();
@@ -3690,14 +3687,11 @@ function renderScores(){
  $('scoreIdentityNote').textContent=own.handle?'@'+own.handle+(own.registered?' · cuenta':' · invitado'):'Configura tu identidad en Mi perfil';
  const metric=RANKING_FIELDS[selectedRanking],listing=scoreBoard(selectedRanking);
  const available=listing.rows,position=available.findIndex(r=>r.ini===own.ini&&(own.handle?r.handle===own.handle:true));
- $('sPos').textContent=position>=0?(listing.origin==='available'?'VAS EN EL LUGAR #':'RÉCORD LOCAL · LUGAR #')+(position+1):(hasIni?'TU IDENTIDAD ARCADE YA ESTÁ GUARDADA':'TU IDENTIDAD SE CONFIGURA AL ENTRAR');
+ $('sPos').textContent=stats[selectedRanking]===0?'AÚN SIN PUNTUACIÓN EN ESTA CATEGORÍA':position>=0?(listing.origin==='available'?'VAS EN EL LUGAR #':'RÉCORD LOCAL · LUGAR #')+(position+1):'TU PUNTAJE ESTÁ GUARDADO';
  $('scoreRankColumn').textContent=metric.label;
  $('tbl').setAttribute('aria-label','Top 10 de '+metric.aria);
  document.querySelectorAll('#scores [data-score-metric]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.scoreMetric===selectedRanking)));
- $('scoreDataScope').textContent=listing.origin==='available'?'RÉCORDS DISPONIBLES ENTRE JUGADORES':
-  listing.origin==='local'?'RÉCORD LOCAL · ESTE DISPOSITIVO':
-  listing.origin==='session'?'RÉCORD DE ESTA SESIÓN':
-  listing.origin==='missing'?'AÚN NO HAY REGISTROS PARA ESTA CATEGORÍA':'RÉCORDS DE ESTA VISTA';
+ $('scoreDataScope').textContent=listing.origin==='available'?'RÉCORDS DISPONIBLES ENTRE JUGADORES':listing.origin==='session'?'RÉCORD DE ESTA SESIÓN':'AÚN NO HAY PUNTUACIONES EN ESTA CATEGORÍA';
  // Diez espacios reales: los huecos nunca contienen jugadores inventados.
  $('tbl').innerHTML=Array.from({length:10},(_,i)=>{
   const r=available[i],mine=!!r&&r.ini===own.ini&&(own.handle?r.handle===own.handle:true);
