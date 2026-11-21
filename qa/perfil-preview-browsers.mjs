@@ -190,11 +190,19 @@ try{
   assert.equal(await page.locator('#scores #bkExp, #scores #bkImp').count(),0,'no hay botones duplicados');
   assert.equal(await page.locator('#scores a[href*="registro"]').count(),0,'cuentas permanecen en Mi perfil');
   assert.equal(await page.locator('#scoreTopTitle').textContent(),'HIGH SCORES');
+  assert.equal(await page.locator('#arcadeBonusTitle').textContent(),'— BONUS STATS —');
+  assert.equal(await page.locator('#scores .arcade-bonus-stat').count(),3,'tres estadísticas con diseño pixel');
+  const bonus=await page.evaluate(()=>({
+   records:['recordDesigns','recordDuplicates','recordRatings'].map(id=>document.getElementById(id).textContent),
+   profile:['profileDesigns','profileDuplicates','profileRatings'].map(id=>document.getElementById(id).textContent)
+  }));
+  assert.deepEqual(bonus.records,bonus.profile.map(n=>String(Number(n)).padStart(3,'0')),'Récords refleja los mismos datos que Mi perfil');
   assert.equal(await page.locator('#scores .arcade-scoreboard-top').textContent(),'— TOP 10 —');
   assert.equal(await page.locator('#scores .arcade-scoreboard-columns span').count(),3,'ranking arcade con posición, iniciales y cartas');
   assert.equal(await page.locator('#scores .arcade-scoreboard-rows .r').count(),10,'diez casillas arcade');
   assert.equal(await page.locator('#scores [data-score-entry]').count(),0,'las casillas vacías no inventan jugadores');
   assert.equal(await page.locator('#scores .score-overview').count(),0,'se elimina la tarjeta genérica');
+  assert.equal(await page.locator('#scores .arcade-bonus-stats').evaluate(el=>getComputedStyle(el).borderTopStyle),'dashed','el marcador conserva el estilo arcade');
   assert.equal(await page.locator('#scores .score-entry-row').count(),0,'el marcador y el botón original siguen separados');
   assert.equal(await page.locator('#scores .wrap > #sSave').count(),1,'Guardar sigue debajo de iniciales');
   assert.ok((await page.locator('#scores .wrap > .px').first().textContent()).includes('TU PUNTAJE: CARTAS DISTINTAS'),'marcador original');
@@ -203,6 +211,7 @@ try{
   await page.screenshot({path:'qa/screenshots/records-arcade-inicial-'+width+'.png',fullPage:true});
   await page.locator('#iniIn').fill('ABC');
   await page.locator('#sSave').click();
+  assert.equal(await page.locator('#scores .arcade-bonus-stat').count(),3,'las estadísticas permanecen tras guardar iniciales');
   assert.equal(await page.locator('#scores [data-score-entry]').count(),1,'guardar iniciales crea un solo registro');
   assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(2)').textContent(),'ABC');
   const actualScore=String(Number(await page.locator('#sMine').textContent())).padStart(3,'0');

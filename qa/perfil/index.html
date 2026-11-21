@@ -1613,6 +1613,19 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 }
 @media(max-width:360px){#avatarSelect .avatar-option span{font-size:10px}#avatarSelect .avatar-grid{gap:7px}}
 
+
+/* Mis bonus stats · extensión del marcador arcade, sin tarjetas. */
+#scores .arcade-bonus-stats{box-sizing:border-box;flex:none;width:min(420px,100%);margin:-2px auto 0;padding:10px 1px 11px;border-top:1px dashed rgba(255,212,0,.38);border-bottom:1px dashed rgba(255,212,0,.38);color:#fff}
+#scores .arcade-bonus-stats h2{margin:0 0 13px;text-align:center;font:8px/1.45 PX,monospace;letter-spacing:.06em;color:#c2bcdf}
+#scores .arcade-bonus-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}
+#scores .arcade-bonus-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-width:0;line-height:1.4}
+#scores .arcade-bonus-stat+.arcade-bonus-stat{border-left:1px dashed rgba(255,255,255,.23)}
+#scores .arcade-bonus-stat span{font:clamp(7px,1.5vw,9px)/1.5 PX,monospace;letter-spacing:0;text-align:center;color:#d2cde3;white-space:nowrap}
+#scores .arcade-bonus-stat strong{font:clamp(13px,3vw,19px)/1.4 PX,monospace;font-variant-numeric:tabular-nums}
+#scores .arcade-bonus-stat:nth-child(1) strong{color:#FFD400}
+#scores .arcade-bonus-stat:nth-child(2) strong{color:#4ff2f3}
+#scores .arcade-bonus-stat:nth-child(3) strong{color:#EC008B}
+@media(max-width:350px){#scores .arcade-bonus-stats{padding-inline:0}#scores .arcade-bonus-stat span{font-size:7px}#scores .arcade-bonus-stat strong{font-size:13px}}
 /* High score board · tipografía de los arcades originales.
    El marcador e ingreso de iniciales arriba conservan exactamente su estilo previo. */
 #scores .arcade-scoreboard{width:min(440px,100%);box-sizing:border-box;flex:none;margin:8px auto 6px;padding:14px 12px 10px;background:rgba(0,2,15,.43);border-top:2px solid rgba(255,212,0,.72);border-bottom:2px solid rgba(255,212,0,.35);border-radius:0;box-shadow:none}
@@ -1707,6 +1720,14 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <div class="px" id="sPos" style="font-size:9px;color:var(--y)"></div>
   <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
   <button class="btn y" id="sSave">GUARDAR</button>
+  <section class="arcade-bonus-stats" aria-labelledby="arcadeBonusTitle">
+   <h2 id="arcadeBonusTitle">— BONUS STATS —</h2>
+   <div class="arcade-bonus-grid">
+    <div class="arcade-bonus-stat"><span>DISEÑOS</span><strong id="recordDesigns" aria-label="0 diseños">000</strong></div>
+    <div class="arcade-bonus-stat"><span>REPETIDAS</span><strong id="recordDuplicates" aria-label="0 repetidas">000</strong></div>
+    <div class="arcade-bonus-stat"><span>CALIFICADAS</span><strong id="recordRatings" aria-label="0 calificadas">000</strong></div>
+   </div>
+  </section>
   <section class="arcade-scoreboard" aria-labelledby="scoreTopTitle">
    <header class="arcade-scoreboard-head">
     <span class="arcade-scoreboard-brand">INSERT COIN MX</span>
@@ -3164,6 +3185,16 @@ window.addEventListener('message',e=>{
 function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STORE.docs.length&&S.ini)m.push({ini:S.ini,score:uniq()});return m.filter(r=>r.ini).sort((a,b)=>b.score-a.score)}
 function renderScores(){
  $('sMine').textContent=uniq();
+ // Idéntica fuente de datos que Mi perfil. Las repetidas pueden variar al canjear.
+ const bonusMetrics=[
+  ['recordDesigns',DESIGNS.filter(d=>!d.bx&&dState(d).own).length,'diseños'],
+  ['recordDuplicates',dups(),'repetidas'],
+  ['recordRatings',Object.keys(S.rate||{}).length,'calificadas']
+ ];
+ for(const [id,count,label] of bonusMetrics){
+  const node=$(id);
+  if(node){node.textContent=String(count).padStart(3,'0');node.setAttribute('aria-label',count+' '+label)}
+ }
  $('iniIn').value=S.ini;
  const available=board().slice(0,10);
  const pos=available.findIndex(r=>r.ini===S.ini);
