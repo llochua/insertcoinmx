@@ -375,7 +375,7 @@ authMessage('Conectando...');
 initAccount();
 
 // Community reads use the public API, writes use the already verified account session.
-export async function communityRequest(name,args){
+globalThis.icmxCommunityRequest=async function(name,args){
  const read=name==='icmx_community_aggregates';
  if(!read&&!['icmx_community_vote','icmx_community_reta'].includes(name))throw Error('Unknown community operation');
  if(read){
@@ -384,9 +384,13 @@ export async function communityRequest(name,args){
   return response.json();
  }
  if(!authClient)throw Error('Account session unavailable');
- const {data:verified,error:verifyError}=await authClient.auth.getUser();
- if(verifyError||!verified?.user||verified.user.is_anonymous)throw Error('Registered account required');
- const {data,error}=await authClient.rpc(name,args);
- if(error)throw error;
- return data;
+ const expected=globalThis.icmxAccountIdentity?.userId;
+ const {data:sessionData,error:sessionError}=await authClient.auth.getSession();
+ const token=sessionData?.session?.access_token;
+ if(sessionError||!expected||!token||sessionData?.session?.user?.id!==expected)throw Error('Account session unavailable');
+ const {data:verified,error:verifyError}=await authClient.auth.getUser(token);
+ if(verifyError||verified?.user?.id!==expected||verified.user.is_anonymous||globalThis.icmxAccountIdentity?.userId!==expected)throw Error('Registered account required');
+ const response=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:SUPABASE_PUBLISHABLE_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(args)});
+ if(!response.ok)throw Error('Community vote rejected');
+ return null;
 }
