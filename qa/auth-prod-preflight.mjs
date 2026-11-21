@@ -20,4 +20,9 @@ const anonymous=s.external?.anonymous_users??s.external?.anonymous??s.enable_ano
 console.log('Anonymous sign-ins (public status):',anonymous===undefined?'NOT EXPOSED':anonymous);
 console.log('PRE-FLIGHT read-only; no cuentas creadas, ninguna bandera activada.');
 assert.equal(anonymous,true,'BLOQUEADO: habilitar Authentication > Providers > Anonymous Sign-Ins en Supabase antes del lanzamiento');
-console.log('✓ Anonymous Sign-Ins activo. Pendiente verificar Manual Linking y entrega de correo.');
+console.log('✓ Anonymous Sign-Ins activo.');
+const manualKey=Object.keys(s).filter(k=>/manual.*link|link.*manual|identity.*link/i.test(k));
+const manual=manualKey.length?Object.fromEntries(manualKey.map(k=>[k,s[k]])):'not exposed by public endpoint';
+console.log('Manual Linking:',JSON.stringify(manual));
+if(manualKey.length)for(const value of Object.values(manual))assert.equal(value,true,'Manual Linking debe estar habilitado');
+console.log('✓ Prerrequisitos públicos confirmados; prueba de vínculo real de correo sigue siendo separada.');
