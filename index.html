@@ -1840,6 +1840,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <div class="bkm" id="bkm" role="dialog" aria-modal="true" aria-label="Respaldo del progreso" aria-hidden="true"><div class="bk-frame"><button type="button" class="ic-close" id="bkX" aria-label="Cerrar respaldo" title="Cerrar respaldo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button><div class="bkin"></div></div></div>
 <button class="savew" id="saveW" hidden>NO SE PUDO GUARDAR TU PROGRESO · TOCA PARA EXPORTARLO</button>
 
+<script src="content/release-reset.js?v=20261120" data-active="false" data-game-epoch="public-2026-launch-v1"></script>
 <script src="content/card-texts.js?v=20261120c"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
@@ -3259,6 +3260,8 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
  if(!isObj(b)||b.app!=='insertcoinmx-album')return E('Este archivo no es un respaldo de Insert Coin MX.');
  if(!Number.isInteger(b.format)||b.format<1)return E('El formato del respaldo no es válido.');
  if(b.format>FORMAT)return E('Este respaldo es de una versión más nueva del álbum. Recarga la página e inténtalo otra vez.');
+ if(window.ICMX_RELEASE_RESET?.active&&b.edition!==window.ICMX_RELEASE_RESET.edition)
+  return E('Este respaldo pertenece a la colección anterior. La nueva edición comienza desde cero.');
  const d=b.data;if(!isObj(d))return E('El respaldo no trae datos de progreso.');
  const out=DEF(),x={pend:{},pendRate:{},pendDuel:{},unk:{}};
  const id=(k,where)=>{if(!IDRE.test(k))throw 'El respaldo trae una carta con nombre inválido ('+where+').'};
@@ -3301,6 +3304,7 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
  if(ext&&JSON.stringify(ext).length>262144)return E('Los datos extra del respaldo pesan demasiado.');
  return {ok:true,data:out,ext,meta:{at:typeof b.exportedAt==='string'?b.exportedAt.slice(0,40):'',cards:Object.keys(out.have).length,rates:Object.keys(out.rate).length,ini:out.ini,pend:extCount(ext)}}}
 function buildBackup(){syncIn();const b={app:'insertcoinmx-album',format:FORMAT,exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(S))};
+ if(window.ICMX_RELEASE_RESET?.active)b.edition=window.ICMX_RELEASE_RESET.edition;
  const e=readExt();if(e)b.ext=e;return JSON.stringify(b,null,1)}
 /* restaura cada clave por separado; no reescribe la que ya tiene su texto original (si faltó espacio, el navegador la conservó) */
 function restoreKeys(m,x){let ok=true;for(const [k,v] of [[KEY,m],[KEY_EXT,x]]){try{if(localStorage.getItem(k)!==v){if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}ok=ok&&localStorage.getItem(k)===v}catch(e){ok=false}}return ok}
