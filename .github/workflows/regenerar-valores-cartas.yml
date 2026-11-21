@@ -1,4 +1,4 @@
-name: Rehacer cartas con valores integrados (rama de corrección v2)
+name: Rehacer cartas con valores integrados (rama de corrección v3)
 
 on:
   push:
@@ -94,7 +94,11 @@ jobs:
           if test -f cartas/arte-manifest.json; then git add cartas/arte-manifest.json; fi
           if ! git diff --cached --quiet; then
             git commit -m "chore(cards): regenerar WebP sin parches y con valor integrado [skip ci]"
-            git push
+            # Si se añadieron pruebas/documentación durante la regeneración,
+            # preservar ambos historiales sin forzar la rama ni perder datos.
+            git fetch origin "$GITHUB_REF_NAME"
+            git rebase "origin/$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
           fi
 
       - name: Guardar vista previa de muestra
