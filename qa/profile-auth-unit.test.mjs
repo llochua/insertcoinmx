@@ -10,7 +10,7 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
  const ids=['profileAuthMessage','profileAuthGuest','profileAuthSigned','profileAuthUser',
   'profilePlayerName','profilePlayerState','profileAuthTabSignup','profileAuthTabLogin',
   'profileAuthSend','profileAuthForm','profileAuthPassword','profileAuthEmail',
-  'profileAuthHint','profileAuthSignOut'];
+  'profileAuthHint','profileAuthSignOut','profileAuthInitials','profileAuthHandle','profileSignedInitials','profileSignedHandle','profileSignedIdentityForm','profileSignedIdentityStatus','profileSignedSave','profileSignupInitialsField','profileSignupHandleField'];
  const elements=Object.fromEntries(ids.map(id=>[id,{
   id,listeners:{},dataset:{},value:'',hidden:false,disabled:false,textContent:'',attrs:{},
   addEventListener(type,fn){this.listeners[type]=fn},
@@ -19,7 +19,7 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
   focus(){this.focused=true}
  }]));
  const calls={signup:[],signin:[],signout:[],avatarUpdates:[],events:[],opts:[],clicked:0,titleRemoved:0,storageWrites:[]};
- const user={id:'user-lab',email:'qa@example.test'};
+ const user={id:'user-lab',email:'qa@example.test',user_metadata:{icmx_initials:'TST',icmx_handle:'qa_player'}};
  const auth={
   onAuthStateChange(fn){this.emit=fn;return {data:{subscription:{unsubscribe(){}}}};},
   async getSession(){return {data:{session:initialSession},error:null};},
@@ -42,8 +42,8 @@ function harness({initialSession=null,callback=false,signUpError=null}={}){
  };
  const ctx={console,document,location:{origin:'https://insertcoinmx.com',
   hash:callback?'#access_token=lab-token':'',search:''},
-  setTimeout(fn){fn()},Event:class{constructor(type){this.type=type}},
-  __sdk:{createClient:(_u,_key,opts)=>{calls.opts.push(opts);return {auth}} },
+  setTimeout(fn){fn()},Event:class{constructor(type){this.type=type}},CustomEvent:class{constructor(type,opts){this.type=type;this.detail=opts?.detail}},
+  __sdk:{createClient:(_u,_key,opts)=>{calls.opts.push(opts);return {auth,from(table){assert.equal(table,'player_profiles');return {select(){return this},eq(){return this},async maybeSingle(){return {data:{public_handle:'qa_player',is_public:true},error:null}}}}} },
   localStorage:{setItem(...args){calls.storageWrites.push(args)}}
  };
  const runnable=code.replace('await import(SDK_URL)','globalThis.__sdk');
@@ -67,6 +67,7 @@ test('signup uses official callback and shared auth storage, no local collection
  const h=harness();await h.flush();
  assert.equal(h.calls.opts.length,1);
  assert.equal(h.calls.opts[0].auth.storageKey,'icmx-auth-qa-nov2026');
+ h.elements.profileAuthInitials.value='TST';h.elements.profileAuthHandle.value='qa_player';
  h.elements.profileAuthEmail.value='tester@example.test';
  h.elements.profileAuthPassword.value='secure-pass-123';
  await h.elements.profileAuthForm.listeners.submit({preventDefault(){}});
