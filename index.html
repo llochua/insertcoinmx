@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8">
+<html lang="es"><head><meta charset="utf-8"><meta name="referrer" content="strict-origin-when-cross-origin"><style>html:not([data-icmx-avatar-ready="true"]) #homePlayerAvatarImage,html:not([data-icmx-avatar-ready="true"]) #profileAvatarImage{visibility:hidden!important}</style>
 <!-- Google Analytics 4 (G-1PZ5B99JMH) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1PZ5B99JMH"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-1PZ5B99JMH');</script>
@@ -1429,6 +1429,217 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #pack .pk[data-pack-variant="gold"] .pkimg{filter:sepia(.94) saturate(2.9) hue-rotate(-9deg) brightness(1.05) contrast(1.12)}
 #pack .pk[data-pack-variant="gold"] .pkshine{opacity:.86;background:linear-gradient(115deg,transparent 27%,rgba(255,244,184,.8) 44%,rgba(255,197,55,.58) 54%,transparent 71%);background-size:240% 240%;background-position:var(--hx) var(--hy)}
 #pack .pk[data-pack-variant="gold"]::after{content:"";position:absolute;inset:7% 6% 4%;z-index:1;pointer-events:none;border:2px solid rgba(255,221,89,.6);border-radius:12px;box-shadow:inset 0 0 17px rgba(255,185,16,.25),0 0 25px rgba(255,184,0,.2)}
+.mh .profile-entry{display:flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;border:1px solid rgba(255,255,255,.26);border-radius:50%;background:rgba(255,255,255,.08);color:#fff}
+.mh .profile-entry svg{width:20px;height:20px;display:block}
+.mh .profile-entry:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+#profile .profile-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:18px 20px max(30px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px}
+#profile .profile-head{display:flex;align-items:center;gap:14px;margin-bottom:3px}
+#profile .profile-avatar{display:flex;align-items:center;justify-content:center;flex:0 0 66px;width:66px;height:66px;border-radius:17px;background:radial-gradient(circle at 48% 32%,rgba(255,212,0,.2),rgba(255,212,0,.04));border:1px solid rgba(255,212,0,.36)}
+#profile .profile-avatar img{width:39px;height:39px;object-fit:contain}
+#profile .profile-kicker{font:700 10px/1.4 AV;letter-spacing:.13em;color:#FFD400;margin:0 0 6px}
+#profile .profile-head h2{font:800 25px/1.1 AV;color:#fff;margin:0 0 7px}
+#profile .profile-status{font:600 12px/1.4 AV;color:#bdb8d1;display:flex;align-items:center;gap:7px}
+#profile .profile-status::before{content:'';display:inline-block;width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#c9c3e1}
+#profile .profile-initials{font:600 12px AV;color:#bdb8d1;margin-top:5px}
+#profile .profile-progress{padding:19px 17px 18px;background:linear-gradient(120deg,rgba(255,212,0,.13),rgba(255,212,0,.035) 75%);border:1px solid rgba(255,212,0,.32);border-radius:15px}
+#profile .profile-progress-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+#profile .profile-progress-top > span{font:700 11px AV;letter-spacing:.08em;color:#ffe287}
+#profile .profile-progress-top strong{font:800 21px AV;color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+#profile .profile-progress-track{height:8px;border-radius:9px;background:rgba(255,255,255,.14);overflow:hidden}
+#profile .profile-progress-track i{display:block;width:0;height:100%;background:#FFD400;border-radius:inherit;transition:width .2s ease}
+#profile .profile-progress-note{font:600 12px AV;color:rgba(255,255,255,.7);margin:12px 0 0}
+#profile .profile-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#profile .profile-metrics div{display:flex;flex-direction:column;gap:6px;padding:14px 11px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);min-width:0}
+#profile .profile-metrics strong{font:800 24px/1 AV;color:#fff;font-variant-numeric:tabular-nums}
+#profile .profile-metrics span{font:600 11px/1.3 AV;color:rgba(255,255,255,.68)}
+#profile .profile-panel{padding:17px 15px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;gap:12px}
+#profile .profile-panel h3{font:800 16px AV;color:#fff;margin:0}
+#profile .profile-panel p{font:500 13px/1.45 AV;color:rgba(255,255,255,.76);margin:0}
+#profile .profile-panel p.profile-kicker{font:700 10px AV;letter-spacing:.12em;color:#FFD400}
+#profile .profile-panel .profile-action{min-height:45px;border-radius:10px;padding:11px 15px;font:800 12px AV;letter-spacing:.015em;text-align:center}
+#profile .profile-action.primary{background:#FFD400;color:#141026}
+#profile .profile-action.secondary{border:1px solid rgba(255,255,255,.3);color:#fff;background:rgba(255,255,255,.06)}
+#profile .profile-action:focus-visible{outline:3px solid #fff;outline-offset:2px}
+#profile .profile-account{border-color:rgba(255,212,0,.25)}
+#profile .profile-panel p.profile-footnote{font:500 12px/1.5 AV;color:rgba(255,255,255,.56)}
+@media(max-width:380px){.mh .hb span{font-size:9px;letter-spacing:.13em}.mh .hc small{display:none}#profile .profile-scroll{padding-inline:14px}#profile .profile-metrics div{padding:12px 8px}}
+@media(min-width:540px){#profile .profile-scroll{width:min(100%,520px);align-self:center}}
+#profile .profile-account [hidden]{display:none!important}
+#profile #profileAuthForm{display:flex;flex-direction:column;gap:11px}
+#profile #profileAuthForm label{font:700 12px AV,system-ui,sans-serif;color:#f3eefa}
+#profile #profileAuthEmail,#profile #profileAuthPassword{display:block;width:100%;min-height:46px;border:1px solid rgba(255,255,255,.27);border-radius:10px;background:#120e29;color:#fff;font:500 15px AV,system-ui,sans-serif;padding:11px 12px}
+#profile #profileAuthEmail:focus-visible,#profile #profileAuthPassword:focus-visible{outline:2px solid #FFD400;outline-offset:2px}
+#profile #profileAuthSend:disabled{opacity:.6;cursor:wait}
+#profile #profileAuthSigned{display:flex;flex-direction:column;gap:10px}
+#profile .profile-auth-email{color:#fff!important;font-weight:700!important;overflow-wrap:anywhere}
+#profile .profile-auth-message{min-height:1.1em;color:#d9d4ea!important}
+#profile .profile-auth-message[data-type=error]{color:#ffb6b6!important}
+
+/* Registro con correo y contraseña: controles accesibles y estados de sesión */
+#profile .profile-auth-modes{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;border:1px solid rgba(255,255,255,.17);border-radius:11px;background:rgba(5,5,20,.45)}
+#profile .profile-auth-modes button{min-height:39px;padding:8px;border-radius:8px;font:800 12px AV,system-ui,sans-serif;color:#c6bfd8}
+#profile .profile-auth-modes button[aria-pressed="true"]{background:#FFD400;color:#15112a}
+#profile .profile-auth-modes button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#profile .profile-auth-field{display:flex;flex-direction:column;gap:6px}
+#profile .profile-auth-help{font:500 12px/1.5 AV,system-ui,sans-serif;color:#a9a2c5}
+#profile .profile-auth-message[data-type="success"]{color:#b8f7cb!important}
+#profile .profile-action:disabled{opacity:.55;cursor:wait}
+#profile .profile-account .profile-auth-hint{font:500 12px/1.55 AV,system-ui,sans-serif;color:rgba(255,255,255,.67)}
+#profile .profile-account [hidden]{display:none!important}
+
+.on-account{display:block;width:min(100%,415px);margin:11px auto 0;padding:13px 14px;border:1px solid rgba(255,212,0,.6);border-radius:11px;background:rgba(255,212,0,.12);color:#ffe878;font:800 12px AV,system-ui,sans-serif}
+.on-account[hidden]{display:none!important}
+.on-account:focus-visible{outline:2px solid #fff;outline-offset:3px}
+#profile .profile-sync-box{padding:13px;border-radius:11px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);font:700 12px/1.45 AV;color:#dad4ed}
+#profile .profile-sync-box[data-sync="synced"]{color:#9bebbd;border-color:rgba(155,235,189,.5)}
+#profile .profile-sync-box[data-sync="conflict"]{color:#ffd400}
+#profile .profile-sync-box[data-sync="offline"]{color:#ffbdc0}
+#profile #profileLinkCollection[hidden]{display:none!important}
+
+/* Mi perfil V2 · pasaporte de jugador y acciones progresivas */
+#home .home-player-card{position:relative;z-index:2;display:flex;flex:none;align-items:center;gap:11px;width:min(100% - 36px,480px);min-height:72px;margin:10px auto 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,212,0,.43);background:linear-gradient(110deg,#29204f,#18122e);color:#fff;text-align:left;box-shadow:0 10px 24px rgba(0,0,0,.2)}
+#home .home-player-avatar{display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;border-radius:12px;background:#ffd400}
+#home .home-player-avatar img{width:32px;height:32px;object-fit:contain}
+#home .home-player-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
+#home .home-player-copy strong{font:800 12px/1.1 AV;color:#fff;letter-spacing:.035em}
+#home .home-player-copy small{font:500 11px/1.3 AV;color:#c9c5d8}
+#home .home-player-pill{margin-left:4px;padding:3px 5px;border-radius:4px;background:rgba(255,212,0,.13);color:#ffd400;font:800 9px AV}
+#home .home-player-count{display:flex;flex-direction:column;text-align:center;gap:2px;align-items:center}
+#home .home-player-count b{font:800 20px/1 AV;color:#ffd400;font-variant-numeric:tabular-nums}
+#home .home-player-count small{font:700 8px AV;letter-spacing:.09em;color:#bcb6d1}
+#home .home-player-arrow{flex:0 0 16px;width:16px;height:16px;color:#ffd400}
+#home .home-player-card:focus-visible{outline:3px solid #ffd400;outline-offset:3px}
+#profile .profile-scroll{width:min(100%,540px);align-self:center;padding:12px 17px max(30px,env(safe-area-inset-bottom));gap:13px}
+#profile .profile-passport{padding:16px;border:1px solid rgba(255,212,0,.36);border-radius:17px;background:linear-gradient(145deg,#292252,#14102b 80%);box-shadow:0 16px 40px rgba(0,0,0,.14)}
+#profile .profile-head{margin:0 0 19px;gap:11px}
+#profile .profile-avatar{width:54px;height:54px;flex-basis:54px;border-radius:13px;background:#ffd400;border:0}
+#profile .profile-avatar img{width:35px;height:35px}
+#profile .profile-identity{min-width:0}
+#profile .profile-kicker{font:800 9px/1.3 AV;letter-spacing:.07em;margin:0 0 4px;color:#ffdc59}
+#profile .profile-head h2{font:800 20px/1.13 AV;margin:0 0 6px}
+#profile .profile-status{font:500 11px/1.4 AV;color:#c7c1dd}
+#profile .profile-collection{display:flex;align-items:center;gap:18px}
+#profile .profile-dial{--profile-fill:0%;width:120px;height:120px;flex:0 0 120px;border-radius:50%;background:conic-gradient(#ffd400 var(--profile-fill),rgba(255,255,255,.1) 0);padding:9px;box-shadow:0 0 0 1px rgba(255,212,0,.2)}
+#profile .profile-dial>div{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;background:#17122f}
+#profile .profile-dial strong{font:800 32px/1 AV;color:#fff}
+#profile .profile-dial span{font:700 9px AV;letter-spacing:.1em;color:#ffd400;margin-top:5px}
+#profile .profile-progress{display:block;flex:1;min-width:0;border:0;border-radius:0;background:none;padding:0}
+#profile .profile-progress-label{display:block;margin-bottom:6px;color:#ffd400;font:800 10px AV;letter-spacing:.1em}
+#profile .profile-progress strong{display:block;margin-bottom:15px;font:700 14px/1.3 AV;color:#fff}
+#profile .profile-progress-track{height:7px}
+#profile .profile-progress-note{font:500 11px AV;margin:9px 0 0;color:#bbb6d3}
+#profile .profile-metrics{gap:8px}
+#profile .profile-metrics div{padding:12px 8px;align-items:center;text-align:center;gap:5px}
+#profile .profile-metrics strong{font-size:21px}
+#profile .profile-metric-icon{font-size:18px!important;line-height:1!important;color:#ffd400!important}
+#profile .profile-spotlight{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 16px;border-radius:16px;border:1px solid rgba(255,212,0,.48);background:linear-gradient(155deg,rgba(255,212,0,.16),rgba(255,212,0,.045) 88%);text-align:center}
+#profile .profile-spotlight[hidden],#profile .profile-account[hidden]{display:none!important}
+#profile .profile-spotlight-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:#ffd400;color:#18132e}
+#profile .profile-spotlight-icon svg{width:28px;height:28px}
+#profile .profile-spotlight h3{margin:0;color:#fff;font:800 19px/1.15 AV}
+#profile .profile-spotlight p{max-width:320px;margin:0 0 4px;color:#d9d4e7;font:500 12px/1.5 AV}
+#profile .profile-spotlight .profile-action{display:block;width:100%;min-height:45px}
+#profile .profile-spotlight small{font:500 10px/1.4 AV;color:#ada6c4}
+#profile .profile-account{padding:16px;gap:10px}
+#profile .profile-account-intro{font-size:12px!important}
+#profile .profile-backup{flex:none;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:rgba(255,255,255,.04)}
+#profile .profile-backup summary{display:flex;align-items:center;gap:11px;min-height:59px;padding:11px 14px;cursor:pointer;list-style:none}
+#profile .profile-backup summary::-webkit-details-marker{display:none}
+#profile .profile-backup summary:focus-visible{outline:2px solid #ffd400;outline-offset:3px}
+#profile .profile-backup summary>span:nth-child(2){display:flex;flex:1;flex-direction:column;gap:4px}
+#profile .profile-backup summary strong{color:#fff;font:700 12px AV}
+#profile .profile-backup summary small{color:#a9a3c2;font:500 11px AV}
+#profile .profile-backup-symbol{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:rgba(255,212,0,.1);color:#ffd400;font:800 20px AV}
+#profile .profile-backup-chevron{color:#ffd400;font-size:19px}
+#profile .profile-backup[open] .profile-backup-chevron{transform:rotate(180deg)}
+#profile .profile-backup-content{display:flex;flex-direction:column;gap:9px;padding:0 14px 14px}
+#profile .profile-backup-content p{margin:0;color:#c8c2dc;font:500 12px/1.5 AV}
+#profile .profile-backup-content .profile-action{min-height:43px}
+@media(max-height:690px){#home .home-player-card{min-height:59px;margin-top:5px;padding:6px 10px}#home .home-player-avatar{width:37px;height:37px;flex-basis:37px}#home .home-player-avatar img{width:26px;height:26px}}
+@media(max-width:370px){#home .home-player-card{width:calc(100% - 20px);gap:7px}#home .home-player-count b{font-size:17px}#profile .profile-dial{width:102px;height:102px;flex-basis:102px}#profile .profile-collection{gap:13px}#profile .profile-head h2{font-size:18px}}
+/* Bienvenida V2: proteger la colección es la acción principal, invitado secundaria */
+.on-visual[data-step="2"] .on-play{display:none}
+.on-visual[data-step="2"] .on-save{display:flex}
+.on-save{flex-direction:column;gap:14px}
+.on-save-visual{display:flex;align-items:center;justify-content:center;gap:clamp(7px,2vw,16px);width:100%}
+.on-save-device{display:flex;flex:0 0 clamp(88px,25vw,138px);width:clamp(88px,25vw,138px);height:clamp(148px,36vh,235px);flex-direction:column;align-items:center;padding:10px 7px 8px;gap:9px;border:4px solid #38315e;border-radius:18px;background:#141027;box-shadow:0 14px 25px rgba(0,0,0,.4)}
+.on-save-device-second{transform:rotate(7deg)}
+.on-save-device:first-child{transform:rotate(-7deg)}
+.on-save-notch{display:block;width:34%;height:4px;border-radius:5px;background:#6c648e}
+.on-save-device img{width:100%;min-height:0;flex:1;object-fit:cover;border-radius:5px;box-shadow:none}
+.on-save-device-label{font:800 9px AV;letter-spacing:.07em;color:#fff}
+.on-save-transfer{display:flex;flex:0 0 clamp(48px,13vw,70px);flex-direction:column;align-items:center;gap:6px}
+.on-save-transfer svg{width:100%}
+.on-save-transfer span{font:800 8px AV;letter-spacing:.05em;color:#ffd400}
+.on-save-caption{font:800 11px AV!important;letter-spacing:.1em;color:#fff!important}
+.onb .on-choice{display:flex;flex:1;min-width:0;flex-direction:column;gap:8px}
+.onb .on-choice .on-account{width:100%;margin:0;padding:15px 10px;min-height:48px;border:0;border-radius:10px;background:#ffd400;color:#18112d;font:800 13px AV,system-ui,sans-serif;letter-spacing:.035em;box-shadow:0 5px 0 #a88b00}
+.onb .on-choice .on-account[hidden]{display:none!important}
+.onb.account-step .on-choice .on-next{background:rgba(255,255,255,.08)!important;color:#fff!important;border:1px solid rgba(255,255,255,.28);border-radius:10px;min-height:43px;box-shadow:none!important;font:700 11px AV!important;letter-spacing:0!important;padding:10px!important}
+.onb .on-choice .on-next{width:100%}
+.onb.account-step .on-copy p{max-width:400px}
+@media(max-height:690px){.on-save-device{height:clamp(112px,25vh,175px)}.on-save{gap:5px}.on-save-caption{font-size:9px!important}.onb .on-choice{gap:5px}.onb .on-choice .on-account{padding:11px 8px}}
+
+/* Refinamiento UX: la tercera pantalla del onboarding tiene una sola acción primaria. */
+.onb .on-actions{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;max-width:415px;margin:0 auto;flex:none}
+.onb .on-choice{width:100%;min-width:0;flex:none;display:flex;flex-direction:column;gap:8px}
+.onb .on-choice .on-account{min-height:50px;padding:13px 16px;margin:0;border:0;border-radius:10px;background:#ffd400;color:#161027;font:800 13px/1.2 AV,system-ui,sans-serif;box-shadow:none;letter-spacing:.03em}
+.onb.account-step .on-choice .on-next{display:block;width:100%;min-height:42px;flex:none;padding:9px 12px!important;background:transparent!important;color:#c8c2df!important;border:0!important;border-radius:10px;box-shadow:none!important;font:700 12px/1.3 AV,system-ui,sans-serif!important;letter-spacing:0!important}
+.onb.account-step .on-choice .on-next:hover{color:#fff!important;background:rgba(255,255,255,.06)!important}
+.onb .on-actions .on-back{flex:none;align-self:center;min-width:0;min-height:33px;padding:7px 13px;margin-top:2px;border:0;border-radius:8px;background:transparent;color:#b9b2d2;font:700 11px AV,system-ui,sans-serif}
+.onb .on-actions .on-back:hover{color:#fff;background:rgba(255,255,255,.055)}
+.onb .on-actions .on-back[hidden]{display:none!important}
+.onb .on-account:focus-visible,.onb .on-next:focus-visible,.onb .on-back:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(min-width:1000px) and (min-height:650px){.onb .on-actions{max-width:none;margin:0;align-items:stretch}.onb .on-actions .on-back{align-self:flex-start}}
+/* El perfil contiene una sola tarea por vista, sin registros duplicados ni barras visibles. */
+#profile .profile-scroll{scrollbar-width:none;-ms-overflow-style:none;scroll-padding-top:8px;overscroll-behavior-y:contain}
+#profile .profile-scroll::-webkit-scrollbar{display:none;width:0;height:0}
+#profile.account-focus .profile-passport,#profile.account-focus .profile-metrics,#profile.account-focus .profile-spotlight,#profile.account-focus .profile-backup{display:none!important}
+#profile.account-focus .profile-scroll{gap:0;padding-top:18px}
+#profile.account-focus .profile-account{width:100%;margin:0 auto;display:flex!important;flex-direction:column}
+#profile .profile-account-return{align-self:flex-start;padding:7px 6px;margin-bottom:5px;background:transparent;border:0;border-radius:6px;color:#ffd400;font:700 11px AV,system-ui,sans-serif}
+#profile .profile-account-return:focus-visible{outline:2px solid #ffd400;outline-offset:3px}
+#profile .profile-account-return[hidden]{display:none!important}
+@media(min-width:1000px){.crt:has(> #profile.on){width:min(740px,calc(100vw - 40px));height:calc(100dvh - 26px);max-height:none}}
+/* Identidad de jugador: avatares Insert Coin MX */
+#profile .profile-avatar{padding:0;overflow:hidden;position:relative;cursor:pointer;background:#15112e!important;border:2px solid #ffd400!important;border-radius:14px}
+#profile .profile-avatar img,#home .home-player-avatar img{width:100%!important;height:100%!important;object-fit:cover}
+#home .home-player-avatar{overflow:hidden;background:#15112e}
+#profile .profile-avatar::after{content:'✎';position:absolute;right:0;bottom:0;width:19px;height:19px;background:#ffd400;color:#15112e;font:900 13px AV;display:grid;place-items:center}
+#profile .profile-avatar-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #ffffff2b}
+#profile .profile-avatar-strip span{font:600 12px AV;color:#cfc9e4}
+#profile .profile-avatar-strip button{min-height:43px;padding:8px 10px;border:1px solid #ffd40088;border-radius:9px;font:800 11px AV;color:#ffd400}
+#avatarSelect .avatar-scroller{display:flex;flex-direction:column;gap:17px;flex:1;width:min(100%,620px);align-self:center;overflow:auto;padding:17px 17px 30px;scrollbar-width:none}
+#avatarSelect .avatar-scroller::-webkit-scrollbar{display:none}
+#avatarSelect .avatar-intro small{font:800 10px AV;color:#ffd400;letter-spacing:.1em}
+#avatarSelect .avatar-intro h2{font:800 25px AV;color:#fff;margin:6px 0}
+#avatarSelect .avatar-intro p{font:500 13px/1.5 AV;color:#c6bfdc}
+#avatarSelect .avatar-preview{display:flex;align-items:center;gap:14px;padding:13px;background:linear-gradient(115deg,#302557,#151029);border:1px solid #ffd40077;border-radius:15px}
+#avatarSelect .avatar-preview img{width:94px;height:94px;border:2px solid #ffd400;border-radius:12px;object-fit:cover}
+#avatarSelect .avatar-preview small{font:700 10px AV;color:#ffd400}
+#avatarSelect .avatar-preview strong{display:block;font:800 19px AV;margin:5px 0}
+#avatarSelect .avatar-preview p{font:500 11px AV;color:#c7c0d9}
+#avatarSelect .avatar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+#avatarSelect .avatar-option{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:7px 5px 10px;border:2px solid transparent;border-radius:12px;background:#ffffff0d;min-width:0}
+#avatarSelect .avatar-option img{width:100%;max-width:144px;aspect-ratio:1;object-fit:cover;border-radius:8px}
+#avatarSelect .avatar-option span{font:700 11px/1.3 AV;color:#fff;text-align:center}
+#avatarSelect .avatar-option[aria-pressed="true"]{border-color:#ffd400;background:#ffd40018}
+#avatarSelect .avatar-option[aria-pressed="true"]::after{content:'✓';position:absolute;right:8px;top:8px;width:25px;height:25px;border-radius:50%;background:#ffd400;color:#15112e;display:grid;place-items:center;font:900 15px AV}
+#avatarSelect button:focus-visible,#profile #profileAvatarChange:focus-visible,#profile #profileAvatarButton:focus-visible{outline:3px solid #ffd400;outline-offset:3px}
+#avatarSelect .avatar-save{position:relative;bottom:auto;flex:none;min-height:52px;width:100%;border-radius:10px;background:#ffd400;color:#15112e;font:800 13px AV}
+#avatarSelect .avatar-save:disabled{opacity:.45}
+#avatarSelect .avatar-note{font:500 11px/1.5 AV;color:#aaa2c6;text-align:center}
+@media(min-width:540px){
+ #avatarSelect .avatar-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+ #avatarSelect .avatar-scroller{gap:11px;padding-top:10px;padding-bottom:15px}
+ #avatarSelect .avatar-option{gap:5px;padding:5px 4px 7px}
+ #avatarSelect .avatar-option img{max-width:100px}
+ #avatarSelect .avatar-option span{font-size:10px}
+ #avatarSelect .avatar-preview{padding:9px}
+ #avatarSelect .avatar-preview img{width:77px;height:77px}
+ #avatarSelect .avatar-intro h2{font-size:23px}
+}
+@media(max-width:360px){#avatarSelect .avatar-option span{font-size:10px}#avatarSelect .avatar-grid{gap:7px}}
 </style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1443,8 +1654,14 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </section>
 <section class="view on" id="home" tabindex="-1">
  <div class="amb" id="mAmb"></div>
- <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
+ <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="profile-entry" data-go="profile" aria-label="Mi perfil de jugador" title="Mi perfil"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-4.3 3.4-6 7.5-6s6.7 1.7 7.5 6"/></svg></button><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
  <span id="test" class="htest"></span>
+ <button type="button" class="home-player-card" data-go="profile" aria-label="Abrir Mi perfil y proteger mi colección">
+  <span class="home-player-avatar" aria-hidden="true"><img id="homePlayerAvatarImage" style="visibility:hidden" src="assets/avatars/moneda-128.webp" alt="" width="48" height="48"></span>
+  <span class="home-player-copy"><strong>MI PERFIL <span class="home-player-pill">1UP</span></strong><small id="homePlayerStatus">Tu colección, tu progreso</small></span>
+  <span class="home-player-count"><b id="homePlayerCards">0</b><small>CARTAS</small></span>
+  <svg class="home-player-arrow" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 5 7 7-7 7"/></svg>
+ </button>
  <div class="mfan" id="mFan"></div>
  <div class="mtabs" id="mTabs"></div>
  <div class="dupbar" id="dupBar"><span id="tDup"></span><button id="tDupB">CAMBIAR</button></div>
@@ -1496,6 +1713,81 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <div class="bkp"><div class="px bkt">RESPALDO DE TU PROGRESO</div><p>Guarda tus cartas, calificaciones y retas en un archivo por si cambias de teléfono o se borra el navegador.</p><div class="bkb"><button class="btn" id="bkExp">EXPORTAR</button><button class="btn" id="bkImp">IMPORTAR</button></div><input type="file" id="bkFile" accept="application/json,.json,text/plain" hidden><p class="cloud-state" id="cloudState" role="status" aria-live="polite">CONSULTANDO CUENTA…</p><button class="btn" id="cloudImport" type="button" hidden>VINCULAR MIS CARTAS A MI CUENTA</button><p class="cloud-link"><a href="/qa/registro/">CUENTA DE PRUEBA · ACCESO Y RESPALDO</a></p></div>
  </div>
 </section>
+<section class="view" id="profile" aria-label="Mi perfil de jugador">
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Mi perfil</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
+ <div class="profile-scroll">
+  <section class="profile-passport" aria-label="Mi partida">
+   <div class="profile-head">
+    <button type="button" id="profileAvatarButton" class="profile-avatar" aria-label="Cambiar mi avatar"><img id="profileAvatarImage" style="visibility:hidden" src="assets/avatars/moneda-128.webp" alt="" width="54" height="54"></button>
+    <div class="profile-identity"><p class="profile-kicker">PLAYER 01 · INSERT COIN MX</p><h2 id="profilePlayerName">Jugador invitado</h2><p class="profile-status" id="profilePlayerState">Progreso en este navegador</p><p class="profile-initials" id="profileInitials" hidden></p></div>
+   </div>
+   <div class="profile-collection">
+    <div class="profile-dial" id="profileDial" aria-hidden="true"><div><strong id="profileCards">0</strong><span>CARTAS</span></div></div>
+    <div class="profile-progress" aria-label="Avance de mi colección">
+     <span class="profile-progress-label">MI COLECCIÓN</span>
+     <strong><span id="profileTotal">0</span> cartas disponibles</strong>
+     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Cartas distintas obtenidas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="profileProgressFill"></i></div>
+     <p class="profile-progress-note" id="profilePercent">0% de la colección</p>
+    </div>
+   </div>
+   <div class="profile-avatar-strip"><span>Tu personaje de Insert Coin MX</span><button type="button" id="profileAvatarChange">CAMBIAR AVATAR</button></div>
+  </section>
+  <div class="profile-metrics" aria-label="Resumen de mi colección">
+   <div><span class="profile-metric-icon" aria-hidden="true">✦</span><strong id="profileDesigns">0</strong><span>Diseños</span></div>
+   <div><span class="profile-metric-icon" aria-hidden="true">▣</span><strong id="profileDuplicates">0</strong><span>Repetidas</span></div>
+   <div><span class="profile-metric-icon" aria-hidden="true">★</span><strong id="profileRatings">0</strong><span>Calificados</span></div>
+  </div>
+  <section class="profile-spotlight" id="profileWelcome" aria-labelledby="profileSpotlightTitle">
+   <div class="profile-spotlight-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6Z"/><path d="m8.5 12 2.3 2.3 4.7-4.7"/></svg></div>
+   <h3 id="profileSpotlightTitle">Que no se pierda tu colección</h3>
+   <p>Con una cuenta puedes guardar tus cartas y recuperarlas en otro dispositivo.</p>
+   <button type="button" class="profile-action primary" id="profileQuickSignup">CREAR MI CUENTA</button>
+   <button type="button" class="profile-action secondary" id="profileQuickLogin">YA TENGO CUENTA</button>
+   <small>También puedes seguir jugando como invitado.</small>
+  </section>
+  <section class="profile-panel profile-account" id="profileAccountPanel" aria-labelledby="profileAccountTitle" tabindex="-1" hidden>
+   <button type="button" id="profileAccountBack" class="profile-account-return">← VOLVER AL PERFIL</button>
+   <p class="profile-kicker">TU CUENTA</p>
+   <h3 id="profileAccountTitle">Acceso de jugador</h3>
+   <p class="profile-account-intro">Tus cartas estarán respaldadas cuando aparezca el estado «NUBE AL DÍA».</p>
+   <div id="profileAuthGuest">
+    <div class="profile-auth-modes" aria-label="Registro e inicio de sesión">
+     <button type="button" id="profileAuthTabSignup" aria-pressed="true">CREAR CUENTA</button>
+     <button type="button" id="profileAuthTabLogin" aria-pressed="false">INICIAR SESIÓN</button>
+    </div>
+    <form id="profileAuthForm" autocomplete="on">
+     <div class="profile-auth-field"><label for="profileAuthEmail">Correo electrónico</label><input type="email" id="profileAuthEmail" name="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="tu@correo.com"></div>
+     <div class="profile-auth-field"><label for="profileAuthPassword">Contraseña</label><input type="password" id="profileAuthPassword" name="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Mínimo 8 caracteres"></div>
+     <p class="profile-auth-help" id="profileAuthHint">Te enviaremos un correo para confirmar tu cuenta.</p>
+     <button type="submit" class="profile-action primary" id="profileAuthSend">CREAR MI CUENTA</button>
+    </form>
+   </div>
+   <div id="profileAuthSigned" hidden><p class="profile-auth-email" id="profileAuthUser"></p><p class="profile-auth-hint">Comprueba el estado de la nube antes de cambiar de dispositivo.</p><button type="button" class="profile-action secondary" id="profileAuthSignOut">CERRAR SESIÓN</button></div>
+   <p class="profile-auth-message" id="profileAuthMessage" role="status" aria-live="polite"></p>
+   <div id="profileCloudStatus" class="profile-sync-box" role="status" aria-live="polite">CONSULTANDO ESTADO DE LA NUBE…</div>
+   <button type="button" class="profile-action secondary" id="profileLinkCollection" hidden>VINCULAR MI COLECCIÓN LOCAL</button>
+   <p class="profile-footnote">Vincular cartas requiere confirmación. Nada se borra ni se fusiona automáticamente.</p>
+  </section>
+  <details class="profile-backup" id="profileBackup">
+   <summary><span class="profile-backup-symbol" aria-hidden="true">↓</span><span><strong>Respaldo manual</strong><small>Guardar o recuperar una copia</small></span><span class="profile-backup-chevron" aria-hidden="true">⌄</span></summary>
+   <div class="profile-backup-content">
+    <p>Como invitado, tus cartas se guardan en este navegador. Puedes descargar una copia por seguridad.</p>
+    <button type="button" class="profile-action secondary" id="profileExport">DESCARGAR MIS CARTAS</button>
+    <button type="button" class="profile-action secondary" id="profileImport">RECUPERAR UN RESPALDO</button>
+   </div>
+  </details>
+ </div>
+</section>
+<section class="view" id="avatarSelect" aria-label="Selección de avatar">
+ <div class="top"><button type="button" class="vback" id="avatarBack" aria-label="Volver al perfil">←</button><h1 class="vt">Mi avatar</h1><span class="sp"></span></div>
+ <div class="avatar-scroller">
+  <div class="avatar-intro"><small>IDENTIDAD DE JUGADOR</small><h2>Elige tu personaje</h2><p>12 personajes de Insert Coin MX. Puedes cambiar el tuyo cuando quieras.</p></div>
+  <div class="avatar-preview"><img id="avatarPreviewImage" src="assets/avatars/moneda-320.webp" alt="Avatar Moneda" width="94" height="94"><div><small>TU SELECCIÓN</small><strong id="avatarPreviewName">Moneda</strong><p>Así se verá en tu perfil.</p></div></div>
+  <div id="avatarGrid" class="avatar-grid" role="group" aria-label="Avatares disponibles"></div>
+  <button type="button" id="avatarSave" class="avatar-save" disabled>GUARDAR AVATAR</button>
+  <p id="avatarNote" class="avatar-note" role="status" aria-live="polite">Como invitado, tu avatar se guarda en este dispositivo. No modifica tus cartas.</p>
+ </div>
+</section>
 <div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onT" aria-hidden="true">
  <div class="on-head"><div class="on-brand"><img src="coin.png" alt=""><span><b>INSERT COIN MX</b><small>EL ÁLBUM</small></span></div><button type="button" class="on-skip" id="onSkip">SALTAR</button></div>
  <div class="on-visual" id="onVisual" data-step="0" aria-hidden="true">
@@ -1505,6 +1797,14 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <img class="on-card-main" src="c/F_gatosamurai.webp" alt="" draggable="false">
   </div>
   <div class="on-scene on-pack"><img src="sobre.png" alt="" draggable="false"></div>
+  <div class="on-scene on-save">
+   <div class="on-save-visual" aria-hidden="true">
+    <div class="on-save-device"><span class="on-save-notch"></span><img src="c/F_gatosamurai.webp" alt=""><span class="on-save-device-label">TUS CARTAS</span></div>
+    <div class="on-save-transfer"><svg viewBox="0 0 72 72" fill="none"><path d="M20 47c-7 0-12-5-12-12 0-6 4-11 10-12 2-10 10-16 19-16 11 0 19 8 20 18 5 1 8 6 8 11 0 6-4 11-11 11H20Z" fill="#ffd400" fill-opacity=".18" stroke="#ffd400" stroke-width="3"/><path d="m27 35 7 7 13-15" stroke="#ffd400" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>RESPALDO</span></div>
+    <div class="on-save-device on-save-device-second"><span class="on-save-notch"></span><img src="c/F_gatosamurai.webp" alt=""><span class="on-save-device-label">CONTIGO</span></div>
+   </div>
+   <p class="on-save-caption">MISMAS CARTAS · OTRO DISPOSITIVO</p>
+  </div>
   <div class="on-scene on-play">
    <div class="on-play-grid">
     <div class="on-feature"><span class="on-label">ÁLBUM</span><img class="on-mini-card" src="c/F_gatosamurai.webp" alt=""></div>
@@ -1516,7 +1816,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="on-panel">
   <div class="on-copy"><div class="on-kicker" id="onK"></div><h2 id="onT"></h2><p id="onP"></p></div>
   <div class="on-progress" id="onDots" aria-label="Paso 1 de 3"></div>
-  <div class="on-actions"><button type="button" class="on-back" id="onBack" hidden>ATRÁS</button><button type="button" class="big on-next" id="onNext">SIGUIENTE</button></div>
+  <div class="on-actions"><div class="on-choice"><button type="button" class="on-account" id="onAccount" hidden>CREAR MI CUENTA</button><button type="button" class="big on-next" id="onNext">SIGUIENTE</button></div><button type="button" class="on-back" id="onBack" hidden>← ATRÁS</button></div>
  </div>
 </div>
 </div>
@@ -1540,6 +1840,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <div class="bkm" id="bkm" role="dialog" aria-modal="true" aria-label="Respaldo del progreso" aria-hidden="true"><div class="bk-frame"><button type="button" class="ic-close" id="bkX" aria-label="Cerrar respaldo" title="Cerrar respaldo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button><div class="bkin"></div></div></div>
 <button class="savew" id="saveW" hidden>NO SE PUDO GUARDAR TU PROGRESO · TOCA PARA EXPORTARLO</button>
 
+<script src="content/release-reset.js?v=20261121-launch" data-active="true" data-game-epoch="public-2026-launch-v1"></script>
 <script src="content/card-texts.js?v=20261120c"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
@@ -2013,25 +2314,31 @@ document.addEventListener('keydown',e=>{
 
 /* ---------- navegación ---------- */
 let cur='home';
-function go(id){if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
+function go(id){
+ if(id!=='profile'&&$('profile')?.classList.contains('account-focus')){
+  $('profile').classList.remove('account-focus');
+  $('profileAccountPanel').hidden=true;
+  $('profileWelcome').hidden=false;
+ }
+ if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
-function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores}[cur]||(()=>{}))()}
+function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores,profile:renderProfile}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
 /* ---------- bienvenida ---------- */
 const ON=[
  {k:'EL ÁLBUM · 01 / 03',t:'Las playeras que hemos hecho, ahora tienen una carta.',p:'Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección.'},
  {k:'TUS PRIMEROS SOBRES · 02 / 03',t:'¡Tienes 5 sobres para empezar!',p:'Cada sobre trae 5 cartas. Después de la bienvenida, recibirás 2 sobres cada 6 horas.'},
- {k:'TU COLECCIÓN · 03 / 03',t:'Tu colección, tus reglas.',p:'Descubre diseños, califica tus favoritas, arma tu Tier y compáralas en Reta.'}
+ {k:'TU PARTIDA · 03 / 03',t:'¡No pierdas tus cartas!',p:'Crea una cuenta gratis para guardar tu colección y recuperarla en otro dispositivo. Si sigues como invitado, solo se guarda en este navegador.'}
 ];
 const ON_PREVIEW=new URLSearchParams(location.search).get('preview')==='onboarding';
 let onI=0;
 function showOn(){
  const o=ON[onI],modal=$('onb');modal.classList.add('on');modal.setAttribute('aria-hidden','false');
- $('onVisual').dataset.step=String(onI);$('onK').textContent=o.k;$('onT').textContent=o.t;$('onP').textContent=o.p;
+ $('onVisual').dataset.step=String(onI);modal.classList.toggle('account-step',onI===ON.length-1);$('onK').textContent=o.k;$('onT').textContent=o.t;$('onP').textContent=o.p;
  $('onDots').innerHTML=ON.map((_,i)=>'<i class="'+(i===onI?'on':'')+'"></i>').join('');
  $('onDots').setAttribute('aria-label','Paso '+(onI+1)+' de '+ON.length);
- $('onBack').hidden=onI===0;$('onNext').textContent=onI<2?'SIGUIENTE':'ABRIR MI PRIMER SOBRE';
- $('onNext').focus({preventScroll:true})
+ $('onBack').hidden=onI===0;$('onNext').textContent=onI<2?'SIGUIENTE':'SEGUIR COMO INVITADO';$('onAccount').hidden=onI!==ON.length-1;
+ if(onI===ON.length-1)$('onAccount').focus({preventScroll:true});else $('onNext').focus({preventScroll:true})
 }
 function closeOn(){
  $('onb').classList.remove('on');$('onb').setAttribute('aria-hidden','true');
@@ -2041,6 +2348,7 @@ function closeOn(){
 }
 $('onBack').onclick=()=>{if(onI>0){beep(440,.04);onI--;showOn()}};
 $('onSkip').onclick=()=>{beep(440,.04);closeOn(false)};
+$('onAccount').onclick=()=>{beep(880);closeOn(false);go('profile');revealProfileAuth('signup')};
 $('onNext').onclick=()=>{beep(880);if(onI<ON.length-1){onI++;showOn()}else closeOn()};
 document.addEventListener('keydown',e=>{if(!$('onb').classList.contains('on'))return;
  if(e.key==='Escape'){e.preventDefault();closeOn(false)}else if(e.key==='ArrowLeft'&&onI>0){e.preventDefault();onI--;showOn()}
@@ -2072,6 +2380,8 @@ const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs
  {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Pon tus iniciales',img:'F_samus',rr:'full',go:'VER'}]};
 function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,imgDir=light?'c':'c2';
  $('hCount').textContent=u+' / '+N;
+ $('homePlayerCards').textContent=u;
+ $('homePlayerStatus').textContent=u?'Tu colección está creciendo':'Comienza tu colección';
  const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="${imgDir}/${m.img}.webp" alt="" decoding="async"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
   [...fan.children].forEach((el,i)=>el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()})}
  [...fan.children].forEach((el,i)=>{const m=M[i],pic=el.querySelector('.fx>img'),src=imgDir+'/'+m.img+'.webp';menuArtLoad(pic,m,imgDir);el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
@@ -2943,13 +3253,15 @@ function claimPend(){const x=readExt();if(!x||!isObj(x))return 0;
  for(const g of ['pend','pendRate','pendDuel'])if(y[g]&&!Object.keys(y[g]).length)delete y[g];
  try{if(Object.keys(y).length)localStorage.setItem(KEY_EXT,JSON.stringify(y));else localStorage.removeItem(KEY_EXT)}catch(e){}
  return n}
-function validateBackup(text){const E=m=>({ok:false,err:m});
+function validateBackup(text,{fromCloud=false}={}){const E=m=>({ok:false,err:m});
  if(typeof text!=='string'||!text.trim())return E('El archivo está vacío.');
  if(text.length>1048576)return E('El archivo pesa más de 1 MB; no parece un respaldo.');
  let b;try{b=pj(text)}catch(e){return E('No es un respaldo válido: el texto no se pudo leer.')}
  if(!isObj(b)||b.app!=='insertcoinmx-album')return E('Este archivo no es un respaldo de Insert Coin MX.');
  if(!Number.isInteger(b.format)||b.format<1)return E('El formato del respaldo no es válido.');
  if(b.format>FORMAT)return E('Este respaldo es de una versión más nueva del álbum. Recarga la página e inténtalo otra vez.');
+ if(window.ICMX_RELEASE_RESET?.active&&!fromCloud&&b.edition!==window.ICMX_RELEASE_RESET.edition)
+  return E('Este respaldo pertenece a la colección anterior. La nueva edición comienza desde cero.');
  const d=b.data;if(!isObj(d))return E('El respaldo no trae datos de progreso.');
  const out=DEF(),x={pend:{},pendRate:{},pendDuel:{},unk:{}};
  const id=(k,where)=>{if(!IDRE.test(k))throw 'El respaldo trae una carta con nombre inválido ('+where+').'};
@@ -2992,6 +3304,7 @@ function validateBackup(text){const E=m=>({ok:false,err:m});
  if(ext&&JSON.stringify(ext).length>262144)return E('Los datos extra del respaldo pesan demasiado.');
  return {ok:true,data:out,ext,meta:{at:typeof b.exportedAt==='string'?b.exportedAt.slice(0,40):'',cards:Object.keys(out.have).length,rates:Object.keys(out.rate).length,ini:out.ini,pend:extCount(ext)}}}
 function buildBackup(){syncIn();const b={app:'insertcoinmx-album',format:FORMAT,exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(S))};
+ if(window.ICMX_RELEASE_RESET?.active)b.edition=window.ICMX_RELEASE_RESET.edition;
  const e=readExt();if(e)b.ext=e;return JSON.stringify(b,null,1)}
 /* restaura cada clave por separado; no reescribe la que ya tiene su texto original (si faltó espacio, el navegador la conservó) */
 function restoreKeys(m,x){let ok=true;for(const [k,v] of [[KEY,m],[KEY_EXT,x]]){try{if(localStorage.getItem(k)!==v){if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}ok=ok&&localStorage.getItem(k)===v}catch(e){ok=false}}return ok}
@@ -3019,7 +3332,7 @@ function applyCloudRestore(backup,sameProgress){
  if(saveFailed||NOWRITE||opening)return {ok:false};
  syncIn();
  const text=JSON.stringify(backup);
- const valid=validateBackup(text);
+ const valid=validateBackup(text,{fromCloud:true});
  if(!valid.ok||!isObj(backup.data))return {ok:false};
  const prevMain=LS.get(KEY),prevExt=LS.get(KEY_EXT),prevS=JSON.parse(JSON.stringify(S));
  const next=JSON.parse(JSON.stringify(backup.data));
@@ -3144,6 +3457,51 @@ async function shareTier(){toast('PREPARANDO IMAGEN...');await document.fonts.re
  for(let i=0;i<4;i++){x.fillStyle='rgba(255,255,255,.06)';x.fillRect(40,y,W-80,hs[i]);x.fillStyle=TC[i];x.fillRect(40,y,140,hs[i]);x.fillStyle='#000';x.font='22px PX';x.textAlign='center';x.fillText(TN[i],110,y+hs[i]/2+10);
   for(let j=0;j<rows[i].length;j++){const im=await li(artOf(rows[i][j].k));if(im)drawCover(x,im,190+(j%per)*(cw+8),y+8+(j/per|0)*(ch+8),cw,ch)}y+=hs[i]+12}
  deliver(cv,'mi-tier-insertcoinmx.png')}
+/* Perfil: solo lee el progreso local, sin modificar ni enviar cartas a Supabase. */
+function renderProfile(){
+ syncIn();
+ const cards=uniq(),total=NAV,progress=$('profileProgress');
+ $('profileCards').textContent=cards;
+ $('profileTotal').textContent=total;
+ $('profileDial').style.setProperty('--profile-fill',(total?Math.min(100,cards/total*100):0)+'%');
+ $('profilePercent').textContent=(total?Math.round(cards/total*100):0)+'% de la colección';
+ progress.setAttribute('aria-valuemax',String(total));
+ progress.setAttribute('aria-valuenow',String(cards));
+ $('profileProgressFill').style.width=(total?Math.min(100,cards/total*100):0)+'%';
+ $('profileDesigns').textContent=DESIGNS.filter(d=>!d.bx&&dState(d).own).length;
+ $('profileDuplicates').textContent=dups();
+ $('profileRatings').textContent=Object.keys(S.rate||{}).length;
+ const initials=$('profileInitials');
+ initials.hidden=!S.ini;
+ initials.textContent=S.ini?'Iniciales en Récords: '+S.ini:'';
+}
+$('profileExport').onclick=()=>$('bkExp').click();
+$('profileImport').onclick=()=>$('bkImp').click();
+$('profileLinkCollection').onclick=()=>{$('cloudImport').click()};
+function revealProfileAuth(mode='signup'){
+ const panel=$('profileAccountPanel');
+ $('profile').classList.add('account-focus');
+ $('profileWelcome').hidden=true;
+ panel.hidden=false;
+ $('profileAccountBack').hidden=false;
+ const tab=$(mode==='login'?'profileAuthTabLogin':'profileAuthTabSignup');
+ if(tab&&!tab.disabled)tab.click();
+ requestAnimationFrame(()=>{
+  const scroller=document.querySelector('#profile .profile-scroll');
+  if(scroller)scroller.scrollTop=0;
+  panel.focus({preventScroll:true});
+ });
+}
+$('profileAccountBack').onclick=()=>{
+ $('profile').classList.remove('account-focus');
+ $('profileAccountPanel').hidden=true;
+ $('profileWelcome').hidden=false;
+ const scroller=document.querySelector('#profile .profile-scroll');
+ if(scroller)scroller.scrollTop=0;
+ $('profileQuickSignup').focus({preventScroll:true});
+};
+$('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
+$('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
 claimPend();initSound();go('home');STORE.init();
@@ -3168,6 +3526,8 @@ import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCl
   if(element){element.dataset.sync=code;element.textContent=message}
   const importButton=$('cloudImport');
   if(importButton)importButton.hidden=!(code==='pending'&&message.includes('PUEDES VINCULARLA'));
+   const pStatus=$('profileCloudStatus');if(pStatus){pStatus.dataset.sync=code;pStatus.textContent=message}
+   const pLink=$('profileLinkCollection');if(pLink)pLink.hidden=!(code==='pending'&&message.includes('PUEDES VINCULARLA'));
  }
 })).then(controller=>{
  cloudSync=controller;
@@ -3181,7 +3541,8 @@ import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCl
   if(result?.status==='imported'){button.hidden=true;toast('¡CARTAS VINCULADAS A TU CUENTA!')}
   else toast('NO SE PUDO VINCULAR<br>TUS CARTAS SIGUEN AQUÍ');
  });
+ document.addEventListener('icmx:auth-changed',()=>cloudSync?.check());
  cloudSync.check();
 })
-.catch(()=>{const e=$('cloudState');if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}});
-</script></body></html>
+.catch(()=>{for(const id of ['cloudState','profileCloudStatus']){const e=$(id);if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}}});
+</script><script type="module" src="content/auth-account.js?v=20261120perfil"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>

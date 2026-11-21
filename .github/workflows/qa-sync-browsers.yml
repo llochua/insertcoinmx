@@ -5,12 +5,19 @@ on:
     branches: [main]
     paths:
       - 'content/cloud-sync.mjs'
+      - 'content/auth-account.js'
+      - 'content/avatar-profile.js'
+      - 'assets/avatars/**'
+      - 'qa/profile-browsers.mjs'
+      - 'qa/perfil-main-browsers.mjs'
+      - 'qa/profile-auth-unit.test.mjs'
       - 'index.html'
       - 'qa/perfil/index.html'
       - 'qa/perfil-preview-browsers.mjs'
       - 'qa/live-experience-browsers.mjs'
       - 'qa/sync-two-browsers.mjs'
       - 'qa/supabase-live-anon.mjs'
+      - 'qa/auth-public-settings.mjs'
       - 'qa/live-auth-two-browsers.mjs'
       - 'qa/registro/index.html'
       - '.github/workflows/qa-sync-browsers.yml'
@@ -94,9 +101,29 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  qa-perfil-main:
+    name: Perfil principal · invitado, cuenta, 12 avatares y colección
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar Playwright fijado
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Instalar Chromium
+        run: npx playwright install chromium
+      - name: Comprobar primera visita, registro, avatar y progreso
+        run: |
+          node qa/profile-browsers.mjs
+          node qa/perfil-main-browsers.mjs
+
   supabase-anon-smoke:
     name: Supabase real · verificar acceso anónimo
-    if: github.event_name == 'pull_request' && github.head_ref == 'feat/sync-automatica-segura-20261119'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -110,6 +137,8 @@ jobs:
 
       - name: Comprobar acceso público sin mutaciones
         run: node qa/supabase-live-anon.mjs
+      - name: Verificar registro y confirmación por correo en GoTrue
+        run: node qa/auth-public-settings.mjs
 
   auth-real-lectura:
     name: Supabase real · dos sesiones (requiere credenciales)

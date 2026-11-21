@@ -364,6 +364,9 @@ async function init(){
    const {data:verified,error:verifyError}=await client.auth.getUser();
    if(verifyError||!verified?.user)throw verifyError||new Error("Session invalid");
    display(verified.user);
+   // Si llegaste desde el correo, la sesión ya se guardó; abrir el juego real.
+   // Evitar enviar tokens de la URL a otra ruta o conservarlos en el historial.
+   if(fromConfirmation){location.replace("/");return}
    await refreshBackupSavedState(verified.user.id);
    message(fromConfirmation?"¡Correo confirmado! La cuenta ya está activa.":"Sesión activa. Ya puedes probar cerrar sesión.","success");
   }else{display(null);message("Listo para registrar una cuenta de prueba.")}
