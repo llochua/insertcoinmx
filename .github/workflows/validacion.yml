@@ -41,6 +41,7 @@ jobs:
           node --check content/validate.mjs
           node --check content/cloud-sync.mjs
           node --check qa/live-auth-two-browsers.mjs
+          node --check qa/live-experience-browsers.mjs
           python -m py_compile cartas/generar.py cartas/actualizar.py cartas/qa.py
 
       - name: Probar sincronización segura
