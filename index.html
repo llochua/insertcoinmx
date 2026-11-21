@@ -1709,6 +1709,11 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile #profileSignedIdentityForm[hidden],#profile #profileSignupInitialsField[hidden],#profile #profileSignupHandleField[hidden]{display:none!important}
 
 #profile .profile-head h2.arcade-initials{font:clamp(17px,4vw,22px)/1.5 PX,monospace;color:#ffd400;letter-spacing:.12em}
+
+/* Récords: reutiliza las iniciales capturadas al acceder; no permite segunda entrada. */
+#scores .score-player-identity{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;margin:8px auto 18px;padding:14px 16px;width:min(100%,300px);border:1px solid rgba(255,212,0,.28);border-radius:12px;background:rgba(255,212,0,.07);text-align:center}
+#scores #scorePlayerInitials{color:#ffd400;font:clamp(16px,4vw,21px)/1.5 PX,monospace;letter-spacing:.12em}
+#scores #scoreIdentityNote{font:600 11px/1.4 AV,system-ui,sans-serif;color:#ccc6e1;overflow-wrap:anywhere;margin:0}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1776,8 +1781,10 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="wrap">
   <div class="px" style="font-size:9px;color:var(--dim);text-align:center;line-height:1.8">TU PUNTAJE: CARTAS DISTINTAS<br><span style="color:var(--y);font-size:26px" id="sMine">0</span></div>
   <div class="px" id="sPos" style="font-size:9px;color:var(--y)"></div>
-  <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
-  <button class="btn y" id="sSave">GUARDAR</button><p class="score-identity-note" id="scoreIdentityNote"></p>
+  <div class="score-player-identity" aria-label="Identidad de jugador en Récords">
+   <strong id="scorePlayerInitials">---</strong>
+   <span id="scoreIdentityNote" class="score-identity-note">Tu identidad arcade</span>
+  </div>
   <section class="arcade-bonus-stats" aria-labelledby="arcadeBonusTitle">
    <h2 id="arcadeBonusTitle">— BONUS STATS —</h2>
    <div class="arcade-bonus-grid">
@@ -2545,6 +2552,7 @@ async function openArcadeEntry(step='welcome'){
     const previous={ini:S.ini,seen:S.seen};
     S.ini=ini;S.seen=1;
     if(!save()){S.ini=previous.ini;S.seen=previous.seen;return false}
+    persistLocalRecord();
     refresh();return true;
    }
   },step);
@@ -3491,10 +3499,8 @@ function renderScores(){
   el.setAttribute('aria-label',n+' '+label);
  }
  const own=arcadeIdentity();
- $('iniIn').value=own.ini||'';
- $('iniIn').readOnly=!!own.handle;
- $('sSave').hidden=!!own.handle;
- $('scoreIdentityNote').textContent=own.handle?'@'+own.handle+(own.registered?' · cuenta':' · récord local'):'Tu récord se guarda en este navegador';
+ $('scorePlayerInitials').textContent=validArcadeIni(own.ini)?own.ini:'---';
+ $('scoreIdentityNote').textContent=own.handle?'@'+own.handle+(own.registered?' · cuenta':' · invitado'):'Se configura al entrar al juego';
  const metric=RANKING_FIELDS[selectedRanking],listing=scoreBoard(selectedRanking);
  const available=listing.rows,position=available.findIndex(r=>r.ini===own.ini&&(own.handle?r.handle===own.handle:true));
  $('sPos').textContent=position>=0?(listing.origin==='available'?'VAS EN EL LUGAR #':'RÉCORD LOCAL · LUGAR #')+(position+1):'PON TUS INICIALES PARA ENTRAR';
@@ -3521,16 +3527,6 @@ $('scores').addEventListener('click',e=>{
  selectedRanking=button.dataset.scoreMetric;
  renderScores();
 });
-$('iniIn').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3)};
-$('sSave').onclick=()=>{
- if(arcadeIdentity().handle){toast('EDITA TU IDENTIDAD EN MI PERFIL');return}
- const value=$('iniIn').value;
- if(value.length<3){toast('3 LETRAS');return}
- syncIn();S.ini=value;
- const saved=save();
- if(saved)persistLocalRecord();
- jingle();toast('¡GUARDADO!');renderScores();
-};
 /* ---------- respaldo: exportar / importar ---------- */
 const IDRE=/^(F_)?[a-z0-9]{1,40}(_[berf])?$/,KRE=/^[A-Za-z0-9_.-]{1,64}$/;
 const esc=t=>String(t).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
