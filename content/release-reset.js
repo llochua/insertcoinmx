@@ -1,6 +1,6 @@
 /* Insert Coin MX · lanzamiento de colección desde cero.
- * PREPARADO, NO ACTIVADO. El atributo data-active del script en index.html
- * solo debe pasar a "true" junto al reinicio transaccional en Supabase.
+ * Rama de lanzamiento, no fusionar antes del reinicio transaccional
+ * en Supabase. La publicación de esta rama disparará la nueva epoch.
  * No elimina cuentas, sesión Auth ni preferencias de avatar.
  */
 (function(){
@@ -13,7 +13,8 @@
  const exact=Object.freeze([
   'icmx-album2','icmx-album2.ext','icmx-album2.bak',
   'icmx-album2.corrupt','icmx-album2.premig',
-  'icmx-cloud-active-account-v1'
+  'icmx-cloud-active-account-v1',
+  'icmx-local-ranking-public-2026-v1'
  ]);
  const prefixes=Object.freeze([
   'icmx-cloud-baseline-v1:',
