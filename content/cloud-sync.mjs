@@ -103,6 +103,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
     autoRefreshToken:true,storageKey:'icmx-auth-qa-nov2026'}}
  );
  let stopped=false,busy=false,rerun=false,debounce=null,interval=null;
+ let syncTask=null; // Espera la comprobación en curso antes de emitir un sobre.
  let accountUid=null,issuing=false,sessionActive=true;
  let importAvailable=false;
  const status=(code,message)=>{if(!stopped)onStatus(code,message)};
@@ -112,12 +113,21 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
    const {data:sessionData}=await client.auth.getSession();
    sessionActive=Boolean(sessionData?.session?.user?.id);
    if(!sessionActive)accountUid=null;
-   status(sessionData?.session?'offline':'guest',
-    sessionData?.session?'NUBE SIN CONEXIÓN · EL PROGRESO LOCAL SIGUE A SALVO':'INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');
+   const bound=localStorage.getItem(ACCOUNT_BINDING);
+   status(sessionData?.session?'offline':bound?'auth_required':'guest',
+    sessionData?.session?'NUBE SIN CONEXIÓN · EL PROGRESO LOCAL SIGUE A SALVO':
+    bound?'SESIÓN CERRADA · INICIA SESIÓN PARA ABRIR SOBRES':'INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');
    return;
   }
   const user=verified?.user;
-  if(!user?.id){accountUid=null;sessionActive=false;importAvailable=false;status('guest','INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');return}
+  if(!user?.id){
+   accountUid=null;sessionActive=false;importAvailable=false;
+   const bound=localStorage.getItem(ACCOUNT_BINDING);
+   status(bound?'auth_required':'guest',bound?
+    'SESIÓN CERRADA · INICIA SESIÓN PARA ABRIR SOBRES':
+    'INVITADO · PROGRESO SOLO EN ESTE DISPOSITIVO');
+   return;
+  }
   const uid=user.id;
   sessionActive=true;
   importAvailable=false;
@@ -210,16 +220,30 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  }
  async function check(){
   if(stopped)return;
-  if(busy||issuing){rerun=true;return}
+  if(busy||issuing){rerun=true;return syncTask}
   busy=true;
-  try{
-   status('checking','COMPROBANDO SINCRONIZACIÓN…');
-   await syncOnce();
-  }catch(_){status('offline','NUBE NO DISPONIBLE · CONSERVAMOS TU PROGRESO LOCAL')}
-  finally{
-   busy=false;
-   if(rerun&&!stopped){rerun=false;setTimeout(check,80)}
-  }
+  syncTask=(async()=>{
+   try{
+    status('checking','COMPROBANDO SINCRONIZACIÓN…');
+    await syncOnce();
+   }catch(_){status('offline','NUBE NO DISPONIBLE · CONSERVAMOS TU PROGRESO LOCAL')}
+   finally{
+    busy=false;
+    if(rerun&&!stopped){rerun=false;setTimeout(check,80)}
+   }
+  })();
+  try{await syncTask}finally{syncTask=null}
+ }
+ // Una comprobación rutinaria no debe rechazar una apertura legítima como «ocupada».
+ // Antes de mutar se comprueba que haya una sesión y un snapshot reconciliado.
+ async function readyForMutation(){
+  if(stopped)return 'guest';
+  if(busy&&syncTask)await syncTask;
+  if(stopped)return 'guest';
+  if(!accountUid&&sessionActive)await check();
+  if(busy&&syncTask)await syncTask;
+  if(!accountUid)return localStorage.getItem(ACCOUNT_BINDING)?'auth_required':'guest';
+  return null;
  }
  /**
   * Emisión en servidor. request_id permanece hasta confirmar la restauración:
@@ -227,8 +251,10 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   * No existen parámetros de cartas o cuotas controlables por el navegador.
   */
  async function issuePack(){
-  if(stopped||!accountUid)return {status:'guest'};
-  if(issuing||busy)return {status:'busy'};
+  if(issuing)return {status:'busy'};
+  const gate=await readyForMutation();
+  if(gate)return {status:gate};
+  if(issuing)return {status:'busy'};
   issuing=true;
   const uid=accountUid;
   const pendingKey='icmx-cloud-pack-request-v1:'+uid;
@@ -294,8 +320,10 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   }
  }
  async function exchangeDuplicates(){
-  if(stopped||!accountUid)return {status:'guest'};
-  if(issuing||busy)return {status:'busy'};
+  if(issuing)return {status:'busy'};
+  const gate=await readyForMutation();
+  if(gate)return {status:gate};
+  if(issuing)return {status:'busy'};
   issuing=true;
   const uid=accountUid;
   const pendingKey='icmx-cloud-exchange-request-v1:'+uid;

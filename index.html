@@ -2616,7 +2616,13 @@ function openServerPack(){
   if(!result||!['issued','duplicate'].includes(result.status)){
    serverPackBusy=false;
    if(result?.status==='no_packs'){uxEmptyPacks(true);return}
-   toast('SINCRONIZACIÓN PENDIENTE<br>INTENTA DE NUEVO');
+   if(result?.status==='auth_required'){
+    toast('SESIÓN CERRADA<br>INICIA SESIÓN EN TU PERFIL');return;
+   }
+   if(result?.status==='busy'){
+    toast('OPERACIÓN EN CURSO<br>INTENTA DE NUEVO');return;
+   }
+   toast('SINCRONIZACIÓN PENDIENTE<br>REVISA TU CONEXIÓN O PERFIL');
    return;
   }
   if(!Array.isArray(result.cards)||result.cards.some(k=>!CB[k])){
@@ -2655,6 +2661,12 @@ function openServerPack(){
 function openPack(){
  if(opening||serverPackBusy)return;
  if(cloudSync?.requiresServer?.()){openServerPack();return}
+ // No emitir sobres locales si falla la carga de nube para una cuenta vinculada.
+ if(!cloudSync&&(localStorage.getItem('icmx-cloud-active-account-v1')||
+    localStorage.getItem('icmx-auth-qa-nov2026'))){
+  toast('VERIFICANDO TU CUENTA<br>NO SE CONSUMIÓ EL SOBRE');
+  return;
+ }
  opening=true;clearTimeout(hintT);
  withLock(()=>{syncIn();if(!packReady()){opening=false;go('home');uxEmptyPacks(true);return}
   const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),have:{},last:'',extra:0,welcome:0,daily:0,dailyDay:'',dailyCycle:null,saved:false,t:0};
