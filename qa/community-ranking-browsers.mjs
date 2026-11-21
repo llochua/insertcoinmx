@@ -62,17 +62,40 @@ try{
  assert.equal(await a.locator('#communityRankRows button').count(),0);
  const before=await a.evaluate(()=>JSON.stringify(S.have));
  await a.evaluate(()=>openCard('abuket_b'));
- await a.locator('#zLikes button[data-like="1"]').click();
- await a.locator('#zLikeStatus').getByText('Voto actualizado').waitFor();
- await a.locator('#zLikes button[data-like="1"]').click();
- await a.locator('#zLikeStatus').getByText('Voto actualizado').waitFor();
- assert.equal(aggregates()[0].likes.total,1);
+ assert.equal(await a.locator('#zRate button[data-r]').count(),4,'Solo cuatro reacciones');
+ // Una reacción controla Tier y Like; el mismo botón permite retirarla sin duplicar votos.
+ await a.locator('#zRate [data-r="0"]').click(); // GOTY: Tier GOTY + Like positivo
+ await a.waitForFunction(()=>{
+  const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
+  return x?.tiers.goty===1&&x?.likes.total===1&&x?.likes.positive===1;
+ });
+ await a.locator('#zRate [data-r="0"]').click(); // Segundo toque: retirar ambos
+ await a.waitForFunction(()=>{
+  const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
+  return x?.tiers.goty===0&&x?.likes.total===0;
+ });
+ assert.equal(aggregates()[0].likes.total,0,'El retiro no deja Likes huérfanos');
+ await a.locator('#zRate [data-r="1"]').click(); // GENIAL: Like positivo
+ await a.waitForFunction(()=>{
+  const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
+  return x?.tiers.genial===1&&x?.likes.total===1&&x?.likes.positive===1;
+ });
  await b.evaluate(()=>openCard('abuket_e'));
- await b.locator('#zLikes button[data-like="0"]').click();
- await b.locator('#zLikeStatus').getByText('Voto actualizado').waitFor();
- assert.equal(aggregates()[0].likes.total,2);
- await b.locator('#zRate [data-r="0"]').click();
- await b.waitForFunction(()=>communityRanking?.state.aggregates.find(x=>x.id==='abuket')?.tiers.goty===1);
+ await b.locator('#zRate [data-r="3"]').click(); // MMM: Like negativo
+ await b.waitForFunction(()=>{
+  const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
+  return x?.tiers.mmm===1&&x?.likes.total===2&&x?.likes.positive===1;
+ });
+ await b.locator('#zRate [data-r="2"]').click(); // OK: Tier neutro, sin Like
+ await b.waitForFunction(()=>{
+  const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
+  return x?.tiers.ok===1&&x?.tiers.mmm===0&&x?.likes.total===1;
+ });
+ await b.locator('#zRate [data-r="0"]').click(); // Cambia a GOTY: reemplaza el voto de beta
+ await b.waitForFunction(()=>{
+  const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
+  return x?.tiers.goty===1&&x?.tiers.ok===0&&x?.likes.total===2&&x?.likes.positive===2;
+ });
  const expected=rankDesigns(aggregates()).find(x=>x.id==='abuket').score;
  assert.equal(await b.locator('#zFx svg.icmx-live-pop').getAttribute('data-pop'),String(expected));
  await a.locator('#zClose').click();await a.evaluate(()=>go('scores'));
@@ -82,12 +105,15 @@ try{
   await a.waitForFunction(v=>document.querySelector('#zFx svg.icmx-live-pop')?.dataset.pop===String(v),expected);
   await a.locator('#zClose').click();
  }
+ const publishedBeforeGuest=JSON.stringify(aggregates());
  await guest.evaluate(()=>openCard('abuket_b'));
- assert.equal(await guest.locator('#zLikes').isVisible(),false);
+ await guest.locator('#zRate [data-r="0"]').click();
+ assert.equal(await guest.locator('#zRate [data-r="0"]').getAttribute('aria-pressed'),'true','Invitado puede reaccionar localmente');
+ assert.equal(JSON.stringify(aggregates()),publishedBeforeGuest,'Invitado sin cuenta no publica votos');
  assert.equal(await a.evaluate(()=>JSON.stringify(S.have)),before,'votes do not modify inventory');
  await mkdir('qa/screenshots',{recursive:true});
  await a.screenshot({path:'qa/screenshots/global-pop-mobile.png',fullPage:true});
  await b.locator('#zClose').click();await b.evaluate(()=>go('scores'));
  await b.screenshot({path:'qa/screenshots/global-pop-desktop.png',fullPage:true});
- assert.deepEqual(errors,[]);console.log('PASS: two authenticated browser identities, update/duplicate handling, shared POP, guest read-only, inventory preserved');
+ assert.deepEqual(errors,[]);console.log('PASS: two authenticated browser identities, reaction replacement/retraction, shared POP, guest local-only, inventory preserved');
 }finally{await Promise.allSettled(contexts.map(c=>c.close()));await browser.close();await new Promise(r=>server.close(r));}
