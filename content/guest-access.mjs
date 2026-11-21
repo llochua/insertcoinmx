@@ -90,5 +90,12 @@ function show(step){
 }
 export function hide(){if(root)root.hidden=true}
 export function openGuestAccess(options,step='welcome'){
- ensure();handlers=options;q('icmxGuestLogin').hidden=typeof options.onLogin!=='function';root.hidden=false;show(step);
+ ensure();handlers=options;q('icmxGuestLogin').hidden=typeof options.onLogin!=='function';
+ q('icmxGuestWelcome').querySelector('.guest-warning').textContent=options.verified
+  ?'Tu partida de invitado se protege con una sesión verificable. Para recuperarla en otro dispositivo, vincula tu correo antes de cerrar sesión o borrar datos.'
+  :'Como invitado, tus cartas se guardan en este navegador, pero podrías perderlas si borras sus datos o cambias de dispositivo.';
+ q('icmxGuestIdentity').querySelector('.guest-help').textContent=options.verified
+  ?'De 3 a 20 caracteres: letras, números o guion bajo. Este @usuario será único en el ranking global.'
+  :'De 3 a 20 caracteres: letras, números o guion bajo. Tu @usuario es provisional hasta crear una cuenta.';
+ root.hidden=false;show(step);
 }
