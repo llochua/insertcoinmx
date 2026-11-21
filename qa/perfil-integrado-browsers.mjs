@@ -21,7 +21,7 @@ const server=createServer(async(req,res)=>{
  }catch(_){res.writeHead(404);res.end('Not found')}
 });
 await new Promise(ok=>server.listen(0,'127.0.0.1',ok));
-const URL='http://127.0.0.1:'+server.address().port+'/qa/perfil-integrado/';
+const TARGET_URL='http://127.0.0.1:'+server.address().port+'/qa/perfil-integrado/';
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const errors=[],unexpectedRemote=[];
 const sdk=[
@@ -46,7 +46,8 @@ async function device(signed){
  await context.route(/https:\/\/.*supabase\.co\/.*/,route=>{unexpectedRemote.push(route.request().url());return route.abort()});
  const page=await context.newPage();
  page.on('pageerror',e=>errors.push(e.message));
- await page.goto(URL,{waitUntil:'domcontentloaded'});
+ const response=await page.goto(TARGET_URL,{waitUntil:'domcontentloaded'});
+ assert.equal(response.status(),200,'QA page must load correctly');
  assert.equal(await page.locator('#homePlayerAvatarImage').evaluate(el=>getComputedStyle(el).visibility),'hidden','avatar is hidden until real identity resolves');
  await page.waitForFunction(()=>document.documentElement.dataset.icmxAvatarReady==='true');
  await page.locator('#homePlayerAvatarImage').waitFor({state:'visible'});
