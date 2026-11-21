@@ -3170,6 +3170,8 @@ $('title').addEventListener('click',e=>{
  beep(880,.06);setTimeout(()=>beep(1320,.08),70);
  $('title').classList.remove('on');renderHome();
  if(ON_PREVIEW)return;
+ // Una sesión autenticada no debe volver a entrar por el flujo de invitado.
+ if(globalThis.icmxAvatarAuthUser?.id)return;
  const identity=arcadeIdentity();
  if(!globalThis.icmxAccountIdentity?.handle&&(!validArcadeIni(identity.ini)||!validArcadeHandle(identity.handle))){
    // Una colección antigua nunca se reinicia: solo se solicita la identidad faltante.
