@@ -4105,7 +4105,7 @@ $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[d
    if(fd)renderFicha();
    if($('zoom').open&&CB[zk])mountFaceValue($('zFx'),CB[zk]);
   }});
-  communityRanking.refresh();
+  if(cur==='scores')communityRanking.refresh();
  }).catch(()=>{});
  import('./content/community-value.mjs').then(mod=>{
  communityValueEngine=mod;
