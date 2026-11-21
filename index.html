@@ -1916,7 +1916,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx" role="button" tabindex="0" aria-label="Tocar carta para regresar" title="Tocar para regresar"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <p class="z-return-hint" aria-hidden="true">TOCA LA CARTA PARA VOLVER</p>
- <section class="icmx-card-value" aria-label="Puntos de la carta y popularidad del diseño"><div><span class="value-label">VALOR DE VARIANTE</span><strong id="zVariantPoints">— PTS</strong><small id="zVariantOwned">Primera obtención</small></div><div class="value-pop"><span class="value-label">POPULARIDAD GLOBAL</span><strong id="zDesignPopularity">— POP</strong><small id="zGlobalPosition">Sin clasificar</small></div><p class="icmx-card-value-note">POPULARIDAD: LIKES 35% · TIER 35% · RETA 30%. Pendiente de conectar votos globales.</p></section>
+ <p class="icmx-card-value-note" id="zCommunityFormula">POPULARIDAD: LIKES 35% · TIER 35% · RETA 30% · VALOR GLOBAL PENDIENTE</p>
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
  <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div></div>
  <section class="z-narrative" id="zNarrative" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
@@ -1934,6 +1934,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 
 <script src="content/release-reset.js?v=20261121-launch" data-active="true" data-game-epoch="public-2026-launch-v1"></script>
 <script src="content/card-texts.js?v=20261120c"></script>
+<script src="content/card-value-overlay.js?v=20261120b"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
    b Base · e Especial · r Rara · f Full. La clave de una carta es diseño+'_'+letra (ej. fatality_r, x_f).
@@ -2191,11 +2192,30 @@ function collectionPointsLocal(){
 }
 const valueVariantPoints=v=>communityValueEngine?.VARIANT_POINTS?.[v]??null;
 function updateCardValueUI(card){
- const value=valueVariantPoints(card.v);
- $('zVariantPoints').textContent=card.bx?'—':value===null?'— PTS':value+' PTS';
- $('zVariantOwned').textContent=S.have[card.k]?'Descubierta en tu colección':'Al descubrirla por primera vez';
- $('zDesignPopularity').textContent='— POP';
- $('zGlobalPosition').textContent='Sin clasificar';
+ // POP se revela únicamente cuando Supabase sirva resultados comunitarios verificables.
+ // Los PTS pertenecen a la variante: son 10, 25, 50 o 100 según su rareza.
+ const pts=card.bx?null:valueVariantPoints(card.v);
+ return {variant:card.v,points:pts,pop:null};
+}
+function mountFaceValue(fx,card){
+ if(!window.ICMX_CARD_VALUE)return;
+ window.ICMX_CARD_VALUE.mount(fx,updateCardValueUI(card));
+}
+let faceCardObserver=null;
+const pendingFaceCards=new WeakMap();
+function mountFaceValueLazy(fx,card){
+ if(!fx)return;
+ if(typeof IntersectionObserver!=='function'){mountFaceValue(fx,card);return}
+ if(!faceCardObserver)faceCardObserver=new IntersectionObserver(entries=>{
+  for(const entry of entries)if(entry.isIntersecting){
+   faceCardObserver.unobserve(entry.target);
+   const record=pendingFaceCards.get(entry.target);
+   if(record&&entry.target.isConnected)mountFaceValue(entry.target,record);
+   pendingFaceCards.delete(entry.target);
+  }
+ },{rootMargin:'100px'});
+ pendingFaceCards.set(fx,card);
+ faceCardObserver.observe(fx);
 }
 const PRUEBA=false; // quitar al lanzar: sobres ilimitados para revisar
 /* Regla pactada: 5 sobres de bienvenida, luego 2 cada 6 horas.
@@ -2883,6 +2903,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
    <div class="dx-tags"><span class="dx-v">${VSHORT[v].toUpperCase()}</span>${c._new?`<span class="dx-s">${c._dnew?'NUEVA':'NUEVA VARIANTE'}</span>`:`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
   <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span>${icAward(c)}</button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
  resolveArtworkBackground(d,D);
+ mountFaceValue($('dcCard').querySelector('.fx'),c);
  $('dcCard').onclick=()=>openCard(c.k);
  dxNav();
  $('dcArtBack').onclick=()=>{setArtworkView(false);$('dcNext').focus({preventScroll:true});ga('vista_ilustracion',{origen:'regresar',accion:'ver_carta'})};
@@ -3026,6 +3047,8 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
   <div class="rs-group rs-redeem">${tradeH}</div>
   <div class="rs-pg">${disc} de ${PD.length} diseños · ${AV.filter(c=>S.have[c.k]).length} de ${NAV} cartas</div>
  </div>`;
+ for(const c of hand)mountFaceValueLazy(s.querySelector('.rc[data-k="'+c.k+'"] .fx'),c);
+ mountFaceValueLazy(s.querySelector('.rh .dx-card .fx'),H);
  if(entering){s.scrollTop=0;ga('resumen_sobre_visto',{tipo:lastOpenedPack?.kind||'extra',paso:lastOpenedPack?.number||0})}
  refreshSummaryActions();
  s.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>openCard(b.dataset.k));
@@ -3068,6 +3091,7 @@ function renderAlbum(){
  const dn=LN.filter(x=>x.st.all).length;
  $('aSub').innerHTML=`<b>${dn}</b> de ${LN.length} diseños completos · ${t} cartas en sobres`+(SOON_N>0?`<span>+ ${SOON_N} ilustraciones en camino · todavía no salen en sobres</span>`:'');
  $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv${st.own?` fx idle r-${st.cover.r}`:''}">${st.own?`<img src="${imgOf(st.cover,'c')}" loading="lazy" alt=""><i class="foil"></i><i class="glare"></i>`:`<span class="lk"><img src="coin.png" alt="">${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
+ for(const {d,st} of L)if(st.own)mountFaceValueLazy($('grid').querySelector('.dt[data-d="'+d.id+'"] .fx'),st.cover);
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
 $('grid').onclick=e=>{const t=e.target.closest('.dt');if(!t)return;beep(880,.04);openFicha(t.dataset.d)};
@@ -3081,6 +3105,7 @@ function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
   return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv fx idle r-${x.c.img?x.c.r:'comun'}"><img src="${imgOf(x.c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span>${lb}</button>`
    :`<div class="vc av"><span class="cv"><img src="coin.png" alt=""><span>EN SOBRES</span></span>${lb}</div>`}).join('');
+ for(const x of col)if(x.st==='have')mountFaceValueLazy($('fVers').querySelector('.vc[data-k="'+x.c.k+'"] .fx'),x.c);
  const soon=st.vs.filter(x=>x.st==='soon');$('fSoon').innerHTML=soon.length?'Ilustración en camino:'+soon.map(x=>`<span>${VN[x.v]}</span>`).join(''):''}
 $('fVers').onclick=e=>{const b=e.target.closest('.vc.have');if(b)openCard(b.dataset.k)};
 $('fClose').onclick=closeFicha;
@@ -3096,7 +3121,6 @@ function openCard(k){
  const token=++zLoadToken,zoom=$('zoom'),img=$('zImg'),fx=$('zFx'),status=$('zLoad');
  zReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
  zk=cc.k;
- updateCardValueUI(cc);
  $('zName').textContent=cc.n+' · '+VN[cc.v];
  const stxt=storyFor(cc),sn=$('zNarrative');sn.hidden=!stxt;$('zNarrativeKicker').textContent=stxt?storyLabel(cc):'';$('zNarrativeText').textContent=stxt;
  // Ocultar arte anterior ANTES de asignar el src o abrir el diálogo.
@@ -3123,6 +3147,7 @@ function openCard(k){
  if(!zoom.open)zoom.showModal();
  zoom.scrollTop=0;
  img.src=imgOf(cc,'c2');
+ mountFaceValue(fx,cc);
  // decode garantiza que el primer fotograma visible ya pertenece a la carta nueva.
  if(typeof img.decode==='function')img.decode().then(ready,failed);
  else if(img.complete)(img.naturalWidth?ready():failed());
@@ -3143,6 +3168,7 @@ $('zFx').addEventListener('keydown',e=>{
 });
 
 $('zoom').addEventListener('close',()=>{
+ if($('zoom').open)return; // un cierre anterior no debe limpiar la carta que acaba de reabrirse
  ++zLoadToken; // invalida cargas previas, también si se cierra con Escape
  const img=$('zImg');img.onload=null;img.onerror=null;img.removeAttribute('src');
  $('zFx').className='fx';$('zLoad').textContent='';
@@ -3704,7 +3730,7 @@ $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 import('./content/community-value.mjs').then(mod=>{
  communityValueEngine=mod;
  if(cur==='profile')renderProfile();
- if($('zoom').open&&CB[zk])updateCardValueUI(CB[zk]);
+ if($('zoom').open&&CB[zk])mountFaceValue($('zFx'),CB[zk]);
  if(cur==='pack'&&$('disc').classList.contains('on'))showCard();
 }).catch(()=>{/* El juego sigue utilizable si el módulo de puntos no carga. */});
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
