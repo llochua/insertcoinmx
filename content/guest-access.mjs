@@ -51,7 +51,7 @@ function ensure(){
  </section>
  <section id="icmxGuestIdentity" hidden><h2>Tu identidad arcade</h2><p>Elige tus tres iniciales y un nombre de usuario.</p>
  <label for="icmxGuestIni">TUS INICIALES</label><input id="icmxGuestIni" type="text" maxlength="3" autocapitalize="characters" spellcheck="false" autocomplete="off" placeholder="AAA">
- <label for="icmxGuestHandle">NOMBRE DE USUARIO</label><div class="guest-handle"><span aria-hidden="true">@</span><input id="icmxGuestHandle" type="text" maxlength="20" autocapitalize="none" spellcheck="false" autocomplete="off" placeholder="josplayer"></div>
+ <label for="icmxGuestHandle">NOMBRE DE USUARIO</label><div class="guest-handle"><span aria-hidden="true">@</span><input id="icmxGuestHandle" type="text" maxlength="20" autocapitalize="none" spellcheck="false" autocomplete="off" placeholder="nombre_usuario"></div>
  <p class="guest-help">De 3 a 20 caracteres: letras, números o guion bajo. Tu @usuario es provisional hasta crear una cuenta.</p>
  <p id="icmxGuestError" role="status" aria-live="polite"></p>
  <button id="icmxGuestPlay" type="button" disabled>¡A JUGAR!</button>
