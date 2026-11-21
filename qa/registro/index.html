@@ -88,6 +88,18 @@ a{color:var(--yellow)}
  </div>
  <button type="button" class="action secondary" id="logout">CERRAR SESIÓN DE PRUEBA</button>
 </section>
+<section id="recovery" hidden aria-labelledby="recoveryTitle">
+ <h2 id="recoveryTitle">Nueva contraseña</h2>
+ <p id="recoveryIntro" class="intro" style="text-align:left;margin:8px 0 18px">Elige una contraseña para recuperar el acceso a tu cuenta.</p>
+ <form id="recoveryForm">
+  <div class="field"><label for="recoveryPassword">Nueva contraseña</label>
+   <input id="recoveryPassword" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Mínimo 8 caracteres"></div>
+  <div class="field"><label for="recoveryConfirm">Confirmar contraseña</label>
+   <input id="recoveryConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Repite tu contraseña"></div>
+  <button type="submit" id="recoverySave" class="action">GUARDAR CONTRASEÑA</button>
+ </form>
+ <a id="recoveryHome" class="action" href="/" hidden style="display:grid;place-items:center;text-decoration:none">VOLVER AL JUEGO</a>
+</section>
 <p id="message" role="status" aria-live="polite">Conectando con Supabase…</p>
 <p class="foot"><strong>Solo pruebas.</strong> Esta página no abre sobres ni modifica tu colección. Tu cuenta es real. La descarga de respaldo sigue disponible. La carga manual permanece suspendida; la sincronización protegida se prueba en el juego.</p>
 </main>
@@ -99,10 +111,15 @@ const SDK_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm"
 const SESSION_KEY = "icmx-auth-qa-nov2026";
 const RETURN_URL = location.origin + location.pathname;
 const fromConfirmation = /(?:^|[?&#])(?:access_token|code)=/.test(location.hash+"&"+location.search);
+const recoveryHash=new URLSearchParams(location.hash.slice(1));
+const recoverySearch=new URLSearchParams(location.search);
+const fromRecoveryLink=(recoveryHash.get("type")==="recovery"&&recoveryHash.has("access_token")&&recoveryHash.has("refresh_token"))||
+ (recoverySearch.get("type")==="recovery"&&recoverySearch.has("code"));
 const el = id => document.getElementById(id);
-let client, mode = "signup", busy = false;
+let client, mode = "signup", busy = false,recoveryActive=false,recoveryUserId=null;
 function message(copy,tone="info"){el("message").textContent=copy;el("message").dataset.tone=tone}
 function display(user){
+ if(recoveryActive)return;
  const active = Boolean(user);
  el("guest").hidden=active;
  el("signed").setAttribute("aria-hidden",String(!active));
@@ -111,6 +128,22 @@ function display(user){
   resetBackupUi();
   el("cloudSummary").textContent="Consulta tu respaldo en Supabase sin descargarlo ni reemplazar cartas en este dispositivo.";
  }
+}
+function showRecovery(user){
+ if(!user?.id||user.is_anonymous===true)return false;
+ recoveryActive=true;
+ recoveryUserId=user.id;
+ el("guest").hidden=true;
+ el("signed").setAttribute("aria-hidden","true");
+ el("recovery").hidden=false;
+ document.querySelector(".kicker").textContent="INSERT COIN MX · SEGURIDAD";
+ document.querySelector("main > h1").textContent="Recupera tu cuenta";
+ document.querySelector("main > .intro").textContent="Establece una nueva contraseña para regresar a tu álbum.";
+ document.querySelector(".foot").textContent="Tu cuenta, tus cartas, tu avatar y tus puntos no se eliminan al cambiar la contraseña.";
+ message("Enlace verificado. Escribe tu nueva contraseña.","success");
+ // El SDK ya consumió el enlace: no conservar tokens de acceso en el historial.
+ if(fromRecoveryLink)history.replaceState(null,"",location.pathname);
+ return true;
 }
 function setMode(next){
  if(busy||!["signup","login"].includes(next))return;
@@ -341,6 +374,34 @@ el("authForm").addEventListener("submit",async e=>{
  }catch(err){message(errorText(err),"error")}
  finally{lock(false)}
 });
+el("recoveryForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ if(!client||!recoveryActive||!recoveryUserId||busy)return;
+ const password=el("recoveryPassword").value,confirm=el("recoveryConfirm").value;
+ if(password.length<8||password.length>128){
+  message("La contraseña debe tener al menos 8 caracteres.","error");return;
+ }
+ if(password!==confirm){
+  message("Las contraseñas no coinciden. Revisa ambos campos.","error");
+  el("recoveryConfirm").focus();return;
+ }
+ busy=true;el("recoverySave").disabled=true;
+ message("Actualizando tu contraseña…");
+ try{
+  const {data:verified,error:verifyError}=await client.auth.getUser();
+  if(verifyError||verified?.user?.id!==recoveryUserId||verified.user.is_anonymous===true)
+   throw Error("Invalid recovery identity");
+  const {data,error}=await client.auth.updateUser({password});
+  if(error||data?.user?.id!==recoveryUserId)throw error||Error("Invalid recovery response");
+  el("recoveryPassword").value="";el("recoveryConfirm").value="";
+  el("recoveryForm").hidden=true;el("recoveryHome").hidden=false;
+  el("recoveryIntro").textContent="Tu nueva contraseña quedó guardada. Ya puedes volver a Insert Coin MX.";
+  message("Contraseña actualizada correctamente. Tu colección está intacta.","success");
+  recoveryActive=false;
+ }catch(err){
+  message(errorText(err),"error");
+ }finally{busy=false;el("recoverySave").disabled=false}
+});
 el("logout").addEventListener("click",async()=>{
  if(!client||busy)return;
  el("logout").disabled=true;
@@ -357,18 +418,33 @@ async function init(){
   client=sdk.createClient(URL_SUPABASE,PUBLIC_KEY,{
    auth:{flowType:"implicit",detectSessionInUrl:true,persistSession:true,autoRefreshToken:true,storageKey:SESSION_KEY}
   });
-  client.auth.onAuthStateChange((_event,session)=>display(session?.user||null));
+  client.auth.onAuthStateChange((event,session)=>{
+   if(event==="PASSWORD_RECOVERY"){
+    if(session?.user?.id)showRecovery(session.user);
+    return;
+   }
+   if(!recoveryActive)display(session?.user||null);
+  });
   const {data,error}=await client.auth.getSession();
   if(error)throw error;
   if(data.session){
    const {data:verified,error:verifyError}=await client.auth.getUser();
    if(verifyError||!verified?.user)throw verifyError||new Error("Session invalid");
+   if(recoveryActive||fromRecoveryLink){
+    if(!showRecovery(verified.user))throw Error("Recovery session not valid");
+    return;
+   }
    display(verified.user);
-   // Si llegaste desde el correo, la sesión ya se guardó; abrir el juego real.
-   // Evitar enviar tokens de la URL a otra ruta o conservarlos en el historial.
+   // Si llegaste desde el correo de confirmación normal, abrir el juego real.
+   // Nunca reenviar ni conservar el token en otra URL.
    if(fromConfirmation){location.replace("/");return}
    await refreshBackupSavedState(verified.user.id);
    message(fromConfirmation?"¡Correo confirmado! La cuenta ya está activa.":"Sesión activa. Ya puedes probar cerrar sesión.","success");
+  }else if(fromRecoveryLink){
+   el("guest").hidden=true;
+   el("signed").setAttribute("aria-hidden","true");
+   message("El enlace expiró o ya se utilizó. Solicita uno nuevo desde INICIAR SESIÓN.","error");
+   history.replaceState(null,"",location.pathname);
   }else{display(null);message("Listo para registrar una cuenta de prueba.")}
  }catch(e){client=null;display(null);message("No pudimos conectar con Supabase. Revisa la conexión.","error")}
 }
