@@ -35,6 +35,8 @@ CREATE POLICY player_profiles_update_own ON public.player_profiles FOR UPDATE TO
 UPDATE private_sync.beta_access_gate SET enabled=true WHERE key='public_beta';
 \ir backend-review.sql
 \ir admission-metrics.sql
+\ir ../../supabase/sql/guest_public_identity_STAGED.sql
+\ir ../../supabase/sql/player_global_leaderboards_STAGED.sql
 -- Simulate 98 earlier admissions; the next three real guests must all enter.
 INSERT INTO private_sync.guest_admission_daily VALUES ((clock_timestamp() AT TIME ZONE 'UTC')::date,98);
 NOTIFY pgrst,'reload schema';
