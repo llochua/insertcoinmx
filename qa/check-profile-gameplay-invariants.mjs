@@ -27,6 +27,8 @@ const allowed=new Set([
   'qa/profile-auth-unit.test.mjs',
   'qa/profile-browsers.mjs',
   'qa/sync-two-browsers.mjs',
+  'qa/release-reset.test.mjs',
+  'content/release-reset.js',
   'qa/perfil-main-browsers.mjs',
   'qa/check-profile-gameplay-invariants.mjs',
   '.github/workflows/validacion.yml',
