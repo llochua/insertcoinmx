@@ -1686,6 +1686,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @keyframes cinemaTitle{0%,6%{opacity:0;transform:translateY(17px) scale(.82)}30%{opacity:1;transform:translateY(0) scale(1.10)}68%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.disc.dx .dx-cinema-overlay{display:none!important;animation:none!important}}
 
+#home:focus{outline:none}
 /* La carta ampliada sirve para abrir/cerrar desde la misma superficie. */
 #zoom #zFx[role="button"]{cursor:zoom-out;-webkit-tap-highlight-color:rgba(255,212,0,.12)}
 #zoom #zFx[role="button"]:focus-visible{outline:3px solid #FFD400;outline-offset:4px}
@@ -1708,7 +1709,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="ttick"><span id="tiTick"></span></div>
  <div class="tscan"></div>
 </section>
-<section class="view on" id="home">
+<section class="view on" id="home" tabindex="-1">
  <div class="amb" id="mAmb"></div>
  <header class="mh"><div class="hb"><img id="logo" src="coin.png" alt=""><span>EL ÁLBUM</span></div><div class="hc"><b id="hCount"></b><small>CARTAS</small></div><button type="button" class="profile-entry" data-go="profile" aria-label="Mi perfil de jugador" title="Mi perfil"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-4.3 3.4-6 7.5-6s6.7 1.7 7.5 6"/></svg></button><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></header>
  <span id="test" class="htest"></span>
@@ -2421,7 +2422,7 @@ function closeOn(){
  $('onb').classList.remove('on');$('onb').setAttribute('aria-hidden','true');
  syncIn();if(!S.seen&&!ON_PREVIEW){S.seen=1;save()}
  // Ningún sobre se emite hasta que el jugador lo elija desde Inicio.
- go('home');$('mGo').focus({preventScroll:true});
+ go('home');$('home').focus({preventScroll:true});
 }
 $('onBack').onclick=()=>{if(onI>0){beep(440,.04);onI--;showOn()}};
 $('onSkip').onclick=()=>{beep(440,.04);closeOn(false)};
