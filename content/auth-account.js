@@ -247,9 +247,17 @@ function setAuthBusy(busy) {
   $auth('profileAuthTabSignup').disabled = busy;
   $auth('profileAuthTabLogin').disabled = busy||guestStage!=='none';
 }
+async function authCaptchaOptions(){
+ if(globalThis.ICMX_VERIFIED_GUEST_PLAY!==true&&globalThis.ICMX_CAPTCHA_ENABLED!==true)return {};
+ if(typeof globalThis.icmxGuestCaptcha!=='function')throw Error('captcha_configuration_missing');
+ const captchaToken=await globalThis.icmxGuestCaptcha();
+ if(typeof captchaToken!=='string'||!captchaToken.trim())throw Error('captcha_empty');
+ return {captchaToken};
+}
 function friendlyAuthError(error, mode) {
   const text = String(error?.message || '').toLowerCase();
   const code = String(error?.code || '').toLowerCase();
+  if(/captcha/.test(code+' '+text))return 'No se completó la comprobación de seguridad. Tu progreso sigue intacto; puedes volver a intentarlo.';
   if (/over_email_send_rate_limit|email_rate_limit_exceeded|rate.limit|too.many/.test(code + ' ' + text)) {
     return 'Se alcanzó el límite de envíos. Podrás intentarlo más tarde.';
   }
@@ -388,7 +396,7 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
       const {data, error} = await authClient.auth.signUp({
         email,
         password,
-        options: {emailRedirectTo: REDIRECT_URL,
+        options: {emailRedirectTo: REDIRECT_URL,...await authCaptchaOptions(),
           data:{icmx_initials:signupIdentity.ini,icmx_handle:signupIdentity.handle}}
       });
       if (error) throw error;
@@ -400,7 +408,8 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
         authMessage('Solicitud recibida. Si este correo todavía no tiene cuenta, recibirás un mensaje para confirmarla. Si ya tienes cuenta, elige INICIAR SESIÓN.', 'success');
       }
     } else {
-      const {data, error} = await authClient.auth.signInWithPassword({email, password});
+      const captchaOptions=await authCaptchaOptions();
+      const {data, error} = await authClient.auth.signInWithPassword({email,password,...(captchaOptions.captchaToken?{options:captchaOptions}:{})});
       if (error) throw error;
       showAuthUser(data?.user || null);
       if(data?.user?.id)loadAccountIdentity(data.user.id);
