@@ -1694,6 +1694,114 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 
 
 
+
+
+/* Perfil compacto · jerarquía: jugador > colección > cuenta > respaldo.
+   Conserva los IDs del motor de cartas, cuenta y avatar. */
+#profile .profile-scroll{gap:11px;padding-top:12px}
+#profile .profile-passport{padding:14px 15px;border-radius:15px;background:linear-gradient(145deg,#292252,#16112d 80%);border-color:rgba(255,212,0,.32)}
+#profile .profile-head{margin:0;gap:12px;align-items:center}
+#profile .profile-avatar{position:relative;width:54px;height:54px;flex:0 0 54px;border-radius:13px}
+#profile .profile-avatar .avatar-pencil{position:absolute;right:-5px;bottom:-5px;display:grid;place-items:center;width:21px;height:21px;border:2px solid #292252;border-radius:50%;background:#fff;color:#211947;font:900 13px AV,system-ui,sans-serif}
+#profile .profile-identity{min-width:0;flex:1}
+#profile .profile-kicker{font:800 9px/1.3 AV,system-ui,sans-serif;letter-spacing:.07em;margin-bottom:3px}
+#profile .profile-head h2{margin:0 0 3px}
+#profile .profile-identity .profile-initials{font:700 12px/1.3 AV,system-ui,sans-serif;color:#f3f1ff;margin:0 0 3px;overflow-wrap:anywhere}
+#profile .profile-identity .profile-status{font:500 11px/1.3 AV,system-ui,sans-serif;color:#aaa4ca}
+#profile .profile-identity .profile-status::before{height:6px;width:6px;flex-basis:6px;background:#c2bbd8}
+#profile .guest-edit-identity{flex:none;align-self:flex-start;min-height:32px;margin:0;padding:6px 8px;border:1px solid rgba(255,212,0,.28);border-radius:8px;font:800 10px AV,system-ui,sans-serif;color:#ffd400}
+#profile .profile-passport #profileAvatarChange[hidden]{display:none!important}
+#profile .profile-summary-board{padding:16px 16px 13px;border:1px solid rgba(255,255,255,.15);border-radius:15px;background:linear-gradient(155deg,rgba(36,30,79,.86),rgba(15,11,38,.95))}
+#profile .profile-summary-board .profile-collection{display:block}
+#profile .profile-summary-board .profile-dial[hidden]{display:none!important}
+#profile .profile-summary-board .profile-progress{display:block;min-width:0;width:100%;padding:0}
+#profile .profile-summary-board .profile-progress-topline{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 5px}
+#profile .profile-summary-board .profile-progress-label{display:inline;margin:0;color:#ffd400;font:800 10px/1.3 AV,system-ui,sans-serif;letter-spacing:.07em}
+#profile .profile-summary-board .profile-progress-note{display:block;margin:0;white-space:nowrap;text-align:right;font:700 11px/1.3 AV,system-ui,sans-serif;color:#c9c4dc}
+#profile .profile-summary-board .profile-collection-total{display:block;margin:0 0 11px;color:#fff;font:800 24px/1.1 AV,system-ui,sans-serif;letter-spacing:-.015em;font-variant-numeric:tabular-nums}
+#profile .profile-summary-board .collection-slash{font-weight:500;color:#a49ebc}
+#profile .profile-summary-board .collection-unit{font:700 11px/1.4 AV,system-ui,sans-serif;color:#c5bfd9;letter-spacing:.05em}
+#profile .profile-summary-board .profile-progress-track{height:7px;border-radius:8px}
+#profile .profile-summary-board .profile-points-compact{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:15px 0 11px;padding:12px 0 0;border:0;border-top:1px solid rgba(255,255,255,.14);border-radius:0;background:none;box-shadow:none}
+#profile .profile-summary-board .profile-points-compact>div{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+#profile .profile-summary-board .profile-points-compact>div span{font:800 10px/1.25 AV,system-ui,sans-serif;letter-spacing:.045em;color:#c9c4dc}
+#profile .profile-summary-board .profile-points-compact #profileValuePoints{font:800 22px/1.1 AV,system-ui,sans-serif;color:#ffd400;letter-spacing:0}
+#profile .profile-summary-board .profile-points-compact>small{max-width:46%;text-align:right;color:#aaa4c0;font:500 11px/1.3 AV,system-ui,sans-serif}
+#profile .profile-summary-board .profile-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid rgba(255,255,255,.12);padding-top:12px}
+#profile .profile-summary-board .profile-metrics div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:3px 6px;border:0;border-right:1px solid rgba(255,255,255,.13);border-radius:0;background:none;text-align:center}
+#profile .profile-summary-board .profile-metrics div:last-child{border-right:0}
+#profile .profile-summary-board .profile-metrics strong{font:800 18px/1.1 AV,system-ui,sans-serif;color:#fff}
+#profile .profile-summary-board .profile-metrics span{font:600 11px/1.2 AV,system-ui,sans-serif;color:#bcb7d4}
+#profile .profile-spotlight{display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:14px 15px;border-radius:14px;background:linear-gradient(145deg,rgba(255,212,0,.10),rgba(255,212,0,.035) 90%);border-color:rgba(255,212,0,.29);text-align:left}
+#profile .profile-spotlight-heading{display:flex;align-items:center;gap:11px}
+#profile .profile-spotlight-icon{flex:0 0 36px;width:36px;height:36px;border-radius:10px}
+#profile .profile-spotlight-icon svg{width:22px;height:22px}
+#profile .profile-spotlight-heading>div{min-width:0}
+#profile .profile-spotlight h3{margin:0 0 3px;font:800 15px/1.2 AV,system-ui,sans-serif;color:#fff}
+#profile .profile-spotlight p{max-width:none;margin:0;color:#cbc6de;font:500 11px/1.4 AV,system-ui,sans-serif}
+#profile .profile-spotlight-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+#profile .profile-spotlight .profile-action{min-height:39px;margin:0;border-radius:9px;padding:9px 7px;font:800 11px/1.2 AV,system-ui,sans-serif;letter-spacing:0}
+#profile .profile-backup summary{min-height:52px;padding:9px 12px}
+@media(max-width:380px){
+ #profile .profile-passport{padding:12px}
+ #profile .profile-head{gap:10px}
+ #profile .profile-avatar{width:48px;height:48px;flex-basis:48px}
+ #profile .profile-identity .profile-initials{font-size:11px}
+ #profile .guest-edit-identity{font-size:9px;padding:5px}
+ #profile .profile-summary-board{padding:14px 13px 12px}
+ #profile .profile-spotlight .profile-action{font-size:10px}
+}
+
+/* Perfil aprobado v4: avatar protagonista arriba, progreso circular y lineal restaurados.
+   Identidad, colección, puntos y estadísticas son módulos independientes. */
+#profile .profile-scroll{gap:14px}
+#profile .profile-passport{padding:17px 16px;min-height:116px}
+#profile .profile-head{display:flex;align-items:center;gap:15px}
+#profile .profile-avatar{flex:0 0 82px;width:82px;height:82px;min-height:82px;border-radius:50%;background:#ffd400;padding:3px;overflow:visible}
+#profile .profile-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
+#profile .profile-avatar .avatar-pencil{right:-3px;bottom:-2px;width:22px;height:22px}
+#profile .profile-identity{display:flex;flex-direction:column;gap:3px;min-width:0}
+#profile .profile-identity .profile-kicker{margin:0 0 2px;font-size:9px}
+#profile .profile-head h2{margin:0 0 2px}
+#profile .profile-identity .profile-initials{margin:0 0 2px;font-size:12px}
+#profile .profile-identity .profile-status{margin:0;font-size:11px}
+#profile .guest-edit-identity{align-self:flex-start;flex:none;margin-left:auto}
+#profile .profile-summary-board{padding:18px 16px;background:linear-gradient(145deg,#292252,#14102b 80%);border:1px solid rgba(255,212,0,.28);border-radius:16px}
+#profile .profile-summary-board .profile-collection{display:flex;align-items:center;gap:18px}
+#profile .profile-summary-board .profile-dial{display:block;flex:0 0 116px;width:116px;height:116px;padding:9px;border-radius:50%;background:conic-gradient(#ffd400 var(--profile-fill),rgba(255,255,255,.12) 0);box-shadow:0 0 0 1px rgba(255,212,0,.22)}
+#profile .profile-summary-board .profile-dial>div{display:flex;align-items:center;justify-content:center;flex-direction:column;width:100%;height:100%;border-radius:50%;background:#17122f}
+#profile .profile-summary-board .profile-dial strong{color:#fff;font:800 30px/1.1 AV,system-ui,sans-serif}
+#profile .profile-summary-board .profile-dial span{margin-top:4px;color:#ffd400;font:800 10px/1.2 AV,system-ui,sans-serif}
+#profile .profile-summary-board .profile-progress{display:block;flex:1;min-width:0;width:auto;padding:0}
+#profile .profile-summary-board .profile-progress-label{display:block;margin:0 0 6px;color:#ffd400;font:800 10px/1.2 AV,system-ui,sans-serif;letter-spacing:.06em}
+#profile .profile-summary-board .profile-progress strong{display:block;margin:0 0 15px;color:#fff;font:800 14px/1.35 AV,system-ui,sans-serif;letter-spacing:0}
+#profile .profile-summary-board .profile-progress-track{height:8px;border-radius:9px;background:rgba(255,255,255,.15)}
+#profile .profile-summary-board .profile-progress-note{display:block;margin:9px 0 0;text-align:left;color:#c4bfd7;font:600 11px/1.3 AV,system-ui,sans-serif;white-space:normal}
+#profile .icmx-player-points.profile-points-standalone{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:0;padding:16px 15px;border:1px solid rgba(255,212,0,.4);border-radius:14px;background:linear-gradient(130deg,#181331,#100d27);box-shadow:none}
+#profile .profile-points-standalone>div{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;flex:1}
+#profile .profile-points-standalone>div span{font:800 10px/1.25 AV,system-ui,sans-serif;color:#bdb8d1;letter-spacing:.04em}
+#profile .profile-points-standalone #profileValuePoints{color:#ffd400;font:800 clamp(20px,5vw,27px)/1.18 AV,system-ui,sans-serif;white-space:nowrap;letter-spacing:0}
+#profile .profile-points-standalone>small{flex:0 0 41%;max-width:41%;color:#c4bfd6;font:500 11px/1.45 AV,system-ui,sans-serif;text-align:right}
+#profile .profile-metrics-spaced{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+#profile .profile-metrics-spaced div{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:15px 6px;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:rgba(255,255,255,.055)}
+#profile .profile-metrics-spaced strong{font:800 20px/1.1 AV,system-ui,sans-serif}
+#profile .profile-metrics-spaced span:last-child{font:600 11px/1.2 AV,system-ui,sans-serif}
+#profile .profile-metrics-spaced .profile-metric-icon{font-size:16px!important}
+@media(max-width:400px){
+ #profile .profile-passport{padding:14px 12px}
+ #profile .profile-head{gap:10px}
+ #profile .profile-avatar{width:72px;height:72px;min-height:72px;flex-basis:72px}
+ #profile .guest-edit-identity{padding:5px;font-size:9px}
+ #profile .profile-summary-board{padding:15px 12px}
+ #profile .profile-summary-board .profile-collection{gap:13px}
+ #profile .profile-summary-board .profile-dial{width:102px;height:102px;flex-basis:102px;padding:8px}
+ #profile .profile-summary-board .profile-progress strong{font-size:12px}
+ #profile .icmx-player-points.profile-points-standalone{padding:14px 12px;gap:9px}
+ #profile .profile-points-standalone>small{flex-basis:39%;max-width:39%;font-size:10px}
+ #profile .profile-metrics-spaced{gap:7px}
+ #profile .profile-metrics-spaced div{padding:12px 4px}
+}
+
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1800,35 +1908,48 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <section class="view" id="profile" aria-label="Mi perfil de jugador">
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Mi perfil</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="profile-scroll">
-  <section class="profile-passport" aria-label="Mi partida">
+  <section class="profile-passport" aria-label="Identidad del jugador">
    <div class="profile-head">
-    <button type="button" id="profileAvatarButton" class="profile-avatar" aria-label="Cambiar mi avatar"><img id="profileAvatarImage" style="visibility:hidden" src="assets/avatars/moneda-128.webp" alt="" width="54" height="54"></button>
-    <div class="profile-identity"><p class="profile-kicker">PLAYER 01 · INSERT COIN MX</p><h2 id="profilePlayerName">Jugador invitado</h2><p class="profile-status" id="profilePlayerState">Progreso en este navegador</p><p class="profile-initials" id="profileInitials" hidden></p></div>
+    <button type="button" id="profileAvatarButton" class="profile-avatar" aria-label="Cambiar mi avatar" title="Cambiar avatar"><img id="profileAvatarImage" style="visibility:hidden" src="assets/avatars/moneda-128.webp" alt="" width="82" height="82"><span class="avatar-pencil" aria-hidden="true">✎</span></button>
+    <div class="profile-identity">
+     <p class="profile-kicker">MI IDENTIDAD ARCADE</p>
+     <h2 id="profilePlayerName">Jugador invitado</h2>
+     <p class="profile-initials" id="profileInitials" hidden></p>
+     <p class="profile-status" id="profilePlayerState">Progreso en este navegador</p>
+    </div>
+    
    </div>
+   <button type="button" id="profileAvatarChange" hidden>CAMBIAR AVATAR</button>
+  </section>
+  <section class="profile-summary-board" aria-label="Avance de mi colección">
    <div class="profile-collection">
     <div class="profile-dial" id="profileDial" aria-hidden="true"><div><strong id="profileCards">0</strong><span>CARTAS</span></div></div>
-    <div class="profile-progress" aria-label="Avance de mi colección">
+    <div class="profile-progress">
      <span class="profile-progress-label">MI COLECCIÓN</span>
-     <strong><span id="profileTotal">0</span> cartas disponibles</strong>
-     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Cartas distintas obtenidas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="profileProgressFill"></i></div>
+     <strong><span id="profileTotal">386</span> cartas disponibles</strong>
+     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Cartas distintas obtenidas" aria-valuemin="0" aria-valuemax="386" aria-valuenow="0"><i id="profileProgressFill"></i></div>
      <p class="profile-progress-note" id="profilePercent">0% de la colección</p>
     </div>
    </div>
-   <div class="profile-avatar-strip"><span>Tu personaje de Insert Coin MX</span><button type="button" id="profileAvatarChange">CAMBIAR AVATAR</button></div>
-   <div class="icmx-player-points" aria-label="Puntos acumulados de colección"><div><span>PUNTOS DE COLECCIÓN</span><strong id="profileValuePoints" aria-live="polite">— PTS</strong></div><small>Por descubrir variantes nuevas. Las repetidas no suman.</small></div>
   </section>
-  <div class="profile-metrics" aria-label="Resumen de mi colección">
+  <section class="icmx-player-points profile-points-standalone" aria-label="Puntos acumulados de colección">
+   <div><span>PUNTOS DE COLECCIÓN</span><strong id="profileValuePoints" aria-live="polite">— PTS</strong></div>
+   <small>Por descubrir variantes nuevas. Las repetidas no suman.</small>
+  </section>
+  <div class="profile-metrics profile-metrics-spaced" aria-label="Resumen de mi colección">
    <div><span class="profile-metric-icon" aria-hidden="true">✦</span><strong id="profileDesigns">0</strong><span>Diseños</span></div>
    <div><span class="profile-metric-icon" aria-hidden="true">▣</span><strong id="profileDuplicates">0</strong><span>Repetidas</span></div>
    <div><span class="profile-metric-icon" aria-hidden="true">★</span><strong id="profileRatings">0</strong><span>Calificados</span></div>
   </div>
   <section class="profile-spotlight" id="profileWelcome" aria-labelledby="profileSpotlightTitle">
-   <div class="profile-spotlight-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6Z"/><path d="m8.5 12 2.3 2.3 4.7-4.7"/></svg></div>
-   <h3 id="profileSpotlightTitle">Que no se pierda tu colección</h3>
-   <p>Con una cuenta puedes guardar tus cartas y recuperarlas en otro dispositivo.</p>
-   <button type="button" class="profile-action primary" id="profileQuickSignup">CREAR MI CUENTA</button>
-   <button type="button" class="profile-action secondary" id="profileQuickLogin">YA TENGO CUENTA</button>
-   <small>También puedes seguir jugando como invitado.</small>
+   <div class="profile-spotlight-heading">
+    <span class="profile-spotlight-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6Z"/><path d="m8.5 12 2.3 2.3 4.7-4.7"/></svg></span>
+    <div><h3 id="profileSpotlightTitle">Protege tu colección</h3><p>Crea una cuenta para recuperar tus cartas en otro dispositivo.</p></div>
+   </div>
+   <div class="profile-spotlight-actions">
+    <button type="button" class="profile-action primary" id="profileQuickSignup">CREAR CUENTA</button>
+    <button type="button" class="profile-action secondary" id="profileQuickLogin">INICIAR SESIÓN</button>
+   </div>
   </section>
   <section class="profile-panel profile-account" id="profileAccountPanel" aria-labelledby="profileAccountTitle" tabindex="-1" hidden>
    <button type="button" id="profileAccountBack" class="profile-account-return">← VOLVER AL PERFIL</button>
