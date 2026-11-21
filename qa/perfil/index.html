@@ -1613,35 +1613,30 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 }
 @media(max-width:360px){#avatarSelect .avatar-option span{font-size:10px}#avatarSelect .avatar-grid{gap:7px}}
 
-/* Récords: ranking primero, respaldo únicamente en Mi perfil. */
-#scores .wrap{width:min(100%,540px);align-self:center;align-items:stretch;padding:13px 17px 28px;gap:15px}
-#scores .score-overview{display:flex;flex-direction:column;align-items:center;gap:9px;padding:17px;border:1px solid rgba(255,212,0,.34);border-radius:16px;background:linear-gradient(150deg,#292253,#15112e 88%)}
-#scores .score-kicker{font:800 10px AV,system-ui,sans-serif;letter-spacing:.12em;color:#ffd400}
-#scores .score-total{display:flex;flex-direction:column;align-items:center;gap:5px}
-#scores .score-total strong{font:800 42px/1 AV,system-ui,sans-serif;color:#fff;font-variant-numeric:tabular-nums}
-#scores .score-total span{font:800 10px AV,system-ui,sans-serif;color:#e4dbf7;letter-spacing:.06em}
-#scores .score-position{font:700 10px/1.4 AV,system-ui,sans-serif;color:#ffd400;text-align:center}
-#scores .score-entry{display:flex;flex-direction:column;gap:9px;width:min(100%,300px);margin-top:4px}
-#scores .score-entry>label{font:800 10px AV,system-ui,sans-serif;color:#cfc9e4;text-align:center;letter-spacing:.07em}
-#scores .score-entry-row{display:flex;align-items:stretch;gap:9px;width:100%}
-#scores #iniIn{flex:1;width:0;min-width:0;min-height:46px;padding:9px 8px 8px 15px;font-size:20px;border-radius:9px;letter-spacing:.2em}
-#scores #sSave{flex:0 0 112px;min-height:46px;border:0;border-radius:9px;font:800 12px AV,system-ui,sans-serif}
-#scores #iniIn:focus-visible,#scores #sSave:focus-visible{outline:3px solid #fff;outline-offset:2px}
-#scores .score-leaderboard{border:1px solid rgba(255,255,255,.17);border-radius:16px;background:rgba(255,255,255,.045);padding:16px 14px 14px;min-height:180px}
-#scores .score-leaderboard-head{display:flex;flex-direction:column;gap:5px;margin-bottom:15px}
-#scores .score-leaderboard h2{font:800 20px/1.1 AV,system-ui,sans-serif;color:#ffd400;letter-spacing:.02em}
-#scores .score-leaderboard-head p{font:500 11px/1.45 AV,system-ui,sans-serif;color:#ada7c9}
-#scores .score-columns{display:grid;grid-template-columns:44px 1fr 64px;gap:8px;padding:0 8px 10px;border-bottom:1px solid rgba(255,255,255,.19);font:800 9px AV,system-ui,sans-serif;letter-spacing:.08em;color:#aaa2cb}
-#scores .score-columns span:last-child{text-align:right}
-#scores .tbl{width:100%}
-#scores .tbl .r{display:grid;grid-template-columns:44px 1fr 64px;align-items:center;gap:8px;padding:12px 8px!important;margin:0;border-radius:0}
-#scores .tbl .r span:nth-child(1){width:auto;color:#bdb7da}
-#scores .tbl .r span:nth-child(2){min-width:0;letter-spacing:.1em}
-#scores .tbl .r span:nth-child(3){text-align:right;font-variant-numeric:tabular-nums;font-weight:800}
-#scores .tbl .r.me{border-radius:8px;color:#ffd400;background:rgba(255,212,0,.11)}
-#scores .tbl .r.me span:nth-child(1){color:#ffd400}
-#scores .score-empty{padding:18px 7px;text-align:center;font:600 12px/1.6 AV,system-ui,sans-serif;color:#c1b9db}
-@media(max-width:360px){#scores .wrap{padding-inline:12px}#scores .score-overview{padding:13px 11px}#scores .score-leaderboard{padding-inline:10px}}
+/* High score board · tipografía de los arcades originales.
+   El marcador e ingreso de iniciales arriba conservan exactamente su estilo previo. */
+#scores .arcade-scoreboard{width:min(440px,100%);box-sizing:border-box;flex:none;margin:12px auto 8px;padding:19px 12px 15px;background:rgba(0,2,15,.43);border-top:2px solid rgba(255,212,0,.72);border-bottom:2px solid rgba(255,212,0,.35);border-radius:0;box-shadow:none}
+#scores .arcade-scoreboard-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;margin-bottom:20px}
+#scores .arcade-scoreboard-brand{font:8px/1.4 PX,monospace;color:#EC008B;letter-spacing:.11em}
+#scores .arcade-scoreboard-head h2{font:clamp(13px,2.6vw,17px)/1.4 PX,monospace;color:#FFD400;letter-spacing:.035em;white-space:nowrap;margin:0}
+#scores .arcade-scoreboard-top{font:10px/1.4 PX,monospace;color:#fff;letter-spacing:.09em;margin-top:1px}
+#scores .arcade-scoreboard-columns{display:grid;grid-template-columns:66px minmax(0,1fr) 77px;gap:6px;padding:0 4px 12px;align-items:center;font:9px/1.35 PX,monospace;color:#4ff2f3}
+#scores .arcade-scoreboard-columns span:nth-child(2){text-align:center}
+#scores .arcade-scoreboard-columns span:last-child{text-align:right}
+#scores .arcade-scoreboard-rows{width:100%!important;max-width:none;display:block;font-family:PX,monospace!important}
+#scores .arcade-scoreboard-rows .r{display:grid;position:relative;grid-template-columns:66px minmax(0,1fr) 77px;align-items:center;gap:6px;min-height:34px;padding:7px 4px!important;border:0!important;border-radius:0!important;background:transparent!important;color:#e9e5f8;font:11px/1.4 PX,monospace!important}
+#scores .arcade-scoreboard-rows .r span{min-width:0;font:inherit!important;letter-spacing:0!important;align-self:center}
+#scores .arcade-scoreboard-rows .r span:nth-child(1){width:auto!important;text-align:left;color:inherit}
+#scores .arcade-scoreboard-rows .r span:nth-child(2){text-align:center;color:inherit}
+#scores .arcade-scoreboard-rows .r span:nth-child(3){text-align:right;font-variant-numeric:tabular-nums;color:inherit}
+#scores .arcade-scoreboard-rows .r.rank-1{color:#FFD400;font-size:13px!important}
+#scores .arcade-scoreboard-rows .r.rank-2{color:#4ff2f3}
+#scores .arcade-scoreboard-rows .r.rank-3{color:#EC008B}
+#scores .arcade-scoreboard-rows .r.rank-empty{color:rgba(173,169,209,.35);font-size:9px!important}
+#scores .arcade-scoreboard-rows .r.rank-player::before{content:'▶';position:absolute;left:-9px;top:50%;transform:translateY(-50%);font:10px PX,monospace;color:#FFD400}
+#scores .arcade-scoreboard-rows .r.rank-player:not(.rank-1):not(.rank-2):not(.rank-3){color:#FFD400}
+#scores .arcade-scoreboard-source{font:8px/1.6 PX,monospace;color:#aaa5cd;text-align:center;letter-spacing:.02em;margin-top:19px}
+@media(max-width:399px){#scores .arcade-scoreboard{padding-inline:8px}#scores .arcade-scoreboard-columns,#scores .arcade-scoreboard-rows .r{grid-template-columns:59px minmax(0,1fr) 68px}#scores .arcade-scoreboard-rows .r{font-size:10px!important}#scores .arcade-scoreboard-rows .r.rank-1{font-size:11px!important}}
 </style></head><body>
 <div class="lab-ribbon" aria-label="Vista previa no publicada">LAB · VISTA PREVIA · NO USA TUS CARTAS</div>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
@@ -1708,16 +1703,19 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <section class="view" id="scores">
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Récords</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="wrap">
-  <section class="score-overview" aria-label="Mi récord">
-   <p class="score-kicker">MI RÉCORD</p>
-   <div class="score-total"><strong id="sMine">0</strong><span>CARTAS DISTINTAS</span></div>
-   <p class="score-position" id="sPos" role="status"></p>
-   <div class="score-entry"><label for="iniIn">TUS INICIALES</label><div class="score-entry-row"><input id="iniIn" aria-label="Tres iniciales para tu récord" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA"><button class="btn y" id="sSave">GUARDAR</button></div></div>
-  </section>
-  <section class="score-leaderboard" aria-labelledby="scoreTopTitle">
-   <div class="score-leaderboard-head"><h2 id="scoreTopTitle">TOP 10</h2><p id="scoreDataScope">Registros disponibles en esta vista previa</p></div>
-   <div class="score-columns" aria-hidden="true"><span>POS.</span><span>JUGADOR</span><span>CARTAS</span></div>
-   <div class="tbl" id="tbl" aria-label="Clasificación por cartas distintas"></div>
+  <div class="px" style="font-size:9px;color:var(--dim);text-align:center;line-height:1.8">TU PUNTAJE: CARTAS DISTINTAS<br><span style="color:var(--y);font-size:26px" id="sMine">0</span></div>
+  <div class="px" id="sPos" style="font-size:9px;color:var(--y)"></div>
+  <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
+  <button class="btn y" id="sSave">GUARDAR</button>
+  <section class="arcade-scoreboard" aria-labelledby="scoreTopTitle">
+   <header class="arcade-scoreboard-head">
+    <span class="arcade-scoreboard-brand">INSERT COIN MX</span>
+    <h2 id="scoreTopTitle">HIGH SCORES</h2>
+    <span class="arcade-scoreboard-top">— TOP 10 —</span>
+   </header>
+   <div class="arcade-scoreboard-columns" aria-hidden="true"><span>RANK</span><span>NAME</span><span>CARDS</span></div>
+   <div class="tbl arcade-scoreboard-rows" id="tbl" aria-label="Top 10 de cartas distintas"></div>
+   <p class="arcade-scoreboard-source" id="scoreDataScope">RÉCORDS DISPONIBLES EN ESTA VISTA PREVIA</p>
   </section>
  </div>
 </section>
@@ -3167,11 +3165,18 @@ function board(){const m=STORE.docs.map(d=>({ini:d.ini,score:d.score}));if(!STOR
 function renderScores(){
  $('sMine').textContent=uniq();
  $('iniIn').value=S.ini;
- const b=board(),pos=b.findIndex(r=>r.ini===S.ini);
- $('sPos').textContent=pos>=0?'TU POSICIÓN: #'+(pos+1):'GUARDA TUS INICIALES PARA PARTICIPAR';
- $('scoreDataScope').textContent=STORE.docs.length?'Puntajes disponibles entre los jugadores':'Registros disponibles en esta vista previa';
- $('tbl').innerHTML=b.slice(0,10).map((r,i)=>`<div class="r ${r.ini===S.ini?'me':''}"><span>${i+1}</span><span>${esc(r.ini)}</span><span>${Number.isFinite(r.score)?r.score:0}</span></div>`).join('')
-  ||'<p class="score-empty">TODAVÍA NO HAY RÉCORDS.<br>Registra tus iniciales para empezar.</p>';
+ const available=board().slice(0,10);
+ const pos=available.findIndex(r=>r.ini===S.ini);
+ $('sPos').textContent=pos>=0?'VAS EN EL LUGAR #'+(pos+1):'PON TUS INICIALES PARA ENTRAR';
+ $('scoreDataScope').textContent=STORE.docs.length?'RÉCORDS DISPONIBLES ENTRE JUGADORES':'RÉCORDS DISPONIBLES EN ESTA VISTA PREVIA';
+ // Las posiciones vacías son casillas sin datos, nunca resultados ficticios.
+ $('tbl').innerHTML=Array.from({length:10},(_,i)=>{
+  const r=available[i],mine=!!r&&r.ini===S.ini;
+  const cl='r rank-'+(i+1)+(r?'':' rank-empty')+(mine?' rank-player':'');
+  const name=r?esc(String(r.ini).slice(0,3)):'---';
+  const count=r&&Number.isFinite(r.score)?String(Math.max(0,Math.floor(r.score))).padStart(3,'0'):'---';
+  return `<div class="${cl}"${r?' data-score-entry="true"':''}><span>${String(i+1).padStart(2,'0')}</span><span>${name}</span><span>${count}</span></div>`;
+ }).join('');
 }
 $('iniIn').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3)};
 $('sSave').onclick=()=>{const v=$('iniIn').value;if(v.length<3){toast('3 LETRAS');return}syncIn();S.ini=v;save();jingle();toast('¡GUARDADO!');renderScores()};
