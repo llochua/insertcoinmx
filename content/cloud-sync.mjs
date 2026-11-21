@@ -8,6 +8,44 @@
  */
 const BASE_PREFIX='icmx-cloud-baseline-v1:';
 const ACCOUNT_BINDING='icmx-cloud-active-account-v1';
+const AUTH_STORAGE='icmx-auth-qa-nov2026';
+const ARCHIVE_PREFIX='icmx-cloud-conflict-archive-v1:';
+const ECONOMY=['have','pk','fg','last','extra','welcomeLeft','freeDay','freeUsed','freeCycle','test'];
+const economySignature=b=>canonical({fields:Object.fromEntries(ECONOMY.map(k=>[k,b.data[k]??null])),ext:b.ext??null});
+const eq=(a,b)=>canonical(a)===canonical(b);
+// Solo se incorpora metadata local si la economía no divergió desde la base.
+// Las cartas, cuotas, IDs de sobres y extensiones siempre vienen del servidor.
+export function reconcileMetadata({local,remote,base}){
+ if(!base||!remote)return null;
+ const l=assertBackup(local),r=assertBackup(remote),b=assertBackup(base.backup);
+ if(economySignature(l)!==economySignature(b)&&economySignature(l)!==economySignature(r))return null;
+ const out=safeCopy(r);
+ for(const k of Object.keys(l.data)){
+  if(ECONOMY.includes(k)||IGNORED.has(k)||eq(l.data[k],b.data[k]))continue;
+  if(k==='rate'){
+   for(const id of new Set([...Object.keys(l.data.rate),...Object.keys(b.data.rate)])){
+    const lv=l.data.rate[id],bv=b.data.rate[id],rv=r.data.rate[id];
+    if(eq(lv,bv))continue;
+    if(!eq(rv,bv)&&!eq(rv,lv))return null;
+    if(lv===undefined)delete out.data.rate[id];else out.data.rate[id]=lv;
+   }
+  }else{
+   if(!eq(r.data[k],b.data[k])&&!eq(r.data[k],l.data[k]))return null;
+   out.data[k]=l.data[k];
+  }
+ }
+ // Una eliminación local de metadata desconocida no se presume intencional.
+ for(const k of Object.keys(b.data))if(!ECONOMY.includes(k)&&!IGNORED.has(k)&&!own(l.data,k)&&own(r.data,k))return null;
+ return assertBackup(out);
+}
+export function archiveConflict(storage,{owner,local}){
+ const backup=assertBackup(local);
+ const key=ARCHIVE_PREFIX+(owner||'guest')+':'+crypto.randomUUID();
+ const value=JSON.stringify({at:new Date().toISOString(),backup});
+ storage.setItem(key,value);
+ if(storage.getItem(key)!==value)throw Error('No se verificó el respaldo local del conflicto');
+ return key;
+}
 const IGNORED=new Set(['rev','sv','mv','test']);
 const CARD=/^[a-z0-9]{1,40}_[berf]$/;
 const RATING=/^[a-z0-9]{1,40}$/;
@@ -105,9 +143,15 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  let stopped=false,busy=false,rerun=false,debounce=null,interval=null;
  let syncTask=null; // Espera la comprobación en curso antes de emitir un sobre.
  let accountUid=null,issuing=false,sessionActive=true;
- let importAvailable=false;
+ let importAvailable=false,conflictInfo=null;
  const status=(code,message)=>{if(!stopped)onStatus(code,message)};
+ const hasStoredSession=()=>Boolean(localStorage.getItem(AUTH_STORAGE));
+ const showConflict=(uid,bound,local,remote,rev)=>{
+  conflictInfo={uid,bound,local,remote,rev};
+  status('conflict','DOS COLECCIONES · REVISA EL PROGRESO DESDE TU PERFIL');
+ };
  async function syncOnce(){
+  conflictInfo=null;
   const {data:verified,error:authError}=await client.auth.getUser();
   if(authError){
    const {data:sessionData}=await client.auth.getSession();
@@ -137,7 +181,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   const bound=localStorage.getItem(ACCOUNT_BINDING);
   if(bound&&bound!==uid){
    accountUid=null;
-   status('conflict','OTRA CUENTA EN ESTE NAVEGADOR · COLECCIÓN LOCAL PROTEGIDA');
+   status('conflict','OTRA CUENTA EN ESTE NAVEGADOR · INICIA SESIÓN CON LA CUENTA ORIGINAL');
    return;
   }
   accountUid=uid;
@@ -150,7 +194,31 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   const remote=row?assertBackup(row.state):null;
   const rev=row?Number(row.revision):0;
   const base=readBaseline(localStorage,uid);
-  const action=decideSync({local,remote,base,remoteRevision:rev});
+  let action=decideSync({local,remote,base,remoteRevision:rev});
+  const localEconomyChanged=remote&&economySignature(local)!==economySignature(remote);
+  if(action==='upload'&&localEconomyChanged)action='conflict';
+  if(action==='conflict'&&remote&&bound===uid&&base){
+   const merged=reconcileMetadata({local,remote,base});
+   if(merged){
+    if(!sameProgress(readLocal(),local)){rerun=true;return}
+    let revision=rev;
+    if(!sameProgress(merged,remote)){
+     const {data,error}=await client.rpc('sync_player_snapshot',{p_expected_revision:rev,p_state:merged});
+     if(error)throw error;
+     if(data?.status==='conflict'){rerun=true;return}
+     if(data?.status!=='updated'||!Number.isSafeInteger(Number(data.revision))||Number(data.revision)<=rev)
+      throw Error('No se pudo verificar la reconciliación');
+     revision=Number(data.revision);
+    }
+    // Si el navegador avanzó, conservarlo; el próximo check decide nuevamente.
+    if(!sameProgress(readLocal(),local)){rerun=true;return}
+    const outcome=restoreLocal(merged);
+    if(!outcome?.ok)throw Error('No se pudo recuperar el progreso reconciliado');
+    persistBaseline(localStorage,uid,revision,merged);
+    status('synced','NUBE AL DÍA · CAMBIOS COMPATIBLES RECUPERADOS');
+    return;
+   }
+  }
   // No vincular el dispositivo antes de comprobar que la colección local
   // puede recuperarse o sincronizarse sin conflicto.
   if(action!=='conflict'&&action!=='first-upload-required'){
@@ -182,11 +250,13 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   }
   if(action==='first-upload-required'){
    importAvailable=!bound&&!base&&!remote;
-   status('pending',importAvailable?'TU COLECCIÓN ESTÁ EN ESTE DISPOSITIVO · PUEDES VINCULARLA':'RESPALDO INICIAL PENDIENTE');
+   if(importAvailable)showConflict(uid,bound,local,null,0);
+   else status('pending','RESPALDO INICIAL PENDIENTE');
    return;
   }
   if(action==='conflict'){
-   status('conflict','CONFLICTO DE PROGRESO · AMBAS COLECCIONES SE CONSERVAN, SIN MEZCLAR');
+   if(remote)showConflict(uid,bound,local,remote,rev);
+   else status('conflict','RESPALDO DE NUBE NO DISPONIBLE · COLECCIÓN LOCAL PROTEGIDA');
    return;
   }
   if(action==='matched'){
@@ -226,7 +296,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
    try{
     status('checking','COMPROBANDO SINCRONIZACIÓN…');
     await syncOnce();
-   }catch(_){status('offline','NUBE NO DISPONIBLE · CONSERVAMOS TU PROGRESO LOCAL')}
+   }catch(error){console.warn('[ICMX] sync failed',error?.code||error?.name);status('offline','NUBE NO DISPONIBLE · CONSERVAMOS TU PROGRESO LOCAL')}
    finally{
     busy=false;
     if(rerun&&!stopped){rerun=false;setTimeout(check,80)}
@@ -240,9 +310,9 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   if(stopped)return 'guest';
   if(busy&&syncTask)await syncTask;
   if(stopped)return 'guest';
-  if(!accountUid&&sessionActive)await check();
+  if(!accountUid&&(sessionActive||hasStoredSession()))await check();
   if(busy&&syncTask)await syncTask;
-  if(!accountUid)return localStorage.getItem(ACCOUNT_BINDING)?'auth_required':'guest';
+  if(!accountUid)return localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()?'auth_required':'guest';
   return null;
  }
  /**
@@ -311,7 +381,8 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
    status('synced','NUBE AL DÍA · SOBRE GUARDADO EN TU CUENTA');
    rerun=true;
    return data;
-  }catch(_){
+  }catch(error){
+   console.warn('[ICMX] mutation failed',error?.code||error?.name);
    status('offline','NO SE CONFIRMÓ EL SOBRE · PUEDE REINTENTARSE SIN DUPLICAR');
    return {status:'pending'};
   }finally{
@@ -379,13 +450,67 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
    status('synced','NUBE AL DÍA · CANJE GUARDADO EN TU CUENTA');
    rerun=true;
    return data;
-  }catch(_){
+  }catch(error){
+   console.warn('[ICMX] mutation failed',error?.code||error?.name);
    status('offline','NO SE CONFIRMÓ EL CANJE · REINTENTA SIN DUPLICAR');
    return {status:'pending'};
   }finally{
    issuing=false;
    if(rerun&&!stopped){rerun=false;setTimeout(check,80)}
   }
+ }
+ // El jugador confirma una colección explícita. No se acuñan ni se suman cartas.
+ // Si cambia cualquiera de las dos versiones tras mostrar la revisión, se cancela.
+ function getConflict(){
+  if(!conflictInfo)return null;
+  const {local,remote,rev}=conflictInfo;
+  return {local:assertBackup(local),remote:remote?assertBackup(remote):null,rev};
+ }
+ async function useCloud(review){
+  if(stopped||issuing||!conflictInfo||!review)return {status:'unavailable'};
+  if(busy&&syncTask)await syncTask;
+  const info=conflictInfo;
+  if(stopped||issuing||busy||!info||!review||info.rev!==review.rev||
+     !sameProgress(info.local,review.local)||
+     Boolean(info.remote)!==Boolean(review.remote)||
+     info.remote&&!sameProgress(info.remote,review.remote))return {status:'changed'};
+  issuing=true;
+  try{
+   const {data:auth,error:authError}=await client.auth.getUser();
+   if(authError||auth?.user?.id!==info.uid||localStorage.getItem(ACCOUNT_BINDING)!==info.bound)
+    return {status:'changed'};
+   const {data:row,error}=await client.from('player_snapshots')
+    .select('user_id,game_format,state,revision').eq('user_id',info.uid).maybeSingle();
+   if(error)throw error;
+   if(info.remote?(!row||row.user_id!==info.uid||row.game_format!==2||
+      Number(row.revision)!==info.rev||!sameProgress(row.state,info.remote)):Boolean(row))
+     return {status:'changed'};
+   if(!sameProgress(readLocal(),info.local))return {status:'changed'};
+   if(localStorage.getItem('icmx-cloud-pack-request-v1:'+info.uid)||
+      localStorage.getItem('icmx-cloud-exchange-request-v1:'+info.uid))return {status:'pending_request'};
+   // Respaldo separado y verificable, nunca solo .bak (que puede rotar).
+   const archiveKey=archiveConflict(localStorage,{owner:info.bound,local:info.local});
+   let remote=info.remote,revision=info.rev;
+   if(!remote){
+    const {data,error:initError}=await client.rpc('ensure_player_snapshot');
+    if(initError)throw initError;
+    if(data?.status!=='created'||!Number.isSafeInteger(Number(data.revision))||Number(data.revision)<1)
+      return {status:'changed'};
+    remote=assertBackup(data.state);revision=Number(data.revision);
+   }
+   if(!sameProgress(readLocal(),info.local)||localStorage.getItem(ACCOUNT_BINDING)!==info.bound)
+    return {status:'changed'};
+   const restored=restoreLocal(remote);
+   if(!restored?.ok)throw Error('No se pudo recuperar la colección de nube');
+   localStorage.setItem(ACCOUNT_BINDING,info.uid);
+   persistBaseline(localStorage,info.uid,revision,remote);
+   conflictInfo=null;importAvailable=false;
+   status('synced','NUBE AL DÍA · RESPALDO LOCAL CONSERVADO');
+   return {status:'resolved',archiveKey};
+  }catch(error){
+   console.warn('[ICMX] conflict recovery failed',error?.code||error?.name);
+   return {status:'pending'};
+  }finally{issuing=false;if(!stopped)setTimeout(check,80)}
  }
  async function importGuest(){
   if(stopped||busy||issuing||!accountUid||!importAvailable)return {status:'unavailable'};
@@ -442,7 +567,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  window.addEventListener('storage',onStorage);
  interval=setInterval(()=>{if(!document.hidden)check()},15000);
  check();
- return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),canImport:()=>importAvailable,importGuest,requiresServer:()=>Boolean(sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)),stop(){
+ return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),canImport:()=>importAvailable,importGuest,getConflict,useCloud,requiresServer:()=>Boolean(sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()),stop(){
   stopped=true;clearTimeout(debounce);clearInterval(interval);
   listener?.subscription?.unsubscribe();
   window.removeEventListener('focus',onFocus);
