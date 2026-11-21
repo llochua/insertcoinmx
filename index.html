@@ -1707,6 +1707,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile #profileAuthHandle,#profile #profileSignedHandle{text-transform:lowercase}
 #profile #profileSignedIdentityForm{display:flex;flex-direction:column;gap:10px}
 #profile #profileSignedIdentityForm[hidden],#profile #profileSignupInitialsField[hidden],#profile #profileSignupHandleField[hidden]{display:none!important}
+
+#profile .profile-head h2.arcade-initials{font:clamp(17px,4vw,22px)/1.5 PX,monospace;color:#ffd400;letter-spacing:.12em}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -2258,7 +2260,7 @@ const RECORDS_EDITION='public-2026-launch-v1';
 const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude)return;this.db=await claude.use('db');const u=await claude.use('user');this.uid=u?await u.id():null;try{this.dl=await claude.use('downloads')}catch(e){}
  if(!this.db)return;const data=x=>x&&typeof x.data==='function'?x.data():x;
  this.db.collection('tiers').onSnapshot(s=>{const ds=s&&s.docs?s.docs:(Array.isArray(s)?s:[]);this.docs=ds.map(data).filter(d=>d&&d.v===7&&d.edition===RECORDS_EDITION&&validArcadeHandle(d.handle));refresh()},()=>{})}catch(e){}},
- put(){const identity=globalThis.icmxAccountIdentity;if(this.db&&this.uid&&identity?.handle&&validArcadeIni(identity.ini))
+ put(){const identity=globalThis.icmxAccountIdentity;if(this.db&&this.uid&&identity?.handle&&identity.isPublic===true&&validArcadeIni(identity.ini))
  this.db.doc('tiers/'+this.uid).set({v:7,edition:RECORDS_EDITION,ini:identity.ini,handle:identity.handle,score:uniq(),rate:S.rate,champ:S.champ||'',duel:S.duel||{}}).catch(()=>{})}};
 /* Varias pestañas: lo guardado manda. Antes de cada acción se adopta lo que otra pestaña haya escrito,
    y save() solo escribe si lo guardado sigue siendo lo último que esta pestaña leyó o escribió.
@@ -3788,6 +3790,7 @@ function renderProfile(){
  $('profileRatings').textContent=Object.keys(S.rate||{}).length;
  const identity=arcadeIdentity();
  $('profilePlayerName').textContent=validArcadeIni(identity.ini)?identity.ini:(identity.registered?'Jugador registrado':'Jugador invitado');
+ $('profilePlayerName').classList.toggle('arcade-initials',validArcadeIni(identity.ini));
  $('profilePlayerState').textContent=identity.registered?'Cuenta conectada · revisa tu respaldo':'Invitado · progreso en este dispositivo';
  const initials=$('profileInitials');
  initials.hidden=!identity.handle;
