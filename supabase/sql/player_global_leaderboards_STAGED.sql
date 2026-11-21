@@ -21,7 +21,8 @@ BEGIN
  LOOP
   WITH identities AS (
    SELECT s.user_id,s.state,
-    CASE WHEN s.state->'data'->>'ini' ~ '^[A-Z0-9]{3}$'
+    CASE WHEN u.is_anonymous IS TRUE THEN g.ini
+         WHEN s.state->'data'->>'ini' ~ '^[A-Z0-9]{3}$'
          THEN s.state->'data'->>'ini'
          ELSE u.raw_user_meta_data->>'icmx_initials' END AS ini,
     CASE
@@ -30,11 +31,12 @@ BEGIN
      WHEN u.is_anonymous IS TRUE
       AND EXISTS(SELECT 1 FROM private_sync.beta_access_gate
                  WHERE key='verified_guest' AND enabled)
-      THEN pg_catalog.lower(u.raw_user_meta_data->>'icmx_handle')
+      THEN g.handle
      ELSE NULL END AS handle
    FROM public.player_snapshots s
    JOIN auth.users u ON u.id=s.user_id
    LEFT JOIN public.player_profiles p ON p.user_id=s.user_id
+   LEFT JOIN private_sync.guest_public_identities g ON g.user_id=s.user_id
    WHERE s.game_format=2
      AND s.state->>'app'='insertcoinmx-album'
      AND s.state->>'format'='2'
