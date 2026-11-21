@@ -1665,6 +1665,27 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #scores .arcade-scoreboard-source{font:8px/1.6 PX,monospace;color:#aaa5cd;text-align:center;letter-spacing:.02em;margin-top:10px}
 @media(max-width:399px){#scores .arcade-scoreboard{padding-inline:8px}#scores .arcade-scoreboard-columns,#scores .arcade-scoreboard-rows .r{grid-template-columns:59px minmax(0,1fr) 68px}#scores .arcade-scoreboard-rows .r{font-size:10px!important}#scores .arcade-scoreboard-rows .r.rank-1{font-size:11px!important}}
 
+
+/* Gacha: la primera Holo, Dorada o Ilustración NUEVA se estrena en tres actos.
+   Tonos por rareza, destello geométrico; no se alteran arte ni probabilidades. */
+.disc.dx.dx-cinema{isolation:isolate}
+.dx-cinema-overlay{--cinema-accent:#78eff9;--cinema-soft:rgba(0,211,255,.48);position:absolute;inset:0;z-index:5;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;overflow:hidden;isolation:isolate;animation:cinemaCurtain 1.7s both}
+.dx-cinema-overlay::before{content:"";position:absolute;inset:-20%;z-index:-2;background:radial-gradient(ellipse at 50% 48%,var(--cinema-soft),transparent 50%),linear-gradient(110deg,transparent 33%,rgba(255,255,255,.58) 49%,transparent 65%);animation:cinemaBeam 1.55s ease-out both}
+.dx-cinema-overlay::after{content:"";position:absolute;inset:13%;z-index:-1;border-top:2px solid var(--cinema-accent);border-bottom:2px solid var(--cinema-accent);opacity:0;animation:cinemaFrame 1.35s .12s ease-out both}
+.dx-cinema-overlay small{font:clamp(8px,2vw,12px)/1.5 PX,monospace;color:#fff;text-shadow:0 2px 12px #09071a;letter-spacing:.1em;animation:cinemaTitle 1.4s both}
+.dx-cinema-overlay strong{font:clamp(20px,5.7vw,38px)/1.2 PX,monospace;letter-spacing:.03em;text-align:center;color:var(--cinema-accent);text-shadow:0 0 16px var(--cinema-soft),0 3px 9px #0b0920;animation:cinemaTitle 1.4s .12s both}
+.dx-cinema-e .dx-cinema-overlay{--cinema-accent:#9af2f8;--cinema-soft:rgba(236,0,139,.62)}
+.dx-cinema-r .dx-cinema-overlay{--cinema-accent:#FFE27A;--cinema-soft:rgba(255,178,0,.77)}
+.dx-cinema-r .dx-cinema-overlay::before{background:radial-gradient(ellipse at 50% 48%,rgba(255,243,192,.93),rgba(255,187,49,.48) 34%,transparent 68%),linear-gradient(112deg,transparent 29%,rgba(255,244,202,.88) 48%,transparent 67%)}
+.dx-cinema-f .dx-cinema-overlay{--cinema-accent:#ff7ec9;--cinema-soft:rgba(236,0,139,.74)}
+.dx-cinema-f .dx-cinema-overlay::after{inset:9% 8%;border:2px solid var(--cinema-accent);border-radius:0}
+.dx-cinema-f .dx-cinema-overlay::before{background:radial-gradient(ellipse at 50% 43%,rgba(255,158,225,.45),transparent 61%),linear-gradient(90deg,rgba(6,6,24,.7),transparent 28%,transparent 73%,rgba(6,6,24,.7))}
+@keyframes cinemaCurtain{0%{opacity:0;background:rgba(4,3,18,.92)}18%{opacity:1;background:rgba(4,3,18,.78)}35%{background:rgba(4,3,18,.27)}72%{opacity:1;background:transparent}100%{opacity:0;background:transparent}}
+@keyframes cinemaBeam{0%{opacity:0;transform:scale(.42) rotate(-12deg)}28%{opacity:1;transform:scale(1) rotate(0)}58%{opacity:.6;transform:scale(1.16)}100%{opacity:0;transform:scale(1.3)}}
+@keyframes cinemaFrame{0%{opacity:0;transform:scaleX(.45)}36%{opacity:.96;transform:scaleX(1)}71%{opacity:.72}100%{opacity:0;transform:scaleX(1.07)}}
+@keyframes cinemaTitle{0%,20%{opacity:0;transform:translateY(15px) scale(.88)}43%{opacity:1;transform:translateY(0) scale(1.06)}68%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.disc.dx .dx-cinema-overlay{display:none!important;animation:none!important}}
+
 /* La carta ampliada sirve para abrir/cerrar desde la misma superficie. */
 #zoom #zFx[role="button"]{cursor:zoom-out;-webkit-tap-highlight-color:rgba(255,212,0,.12)}
 #zoom #zFx[role="button"]:focus-visible{outline:3px solid #FFD400;outline-offset:4px}
@@ -2668,7 +2689,7 @@ function resolveArtworkBackground(d,D){
 const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255};
 const icAwardsSeen=new Set(); // sellos vistos en el sobre actual
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
-function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();icAwardsSeen.clear();
+function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();CINEMATIC_SHOWN.clear();icAwardsSeen.clear();
  for(const c of hand)c._comp=!c._doneB&&dState(DB[c.d]).done&&hand.filter(x=>x.d===c.d).pop()===c; // completó en este sobre
  lastPack=new Set(hand.filter(c=>c._new).map(c=>c.d));showCard()}
 function caseOf(c){return !c._new?'rep':c._comp?'comp':c._dnew?'dnew':'vnew'}
@@ -2751,8 +2772,38 @@ function dxNav(){
   else move(1)({detail:1});
  };
 }
+
+/* Tres tratamientos de presentación distintos, un solo efecto por nueva rareza.
+   Este módulo solo dibuja/sonoriza: nunca emite cartas ni cambia su distribución. */
+const CINEMATIC_SHOWN=new Set();
+const CINEMATIC_TYPES=Object.freeze({
+ e:Object.freeze({title:'HOLO',caption:'REVELACIÓN HOLOGRÁFICA',notes:[784,1047,1319]}),
+ r:Object.freeze({title:'DORADA',caption:'REVELACIÓN LEGENDARIA',notes:[523,784,1175,1568]}),
+ f:Object.freeze({title:'ILUSTRACIÓN',caption:'ARTE ESPECIAL DESBLOQUEADO',notes:[659,988,1319,1760]})
+});
+function startCinematicReveal(c,D){
+ if(!c._new||!REV.has(idx)||!CINEMATIC_TYPES[c.v]||CINEMATIC_SHOWN.has(idx))return false;
+ CINEMATIC_SHOWN.add(idx);
+ const meta=CINEMATIC_TYPES[c.v];
+ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return true;
+ D.classList.add('dx-cinema','dx-cinema-'+c.v);
+ const overlay=document.createElement('div');
+ overlay.className='dx-cinema-overlay';overlay.setAttribute('aria-hidden','true');
+ const small=document.createElement('small'),title=document.createElement('strong');
+ small.textContent=meta.caption;title.textContent=meta.title;
+ overlay.append(small,title);D.append(overlay);
+ const current=c;
+ clearTimeout(D._cinemaTimer);
+ D._cinemaTimer=setTimeout(()=>{
+  if(hand[idx]!==current)return;
+  overlay.remove();D.classList.remove('dx-cinema','dx-cinema-'+c.v);
+ },1750);
+ meta.notes.forEach((note,i)=>setTimeout(()=>{if(cur==='pack'&&hand[idx]===current)beep(note,.08)},i*100));
+ return true;
+}
+
 function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
- D.onclick=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._dxToastTimer);
+ D.onclick=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._dxToastTimer);clearTimeout(D._cinemaTimer);
  if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
   D.className=`disc on dx cov v-${c.v}`;D.dataset.artId='';D.style.setProperty('--bg','#0c0a14');
   D.innerHTML=`${c.v==='e'?'<i class="dx-mat holo"></i>':c.v==='r'?'<i class="dx-mat gold"></i>':'<i class="dx-mat pink"></i>'}${dxTop()}
@@ -2811,7 +2862,8 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   const show=!D.classList.contains('dx-art-only');setArtworkView(show);
   ga('vista_ilustracion',{origen:'fondo',accion:show?'ver_arte':'ver_carta'});
  };
- if(k==='rep')beep(440,.05);else if(v==='b')beep(988,.07);else jingle();
+ const cinematic=startCinematicReveal(c,D);
+ if(k==='rep')beep(440,.05);else if(v==='b')beep(988,.07);else if(!cinematic)jingle();
  if(k==='comp')setTimeout(()=>[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.1),i*120)),500)}
 $('stack').addEventListener('click',e=>{});
 function topCard(){return $('stack').querySelector('.sc[data-i="'+idx+'"]')}
