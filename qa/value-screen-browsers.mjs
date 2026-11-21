@@ -60,9 +60,13 @@ try{
  assert.equal(await page.locator('#zoom .icmx-card-value').count(),0,'no duplicar cifras debajo de la carta');
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-mobile.png'),fullPage:true});
  await page.locator('#zClose').click();
+ await page.locator('#zoom[open]').waitFor({state:'hidden'});
+ await page.waitForFunction(()=>!document.getElementById('zImg').getAttribute('src'));
  await page.evaluate(()=>openCard('abuket_e'));
  await page.locator('#zFx canvas.icmx-card-face-values[data-ready="true"][data-points="25"]').waitFor();
  await page.locator('#zClose').click();
+ await page.locator('#zoom[open]').waitFor({state:'hidden'});
+ await page.waitForFunction(()=>!document.getElementById('zImg').getAttribute('src'));
  await page.evaluate(()=>openCard('arcade_f'));
  await page.locator('#zFx canvas.icmx-card-face-values[data-ready="true"][data-points="100"]').waitFor();
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-full-mobile.png'),fullPage:true});
