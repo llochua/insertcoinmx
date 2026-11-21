@@ -124,6 +124,13 @@ assert.equal(done.id,a.uid);assert.equal(upgradeStage(done),'none');
 const second=newClient();
 const login=await second.auth.signInWithPassword({email,password});
 assert.ok(!login.error,'second browser login: '+(login.error?.message||''));
+const secondGuest=await rpc(b.c,'icmx_register_guest_identity',{p_ini:'TWO',p_handle:'qa_guest_b'});
+assert.equal(secondGuest.handle,'qa_guest_b');
+const blocked=await second.from('player_profiles').insert({user_id:a.uid,public_handle:'qa_guest_b',is_public:true});
+assert.ok(blocked.error,'cuenta registrada no puede duplicar el @handle reservado por invitado');
+const owned=await second.from('player_profiles').insert({user_id:a.uid,public_handle:'qa_guest_a',is_public:true});
+assert.ok(!owned.error,'invitado convertido conserva su mismo @handle registrado');
+
 assert.equal(login.data.user.id,a.uid);
 assert.deepEqual(await state(second,a.uid),before);
 const recovered=await rpc(second,'ensure_player_snapshot');
