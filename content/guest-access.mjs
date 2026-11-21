@@ -26,6 +26,7 @@ const STYLE = `
 #icmxGuestGate #icmxGuestError:empty{display:none}
 #icmxGuestGate button{display:flex;align-items:center;justify-content:center;width:100%;min-height:46px;margin-top:10px;padding:11px 14px;border:1px solid #ffd400;border-radius:10px;background:#ffd400;color:#141026;font:800 12px ICGuestAV,system-ui,sans-serif;cursor:pointer}
 #icmxGuestGate button.secondary{border:1px solid #ffffff4d;background:#ffffff0f;color:#fff}
+#icmxGuestGate button.tertiary{border-color:transparent;background:transparent;color:#d2cde5}
 #icmxGuestGate button:disabled{opacity:.5;cursor:not-allowed}
 #icmxGuestGate button:focus-visible,#icmxGuestGate input:focus-visible{outline:2px solid #ffd400;outline-offset:3px}
 #icmxGuestGate .guest-handle input:focus-visible{outline:0}
@@ -42,9 +43,10 @@ function ensure(){
  root=document.createElement('div');root.id='icmxGuestGate';root.hidden=true;
  root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Acceso de jugador');
  root.innerHTML=`<div class="guest-panel"><header class="guest-brand"><img src="/logo.png" alt="Insert Coin MX"><small>EL ÁLBUM</small></header>
- <section id="icmxGuestWelcome"><h2>PRESS START</h2><p>Tu colección comienza aquí.</p>
- <button id="icmxGuestCreate" type="button">CREAR MI CUENTA</button>
- <button id="icmxGuestChoose" class="secondary" type="button">JUGAR COMO INVITADO</button>
+ <section id="icmxGuestWelcome"><h2>¡Bienvenido, jugador!</h2><p>Tu colección comienza aquí.</p>
+ <button id="icmxGuestCreate" type="button">CREAR CUENTA</button>
+ <button id="icmxGuestLogin" class="secondary" type="button">INICIAR SESIÓN</button>
+ <button id="icmxGuestChoose" class="tertiary" type="button">JUGAR COMO INVITADO</button>
  <p class="guest-warning">Como invitado, tus cartas se guardan en este navegador, pero podrías perderlas si borras sus datos o cambias de dispositivo.</p>
  </section>
  <section id="icmxGuestIdentity" hidden><h2>Tu identidad arcade</h2><p>Elige tus tres iniciales y un nombre de usuario.</p>
@@ -59,6 +61,7 @@ function ensure(){
  q('icmxGuestChoose').onclick=()=>show('identity');
  q('icmxGuestBack').onclick=()=>show('welcome');
  q('icmxGuestCreate').onclick=()=>{hide();handlers?.onCreate?.()};
+ q('icmxGuestLogin').onclick=()=>{hide();handlers?.onLogin?.()};
  q('icmxGuestIni').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3);validate()});
  q('icmxGuestHandle').addEventListener('input',e=>{e.target.value=e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,'').slice(0,20);validate()});
  q('icmxGuestPlay').onclick=async()=>{
@@ -68,7 +71,7 @@ function ensure(){
   let ok=false;
   try{ok=await handlers?.onPlay?.({ini,handle})===true}catch(_){}
   if(ok)hide();
-  else {q('icmxGuestError').textContent='No se pudo guardar tu identidad. Tu colección permanece intacta.';validate()}
+  else {validate();q('icmxGuestError').textContent='No se pudo guardar tu identidad. Tu colección permanece intacta.'}
  };
  for(const id of ['icmxGuestIni','icmxGuestHandle'])q(id).addEventListener('keydown',e=>{if(e.key==='Enter')q('icmxGuestPlay').click()});
  root.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();if(!q('icmxGuestIdentity').hidden)show('welcome')}}); 
@@ -83,9 +86,9 @@ function show(step){
   q('icmxGuestHandle').value=validHandle(handlers?.handle)?handlers.handle:'';
   validate();
  }
- (identity?(validIni(q('icmxGuestIni').value)?q('icmxGuestHandle'):q('icmxGuestIni')):q('icmxGuestChoose')).focus({preventScroll:true});
+ (identity?(validIni(q('icmxGuestIni').value)?q('icmxGuestHandle'):q('icmxGuestIni')):q('icmxGuestCreate')).focus({preventScroll:true});
 }
 export function hide(){if(root)root.hidden=true}
 export function openGuestAccess(options,step='welcome'){
- ensure();handlers=options;root.hidden=false;show(step);
+ ensure();handlers=options;q('icmxGuestLogin').hidden=typeof options.onLogin!=='function';root.hidden=false;show(step);
 }

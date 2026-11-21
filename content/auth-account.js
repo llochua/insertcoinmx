@@ -23,6 +23,8 @@ function authMessage(text, kind = 'info') {
 }
 function showAuthUser(user) {
   const active = Boolean(user);
+  if(active&&globalThis.icmxAccountIdentity?.userId!==user.id){identityCheckVersion++;globalThis.icmxAccountIdentity=null;}
+  const entryOpen=$auth('entryAccount')&&!$auth('entryAccount').hidden;
   // Perfil progresivo: invitado ve una sola invitación; cuenta autenticada ve su estado.
   const welcome = $auth('profileWelcome');
   const panel = $auth('profileAccountPanel');
@@ -36,7 +38,7 @@ function showAuthUser(user) {
     if (back) back.hidden = true;
   } else {
     if (welcome) welcome.hidden = Boolean(profile?.classList.contains('account-focus'));
-    if (panel && !profile?.classList.contains('account-focus')) panel.hidden = true;
+    if (panel && !profile?.classList.contains('account-focus')&&!entryOpen) panel.hidden = true;
     if (back) back.hidden = false;
   }
   if (homeStatus) homeStatus.textContent = active
@@ -57,6 +59,7 @@ function showAuthUser(user) {
   }
   globalThis.icmxAvatarAuthUser = user || null;
   document.dispatchEvent(new Event('icmx:avatar-auth'));
+  document.dispatchEvent(new Event('icmx:entry-auth-state'));
 
 }
 /* El avatar es metadato cosmético controlado por la cuenta; no autoriza sobres ni premios. */
@@ -112,6 +115,7 @@ async function loadAccountIdentity(expectedId) {
   if(profile?.public_handle&&!iniOK(meta.icmx_initials))ini=''; // Una cuenta existente no adopta iniciales ajenas del navegador.
   if(readError){
     showMissingIdentity(ini,wantedHandle||draft.handle,'No se pudo consultar tu identidad. Tu colección sigue intacta.');
+    document.dispatchEvent(new Event('icmx:player-identity'));
     return;
   }
   if(!profile?.public_handle&&wantedHandle){
@@ -202,6 +206,7 @@ function changeAuthMode(mode) {
     ? 'Te enviaremos un correo para confirmar tu cuenta.'
     : 'Entra con el correo y la contraseña que registraste.';
   authMessage('');
+  document.dispatchEvent(new CustomEvent('icmx:auth-entry-mode',{detail:mode}));
 }
 function setAuthBusy(busy) {
   authBusy = busy;
@@ -364,6 +369,7 @@ $auth('profileAuthSignOut').addEventListener('click', async () => {
   }
 });
 showAuthUser(null);
+changeAuthMode(globalThis.icmxInitialAuthMode==='login'?'login':'signup');
 fillRegistrationFromGuest();
 authMessage('Conectando...');
 initAccount();
