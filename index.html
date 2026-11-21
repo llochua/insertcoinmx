@@ -2201,6 +2201,22 @@ function mountFaceValue(fx,card){
  if(!window.ICMX_CARD_VALUE)return;
  window.ICMX_CARD_VALUE.mount(fx,updateCardValueUI(card));
 }
+let faceCardObserver=null;
+const pendingFaceCards=new WeakMap();
+function mountFaceValueLazy(fx,card){
+ if(!fx)return;
+ if(typeof IntersectionObserver!=='function'){mountFaceValue(fx,card);return}
+ if(!faceCardObserver)faceCardObserver=new IntersectionObserver(entries=>{
+  for(const entry of entries)if(entry.isIntersecting){
+   faceCardObserver.unobserve(entry.target);
+   const record=pendingFaceCards.get(entry.target);
+   if(record&&entry.target.isConnected)mountFaceValue(entry.target,record);
+   pendingFaceCards.delete(entry.target);
+  }
+ },{rootMargin:'100px'});
+ pendingFaceCards.set(fx,card);
+ faceCardObserver.observe(fx);
+}
 const PRUEBA=false; // quitar al lanzar: sobres ilimitados para revisar
 /* Regla pactada: 5 sobres de bienvenida, luego 2 cada 6 horas.
    La bienvenida se conserva hasta gastarla; los ciclos de 6 horas
@@ -3031,6 +3047,8 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
   <div class="rs-group rs-redeem">${tradeH}</div>
   <div class="rs-pg">${disc} de ${PD.length} diseños · ${AV.filter(c=>S.have[c.k]).length} de ${NAV} cartas</div>
  </div>`;
+ for(const c of hand)mountFaceValueLazy(s.querySelector('.rc[data-k="'+c.k+'"] .fx'),c);
+ mountFaceValueLazy(s.querySelector('.rh .dx-card .fx'),H);
  if(entering){s.scrollTop=0;ga('resumen_sobre_visto',{tipo:lastOpenedPack?.kind||'extra',paso:lastOpenedPack?.number||0})}
  refreshSummaryActions();
  s.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>openCard(b.dataset.k));
@@ -3073,6 +3091,7 @@ function renderAlbum(){
  const dn=LN.filter(x=>x.st.all).length;
  $('aSub').innerHTML=`<b>${dn}</b> de ${LN.length} diseños completos · ${t} cartas en sobres`+(SOON_N>0?`<span>+ ${SOON_N} ilustraciones en camino · todavía no salen en sobres</span>`:'');
  $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv${st.own?` fx idle r-${st.cover.r}`:''}">${st.own?`<img src="${imgOf(st.cover,'c')}" loading="lazy" alt=""><i class="foil"></i><i class="glare"></i>`:`<span class="lk"><img src="coin.png" alt="">${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
+ for(const {d,st} of L)if(st.own)mountFaceValueLazy($('grid').querySelector('.dt[data-d="'+d.id+'"] .fx'),st.cover);
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
 $('grid').onclick=e=>{const t=e.target.closest('.dt');if(!t)return;beep(880,.04);openFicha(t.dataset.d)};
@@ -3086,6 +3105,7 @@ function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
   return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv fx idle r-${x.c.img?x.c.r:'comun'}"><img src="${imgOf(x.c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span>${lb}</button>`
    :`<div class="vc av"><span class="cv"><img src="coin.png" alt=""><span>EN SOBRES</span></span>${lb}</div>`}).join('');
+ for(const x of col)if(x.st==='have')mountFaceValueLazy($('fVers').querySelector('.vc[data-k="'+x.c.k+'"] .fx'),x.c);
  const soon=st.vs.filter(x=>x.st==='soon');$('fSoon').innerHTML=soon.length?'Ilustración en camino:'+soon.map(x=>`<span>${VN[x.v]}</span>`).join(''):''}
 $('fVers').onclick=e=>{const b=e.target.closest('.vc.have');if(b)openCard(b.dataset.k)};
 $('fClose').onclick=closeFicha;
