@@ -15,7 +15,7 @@ function harness({recovery=true,session=true}={}){
  const elements=new Map();
  const element=id=>{
   if(!elements.has(id))elements.set(id,{
-   id,hidden:false,value:'',disabled:false,dataset:{},textContent:'',
+   id,hidden:id==='recovery'||id==='recoveryHome',value:'',disabled:false,dataset:{},textContent:'',
    listeners:{},attributes:{},
    addEventListener(event,fn){this.listeners[event]=fn},
    setAttribute(name,value){this.attributes[name]=String(value)},
@@ -81,7 +81,7 @@ test('Two passwords must match; only verified account can update password',async
 test('Ordinary signup confirmation still redirects back to game without password form',async()=>{
  const h=harness({recovery:false});await h.flush();
  assert.deepEqual(h.calls.redirects,['/']);
- assert.equal(h.element('recovery').hidden,false===true);
+ assert.equal(h.element('recovery').hidden,true);
  assert.equal(h.calls.updated.length,0);
 });
 
