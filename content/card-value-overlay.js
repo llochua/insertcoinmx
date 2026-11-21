@@ -84,10 +84,10 @@
   canvas.setAttribute('aria-hidden','true');
   img.insertAdjacentElement('afterend',canvas);
   const safe=allowPoint(variant,points);
-  let lastSrc=img.currentSrc||img.src;
+  const lastSrc=img.src;
   const paint=()=>{
    if(!canvas.isConnected||!img.complete||!img.naturalWidth)return;
-   if((img.currentSrc||img.src)!==lastSrc)return;
+   if(img.src!==lastSrc)return;
    const ctx=canvas.getContext('2d',{willReadFrequently:false});
    ctx.clearRect(0,0,W,H);
    try{
