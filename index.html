@@ -2044,6 +2044,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
     <p>Como invitado, tus cartas se guardan en este navegador. Puedes descargar una copia por seguridad.</p>
     <button type="button" class="profile-action secondary" id="profileExport">DESCARGAR MIS CARTAS</button>
     <button type="button" class="profile-action secondary" id="profileImport">RECUPERAR UN RESPALDO</button>
+    <button type="button" class="profile-action secondary" id="profileArchivedCollections">RESPALDOS DE COLECCIONES ANTERIORES</button>
     <!-- Puentes internos: el respaldo ya vive en Mi perfil; no se duplica en Récords. -->
     <button type="button" id="bkExp" hidden aria-hidden="true">Exportar</button>
     <button type="button" id="bkImp" hidden aria-hidden="true">Importar</button>
@@ -4146,6 +4147,23 @@ import('./content/cloud-sync.mjs?v=20261121-recovery').then(({startCloudSync,sam
  }
 })).then(controller=>{
  cloudSync=controller;
+ $('profileArchivedCollections').onclick=()=>{
+  const archives=cloudSync.listConflictArchives();
+  bkOpen(`<h2>COLECCIONES CONSERVADAS</h2><p>Estas copias son independientes de tu cuenta. Descárgalas para conservarlas fuera de este navegador.</p><div id="conflictArchiveList" class="bkb"></div><p id="bkMsg" role="status"></p><button class="btn" data-bkx>CERRAR</button>`);
+  const list=$('conflictArchiveList');
+  if(!archives.length){list.textContent='Todavía no hay colecciones archivadas en este navegador.';return}
+  archives.forEach((entry,i)=>{
+   const button=document.createElement('button');
+   button.className='btn';
+   const cards=Object.values(entry.backup.data.have).reduce((n,v)=>n+v,0);
+   button.textContent='DESCARGAR COPIA '+(i+1)+' · '+cards+' CARTAS';
+   button.onclick=async()=>{
+    const ok=await saveFile('insertcoinmx-coleccion-archivada-'+i+'-'+today()+'.json',JSON.stringify(entry.backup,null,2));
+    bkMsg(ok?'Respaldo guardado.':'No se pudo guardar el archivo.',ok?'':'bkwarn');
+   };
+   list.appendChild(button);
+  });
+ };
  $('profileResolveConflict').onclick=()=>{
   const review=cloudSync.getConflict();
   if(!review){cloudSync.check();toast('COMPROBANDO TUS COLECCIONES');return}
