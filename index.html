@@ -2395,7 +2395,7 @@ let communityValueEngine=null;
   communityWrites=communityWrites.then(async()=>{
    if(globalThis.icmxAccountIdentity?.userId!==identity)return;
    await controller.reta(day,copy);
-  }).catch(()=>{});
+  }).catch(()=>{toast('RETA GUARDADA LOCALMENTE<br>VOTO GLOBAL NO DISPONIBLE')});
  }
  function renderCommunityBoard(){
   const status=communityRanking?.state.status||'idle';
@@ -2680,7 +2680,7 @@ function go(id){
   $('profileAccountPanel').hidden=true;
   $('profileWelcome').hidden=false;
  }
- if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh();if(id==='scores')communityRanking?.refresh()}
+ if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh();if(id==='scores'||id==='album'||id==='pack')communityRanking?.refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores,profile:renderProfile}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
@@ -3434,7 +3434,7 @@ let zk=null,zLoadToken=0,zReturnFocus=null;
 /* acepta una clave de carta o un id de diseño (desde el Tier): muestra la versión que tienes; si no, la que ya tiene imagen */
 function cardFor(k){if(CB[k])return CB[k];const d=designId(k);if(!d)return null;const L=VL.map(v=>CB[d+'_'+v]);return L.find(c=>c.img&&S.have[c.k])||L.find(c=>S.have[c.k])||L.find(c=>c.img)||L[0]}
 const zd=()=>CB[zk]?CB[zk].d:zk; // las calificaciones son por diseño, no por versión
-const zGo=()=>{const p=goty(zd());$('zGoty').textContent=p===null?'AUN NADIE LA CALIFICA':p+'% LA PONE GOTY'};
+const zGo=()=>{const t=communityRanking?.state.status==='ready'?communityRanking.state.aggregates.find(r=>r.id===zd())?.tiers:null;const total=t?Object.values(t).reduce((a,b)=>a+b,0):0;$('zGoty').textContent=total?Math.round(100*t.goty/total)+'% LA PONE GOTY':communityRanking?.state.status==='ready'?'AÚN SIN CALIFICACIONES GLOBALES':'CALIFICACIONES GLOBALES NO DISPONIBLES'};
 function openCard(k){
  const cc=cardFor(k);if(!cc)return;
  const token=++zLoadToken,zoom=$('zoom'),img=$('zImg'),fx=$('zFx'),status=$('zLoad');
@@ -3464,6 +3464,7 @@ function openCard(k){
  img.onerror=failed;
  setVoting(true);
  if(!zoom.open)zoom.showModal();
+ if(communityRanking&&communityRanking.state.status!=='loading')communityRanking.refresh();
  zoom.scrollTop=0;
  img.src=imgOf(cc,'c2');
  mountFaceValue(fx,cc);
@@ -3478,7 +3479,7 @@ function setVoting(on){
 }
 $('zToggle').onclick=()=>setVoting($('zVoting').hidden);
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb zr-emoji ${S.rate[zd()]===i?'on':''}" data-r="${i}" type="button" aria-label="${n}" title="${n}" aria-pressed="${S.rate[zd()]===i}">${REACTION_EMOJI[i]}</button>`).join('')}
-$('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zd()]=+b.dataset.r;if(save())communityVote(zd(),'tier',+b.dataset.r);beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();zGo();if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
+$('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zd()]=+b.dataset.r;if(save()&&globalThis.icmxAccountIdentity?.userId){const id=zd();communityVote(id,'tier',+b.dataset.r).then(ok=>{if(!ok&&$('zoom').open&&zd()===id)$('zLikeStatus').textContent='Calificación local guardada; no se publicó globalmente.'})}beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();zGo();if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
 $('zLikes').onclick=async e=>{
   const b=e.target.closest('[data-like]');if(!b)return;
   const id=zd();$('zLikeStatus').textContent='Guardando voto…';
@@ -4103,9 +4104,10 @@ $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[d
    if(cur==='scores')renderCommunityBoard();
    if(cur==='album'&&!fd&&!$('zoom').open)renderAlbum();
    if(fd)renderFicha();
-   if($('zoom').open&&CB[zk])mountFaceValue($('zFx'),CB[zk]);
+   if($('zoom').open&&CB[zk]){mountFaceValue($('zFx'),CB[zk]);zGo()}
+   if(cur==='pack'&&$('disc').classList.contains('on')&&hand[idx])mountFaceValue($('disc').querySelector('.rh .dx-card .fx'),hand[idx]);
   }});
-  if(cur==='scores')communityRanking.refresh();
+  if(['scores','album','pack'].includes(cur)||$('zoom').open)communityRanking.refresh();
  }).catch(()=>{});
  import('./content/community-value.mjs').then(mod=>{
  communityValueEngine=mod;
