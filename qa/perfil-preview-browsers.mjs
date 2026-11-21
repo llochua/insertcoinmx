@@ -168,6 +168,7 @@ try{
   assert.equal(await page.locator('#onb.on').count(),0,'onboarding cerrado');
   assert.equal(await page.locator('#home.on').count(),1,'tras onboarding se abre el menú');
   assert.equal(await page.locator('#pack.on').count(),0,'sin apertura automática de sobre');
+  assert.equal(await page.evaluate(()=>document.activeElement?.id),'home','el foco queda en Inicio, no en Abrir sobre');
   assert.equal(await page.evaluate(()=>S.fg),0,'completar bienvenida no consume primer sobre');
   await page.locator('#home .home-player-card').click();
   await page.locator('#profileAvatarChange').click();
