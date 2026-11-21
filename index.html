@@ -1853,7 +1853,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #home #mGo.pack-wait time{font:800 22px/1.15 AV,system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
 #home #mGo.pack-wait:active{transform:none}
 @media(max-height:650px){#entryAccount .entry-account-brand img{width:64px}#entryAccount .entry-account-brand{margin-bottom:10px}#entryAccount .entry-account-shell{padding-top:12px;padding-bottom:17px}}
-</style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
+</style><link rel="stylesheet" href="content/community-value-ui.css?v=20261121-global"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
 <section id="title" class="on">
@@ -1952,8 +1952,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <h2 id="icmxGlobalTitle">RANKING GLOBAL DE DISEÑOS</h2>
    <p>Los diseños favoritos de la comunidad reunirán votos de Likes, Tier Lists y Reta.</p>
    <div class="icmx-global-weights" aria-label="Cómo se calcula el valor comunitario"><span>LIKES <b>35%</b></span><span>TIER <b>35%</b></span><span>RETA <b>30%</b></span></div>
-   <div class="icmx-global-empty" role="status"><strong>— POP</strong><span>SIN RESULTADOS GLOBALES VERIFICADOS</span></div>
-   <p class="icmx-global-note">El ranking aparecerá aquí cuando esté conectado a los votos compartidos. No mostramos puntos simulados.</p>
+   <div class="icmx-global-empty" id="communityRankEmpty" role="status"><strong>— POP</strong><span id="communityRankStatus">SIN RESULTADOS GLOBALES VERIFICADOS</span></div><div id="communityRankRows" aria-label="Top 10 de diseños por popularidad" aria-live="polite"></div>
+   <p class="icmx-global-note" id="communityRankNote">Los diseños sin votos permanecen sin clasificar.</p>
   </section>
  </div>
 </section>
@@ -2110,7 +2110,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <p class="z-return-hint" aria-hidden="true">TOCA LA CARTA PARA VOLVER</p>
  <p class="icmx-card-value-note" id="zCommunityFormula">POPULARIDAD: LIKES 35% · TIER 35% · RETA 30% · VALOR GLOBAL PENDIENTE</p>
  <button class="btn" id="zToggle" aria-expanded="false" aria-controls="zVoting">Calificar en GOTY</button>
- <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div></div>
+ <div id="zVoting" hidden><div id="zGoty"></div><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><div id="zLikes" role="group" aria-label="Vota por este diseño" hidden><button type="button" data-like="1">Me gusta</button><button type="button" data-like="0">No me gusta</button><button type="button" data-like="clear">Retirar voto</button><span id="zLikeStatus" role="status"></span></div></div>
  <section class="z-narrative" id="zNarrative" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
 </dialog>
 <div class="toast" id="toast"></div>
@@ -2375,7 +2375,44 @@ const ga=(n,p)=>{try{if(window.gtag)gtag('event',n,p||{})}catch(e){}};
 try{if(S.last&&S.last<today())ga('regreso',{dias_desde_ultimo_sobre:Math.round((new Date(today())-new Date(S.last))/864e5)})}catch(e){}
 const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
-let communityValueEngine=null;
+let communityValueEngine=null,communityRanking=null;
+ let communityWrites=Promise.resolve();
+ function communityVote(id,channel,value){
+  const identity=globalThis.icmxAccountIdentity?.userId;
+  if(!identity||!communityRanking||DB[id]?.bx)return Promise.resolve(false);
+  const controller=communityRanking;
+  const promise=communityWrites.then(async()=>{
+   if(globalThis.icmxAccountIdentity?.userId!==identity)return false;
+   await controller.vote(id,channel,value);return true;
+  }).catch(()=>false);
+  communityWrites=promise;return promise;
+ }
+ function communityReta(day,matches){
+  const identity=globalThis.icmxAccountIdentity?.userId;
+  if(!identity||!communityRanking)return;
+  const copy=JSON.parse(JSON.stringify(matches)),controller=communityRanking;
+  communityWrites=communityWrites.then(async()=>{
+   if(globalThis.icmxAccountIdentity?.userId!==identity)return;
+   await controller.reta(day,copy);
+  }).catch(()=>{});
+ }
+ function renderCommunityBoard(){
+  const status=communityRanking?.state.status||'idle';
+  const rows=status==='ready'?communityRanking.state.rows.filter(r=>r.position!==null&&DB[r.id]&&!DB[r.id].bx).slice(0,10):[];
+  $('communityRankEmpty').hidden=rows.length>0;
+  $('communityRankStatus').textContent=status==='loading'?'CARGANDO RANKING':status==='offline'?'RANKING NO DISPONIBLE':status==='ready'?'AÚN SIN VOTOS COMUNITARIOS':'SIN RESULTADOS GLOBALES VERIFICADOS';
+  $('communityRankNote').textContent=rows.length?'POP de 0 a 1,000 · las cuatro variantes comparten popularidad.':'Los diseños sin votos permanecen sin clasificar.';
+  $('communityRankRows').replaceChildren(...rows.map(r=>{
+   const b=document.createElement('button');b.type='button';b.className='community-rank-row';b.dataset.design=r.id;
+   const rank=document.createElement('span');rank.textContent=String(r.position).padStart(2,'0');
+   const name=document.createElement('span');name.textContent=DB[r.id].n;
+   const score=document.createElement('strong');score.textContent=r.score+' POP';
+   b.append(rank,name,score);return b;
+  }));
+ }
+ function getGlobalPop(id){
+  return communityRanking?.state.status==='ready'?communityRanking.get(id):null;
+ }
 const validValueCards=()=>CARDS.filter(c=>!c.bx&&c.img).map(c=>c.k);
 function collectionPointsLocal(){
  if(!communityValueEngine)return null;
@@ -2387,7 +2424,7 @@ function updateCardValueUI(card){
  // POP se revela únicamente cuando Supabase sirva resultados comunitarios verificables.
  // Los PTS pertenecen a la variante: son 10, 25, 50 o 100 según su rareza.
  const pts=card.bx?null:valueVariantPoints(card.v);
- return {variant:card.v,points:pts,pop:null};
+ return {variant:card.v,points:pts,pop:card.bx?null:getGlobalPop(card.d)?.score??null};
 }
 function mountFaceValue(fx,card){
  if(!window.ICMX_CARD_VALUE)return;
@@ -2642,7 +2679,7 @@ function go(id){
   $('profileAccountPanel').hidden=true;
   $('profileWelcome').hidden=false;
  }
- if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh()}
+ if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh();if(id==='scores')communityRanking?.refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores,profile:renderProfile}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
@@ -3380,7 +3417,7 @@ function openFicha(id){if(!DB[id])return;fd=id;ga('ver_ficha',{diseno:id});rende
 function closeFicha(){fd=null;$('ficha').classList.remove('on');$('ficha').setAttribute('aria-hidden','true')}
 function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(d);
  $('fMeta').innerHTML=d.cat+(d.bx?' · BONUS':d.no?' · #'+String(d.no).padStart(3,'0'):'')+(st.done?'<span class="fdone">★ COMPLETO</span>':st.was?'<span class="fdone was">★ COMPLETADO '+fday(S.logro[d.id]).toUpperCase()+' · NUEVA VERSIÓN</span>':'');$('fName').textContent=d.n;
- $('fDesignValue').textContent='POPULARIDAD GLOBAL · SIN CLASIFICAR';
+ const pop=getGlobalPop(d.id);$('fDesignValue').textContent=pop?.position!=null?'POPULARIDAD GLOBAL · '+pop.score+' POP · #'+pop.position:'POPULARIDAD GLOBAL · SIN CLASIFICAR';
  const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
  const col=st.vs.filter(x=>x.st==='have'||x.st==='av');$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
@@ -3436,12 +3473,18 @@ function openCard(k){
 function setVoting(on){
  $('zToggle').setAttribute('aria-expanded',String(on));
  $('zVoting').hidden=!on;
- if(on){paintRate();zGo();/* sin desplazamiento automático */}
+ if(on){paintRate();zGo();$('zLikes').hidden=!globalThis.icmxAccountIdentity?.userId||!!DB[zd()]?.bx;$('zLikeStatus').textContent='';/* sin desplazamiento automático */}
 }
 $('zToggle').onclick=()=>setVoting($('zVoting').hidden);
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb zr-emoji ${S.rate[zd()]===i?'on':''}" data-r="${i}" type="button" aria-label="${n}" title="${n}" aria-pressed="${S.rate[zd()]===i}">${REACTION_EMOJI[i]}</button>`).join('')}
-$('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zd()]=+b.dataset.r;save();beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();zGo();if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
-$('zClose').onclick=()=>$('zoom').close();
+$('zRate').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;syncIn();S.rate[zd()]=+b.dataset.r;if(save())communityVote(zd(),'tier',+b.dataset.r);beep([1319,1047,784,523][+b.dataset.r],.08);paintRate();zGo();if(cur==='album')renderAlbum();if(cur==='tier')renderTier()};
+$('zLikes').onclick=async e=>{
+  const b=e.target.closest('[data-like]');if(!b)return;
+  const id=zd();$('zLikeStatus').textContent='Guardando voto…';
+  const ok=await communityVote(id,'like',b.dataset.like==='clear'?null:Number(b.dataset.like));
+  if($('zoom').open&&zd()===id)$('zLikeStatus').textContent=ok?'Voto actualizado':'No se pudo registrar el voto global';
+ };
+ $('zClose').onclick=()=>$('zoom').close();
 function closeZoomByCard(){if($('zoom').open)$('zoom').close()}
 $('zFx').addEventListener('click',closeZoomByCard);
 $('zFx').addEventListener('keydown',e=>{
@@ -3469,7 +3512,7 @@ $('tier').addEventListener('pointerdown',e=>{const ch=e.target.closest('.chip');
 $('tier').addEventListener('pointermove',e=>{if(!d)return;if(!d.g){if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<8)return;const r=d.ch.getBoundingClientRect();d.g=d.ch.cloneNode(true);d.g.className='chip ghost';d.g.style.width=r.width*1.4+'px';document.body.appendChild(d.g);d.ch.style.opacity=.25;beep(660,.03)}
  d.g.style.left=e.clientX+'px';d.g.style.top=e.clientY+'px';mark(tz(e))});
 const end=e=>{if(!d)return;const c=d;d=null;mark(null);if(!c.g){if(e.type==='pointerup')openCard(c.k);return}c.g.remove();c.ch.style.opacity='';const t=e.type==='pointerup'&&tz(e);if(!t)return;
- syncIn();if(t.classList.contains('trow')){const r=+t.dataset.r;if(S.rate[c.k]!==r){S.rate[c.k]=r;beep([1319,1047,784,523][r],.08)}}else{delete S.rate[c.k];beep(330,.05)}save();renderTier()};
+ syncIn();if(t.classList.contains('trow')){const r=+t.dataset.r;if(S.rate[c.k]!==r){S.rate[c.k]=r;beep([1319,1047,784,523][r],.08)}}else{delete S.rate[c.k];beep(330,.05)}if(save())communityVote(c.k,'tier',S.rate[c.k]??null);renderTier()};
 $('tier').addEventListener('pointerup',end);$('tier').addEventListener('pointercancel',end);
 $('tier').addEventListener('touchmove',e=>{if(d&&d.g)e.preventDefault()},{passive:false})})();
 $('tShare').onclick=()=>shareTier();
@@ -3533,7 +3576,7 @@ function retaNueva(pool,reroll=false){
  return {day,seed,roster,round:0,champion:first,top:roster[0],bottom:roster[1],
   streak:0,lastChampion:prior,startingChampion:first,lastSide:'top',
   rerolls:used+(reroll?1:0),
-  done:false,titleDefended:false,defenses:preDayDefenses,startingDefenses:preDayDefenses,
+  done:false,matches:[],titleDefended:false,defenses:preDayDefenses,startingDefenses:preDayDefenses,
   history};
 }
 function retaRerollUI(pool){
@@ -3594,6 +3637,7 @@ function retaElegir(f,msg){
    retaInitFrame(f);return;
   }
   const lost=msg.side==='top'?'bottom':'top',previous=r.champion;
+  if(Array.isArray(r.matches)&&r.matches.length===r.round)r.matches.push({winner:msg.winner,loser:r[lost]});
   r.champion=msg.winner;r.streak=msg.winner===previous?r.streak+1:1;
   r.lastSide=msg.side;
   r.round++;
@@ -3608,6 +3652,7 @@ function retaElegir(f,msg){
    ga('reta_completada',{campeona:r.champion,defendida:r.titleDefended?1:0});
   }else{r[lost]=r.roster[r.round+1]}
   const ok=save();
+  if(ok&&r.done&&r.matches?.length===7)communityReta(r.day,r.matches);
   if(!ok)toast('RETA: GUARDADO PENDIENTE');
   retaRerollUI(retaPool());
   ga('reta_eleccion',{ronda:r.round,diseno:msg.winner,campeona:r.champion});
@@ -3674,6 +3719,7 @@ function scoreBoard(metric=selectedRanking){
  return {rows:[],origin:'empty'};
 }
 function renderScores(){
+ renderCommunityBoard();
  const stats=currentRecordScores();
  $('sMine').textContent=stats.cards;
  for(const [id,key,label] of [['recordDesigns','designs','diseños'],['recordDuplicates','duplicates','repetidas'],['recordRatings','ratings','calificadas']]){
@@ -4050,7 +4096,17 @@ $('profileAccountBack').onclick=()=>{
 $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
-import('./content/community-value.mjs').then(mod=>{
+$('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
+ Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261121-global')]).then(([mod,auth])=>{
+  communityRanking=mod.createCommunityRanking({request:auth.communityRequest,onChange:()=>{
+   if(cur==='scores')renderCommunityBoard();
+   if(cur==='album'&&!fd&&!$('zoom').open)renderAlbum();
+   if(fd)renderFicha();
+   if($('zoom').open&&CB[zk])mountFaceValue($('zFx'),CB[zk]);
+  }});
+  communityRanking.refresh();
+ }).catch(()=>{});
+ import('./content/community-value.mjs').then(mod=>{
  communityValueEngine=mod;
  if(cur==='profile')renderProfile();
  if($('zoom').open&&CB[zk])mountFaceValue($('zFx'),CB[zk]);
@@ -4098,4 +4154,4 @@ import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCl
  cloudSync.check();
 })
 .catch(()=>{for(const id of ['cloudState','profileCloudStatus']){const e=$(id);if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}}});
-</script><script type="module" src="content/auth-account.js?v=20261121tres"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
+</script><script type="module" src="content/auth-account.js?v=20261121-global"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
