@@ -2839,8 +2839,14 @@ armDay();setInterval(dayTick,30000);
  document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake)}
 setInterval(()=>{if(saveFailed)save()},30000);
 if(NOWRITE){saveFailed=true;setWarn(true)}
+// El lanzamiento de invitados verificados requiere la configuración de Auth y CAPTCHA.
+// Sin esa configuración se mantiene el modo anterior; no activar en producción sin QA.
+const VERIFIED_GUEST_PLAY=globalThis.ICMX_VERIFIED_GUEST_PLAY===true;
 let serverTradeBusy=false;
 function trade(after){
+ if(!cloudSync&&(VERIFIED_GUEST_PLAY||localStorage.getItem('icmx-cloud-active-account-v1')||localStorage.getItem('icmx-auth-qa-nov2026'))){
+  toast('VERIFICANDO TU CUENTA<br>NO SE CONSUMIERON CARTAS');return
+ }
  if(cloudSync?.requiresServer?.()){
   if(serverTradeBusy)return;
   serverTradeBusy=true;
@@ -2958,6 +2964,7 @@ function openServerPack(){
 function openPack(){
  if(opening||serverPackBusy)return;
  if(cloudSync?.requiresServer?.()){openServerPack();return}
+ if(VERIFIED_GUEST_PLAY){toast('PREPARANDO TU PARTIDA<br>NO SE CONSUMIÓ EL SOBRE');return}
  // No emitir sobres locales si falla la carga de nube para una cuenta vinculada.
  if(!cloudSync&&(localStorage.getItem('icmx-cloud-active-account-v1')||
     localStorage.getItem('icmx-auth-qa-nov2026'))){
@@ -3853,7 +3860,10 @@ function buildBackup(){syncIn();const b={app:'insertcoinmx-album',format:FORMAT,
 function restoreKeys(m,x){let ok=true;for(const [k,v] of [[KEY,m],[KEY_EXT,x]]){try{if(localStorage.getItem(k)!==v){if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}ok=ok&&localStorage.getItem(k)===v}catch(e){ok=false}}return ok}
 /* importar = reemplazar. Copia previa en .bak, escritura, lectura de vuelta; ante cualquier falla
    las dos claves vuelven a su texto exacto anterior y S a su estado anterior. Nada sale del teléfono antes. */
-function applyImport(v){clearTimeout(save.t);syncIn();
+function applyImport(v){
+ if(VERIFIED_GUEST_PLAY&&(cloudSync?.requiresServer?.()||localStorage.getItem('icmx-cloud-active-account-v1')))
+  return {ok:false,err:'Las cartas de una cuenta verificada se recuperan desde la nube. Los archivos anteriores se conservan como copias independientes.'};
+ clearTimeout(save.t);syncIn();
  const prevMain=LS.get(KEY),prevExt=LS.get(KEY_EXT),prevS=JSON.parse(JSON.stringify(S));
  try{localStorage.setItem(KEY_BAK,JSON.stringify({at:new Date().toISOString(),main:prevMain,ext:prevExt}))}
  catch(e){return {ok:false,err:'No hay espacio para guardar la copia de seguridad. No se cambió nada. Exporta tu progreso antes de volver a intentarlo.'}}
@@ -4123,7 +4133,16 @@ claimPend();initSound();go('home');STORE.init();
 if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
 /* Integración segura: nunca reemplaza un progreso distinto sin revisión.
    Los visitantes sin sesión continúan jugando y guardando localmente. */
-import('./content/cloud-sync.mjs?v=20261121-recovery').then(({startCloudSync,sameProgress})=>startCloudSync({
+import('./content/cloud-sync.mjs?v=20261121-guest').then(({startCloudSync,sameProgress})=>startCloudSync({
+ verifiedGuests:VERIFIED_GUEST_PLAY,
+ guestSession:async auth=>{
+  const {ensureVerifiedGuest}=await import('./content/verified-guest.mjs?v=20261121');
+  return ensureVerifiedGuest({
+   auth,storage:localStorage,
+   exclusive:navigator.locks?.request?task=>navigator.locks.request('icmx-verified-guest-init',task):null,
+   captchaToken:async()=>typeof globalThis.icmxGuestCaptcha==='function'?await globalThis.icmxGuestCaptcha():null
+  });
+ },
  readLocal:()=>{
   // Nunca publicar un sobre que el navegador no logró guardar.
   if(saveFailed||NOWRITE)throw Error('Hay progreso local pendiente de proteger');
@@ -4206,4 +4225,4 @@ import('./content/cloud-sync.mjs?v=20261121-recovery').then(({startCloudSync,sam
  cloudSync.check();
 })
 .catch(()=>{for(const id of ['cloudState','profileCloudStatus']){const e=$(id);if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}}});
-</script><script type="module" src="content/auth-account.js?v=20261121-global"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
+</script><script type="module" src="content/auth-account.js?v=20261121-guest"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
