@@ -27,6 +27,7 @@ function authMessage(text, kind = 'info') {
 }
 function renderGuestAuthStage(){
  const guest=guestStage!=='none',passwordStage=guestStage==='password';
+ $auth('profileAuthForgot').hidden=guest||authMode!=='login';
  const email=$auth('profileAuthEmail'),password=$auth('profileAuthPassword');
  $auth('profileAuthTabLogin').hidden=guest;
  email.required=!passwordStage;
@@ -226,6 +227,7 @@ function changeAuthMode(mode) {
   $auth('profileAuthTabSignup').setAttribute('aria-pressed', String(mode === 'signup'));
   $auth('profileAuthTabLogin').setAttribute('aria-pressed', String(mode === 'login'));
   $auth('profileAuthSend').textContent = mode === 'signup' ? 'CREAR MI CUENTA' : 'INICIAR SESIÓN';
+  $auth('profileAuthForgot').hidden=mode!=='login'||guestStage!=='none';
   for(const [container,id] of [['profileSignupInitialsField','profileAuthInitials'],['profileSignupHandleField','profileAuthHandle']]){
     const visible=mode==='signup';
     $auth(container).hidden=!visible;
@@ -246,6 +248,7 @@ function setAuthBusy(busy) {
   $auth('profileAuthForm').setAttribute('aria-busy', String(busy));
   $auth('profileAuthTabSignup').disabled = busy;
   $auth('profileAuthTabLogin').disabled = busy||guestStage!=='none';
+  $auth('profileAuthForgot').disabled = busy||authMode!=='login'||guestStage!=='none';
 }
 async function authCaptchaOptions(){
  if(globalThis.ICMX_CAPTCHA_ENABLED!==true)return {};
@@ -334,6 +337,28 @@ async function initAccount() {
 }
 $auth('profileAuthTabSignup').addEventListener('click', () => changeAuthMode('signup'));
 $auth('profileAuthTabLogin').addEventListener('click', () => changeAuthMode('login'));
+$auth('profileAuthForgot').addEventListener('click', async () => {
+  if(authBusy||authMode!=='login'||guestStage!=='none')return;
+  if(!authClient){authMessage('No hay conexión con el servicio de cuentas. Reintenta.', 'error');return}
+  const input=$auth('profileAuthEmail'),email=input.value.trim();
+  if(!input.checkValidity()||!email||email.length>254){
+    authMessage('Escribe tu correo para recibir el enlace de recuperación.', 'error');
+    input.focus();return;
+  }
+  setAuthBusy(true);
+  authMessage('Enviando instrucciones de recuperación…');
+  try{
+    const captcha=await authCaptchaOptions();
+    const {error}=await authClient.auth.resetPasswordForEmail(email,{
+      redirectTo:REDIRECT_URL,...captcha
+    });
+    if(error)throw error;
+    // No confirmar ni negar la existencia del correo para evitar enumeración.
+    authMessage('Si ese correo tiene una cuenta, recibirás un enlace para crear otra contraseña. Revisa también spam.', 'success');
+  }catch(error){
+    authMessage(friendlyAuthError(error,'login'),'error');
+  }finally{setAuthBusy(false)}
+});
 $auth('profileAuthForm').addEventListener('submit', async event => {
   event.preventDefault();
   if (authBusy) return;
