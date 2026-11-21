@@ -28,6 +28,7 @@ const allowed=new Set([
   'qa/profile-browsers.mjs',
   'qa/sync-two-browsers.mjs',
   'qa/release-reset.test.mjs',
+  'qa/auth-public-settings.mjs',
   'content/release-reset.js',
   'qa/perfil-main-browsers.mjs',
   'qa/check-profile-gameplay-invariants.mjs',
