@@ -204,7 +204,8 @@ try{
   await page.locator('#sSave').click();
   assert.equal(await page.locator('#scores [data-score-entry]').count(),1,'guardar iniciales crea un solo registro');
   assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(2)').textContent(),'ABC');
-  assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(3)').textContent(),'001');
+  const actualScore=String(Number(await page.locator('#sMine').textContent())).padStart(3,'0');
+  assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(3)').textContent(),actualScore,'Top 10 refleja el puntaje real sin inventarlo');
   await page.screenshot({path:'qa/screenshots/records-top10-'+width+'.png',fullPage:true});
   // El selector y los Récords no deben tocar las cartas reales, abrir sesiones ni emitir RPC.
   const saved=await page.evaluate(()=>({
