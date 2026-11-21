@@ -377,8 +377,21 @@ async function run(){
   await D.page.evaluate(()=>go('pack'));
   await until(async()=>await D.page.locator('#cloudState').getAttribute('data-sync')==='synced',
     'sincronización lista antes de abrir el primer sobre vinculado');
+  const linkedIssue=()=>[...issued.keys()].some(key=>key.startsWith(LEGACY+':'));
   await D.page.evaluate(()=>openPack());
-  await until(()=>[...issued.keys()].some(key=>key.startsWith(LEGACY+':')),
+  // importGuest programa una última comprobación asíncrona. Si coincide con
+  // el primer tap, issuePack devuelve "busy" SIN acuñar cartas: la UI indica
+  // reintentar. Cubrir ese reintento legítimo sin ocultar fallos persistentes
+  // ni permitir más de un sobre/revisión.
+  await until(linkedIssue,'primera petición tras vincular',1200).catch(async()=>{
+    assert.equal(count(await read(D.page)),importedCards,
+      'un intento ocupado no debe añadir cartas en el dispositivo');
+    await until(async()=>await D.page.locator('#cloudState').getAttribute('data-sync')==='synced',
+      'la última comprobación de nube debe terminar antes del reintento',5000);
+    await delay(250);
+    await D.page.evaluate(()=>openPack());
+  });
+  await until(linkedIssue,
     'el primer sobre tras vincular debe emitirse en servidor',4500).catch(async(error)=>{
     const diagnostic=await D.page.evaluate(()=>({
       sync:document.getElementById('cloudState').dataset.sync,
