@@ -42,6 +42,8 @@ jobs:
           node --check content/cloud-sync.mjs
           node --check content/cloud-pack-session.test.mjs
           node --check content/community-value.mjs
+          node --check content/community-ranking.mjs
+          node --check qa/community-ranking.test.mjs
           node --check content/card-value-overlay.js
           node --check qa/community-value.test.mjs
           node --check qa/value-screens.test.mjs
@@ -65,6 +67,7 @@ jobs:
           node --test qa/release-reset.test.mjs
           node --test qa/records-edition.test.mjs
           node --test qa/community-value.test.mjs
+          node --test qa/community-ranking.test.mjs
           node --test qa/value-screens.test.mjs
           node - <<'NODE'
           const fs = require('node:fs');
