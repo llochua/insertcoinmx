@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {createClient} from '@supabase/supabase-js';
-import {beginGuestUpgrade,finishGuestUpgrade,upgradeStage} from '../../content/verified-guest.mjs';
+import {ensureVerifiedGuest,beginGuestUpgrade,finishGuestUpgrade,upgradeStage} from '../../content/verified-guest.mjs';
 const base=process.env.API_URL||'http://127.0.0.1:54321';
 const anon=process.env.ANON_KEY||process.env.PUBLISHABLE_KEY;
 assert.equal(new URL(base).hostname,'127.0.0.1','local only');
@@ -20,9 +20,10 @@ const state=async(client,uid)=>{
 };
 const count=s=>Object.values(s.data.have).reduce((a,b)=>a+b,0);
 async function guest(){
- const c=newClient(),{data,error}=await c.auth.signInAnonymously();
- assert.ok(!error&&data?.user?.is_anonymous,'real anonymous session: '+(error?.message||''));
- return {c,uid:data.user.id};
+ const c=newClient();
+ const user=await ensureVerifiedGuest({auth:c.auth,storage:{getItem:()=>null},exclusive:task=>task()});
+ assert.ok(user.is_anonymous,'real anonymous session');
+ return {c,uid:user.id};
 }
 const a=await guest(),b=await guest();
 assert.notEqual(a.uid,b.uid);
@@ -59,6 +60,13 @@ assert.deepEqual(before.state,rated);
 assert.ok((await a.c.from('player_profiles').insert({user_id:a.uid,public_handle:'guest_'+randomUUID().slice(0,8),is_public:true})).error,'anonymous profile forbidden');
 assert.deepEqual((await b.c.from('player_snapshots').select('user_id').eq('user_id',a.uid)).data,[]);
 assert.equal(count((await rpc(b.c,'ensure_player_snapshot')).state),0);
+const blocked=await guest();
+const denied=await blocked.c.rpc('ensure_player_snapshot');
+assert.match(denied.error?.message||'',/guest_daily_admission_limit/);
+assert.equal((await rpc(a.c,'ensure_player_snapshot')).status,'existing');
+assert.equal((await rpc(b.c,'ensure_player_snapshot')).status,'existing');
+assert.deepEqual((await blocked.c.from('player_snapshots').select('user_id').eq('user_id',blocked.uid)).data,[]);
+console.log('PASS: global admission cap rejects new guests but preserves existing sessions');
 console.log('PASS: real guest, 10 cards, idempotent pack, ratings, quota protection, isolated UID and private profile');
 const email='qa-'+randomUUID()+'@example.test';
 const password=randomUUID()+'A1!';

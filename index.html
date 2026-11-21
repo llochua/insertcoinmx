@@ -2841,10 +2841,10 @@ armDay();setInterval(dayTick,30000);
  document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake)}
 setInterval(()=>{if(saveFailed)save()},30000);
 if(NOWRITE){saveFailed=true;setWarn(true)}
-// El lanzamiento de invitados verificados requiere la configuración de Auth y CAPTCHA.
+// El lanzamiento de invitados verificados requiere Auth y límites de admisión del servidor.
 // Sin esa configuración se mantiene el modo anterior; no activar en producción sin QA.
 const VERIFIED_GUEST_PLAY=globalThis.ICMX_VERIFIED_GUEST_PLAY===true;
-const ICMX_CAPTCHA_ON=VERIFIED_GUEST_PLAY||globalThis.ICMX_CAPTCHA_ENABLED===true;
+const ICMX_CAPTCHA_ON=globalThis.ICMX_CAPTCHA_ENABLED===true;
 if(ICMX_CAPTCHA_ON&&typeof globalThis.icmxGuestCaptcha!=='function'){
  globalThis.icmxGuestCaptcha=async()=>{
   const {requestCaptcha}=await import('./content/guest-captcha.mjs?v=20261121');
@@ -4121,7 +4121,7 @@ $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
- Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261121-global')]).then(([mod,auth])=>{
+ Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261121-beta2')]).then(([mod,auth])=>{
   communityRanking=mod.createCommunityRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{
    if(cur==='scores')renderCommunityBoard();
    if(cur==='album'&&!fd&&!$('zoom').open)renderAlbum();
@@ -4145,11 +4145,11 @@ if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
 import('./content/cloud-sync.mjs?v=20261121-guest').then(({startCloudSync,sameProgress})=>startCloudSync({
  verifiedGuests:VERIFIED_GUEST_PLAY,
  guestSession:async auth=>{
-  const {ensureVerifiedGuest}=await import('./content/verified-guest.mjs?v=20261121');
+  const {ensureVerifiedGuest}=await import('./content/verified-guest.mjs?v=20261121-beta2');
   return ensureVerifiedGuest({
    auth,storage:localStorage,
    exclusive:navigator.locks?.request?task=>navigator.locks.request('icmx-verified-guest-init',task):null,
-   captchaToken:async()=>typeof globalThis.icmxGuestCaptcha==='function'?await globalThis.icmxGuestCaptcha():null
+   captchaToken:ICMX_CAPTCHA_ON?async()=>typeof globalThis.icmxGuestCaptcha==='function'?await globalThis.icmxGuestCaptcha():null:undefined
   });
  },
  readLocal:()=>{
@@ -4234,4 +4234,4 @@ import('./content/cloud-sync.mjs?v=20261121-guest').then(({startCloudSync,samePr
  cloudSync.check();
 })
 .catch(()=>{for(const id of ['cloudState','profileCloudStatus']){const e=$(id);if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}}});
-</script><script type="module" src="content/auth-account.js?v=20261121-guest"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
+</script><script type="module" src="content/auth-account.js?v=20261121-beta2"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>

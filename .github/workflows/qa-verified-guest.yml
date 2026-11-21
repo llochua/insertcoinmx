@@ -41,6 +41,29 @@ jobs:
           for key in ['enable_anonymous_sign_ins','enable_manual_linking','enable_confirmations']:
               s,n=re.subn(r'(?m)^'+key+r'\s*=\s*false\s*$',key+' = true',s)
               assert n>0 or re.search(r'(?m)^'+key+r'\s*=\s*true\s*$',s),key
+          s,n=re.subn(r'(?m)^anonymous_users\s*=\s*\d+\s*
+          PY
+          supabase start
+      - name: Probar gate, emisión, confirmación de correo y recuperación
+        run: |
+          cd "$RUNNER_TEMP/guest-local"
+          set -a
+          eval "$(supabase status -o env)"
+          set +a
+          cd "$GITHUB_WORKSPACE"
+          export PGPASSWORD=postgres
+          psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -f qa/verified-guest/local-fixture.sql
+          sleep 2
+          node qa/verified-guest/local-auth.mjs --closed
+          psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -c "update private_sync.beta_access_gate set enabled=true where key='verified_guest'"
+          node qa/verified-guest/local-auth.mjs
+      - name: Destruir instancia desechable
+        if: always()
+        run: |
+          cd "$RUNNER_TEMP/guest-local"
+          supabase stop --no-backup
+, 'anonymous_users = 10', s)
+          assert n==1, 'anonymous_users'
           p.write_text(s)
           PY
           supabase start

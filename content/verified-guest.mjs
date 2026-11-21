@@ -27,9 +27,13 @@ export async function ensureVerifiedGuest({auth,storage,exclusive,captchaToken})
   }
   // Una sesión perdida de una colección previa jamás genera otra bienvenida.
   if(bound)throw fail('guest_session_lost');
-  const token=await captchaToken();
-  if(typeof token!=='string'||!token.trim())throw fail('guest_captcha_required');
-  const {data:created,error:createError}=await auth.signInAnonymously({options:{captchaToken:token}});
+  let options;
+  if(typeof captchaToken==='function'){
+   const token=await captchaToken();
+   if(typeof token!=='string'||!token.trim())throw fail('guest_captcha_required');
+   options={options:{captchaToken:token}};
+  }
+  const {data:created,error:createError}=await auth.signInAnonymously(options);
   if(createError)throw createError;
   const uid=created?.user?.id||created?.session?.user?.id;
   const {data:verified,error:verifyError}=await auth.getUser();

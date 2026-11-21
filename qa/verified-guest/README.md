@@ -1,28 +1,21 @@
-# Invitado verificable — etapa de integración (no producción)
+# Invitado verificable — beta controlada sin proveedor externo
 
 ## Invariantes
 
-- La identidad anónima de Auth y la cuenta convertida tienen el mismo UUID.
-- El servidor genera sobres y canjes; el cliente no puede incrementar cantidades, cambiar cuotas ni editar historial económico.
-- No se modifica la colección al vincular un correo, verificarlo o establecer una contraseña.
-- Invitado no publica perfil ni votos comunitarios. No se amplía la función can_access_beta: solo se agrega can_access_game para las cuatro RPC económicas y de snapshot.
-- Guardar archivos anteriores sigue siendo posible; nunca se importan como cartas verificadas.
-- Correos existentes no reemplazan la sesión de invitado. La vinculación con una cuenta existente requiere otro flujo de revisión, explícito y verificable.
-- Las cuentas anteriores siguen con los permisos actuales mientras verified_guest está apagado.
+- Mismo UUID al registrar correo y contraseña. El servidor controla todas las cartas y cuotas.
+- No se importan archivos locales como cartas verificadas; invitado no publica perfil ni votos comunitarios.
+- No se reinicia la bienvenida cuando se pierde una sesión vinculada.
+- Correo existente y progreso local previo requieren recuperación explícita; no fusionar ni sobrescribir automáticamente.
 
-## Activación controlada
+## Estado de producción (21 nov 2026)
 
-1. El archivo backend-review.sql es SQL de revisión, no una migración aplicada. Probar en Supabase local/desechable contra las migraciones existentes y generar la migración definitiva con la CLI. No ejecutar en producción todavía.
-2. Configurar Auth anónimo, vinculación de identidad, confirmación de cambio de correo, URLs autorizadas, protección CAPTCHA/Turnstile y límites de solicitudes. No exponer claves privadas o secretas. Auditar otras RPC/políticas accesibles con el rol authenticated.
-3. El frontend permanece desactivado por defecto (ICMX_VERIFIED_GUEST_PLAY !== true). Para QA habilitarlo antes de ejecutar el script de index y configurar ICMX_TURNSTILE_SITE_KEY (clave pública del sitio, nunca el secreto). El diálogo Turnstile usa el token de un solo uso. ICMX_CAPTCHA_ENABLED permite verificar también el registro e inicio de sesión regular sin activar todavía invitados; el proveedor de Auth debe coincidir. Para pruebas simuladas se puede inyectar icmxGuestCaptcha() antes del inicio. Si no hay token, la partida verificada no se inicia; no se emiten sobres localmente cuando está habilitado.
-4. El flag de servidor verified_guest debe permanecer false hasta terminar la validación del entorno. No confundirlo con public_beta.
-5. Activar frontend y backend coordinadamente. Si se desactiva la característica, las colecciones verificadas conservan su vínculo y no pueden acuñar cartas localmente.
-6. Probar con un invitado real en entorno aislado: primera apertura, cinco sobres iniciales, reconexión, mismo request_id tras pérdida de respuesta, canje, calificaciones, confirmar correo, establecer contraseña, segundo navegador, privacidad de otros UUID y rechazo de modificar cantidades/cuotas. Asegurar que no pierde carta ni vuelve a recibir bienvenida.
-7. Probar email ya registrado, confirmación vencida, recarga durante registro, cierre de pestaña, almacenamiento lleno, falta de CAPTCHA, doble pestaña, navegador sin Web Locks. Comprobar que no se generan nuevas identidades si hay vínculo local sin sesión.
-8. Proteger y conservar colecciones invitadas antiguas de forma independiente; no certificarlas automáticamente. Mantener accesible la recuperación del PR #117. Si el registro global no puede completar esta transición sin una decisión del jugador, el lanzamiento de la funcionalidad queda bloqueado.
+La primera migración backend-review.sql fue aplicada como verified_guest_progress_preparation_closed_20261121 después de seis checks verdes. public_beta sigue habilitado; verified_guest sigue false. Se verificó que la huella de snapshots, el número de sobres y perfiles no cambiaron. La segunda migración admission-limit.sql es candidata, no aplicada aún.
 
-## Validación
+## Beta sin CAPTCHA
 
-Los tests existentes incorporan una simulación del SDK y nuevas pruebas de UID, conversión y primer sobre de invitado. No sustituyen la prueba con Supabase Auth real, confirmación de email y CAPTCHA. No se debe aprobar el PR por CI general únicamente.
-
-La acción `QA · Invitado verificado con Auth real` inicia Supabase local, habilita Auth anónimo y confirmación por correo exclusivamente en esa instancia, aplica `local-fixture.sql` y prueba el flujo real por SDK con buzón local. CAPTCHA real se prueba aparte con un sitio autorizado por Cloudflare; no se desactiva la protección en producción.
+- Supabase Auth: habilitar sesiones anónimas y vinculación manual solo al preparar activación; confirmar email, verificar URLs y entrega real de correos. Configurar 10 altas anónimas por IP/hora en Auth > Rate Limits.
+- admission-limit.sql limita nuevas partidas de invitado a 100 por día UTC. Contador transaccional privado sin permisos cliente; serializa admisiones y conserva partidas existentes. Este cupo no limita la creación directa de identidades Auth: se necesita también el límite por IP. No es equivalente a CAPTCHA; revisar métricas y detener admisión si aparece abuso.
+- ICMX_VERIFIED_GUEST_PLAY permanece false por defecto; ICMX_CAPTCHA_ENABLED es independiente, false por defecto. El diálogo Turnstile queda disponible para una futura fase, no se carga sin habilitarlo. Nunca almacenar secretos en el repo.
+- La prueba local utiliza SDK real sin token, verifica acceso con compuerta cerrada, cuota global, emisión idempotente, aislamiento, confirmación por correo y segundo navegador. El límite se ejercita con 98 admisiones sembradas y dos invitados reales. QA independiente no prueba configuración del hosting.
+- Revisar políticas/RPC restantes para JWT anónimos, correo existente, archivos invitados antiguos, sesión perdida, Web Locks y confirmación vencida. Mantener el PR #117 de recuperación. Lanzamiento global bloqueado hasta resolver compatibilidad de progreso previo y cuentas existentes.
+- Activar frontend y servidor coordinadamente solo tras validación y comprobación de ajustes Auth. Si se desactiva, no permitir acuñación local para colecciones vinculadas.

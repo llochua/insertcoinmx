@@ -248,7 +248,7 @@ function setAuthBusy(busy) {
   $auth('profileAuthTabLogin').disabled = busy||guestStage!=='none';
 }
 async function authCaptchaOptions(){
- if(globalThis.ICMX_VERIFIED_GUEST_PLAY!==true&&globalThis.ICMX_CAPTCHA_ENABLED!==true)return {};
+ if(globalThis.ICMX_CAPTCHA_ENABLED!==true)return {};
  if(typeof globalThis.icmxGuestCaptcha!=='function')throw Error('captcha_configuration_missing');
  const captchaToken=await globalThis.icmxGuestCaptcha();
  if(typeof captchaToken!=='string'||!captchaToken.trim())throw Error('captcha_empty');
@@ -349,7 +349,7 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
    if(!passEl.checkValidity()||password.length<8){authMessage('La contraseña debe tener al menos 8 caracteres.','error');return}
    setAuthBusy(true);
    try{
-    const {finishGuestUpgrade}=await import('./verified-guest.mjs?v=20261121');
+    const {finishGuestUpgrade}=await import('./verified-guest.mjs?v=20261121-beta2');
     const user=await finishGuestUpgrade({auth:authClient.auth,expectedUid:currentGuestUser?.id,password});
     passEl.value='';
     showAuthUser(user);
@@ -384,7 +384,7 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
   authMessage(authMode === 'signup' ? 'Preparando tu registro...' : 'Iniciando sesión...');
   try {
     if(guestStage==='email'){
-      const {beginGuestUpgrade}=await import('./verified-guest.mjs?v=20261121');
+      const {beginGuestUpgrade}=await import('./verified-guest.mjs?v=20261121-beta2');
       const user=await beginGuestUpgrade({auth:authClient.auth,expectedUid:currentGuestUser?.id,email,
        ini:signupIdentity?.ini,handle:signupIdentity?.handle,redirectTo:REDIRECT_URL});
       passEl.value='';

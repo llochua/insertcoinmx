@@ -109,7 +109,7 @@ const guestAuthHarness=()=>{
   async getSession(){return {data:{session:user?{user}:null},error:null}},
   async getUser(){return {data:{user},error:null}},
   async signInAnonymously(args){
-   assert.equal(args.options.captchaToken,'qa-token');created++;
+   if(args!==undefined)assert.equal(args.options.captchaToken,'qa-token');created++;
    user={id:'guest-uid',is_anonymous:true,user_metadata:{}};
    return {data:{user,session:{user}},error:null};
   },
@@ -159,4 +159,10 @@ test('No convertir ni cambiar contraseña de una sesión distinta',async()=>{
  const h=guestAuthHarness();await ensureVerifiedGuest(h.params);
  await assert.rejects(()=>beginGuestUpgrade({auth:h.auth,expectedUid:'other',email:'qa@example.invalid',ini:'JOS',handle:'qa_guest'}),/guest_identity_changed/);
  assert.equal(h.updates.length,0);
+});
+
+test('Beta sin CAPTCHA usa Auth real sin token, conserva UID y no repite alta',async()=>{
+ const h=guestAuthHarness();const params={...h.params,captchaToken:undefined};
+ const first=await ensureVerifiedGuest(params);h.storage.setItem(GUEST_BINDING,first.id);
+ assert.equal((await ensureVerifiedGuest(params)).id,first.id);assert.equal(h.created,1);
 });
