@@ -189,12 +189,25 @@ try{
   assert.equal(await page.locator('#scores .bkp').count(),0,'el bloque de respaldo ya no aparece en Récords');
   assert.equal(await page.locator('#scores #bkExp, #scores #bkImp').count(),0,'no hay botones duplicados');
   assert.equal(await page.locator('#scores a[href*="registro"]').count(),0,'cuentas permanecen en Mi perfil');
-  assert.equal(await page.locator('#scoreTopTitle').textContent(),'TOP 10');
-  assert.equal(await page.locator('#scores .score-columns span').count(),3,'ranking con posición, iniciales y cartas');
+  assert.equal(await page.locator('#scoreTopTitle').textContent(),'HIGH SCORES');
+  assert.equal(await page.locator('#scores .arcade-scoreboard-top').textContent(),'— TOP 10 —');
+  assert.equal(await page.locator('#scores .arcade-scoreboard-columns span').count(),3,'ranking arcade con posición, iniciales y cartas');
+  assert.equal(await page.locator('#scores .arcade-scoreboard-rows .r').count(),10,'diez casillas arcade');
+  assert.equal(await page.locator('#scores [data-score-entry]').count(),0,'las casillas vacías no inventan jugadores');
+  assert.equal(await page.locator('#scores .score-overview').count(),0,'se elimina la tarjeta genérica');
+  assert.equal(await page.locator('#scores .score-entry-row').count(),0,'el marcador y el botón original siguen separados');
+  assert.equal(await page.locator('#scores .wrap > #sSave').count(),1,'Guardar sigue debajo de iniciales');
+  assert.ok((await page.locator('#scores .wrap > .px').first().textContent()).includes('TU PUNTAJE: CARTAS DISTINTAS'),'marcador original');
+  const inputLook=await page.locator('#iniIn').evaluate(el=>({font:getComputedStyle(el).fontSize,field:Math.round(el.getBoundingClientRect().width),border:getComputedStyle(el).borderTopWidth}));
+  assert.deepEqual(inputLook,{font:'30px',field:200,border:'2px'},'campo de iniciales idéntico al original');
+  await page.screenshot({path:'qa/screenshots/records-arcade-inicial-'+width+'.png',fullPage:true});
   await page.locator('#iniIn').fill('ABC');
   await page.locator('#sSave').click();
-  assert.equal(await page.locator('#scores #tbl .r').count(),1,'guardar iniciales muestra registro local');
-  assert.equal(await page.locator('#scores #tbl .r span:nth-child(2)').textContent(),'ABC');
+  assert.equal(await page.locator('#scores [data-score-entry]').count(),1,'guardar iniciales crea un solo registro');
+  assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(2)').textContent(),'ABC');
+  const actualScore=String(Number(await page.locator('#sMine').textContent())).padStart(3,'0');
+  assert.equal(await page.locator('#scores .arcade-scoreboard-rows .rank-1 span:nth-child(3)').textContent(),actualScore,'Top 10 refleja el puntaje real sin inventarlo');
+  await page.waitForTimeout(1800);
   await page.screenshot({path:'qa/screenshots/records-top10-'+width+'.png',fullPage:true});
   // El selector y los Récords no deben tocar las cartas reales, abrir sesiones ni emitir RPC.
   const saved=await page.evaluate(()=>({
