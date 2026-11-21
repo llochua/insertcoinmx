@@ -129,7 +129,8 @@ async function loadAccountIdentity(expectedId) {
     globalThis.icmxAccountIdentity={
       userId:user.id,
       ini,
-      handle:profile.public_handle.toLowerCase()
+      handle:profile.public_handle.toLowerCase(),
+      isPublic:profile.is_public===true
     };
     $auth('profileSignedIdentityForm').hidden=true;
     $auth('profileSignedIdentityStatus').textContent='JUGADOR '+ini+' · @'+profile.public_handle.toLowerCase();
