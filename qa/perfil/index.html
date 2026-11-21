@@ -1673,17 +1673,17 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .dx-cinema-overlay::before{content:"";position:absolute;inset:-20%;z-index:-2;background:radial-gradient(ellipse at 50% 48%,var(--cinema-soft),transparent 50%),linear-gradient(110deg,transparent 33%,rgba(255,255,255,.58) 49%,transparent 65%);animation:cinemaBeam 1.55s ease-out both}
 .dx-cinema-overlay::after{content:"";position:absolute;inset:13%;z-index:-1;border-top:2px solid var(--cinema-accent);border-bottom:2px solid var(--cinema-accent);opacity:0;animation:cinemaFrame 1.35s .12s ease-out both}
 .dx-cinema-overlay small{font:clamp(8px,2vw,12px)/1.5 PX,monospace;color:#fff;text-shadow:0 2px 12px #09071a;letter-spacing:.1em;animation:cinemaTitle 1.4s both}
-.dx-cinema-overlay strong{font:clamp(20px,5.7vw,38px)/1.2 PX,monospace;letter-spacing:.03em;text-align:center;color:var(--cinema-accent);text-shadow:0 0 16px var(--cinema-soft),0 3px 9px #0b0920;animation:cinemaTitle 1.4s .12s both}
+.dx-cinema-overlay strong{font:clamp(20px,5.7vw,38px)/1.2 PX,monospace;letter-spacing:.03em;text-align:center;color:var(--cinema-accent);text-shadow:0 0 16px var(--cinema-soft),0 3px 9px #0b0920;animation:cinemaTitle 1.4s .02s both}
 .dx-cinema-e .dx-cinema-overlay{--cinema-accent:#9af2f8;--cinema-soft:rgba(236,0,139,.62)}
 .dx-cinema-r .dx-cinema-overlay{--cinema-accent:#FFE27A;--cinema-soft:rgba(255,178,0,.77)}
-.dx-cinema-r .dx-cinema-overlay::before{background:radial-gradient(ellipse at 50% 48%,rgba(255,243,192,.93),rgba(255,187,49,.48) 34%,transparent 68%),linear-gradient(112deg,transparent 29%,rgba(255,244,202,.88) 48%,transparent 67%)}
+.dx-cinema-r .dx-cinema-overlay::before{background:radial-gradient(ellipse at 50% 48%,rgba(255,243,192,.76),rgba(255,187,49,.35) 31%,transparent 64%),linear-gradient(112deg,transparent 29%,rgba(255,244,202,.65) 48%,transparent 67%)}
 .dx-cinema-f .dx-cinema-overlay{--cinema-accent:#ff7ec9;--cinema-soft:rgba(236,0,139,.74)}
 .dx-cinema-f .dx-cinema-overlay::after{inset:9% 8%;border:2px solid var(--cinema-accent);border-radius:0}
 .dx-cinema-f .dx-cinema-overlay::before{background:radial-gradient(ellipse at 50% 43%,rgba(255,158,225,.45),transparent 61%),linear-gradient(90deg,rgba(6,6,24,.7),transparent 28%,transparent 73%,rgba(6,6,24,.7))}
 @keyframes cinemaCurtain{0%{opacity:0;background:rgba(4,3,18,.92)}18%{opacity:1;background:rgba(4,3,18,.78)}35%{background:rgba(4,3,18,.27)}72%{opacity:1;background:transparent}100%{opacity:0;background:transparent}}
 @keyframes cinemaBeam{0%{opacity:0;transform:scale(.42) rotate(-12deg)}28%{opacity:1;transform:scale(1) rotate(0)}58%{opacity:.6;transform:scale(1.16)}100%{opacity:0;transform:scale(1.3)}}
 @keyframes cinemaFrame{0%{opacity:0;transform:scaleX(.45)}36%{opacity:.96;transform:scaleX(1)}71%{opacity:.72}100%{opacity:0;transform:scaleX(1.07)}}
-@keyframes cinemaTitle{0%,20%{opacity:0;transform:translateY(15px) scale(.88)}43%{opacity:1;transform:translateY(0) scale(1.06)}68%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+@keyframes cinemaTitle{0%,6%{opacity:0;transform:translateY(17px) scale(.82)}30%{opacity:1;transform:translateY(0) scale(1.10)}68%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.disc.dx .dx-cinema-overlay{display:none!important;animation:none!important}}
 
 /* La carta ampliada sirve para abrir/cerrar desde la misma superficie. */
