@@ -344,12 +344,12 @@ async function run(){
     'cambiar de cuenta no debe abrir sobres locales mientras la nube está bloqueada');
   console.log('✓ Cambio de cuenta bloqueado sin mezclar ni sustituir colecciones');
 
-  // La existencia de cartas locales sin nube bloquea la migración automática.
+  // Invitado con cartas sin historial verificable: conservarlas aparte.
   const LEGACY='qa-sync-legacy-03';
   const D=await device(LEGACY,{...baseState(),have:{abuket_b:4}});
   assert.equal(cloud.has(LEGACY),false,'una colección local no debe crear respaldo remoto');
   assert.equal((await read(D.page)).have.abuket_b,4);
-  assert.equal(await D.page.locator('#cloudState').getAttribute('data-sync'),'pending');
+  assert.equal(await D.page.locator('#cloudState').getAttribute('data-sync'),'conflict');
   assert.equal(await D.page.evaluate(()=>cloudSync.requiresServer()),true);
   const legacyBefore=await read(D.page);
   await D.page.evaluate(()=>openPack());
@@ -358,62 +358,53 @@ async function run(){
     'una cuenta pendiente no puede acuñar cartas en local');
   assert.equal(cloud.has(LEGACY),false);
   console.log('✓ Colección local previa permanece intacta, sin migración automática ni sobres locales');
-  assert.equal(await D.page.evaluate(()=>cloudSync.canImport()),true);
-  // El respaldo y la vinculación ya no viven en Récords: se accionan desde Mi perfil.
   await D.page.evaluate(()=>{document.getElementById('title').classList.remove('on');go('profile');revealProfileAuth('login')});
-  await D.page.locator('#profileLinkCollection').waitFor({state:'visible'});
+  await D.page.locator('#profileResolveConflict').waitFor({state:'visible'});
+  await D.page.locator('#profileResolveConflict').click();
+  await D.page.locator('#conflictUseCloud').waitFor({state:'visible'});
+  assert.match(await D.page.locator('#bkm').innerText(),/4 cartas/);
+  D.page.once('dialog',dialog=>dialog.dismiss());
+  await D.page.locator('#conflictUseCloud').click();
+  assert.deepEqual(await read(D.page),legacyBefore);
+  assert.equal(cloud.has(LEGACY),false);
   D.page.once('dialog',dialog=>dialog.accept());
-  await D.page.locator('#profileLinkCollection').click();
-  await until(()=>cloud.has(LEGACY),'importación de colección local');
+  await D.page.locator('#conflictUseCloud').click();
+  await until(()=>cloud.has(LEGACY),'alta de cuenta explícita');
   await until(async()=>await D.page.locator('#cloudState').getAttribute('data-sync')==='synced',
-    'estado sincronizado tras importación');
-  assert.equal(cloud.get(LEGACY).state.data.have.abuket_b,4);
+    'estado sincronizado tras recuperación');
+  assert.deepEqual(cloud.get(LEGACY).state.data.have,{});
+  assert.deepEqual((await read(D.page)).have,{});
   assert.equal(await D.page.evaluate(()=>cloudSync.canImport()),false);
-  const importedBefore=clone(cloud.get(LEGACY));
+  const archived=await D.page.evaluate(()=>cloudSync.listConflictArchives());
+  assert.equal(archived.length,1);
+  assert.deepEqual(archived[0].backup.data,legacyBefore);
+  const linkedBefore=clone(cloud.get(LEGACY));
   await check(D.page);
-  assert.deepEqual(cloud.get(LEGACY),importedBefore,'no reimportar colección');
-  console.log('✓ Vinculación explícita conserva las cartas originales');
+  assert.deepEqual(cloud.get(LEGACY),linkedBefore,'no reinicializar colección');
+  console.log('✓ Recuperación explícita conserva respaldo local y crea una cuenta sin cartas no verificadas');
 
-  // Recorrido completo después de importar: emisión por servidor y recuperación
-  // desde un navegador nuevo, sin compartir almacenamiento local.
-  const importedCards=count((await read(D.page)));
+  // Emitir un sobre después de resolver y recuperar desde otro navegador.
+  const initialCards=count(await read(D.page));
   await D.page.evaluate(()=>go('pack'));
   await until(async()=>await D.page.locator('#cloudState').getAttribute('data-sync')==='synced',
-    'sincronización lista antes de abrir el primer sobre vinculado');
+    'sincronización lista antes del primer sobre');
   const linkedIssue=()=>[...issued.keys()].some(key=>key.startsWith(LEGACY+':'));
   await D.page.evaluate(()=>openPack());
-  // La comprobación final tras importar NO debe bloquear el primer tap:
-  // issuePack espera el check en curso sin acuñar dos sobres.
-  assert.equal(count(await read(D.page)),importedCards,
-    'antes de emitir el primer sobre se conserva la colección importada');
-  await until(linkedIssue,
-    'el primer sobre tras vincular debe emitirse en servidor',4500).catch(async(error)=>{
-    const diagnostic=await D.page.evaluate(()=>({
-      sync:document.getElementById('cloudState').dataset.sync,
-      canImport:cloudSync.canImport(),account:cloudSync.isAccount(),
-      requiresServer:cloudSync.requiresServer(),busy:serverPackBusy,
-      scene:cur,packReady:packReady(),
-      welcomeLeft:S.welcomeLeft,localCards:Object.keys(S.have).length,
-      pending:localStorage.getItem('icmx-cloud-pack-request-v1:'+localStorage.getItem('icmx-qa-user'))
-    }));
-    throw Error(error.message+' | Diagnóstico: '+JSON.stringify(diagnostic));
-  });
-  await until(async()=>count(await read(D.page))===importedCards+5,
-    'la colección vinculada debe recibir exactamente cinco cartas');
-  assert.equal(cloud.get(LEGACY).state.data.have.abuket_b,5);
-  assert.equal([...issued.keys()].filter(key=>key.startsWith(LEGACY+':')).length,1,
-    'el sobre vinculado solamente debe emitirse una vez');
-  const importedAfterPack=await read(D.page);
+  await until(linkedIssue,'el primer sobre tras recuperar debe emitirse en servidor',4500);
+  await until(async()=>count(await read(D.page))===initialCards+5,
+    'la colección debe recibir exactamente cinco cartas');
+  assert.equal(cloud.get(LEGACY).state.data.have.abuket_b,1);
+  assert.equal([...issued.keys()].filter(key=>key.startsWith(LEGACY+':')).length,1);
+  const afterPack=await read(D.page);
   const E=await device(LEGACY,null);
-  await until(async()=>count(await read(E.page))===count(importedAfterPack),
-    'el segundo dispositivo debe recuperar la colección vinculada');
-  assert.deepEqual((await read(E.page)).have,importedAfterPack.have);
-  assert.deepEqual((await read(E.page)).pk,importedAfterPack.pk);
-  assert.equal((await read(E.page)).welcomeLeft,importedAfterPack.welcomeLeft);
+  await until(async()=>count(await read(E.page))===count(afterPack),
+    'el segundo dispositivo debe recuperar la cuenta');
+  assert.deepEqual((await read(E.page)).have,afterPack.have);
+  assert.deepEqual((await read(E.page)).pk,afterPack.pk);
+  assert.equal((await read(E.page)).welcomeLeft,afterPack.welcomeLeft);
   await check(E.page);
-  assert.equal([...issued.keys()].filter(key=>key.startsWith(LEGACY+':')).length,1,
-    'recuperar en otro dispositivo no debe crear sobres adicionales');
-  console.log('✓ Importación, apertura de sobre y recuperación en segundo dispositivo sin duplicar');
+  assert.equal([...issued.keys()].filter(key=>key.startsWith(LEGACY+':')).length,1);
+  console.log('✓ Recuperación, apertura de sobre y segundo dispositivo sin duplicar');
 
   // Cerrar y reabrir la misma sesión en el mismo navegador no borra
   // ni cambia la colección; durante el cierre no se pueden abrir sobres.

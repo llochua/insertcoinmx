@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {assertBackup,progressSignature,sameProgress,hasGameProgress,decideSync} from './cloud-sync.mjs';
+import {assertBackup,progressSignature,sameProgress,hasGameProgress,decideSync,reconcileMetadata,archiveConflict} from './cloud-sync.mjs';
 
 const backup=(have={},extra={})=>({
  app:'insertcoinmx-album',format:2,exportedAt:new Date().toISOString(),
@@ -60,4 +60,36 @@ test('Sincronización respeta actividad sin cartas (Tier/Reta)',()=>{
  assert.equal(hasGameProgress(backup()),false);
  assert.equal(hasGameProgress(backup({}, {rate:{gato:1}})),true);
  assert.equal(hasGameProgress(backup({}, {reta2:{round:3}})),true);
+});
+
+test('Calificar localmente mientras otro dispositivo abre sobre no bloquea ni altera cartas',()=>{
+ const old=backup({gato_b:1},{pk:['abcdef12'],welcomeLeft:4});
+ const local=backup({gato_b:1},{pk:['abcdef12'],welcomeLeft:4,rate:{gato:2}});
+ const remote=backup({gato_b:2},{pk:['abcdef12','abcdef34'],welcomeLeft:3,rate:{perro:1}});
+ const merged=reconcileMetadata({local,remote,base:base(old)});
+ assert.deepEqual(merged.data.have,remote.data.have);
+ assert.deepEqual(merged.data.pk,remote.data.pk);
+ assert.equal(merged.data.welcomeLeft,3);
+ assert.deepEqual(merged.data.rate,{perro:1,gato:2});
+});
+test('Dos colecciones independientes no se pueden reconciliar por metadata',()=>{
+ const old=backup({gato_b:1});
+ assert.equal(reconcileMetadata({local:backup({gato_b:4}),remote:backup({perro_b:2}),base:base(old)}),null);
+ assert.equal(reconcileMetadata({local:old,remote:backup({perro_b:2}),base:null}),null);
+});
+test('Modificar la misma calificación de forma incompatible requiere revisión',()=>{
+ const old=backup({gato_b:1},{rate:{gato:1}});
+ assert.equal(reconcileMetadata({local:backup({gato_b:1},{rate:{gato:2}}),
+ remote:backup({gato_b:1},{rate:{gato:3}}),base:base(old)}),null);
+});
+test('Archivo de conflicto independiente no sobrescribe una copia anterior',()=>{
+ const store=new Map();
+ const storage={getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)};
+ const first=backup({gato_b:3}),second=backup({perro_b:6});
+ const a=archiveConflict(storage,{owner:'qa',local:first});
+ const b=archiveConflict(storage,{owner:'qa',local:second});
+ assert.notEqual(a,b);
+ assert.deepEqual(JSON.parse(store.get(a)).backup,first);
+ assert.deepEqual(JSON.parse(store.get(b)).backup,second);
+ assert.throws(()=>archiveConflict({getItem:()=>null,setItem(){}},{owner:'qa',local:first}));
 });

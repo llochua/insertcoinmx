@@ -21,6 +21,7 @@ const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function harness({uid='qa-user',local=backup(),remote=backup()}={}){
  const store=new Map();
  const storage={
+  get length(){return store.size},key:i=>[...store.keys()][i]??null,
   getItem:k=>store.has(k)?store.get(k):null,
   setItem:(k,v)=>store.set(k,String(v)),
   removeItem:k=>store.delete(k)
@@ -40,7 +41,16 @@ async function harness({uid='qa-user',local=backup(),remote=backup()}={}){
     async maybeSingle(){return {data:h.remote?{
      user_id:this.userId,game_format:2,state:copy(h.remote),revision:h.revision}:null,error:null}}};
   },
-  async rpc(name){
+  async rpc(name,args){
+   if(name==='sync_player_snapshot'){
+    if(args.p_expected_revision!==h.revision)return {data:{status:'conflict',revision:h.revision},error:null};
+    h.remote=copy(args.p_state);h.revision++;
+    return {data:{status:'updated',revision:h.revision},error:null};
+   }
+   if(name==='ensure_player_snapshot'){
+    if(h.remote)return {data:{status:'existing',revision:h.revision,state:copy(h.remote)},error:null};
+    h.remote=backup();h.revision=1;return {data:{status:'created',revision:1,state:copy(h.remote)},error:null};
+   }
    if(name==='issue_player_pack'){
     h.issueCalls++;
     const cards=['gato_b','perro_b','pizza_b','gato_e','gato_f'];
@@ -155,5 +165,45 @@ test('Conflicto local/remoto nunca emite ni mezcla cartas',{concurrency:false},a
   assert.equal(result.status,'pending');
   assert.equal(h.issueCalls,0);
   assert.deepEqual(h.local,local);
+ }finally{h.stop()}
+});
+
+test('Una colección independiente se archiva y se recupera la cuenta sin sumar cartas',{concurrency:false},async()=>{
+ const local=backup({gato_b:2}),remote=backup({perro_b:7});
+ const h=await harness({local,remote});
+ try{
+  const review=h.controller.getConflict();
+  assert.ok(review);
+  assert.equal((await h.controller.useCloud(review)).status,'resolved');
+  assert.deepEqual(h.local,remote);
+  assert.deepEqual(h.remote,remote);
+  assert.deepEqual(h.controller.listConflictArchives()[0].backup,local);
+  assert.equal(h.issueCalls,0);
+  assert.equal((await h.controller.issuePack()).status,'issued');
+  assert.equal(h.issueCalls,1);
+ }finally{h.stop()}
+});
+test('Si cambia el servidor después de la revisión no se reemplaza el progreso local',{concurrency:false},async()=>{
+ const local=backup({gato_b:2});
+ const h=await harness({local,remote:backup({perro_b:7})});
+ try{
+  const review=h.controller.getConflict();
+  h.remote=backup({perro_b:8});h.revision++;
+  assert.equal((await h.controller.useCloud(review)).status,'changed');
+  assert.deepEqual(h.local,local);
+  assert.equal(h.controller.listConflictArchives().length,0);
+ }finally{h.stop()}
+});
+test('Progreso invitado con cuenta nueva: copia separada y alta sin acuñar cartas',{concurrency:false},async()=>{
+ const local=backup({gato_b:2});
+ const h=await harness({local,remote:null});
+ try{
+  const review=h.controller.getConflict();
+  assert.ok(review);assert.equal(review.remote,null);
+  assert.equal((await h.controller.useCloud(review)).status,'resolved');
+  assert.deepEqual(h.remote.data.have,{});
+  assert.deepEqual(h.local.data.have,{});
+  assert.deepEqual(h.controller.listConflictArchives()[0].backup,local);
+  assert.equal(h.issueCalls,0);
  }finally{h.stop()}
 });

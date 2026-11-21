@@ -1494,7 +1494,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-sync-box[data-sync="synced"]{color:#9bebbd;border-color:rgba(155,235,189,.5)}
 #profile .profile-sync-box[data-sync="conflict"]{color:#ffd400}
 #profile .profile-sync-box[data-sync="offline"]{color:#ffbdc0}
-#profile #profileLinkCollection[hidden]{display:none!important}
+#profile #profileLinkCollection[hidden],#profile #profileResolveConflict[hidden]{display:none!important}
 
 /* Mi perfil V2 · pasaporte de jugador y acciones progresivas */
 #home .home-player-card{position:relative;z-index:2;display:flex;flex:none;align-items:center;gap:11px;width:min(100% - 36px,480px);min-height:72px;margin:10px auto 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,212,0,.43);background:linear-gradient(110deg,#29204f,#18122e);color:#fff;text-align:left;box-shadow:0 10px 24px rgba(0,0,0,.2)}
@@ -2035,6 +2035,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <p class="profile-auth-message" id="profileAuthMessage" role="status" aria-live="polite"></p>
    <div id="profileCloudStatus" class="profile-sync-box" role="status" aria-live="polite">CONSULTANDO ESTADO DE LA NUBE…</div>
    <button type="button" class="profile-action secondary" id="profileLinkCollection" hidden>VINCULAR MI COLECCIÓN LOCAL</button>
+   <button type="button" class="profile-action secondary" id="profileResolveConflict" hidden>REVISAR MIS COLECCIONES</button>
    <p class="profile-footnote">Vincular cartas requiere confirmación. Nada se borra ni se fusiona automáticamente.</p>
   </section>
   <details class="profile-backup" id="profileBackup">
@@ -2043,6 +2044,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
     <p>Como invitado, tus cartas se guardan en este navegador. Puedes descargar una copia por seguridad.</p>
     <button type="button" class="profile-action secondary" id="profileExport">DESCARGAR MIS CARTAS</button>
     <button type="button" class="profile-action secondary" id="profileImport">RECUPERAR UN RESPALDO</button>
+    <button type="button" class="profile-action secondary" id="profileArchivedCollections">RESPALDOS DE COLECCIONES ANTERIORES</button>
     <!-- Puentes internos: el respaldo ya vive en Mi perfil; no se duplica en Récords. -->
     <button type="button" id="bkExp" hidden aria-hidden="true">Exportar</button>
     <button type="button" id="bkImp" hidden aria-hidden="true">Importar</button>
@@ -2916,6 +2918,7 @@ function openServerPack(){
    if(result?.status==='busy'){
     toast('OPERACIÓN EN CURSO<br>INTENTA DE NUEVO');return;
    }
+   if(cloudSync.getConflict?.()){toast('REVISA TUS COLECCIONES<br>DESDE TU PERFIL');return}
    toast('SINCRONIZACIÓN PENDIENTE<br>REVISA TU CONEXIÓN O PERFIL');
    return;
   }
@@ -4120,7 +4123,7 @@ claimPend();initSound();go('home');STORE.init();
 if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
 /* Integración segura: nunca reemplaza un progreso distinto sin revisión.
    Los visitantes sin sesión continúan jugando y guardando localmente. */
-import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCloudSync({
+import('./content/cloud-sync.mjs?v=20261121-recovery').then(({startCloudSync,sameProgress})=>startCloudSync({
  readLocal:()=>{
   // Nunca publicar un sobre que el navegador no logró guardar.
   if(saveFailed||NOWRITE)throw Error('Hay progreso local pendiente de proteger');
@@ -4140,9 +4143,55 @@ import('./content/cloud-sync.mjs').then(({startCloudSync,sameProgress})=>startCl
   if(importButton)importButton.hidden=!(code==='pending'&&message.includes('PUEDES VINCULARLA'));
    const pStatus=$('profileCloudStatus');if(pStatus){pStatus.dataset.sync=code;pStatus.textContent=message}
    const pLink=$('profileLinkCollection');if(pLink)pLink.hidden=!(code==='pending'&&message.includes('PUEDES VINCULARLA'));
+   const resolve=$('profileResolveConflict');if(resolve&&code!=='checking')resolve.hidden=!(code==='conflict'&&message.startsWith('DOS COLECCIONES'));
  }
 })).then(controller=>{
  cloudSync=controller;
+ $('profileArchivedCollections').onclick=()=>{
+  const archives=cloudSync.listConflictArchives();
+  bkOpen(`<h2>COLECCIONES CONSERVADAS</h2><p>Estas copias son independientes de tu cuenta. Descárgalas para conservarlas fuera de este navegador.</p><div id="conflictArchiveList" class="bkb"></div><p id="bkMsg" role="status"></p><button class="btn" data-bkx>CERRAR</button>`);
+  const list=$('conflictArchiveList');
+  if(!archives.length){list.textContent='Todavía no hay colecciones archivadas en este navegador.';return}
+  archives.forEach((entry,i)=>{
+   const button=document.createElement('button');
+   button.className='btn';
+   const cards=Object.values(entry.backup.data.have).reduce((n,v)=>n+v,0);
+   button.textContent='DESCARGAR COPIA '+(i+1)+' · '+cards+' CARTAS';
+   button.onclick=async()=>{
+    const ok=await saveFile('insertcoinmx-coleccion-archivada-'+i+'-'+today()+'.json',JSON.stringify(entry.backup,null,2));
+    bkMsg(ok?'Respaldo guardado.':'No se pudo guardar el archivo.',ok?'':'bkwarn');
+   };
+   list.appendChild(button);
+  });
+ };
+ $('profileResolveConflict').onclick=()=>{
+  const review=cloudSync.getConflict();
+  if(!review){cloudSync.check();toast('COMPROBANDO TUS COLECCIONES');return}
+  const total=b=>Object.values(b?.data?.have||{}).reduce((n,v)=>n+v,0);
+  const votes=b=>Object.keys(b?.data?.rate||{}).length;
+  const remoteText=review.remote
+   ?total(review.remote)+' cartas · '+votes(review.remote)+' calificaciones'
+   :'Cuenta nueva · sin cartas';
+  bkOpen(`<h2>REVISA TUS COLECCIONES</h2>
+   <p>Este dispositivo: <strong>${total(review.local)} cartas · ${votes(review.local)} calificaciones</strong></p>
+   <p>Tu cuenta: <strong>${remoteText}</strong></p>
+   <p>Son progresos distintos. Para proteger las cartas, no los mezclamos. Puedes continuar con el progreso de tu cuenta y conservar el local como archivo independiente. No se agregarán esas cartas a tu cuenta.</p>
+   <div class="bkb"><button class="btn" id="conflictDownload">GUARDAR RESPALDO LOCAL</button><button class="btn y" id="conflictUseCloud">CONTINUAR CON MI CUENTA</button><button class="btn" data-bkx>CANCELAR</button></div><p id="bkMsg" role="status"></p>`);
+  $('conflictDownload').onclick=async()=>{
+   const ok=await saveFile('insertcoinmx-coleccion-local-'+today()+'.json',JSON.stringify(review.local,null,2));
+   bkMsg(ok?'Respaldo guardado.':'No se pudo guardar el archivo. El progreso sigue intacto.',ok?'':'bkwarn');
+  };
+  $('conflictUseCloud').onclick=async()=>{
+   if(!confirm('¿Continuar con la colección de tu cuenta? Guardaremos una copia separada de tus cartas locales en este navegador. No se mezclarán las colecciones.'))return;
+   const button=$('conflictUseCloud');button.disabled=true;
+   const result=await cloudSync.useCloud(review);
+   if(result.status==='resolved'){bkClose();toast('COLECCIÓN DE CUENTA RECUPERADA');return}
+   if(button.isConnected)button.disabled=false;
+   bkMsg(result.status==='changed'?'El progreso cambió. Cierra esta ventana y vuelve a revisar tus colecciones.':
+    result.status==='pending_request'?'Hay una apertura o canje pendiente. Reintenta esa operación antes de cambiar la colección.':
+    'No se pudo recuperar la cuenta. Tu respaldo local sigue protegido.','bkwarn');
+  };
+ };
  const button=$('cloudImport');
  if(button)button.addEventListener('click',async()=>{
   if(!cloudSync?.canImport?.()||button.disabled)return;
