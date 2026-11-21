@@ -89,6 +89,7 @@ try {
  await signed.page.reload({waitUntil:'domcontentloaded'});
  await signed.page.waitForFunction(()=>document.documentElement.dataset.icmxAvatarReady==='true');
  assert.equal(await signed.page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/pizza-128.webp','account avatar survives page reload');
+ if(unexpectedRemote.length)console.error('Unexpected remote QA calls',JSON.stringify(unexpectedRemote));
  assert.equal(unexpectedRemote.length,0,'no real Supabase requests');
  assert.deepEqual(errors,[],'no browser script errors');
  console.log('✓ Mi perfil integrado: invitado, cuenta, 12 avatares, guardado y álbum intacto sin conectar al servidor');
