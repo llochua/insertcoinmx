@@ -1615,8 +1615,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 
 /* High score board · tipografía de los arcades originales.
    El marcador e ingreso de iniciales arriba conservan exactamente su estilo previo. */
-#scores .arcade-scoreboard{width:min(440px,100%);box-sizing:border-box;flex:none;margin:12px auto 8px;padding:19px 12px 15px;background:rgba(0,2,15,.43);border-top:2px solid rgba(255,212,0,.72);border-bottom:2px solid rgba(255,212,0,.35);border-radius:0;box-shadow:none}
-#scores .arcade-scoreboard-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;margin-bottom:20px}
+#scores .arcade-scoreboard{width:min(440px,100%);box-sizing:border-box;flex:none;margin:8px auto 6px;padding:14px 12px 10px;background:rgba(0,2,15,.43);border-top:2px solid rgba(255,212,0,.72);border-bottom:2px solid rgba(255,212,0,.35);border-radius:0;box-shadow:none}
+#scores .arcade-scoreboard-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;margin-bottom:14px}
 #scores .arcade-scoreboard-brand{font:8px/1.4 PX,monospace;color:#EC008B;letter-spacing:.11em}
 #scores .arcade-scoreboard-head h2{font:clamp(13px,2.6vw,17px)/1.4 PX,monospace;color:#FFD400;letter-spacing:.035em;white-space:nowrap;margin:0}
 #scores .arcade-scoreboard-top{font:10px/1.4 PX,monospace;color:#fff;letter-spacing:.09em;margin-top:1px}
@@ -1624,7 +1624,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #scores .arcade-scoreboard-columns span:nth-child(2){text-align:center}
 #scores .arcade-scoreboard-columns span:last-child{text-align:right}
 #scores .arcade-scoreboard-rows{width:100%!important;max-width:none;display:block;font-family:PX,monospace!important}
-#scores .arcade-scoreboard-rows .r{display:grid;position:relative;grid-template-columns:66px minmax(0,1fr) 77px;align-items:center;gap:6px;min-height:34px;padding:7px 4px!important;border:0!important;border-radius:0!important;background:transparent!important;color:#e9e5f8;font:11px/1.4 PX,monospace!important}
+#scores .arcade-scoreboard-rows .r{display:grid;position:relative;grid-template-columns:66px minmax(0,1fr) 77px;align-items:center;gap:6px;min-height:31px;padding:5px 4px!important;border:0!important;border-radius:0!important;background:transparent!important;color:#e9e5f8;font:11px/1.4 PX,monospace!important}
 #scores .arcade-scoreboard-rows .r span{min-width:0;font:inherit!important;letter-spacing:0!important;align-self:center}
 #scores .arcade-scoreboard-rows .r span:nth-child(1){width:auto!important;text-align:left;color:inherit}
 #scores .arcade-scoreboard-rows .r span:nth-child(2){text-align:center;color:inherit}
@@ -1635,7 +1635,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #scores .arcade-scoreboard-rows .r.rank-empty{color:rgba(173,169,209,.35);font-size:9px!important}
 #scores .arcade-scoreboard-rows .r.rank-player::before{content:'▶';position:absolute;left:-9px;top:50%;transform:translateY(-50%);font:10px PX,monospace;color:#FFD400}
 #scores .arcade-scoreboard-rows .r.rank-player:not(.rank-1):not(.rank-2):not(.rank-3){color:#FFD400}
-#scores .arcade-scoreboard-source{font:8px/1.6 PX,monospace;color:#aaa5cd;text-align:center;letter-spacing:.02em;margin-top:19px}
+#scores .arcade-scoreboard-source{font:8px/1.6 PX,monospace;color:#aaa5cd;text-align:center;letter-spacing:.02em;margin-top:10px}
 @media(max-width:399px){#scores .arcade-scoreboard{padding-inline:8px}#scores .arcade-scoreboard-columns,#scores .arcade-scoreboard-rows .r{grid-template-columns:59px minmax(0,1fr) 68px}#scores .arcade-scoreboard-rows .r{font-size:10px!important}#scores .arcade-scoreboard-rows .r.rank-1{font-size:11px!important}}
 </style></head><body>
 <div class="lab-ribbon" aria-label="Vista previa no publicada">LAB · VISTA PREVIA · NO USA TUS CARTAS</div>
@@ -3168,7 +3168,7 @@ function renderScores(){
  const available=board().slice(0,10);
  const pos=available.findIndex(r=>r.ini===S.ini);
  $('sPos').textContent=pos>=0?'VAS EN EL LUGAR #'+(pos+1):'PON TUS INICIALES PARA ENTRAR';
- $('scoreDataScope').textContent=STORE.docs.length?'RÉCORDS DISPONIBLES ENTRE JUGADORES':'RÉCORDS DISPONIBLES EN ESTA VISTA PREVIA';
+ $('scoreDataScope').textContent=STORE.docs.length?'REGISTROS DISPONIBLES':'RÉCORDS DE ESTA VISTA';
  // Las posiciones vacías son casillas sin datos, nunca resultados ficticios.
  $('tbl').innerHTML=Array.from({length:10},(_,i)=>{
   const r=available[i],mine=!!r&&r.ini===S.ini;
