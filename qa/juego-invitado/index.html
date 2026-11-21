@@ -1705,6 +1705,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile #profileAuthHandle,#profile #profileSignedHandle{text-transform:lowercase}
 #profile #profileSignedIdentityForm{display:flex;flex-direction:column;gap:10px}
 #profile #profileSignedIdentityForm[hidden],#profile #profileSignupInitialsField[hidden],#profile #profileSignupHandleField[hidden]{display:none!important}
+
+#profile .profile-head h2.arcade-initials{font:clamp(17px,4vw,22px)/1.5 PX,monospace;color:#ffd400;letter-spacing:.12em}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -3786,6 +3788,7 @@ function renderProfile(){
  $('profileRatings').textContent=Object.keys(S.rate||{}).length;
  const identity=arcadeIdentity();
  $('profilePlayerName').textContent=validArcadeIni(identity.ini)?identity.ini:(identity.registered?'Jugador registrado':'Jugador invitado');
+ $('profilePlayerName').classList.toggle('arcade-initials',validArcadeIni(identity.ini));
  $('profilePlayerState').textContent=identity.registered?'Cuenta conectada · revisa tu respaldo':'Invitado · progreso en este dispositivo';
  const initials=$('profileInitials');
  initials.hidden=!identity.handle;
