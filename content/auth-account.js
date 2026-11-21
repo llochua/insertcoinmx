@@ -373,3 +373,20 @@ changeAuthMode(globalThis.icmxInitialAuthMode==='login'?'login':'signup');
 fillRegistrationFromGuest();
 authMessage('Conectando...');
 initAccount();
+
+// Community reads use the public API, writes use the already verified account session.
+export async function communityRequest(name,args){
+ const read=name==='icmx_community_aggregates';
+ if(!read&&!['icmx_community_vote','icmx_community_reta'].includes(name))throw Error('Unknown community operation');
+ if(read){
+  const response=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},body:'{}'});
+  if(!response.ok)throw Error('Ranking unavailable');
+  return response.json();
+ }
+ if(!authClient)throw Error('Account session unavailable');
+ const {data:verified,error:verifyError}=await authClient.auth.getUser();
+ if(verifyError||!verified?.user||verified.user.is_anonymous)throw Error('Registered account required');
+ const {data,error}=await authClient.rpc(name,args);
+ if(error)throw error;
+ return data;
+}
