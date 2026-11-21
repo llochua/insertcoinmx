@@ -45,7 +45,12 @@ async function device(signed){
  await context.route('https://cdn.jsdelivr.net/**',route=>route.fulfill({status:200,contentType:'text/javascript',headers:{'access-control-allow-origin':'*'},body:sdk}));
  await context.route('**/content/cloud-sync.mjs',route=>route.fulfill({status:200,contentType:'text/javascript',body:syncStub}));
  await context.route('**/rest/v1/rpc/icmx_player_leaderboards',route=>route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify({pts:[],cards:[],designs:[],duplicates:[],ratings:[]})}));
- await context.route(/https:\/\/.*supabase\.co\/.*/,route=>{unexpectedRemote.push(route.request().url());return route.abort()});
+ await context.route(/https:\/\/.*supabase\.co\/.*/,route=>{
+   const url=route.request().url();
+   if(url.includes('/rest/v1/rpc/icmx_player_leaderboards'))
+    return route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify({pts:[],cards:[],designs:[],duplicates:[],ratings:[]})});
+   unexpectedRemote.push(url);return route.abort();
+  });
  const page=await context.newPage();
  page.on('pageerror',e=>errors.push(e.message));
  const response=await page.goto(TARGET_URL,{waitUntil:'domcontentloaded'});
