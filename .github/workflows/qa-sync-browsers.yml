@@ -6,6 +6,10 @@ on:
     paths:
       - 'content/cloud-sync.mjs'
       - 'index.html'
+      - 'content/auth-account.js'
+      - 'content/avatar-profile.js'
+      - 'assets/avatars/**'
+      - 'qa/profile-browsers.mjs'
       - 'qa/perfil/index.html'
       - 'qa/perfil-preview-browsers.mjs'
       - 'qa/live-experience-browsers.mjs'
@@ -94,9 +98,27 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  qa-avatar-perfil:
+    name: Avatar de jugador · recorrido real en Chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar Playwright fijado
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Instalar Chromium
+        run: npx playwright install chromium
+      - name: Validar selector invitado, persistencia e integridad de colección
+        run: node qa/profile-browsers.mjs
+
   supabase-anon-smoke:
     name: Supabase real · verificar acceso anónimo
-    if: github.event_name == 'pull_request' && github.head_ref == 'feat/sync-automatica-segura-20261119'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
