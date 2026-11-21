@@ -62,12 +62,13 @@
    try{data=ratioData(img)}
    catch(_){return false}
    restoreBand(ctx,data,{x1:570,x2:904,y1:142,y2:217,sampleTop:138,sampleBottom:222});
-   restoreBand(ctx,data,{x1:777,x2:916,y1:1245,y2:1285,sampleTop:1237,sampleBottom:1293});
+   restoreBand(ctx,data,{x1:641,x2:843,y1:1252,y2:1281,sampleTop:1249,sampleBottom:1287});
    ctx.fillStyle=ink;ctx.textAlign='left';ctx.textBaseline='middle';
    ctx.font='800 23px "Avenir Next", Arial, sans-serif';
    ctx.fillText('POP',591,185,104);
    drawRight(ctx,isPop(pop)?String(pop):'—',894,184,69,ink,190);
-   drawRight(ctx,'Valor '+(points===null?'—':points),909,1267,26,ink,160);
+   ctx.textAlign='left';ctx.textBaseline='middle';ctx.font='800 26px "Avenir Next", Arial, sans-serif';ctx.fillStyle=ink;
+   ctx.fillText('Valor '+(points===null?'—':points),650,1267,183);
   }
   return true;
  }
