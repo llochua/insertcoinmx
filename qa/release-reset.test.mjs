@@ -18,12 +18,12 @@ function storage(initial={}){
   snapshot(){return Object.fromEntries(m)}
  };
 }
-function launch(s,active,version=epoch){
+function launch(s,active,version=epoch,hostname='insertcoinmx.com'){
  const window={};
  const document={currentScript:{getAttribute(name){
   return {'data-active':active?'true':'false','data-game-epoch':version}[name]??null;
  }}};
- vm.runInNewContext(source,{localStorage:s,window,document,location:{hostname:'insertcoinmx.com'}});
+ vm.runInNewContext(source,{localStorage:s,window,document,location:{hostname}});
  return window.ICMX_RELEASE_RESET;
 }
 const legacy=()=>storage({
@@ -40,12 +40,19 @@ const legacy=()=>storage({
  'sb-ynugqxbtszhsupadqdkz-auth-token':'auth',
  'unrelated-setting':'keep'
 });
-test('La PR mantiene el reinicio desactivado hasta autorizar la publicación',()=>{
- assert.match(html,/release-reset\.js[^>]*data-active="false"[^>]*data-game-epoch="public-2026-launch-v1"/);
+test('La versión candidata prepara el reinicio en el dominio oficial',()=>{
+ assert.match(html,/release-reset\.js[^>]*data-active="true"[^>]*data-game-epoch="public-2026-launch-v1"/);
  const s=legacy();
  assert.equal(launch(s,false).result.status,'staged');
  assert.equal(JSON.parse(s.getItem('icmx-album2')).have.abuket_b,3);
  assert.equal(s.getItem('icmx-game-epoch'),null);
+});
+test('El reinicio no se ejecuta accidentalmente en localhost o QA',()=>{
+ const s=legacy();
+ const run=launch(s,true,epoch,'127.0.0.1');
+ assert.equal(run.active,false);
+ assert.equal(run.result.status,'staged');
+ assert.equal(JSON.parse(s.getItem('icmx-album2')).have.abuket_b,3);
 });
 test('Al activarse elimina juego anterior, no usuarios, Auth ni avatar',()=>{
  const s=legacy();
