@@ -81,6 +81,20 @@ export function progressSignature(value){
  return canonical({data,ext:b.ext??null});
 }
 export function sameProgress(a,b){return progressSignature(a)===progressSignature(b)}
+// Una identidad de invitado sin actividad económica puede inicializarse sin pedir
+// reconciliación. Cualquier progreso anterior real conserva el flujo de revisión.
+export function isFreshGuest(backup){
+ const b=assertBackup(backup),d=b.data;
+ const allowed=new Set(['have','rate','ini','seen','last','extra','test','champ','sv','rev','mv','fg','welcomeLeft','freeDay','freeUsed','freeCycle','pk']);
+ return Object.keys(d).every(k=>allowed.has(k))&&
+  !Object.keys(d.have).length&&!Object.keys(d.rate).length&&!b.ext&&
+  (!d.pk||Array.isArray(d.pk)&&!d.pk.length)&&
+  (d.fg===undefined||d.fg===0)&&!d.last&&!d.champ&&!d.extra&&!d.test&&
+  d.welcomeLeft===5&&!d.freeUsed&&!d.freeDay&&
+  (d.freeCycle===undefined||d.freeCycle===0)&&
+  (!d.ini||/^[A-Z0-9]{3}$/.test(d.ini))&&
+  (d.seen===undefined||d.seen===0||d.seen===1);
+}
 export function hasGameProgress(backup){
  const b=assertBackup(backup),d=b.data;
  if(Object.keys(d.have).length||Object.keys(d.rate).length||b.ext&&Object.keys(b.ext).length)return true;
@@ -132,7 +146,7 @@ function persistBaseline(storage,userId,revision,backup){
  *  onStatus:(code:string,message:string)=>void}} callbacks
  * @returns {Promise<{changed:()=>void,check:()=>void,stop:()=>void}>}
  */
-export async function startCloudSync({readLocal,restoreLocal,onStatus}){
+export async function startCloudSync({readLocal,restoreLocal,onStatus,verifiedGuests=false,guestSession=null}){
  const sdk=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm');
  const client=sdk.createClient(
   'https://ynugqxbtszhsupadqdkz.supabase.co',
@@ -194,6 +208,42 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   const remote=row?assertBackup(row.state):null;
   const rev=row?Number(row.revision):0;
   const base=readBaseline(localStorage,uid);
+  if(verifiedGuests&&user.is_anonymous===true&&!base&&isFreshGuest(local)&&(!remote||isFreshGuest(remote))){
+   let initial=remote,revision=rev;
+   if(!initial){
+    const {data,error}=await client.rpc('ensure_player_snapshot');
+    if(error)throw error;
+    if(!['created','existing'].includes(data?.status)||!Number.isSafeInteger(Number(data.revision))||Number(data.revision)<1)
+     throw Error('No se pudo verificar la colección de invitado');
+    initial=assertBackup(data.state);revision=Number(data.revision);
+   }
+   if(!isFreshGuest(initial)||initial.data.ini&&local.data.ini&&initial.data.ini!==local.data.ini){
+    showConflict(uid,bound,local,initial,revision);return;
+   }
+   if(!sameProgress(readLocal(),local)){rerun=true;return}
+   const merged=safeCopy(initial);
+   if(local.data.ini&&!initial.data.ini)merged.data.ini=local.data.ini;
+   if(local.data.seen===1)merged.data.seen=1;
+   const {data:identity,error:identityError}=await client.auth.getUser();
+   if(identityError||identity?.user?.id!==uid||identity.user.is_anonymous!==true)
+    throw Error('Identidad de invitado cambió');
+   if(!sameProgress(merged,initial)){
+    const {data,error}=await client.rpc('sync_player_snapshot',{p_expected_revision:revision,p_state:merged});
+    if(error)throw error;
+    if(data?.status==='conflict'){rerun=true;return}
+    if(data?.status!=='updated'||!Number.isSafeInteger(Number(data.revision))||Number(data.revision)<=revision)
+     throw Error('No se pudo guardar la identidad inicial');
+    revision=Number(data.revision);
+   }
+   if(!sameProgress(readLocal(),local)||localStorage.getItem(ACCOUNT_BINDING)!==bound){rerun=true;return}
+   const {data:finalIdentity,error:finalError}=await client.auth.getUser();
+   if(finalError||finalIdentity?.user?.id!==uid)throw Error('Sesión cambió');
+   if(!restoreLocal(merged)?.ok)throw Error('No se pudo recuperar la colección inicial');
+   localStorage.setItem(ACCOUNT_BINDING,uid);
+   persistBaseline(localStorage,uid,revision,merged);
+   status('synced','NUBE AL DÍA · INVITADO PROTEGIDO EN ESTE NAVEGADOR');
+   return;
+  }
   let action=decideSync({local,remote,base,remoteRevision:rev});
   const localEconomyChanged=remote&&economySignature(local)!==economySignature(remote);
   if(action==='upload'&&localEconomyChanged)action='conflict';
@@ -314,7 +364,18 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
   // salvo que exista una petición de servidor pendiente que debe reintentarse.
   const pending=accountUid&&(localStorage.getItem('icmx-cloud-pack-request-v1:'+accountUid)||
    localStorage.getItem('icmx-cloud-exchange-request-v1:'+accountUid));
-  if(!pending&&(accountUid||sessionActive||hasStoredSession()))await check();
+  if(!pending&&(accountUid||sessionActive||hasStoredSession()||verifiedGuests))await check();
+  if(!accountUid&&verifiedGuests&&!localStorage.getItem(ACCOUNT_BINDING)&&!hasStoredSession()){
+   if(typeof guestSession!=='function')return 'pending';
+   try{
+    await guestSession(client.auth);
+    await check();
+   }catch(error){
+    console.warn('[ICMX] guest session failed',error?.code||error?.name);
+    status('offline','NO SE PUDO PROTEGER LA PARTIDA · REINTENTA CON CONEXIÓN');
+    return 'pending';
+   }
+  }
   if(busy&&syncTask)await syncTask;
   if(!accountUid)return localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()?'auth_required':'guest';
   return null;
@@ -586,7 +647,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus}){
  window.addEventListener('storage',onStorage);
  interval=setInterval(()=>{if(!document.hidden)check()},15000);
  check();
- return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),canImport:()=>importAvailable,importGuest,getConflict,useCloud,listConflictArchives,requiresServer:()=>Boolean(sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()),stop(){
+ return {changed,check,issuePack,exchangeDuplicates,isAccount:()=>Boolean(accountUid),canImport:()=>importAvailable,importGuest,getConflict,useCloud,listConflictArchives,requiresServer:()=>Boolean(verifiedGuests||sessionActive||accountUid||localStorage.getItem(ACCOUNT_BINDING)||hasStoredSession()),stop(){
   stopped=true;clearTimeout(debounce);clearInterval(interval);
   listener?.subscription?.unsubscribe();
   window.removeEventListener('focus',onFocus);
