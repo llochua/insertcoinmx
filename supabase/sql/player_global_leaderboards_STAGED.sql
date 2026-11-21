@@ -48,12 +48,12 @@ BEGIN
    SELECT e.user_id,
     pg_catalog.count(*)::integer AS cards,
     pg_catalog.count(DISTINCT pg_catalog.regexp_replace(c.key,'_[berf]$',''))::integer AS designs,
-    pg_catalog.coalesce(pg_catalog.sum(
-     pg_catalog.greatest((c.value #>> '{}')::integer-1,0)
+    coalesce(pg_catalog.sum(
+     greatest((c.value #>> '{}')::integer-1,0)
     ),0)::integer AS duplicates
    FROM eligible e
    CROSS JOIN LATERAL pg_catalog.jsonb_each(
-    pg_catalog.coalesce(e.state->'data'->'have','{}'::jsonb)
+    coalesce(e.state->'data'->'have','{}'::jsonb)
    ) AS c(key,value)
    WHERE c.key ~ '^[a-z0-9]{1,40}_[berf]$'
     AND c.value::text ~ '^[1-9][0-9]{0,3}$'
@@ -64,7 +64,7 @@ BEGIN
    SELECT e.user_id,pg_catalog.count(*)::integer AS ratings
    FROM eligible e
    CROSS JOIN LATERAL pg_catalog.jsonb_object_keys(
-    pg_catalog.coalesce(e.state->'data'->'rate','{}'::jsonb)
+    coalesce(e.state->'data'->'rate','{}'::jsonb)
    ) AS k(design)
    GROUP BY e.user_id
   ),
@@ -85,17 +85,17 @@ BEGIN
   ),
   metrics AS (
    SELECT e.user_id,e.ini,e.handle,
-    pg_catalog.coalesce(c.cards,0) AS cards,
-    pg_catalog.coalesce(c.designs,0) AS designs,
-    pg_catalog.coalesce(c.duplicates,0) AS duplicates,
-    pg_catalog.coalesce(r.ratings,0) AS ratings,
-    pg_catalog.coalesce(p.pts,0) AS pts
+    coalesce(c.cards,0) AS cards,
+    coalesce(c.designs,0) AS designs,
+    coalesce(c.duplicates,0) AS duplicates,
+    coalesce(r.ratings,0) AS ratings,
+    coalesce(p.pts,0) AS pts
    FROM eligible e
    LEFT JOIN cards c ON c.user_id=e.user_id
    LEFT JOIN rated r ON r.user_id=e.user_id
    LEFT JOIN points p ON p.user_id=e.user_id
   )
-  SELECT pg_catalog.coalesce(pg_catalog.jsonb_agg(
+  SELECT coalesce(pg_catalog.jsonb_agg(
    pg_catalog.jsonb_build_object(
     'ini',t.ini,'handle',t.handle,'score',t.score,
     'mine',t.user_id=auth.uid()
