@@ -87,7 +87,9 @@ test('Ordinary signup confirmation still redirects back to game without password
 
 test('Expired recovery without verified session never opens the password form',async()=>{
  const h=harness({recovery:true,session:false});await h.flush();
- assert.notEqual(h.element('recovery').hidden,false);
+ assert.equal(h.element('recovery').hidden,false);
+ assert.equal(h.element('recoveryForm').hidden,true);
+ assert.equal(h.element('recoveryHome').hidden,false);
  assert.match(h.element('message').textContent,/expiró/);
  assert.equal(h.calls.updated.length,0);
  assert.equal(h.calls.redirects.length,0);
