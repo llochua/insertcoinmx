@@ -41,6 +41,7 @@ jobs:
           node --check content/validate.mjs
           node --check content/cloud-sync.mjs
           node --check content/community-value.mjs
+          node --check content/card-value-overlay.js
           node --check qa/community-value.test.mjs
           node --check qa/value-screens.test.mjs
           node --check content/auth-account.js
