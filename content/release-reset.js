@@ -7,7 +7,8 @@
  'use strict';
  const tag=document.currentScript;
  const edition=tag?.getAttribute('data-game-epoch')||'';
- const active=tag?.getAttribute('data-active')==='true';
+ const active=tag?.getAttribute('data-active')==='true' &&
+  /^(?:www\.)?insertcoinmx\.com$/i.test(location.hostname);
  const marker='icmx-game-epoch';
  const exact=Object.freeze([
   'icmx-album2','icmx-album2.ext','icmx-album2.bak',
