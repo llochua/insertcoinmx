@@ -21,25 +21,26 @@ const server=createServer(async(req,res)=>{
  }catch(_){res.writeHead(404);res.end('Not found')}
 });
 await new Promise(ok=>server.listen(0,'127.0.0.1',ok));
-const TARGET_URL='http://127.0.0.1:'+server.address().port+'/qa/perfil-integrado/';
+const TARGET_URL='http://127.0.0.1:'+server.address().port+'/';
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const errors=[],unexpectedRemote=[];
 const sdk=[
- 'function mockUser(){return {id:"qa-profile-test",email:"qa@example.test",user_metadata:{icmx_avatar_id:window.__qaAvatar}}}',
+ 'function mockUser(){return {id:"qa-profile-test",email:"qa@example.test",user_metadata:{icmx_avatar_id:window.__qaAvatar,icmx_initials:"TST",icmx_handle:"qa_player"}}}',
  'export function createClient(){return {auth:{',
  'onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}}},',
  'async getSession(){return {data:{session:window.__qaSigned?{user:mockUser()}:null},error:null}},',
  'async getUser(){await new Promise(done=>setTimeout(done,220));return {data:{user:window.__qaSigned?mockUser():null},error:null}},',
  'async updateUser({data}){if(!window.__qaSigned)throw Error("Guest cannot update");window.__qaAvatar=data.icmx_avatar_id;sessionStorage.setItem("icmx-qa-avatar",window.__qaAvatar);return {data:{user:mockUser()},error:null}},',
  'async signOut(){window.__qaSigned=false;return {error:null}}',
- '}}}'
+ '},from(table){if(table!=="player_profiles")throw Error("Unexpected table");return {select(){return this},eq(){return this},async maybeSingle(){return {data:{public_handle:"qa_player",is_public:true},error:null}}}}}}'
 ].join('\n');
 const syncStub='export function sameProgress(){return true} export async function startCloudSync({onStatus}){onStatus("synced","NUBE AL DÍA · QA SIMULADA");return {check(){},changed(){},requiresServer(){return false},isAccount(){return false},stop(){},canImport(){return false}}}';
 async function device(signed){
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
  await context.addInitScript(value=>{
   window.__qaSigned=value;window.__qaAvatar=sessionStorage.getItem('icmx-qa-avatar')||'jos';
-  localStorage.setItem('icmx-album2',JSON.stringify({have:{abuket_b:3,pizza_e:2},rate:{},seen:1,sv:2,mv:2}));
+  localStorage.setItem('icmx-guest-handle-v1','qa_guest');
+  localStorage.setItem('icmx-album2',JSON.stringify({ini:'TST',have:{abuket_b:3,pizza_e:2},rate:{},seen:1,sv:2,mv:2}));
  },signed);
  await context.route('https://cdn.jsdelivr.net/**',route=>route.fulfill({status:200,contentType:'text/javascript',headers:{'access-control-allow-origin':'*'},body:sdk}));
  await context.route('**/content/cloud-sync.mjs',route=>route.fulfill({status:200,contentType:'text/javascript',body:syncStub}));
@@ -65,7 +66,9 @@ const devices=[];
 try {
  const guest=await device(false);devices.push(guest);
  assert.equal(await guest.page.locator('#profileAuthGuest').isVisible(),false,'signup section is progressive');
- assert.equal(await guest.page.locator('#profilePlayerName').innerText(),'Jugador invitado');
+ assert.equal(await guest.page.locator('#profilePlayerName').innerText(),'TST');
+ assert.match(await guest.page.locator('#profilePlayerState').innerText(),/Invitado/);
+ assert.match(await guest.page.locator('#profileInitials').innerText(),/@qa_guest · provisional/);
  assert.equal(await guest.page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/moneda-128.webp');
  await guest.context.close();
 
@@ -74,7 +77,7 @@ try {
  assert.equal(await signed.page.locator('#homePlayerAvatarImage').getAttribute('src'),'assets/avatars/jos-128.webp','account avatar must replace default before reveal');
  assert.equal(await signed.page.locator('#profileAvatarImage').getAttribute('src'),'assets/avatars/jos-128.webp');
  const original=await signed.page.evaluate(()=>JSON.parse(localStorage.getItem('icmx-album2')).have);
- await signed.page.locator('#profileAvatarChange').click();
+ await signed.page.locator('#profileAvatarButton').click();
  await signed.page.locator('#avatarSelect.on').waitFor();
  assert.equal(await signed.page.locator('#avatarGrid [data-avatar]').count(),12);
  await signed.page.locator('#avatarGrid [data-avatar="pizza"]').click();

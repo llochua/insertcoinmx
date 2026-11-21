@@ -1,0 +1,46 @@
+name: QA · Supabase POP con Auth real
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pop-supabase-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  local-supabase:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.81.3
+      - name: Arrancar proyecto Supabase desechable sin conexión a producción
+        run: |
+          supabase --help
+          mkdir -p "$RUNNER_TEMP/pop-local"
+          cd "$RUNNER_TEMP/pop-local"
+          supabase init
+          supabase start
+      - name: Migración y dos cuentas Auth locales reales por REST
+        run: |
+          cd "$RUNNER_TEMP/pop-local"
+          set -a
+          eval "$(supabase status -o env)"
+          set +a
+          cd "$GITHUB_WORKSPACE"
+          export PGPASSWORD=postgres
+          psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -f qa/community-pop-supabase-local.sql
+          node qa/community-pop-supabase-local.mjs --closed
+          psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -c "update private_community.release_gate set enabled=true where key='community_pop'"
+          node qa/community-pop-supabase-local.mjs
+      - name: Destruir entorno desechable
+        if: always()
+        run: |
+          cd "$RUNNER_TEMP/pop-local"
+          supabase stop --no-backup

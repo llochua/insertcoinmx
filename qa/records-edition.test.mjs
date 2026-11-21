@@ -27,7 +27,7 @@ test('Ignorar registros de la colección anterior y otras ediciones',async()=>{
  };
  const context={
   window:{claude:true},claude:{async use(name){if(name==='db')return db;if(name==='user')return {id:async()=> 'u-1'};return null}},
-  S:{ini:'NEW',rate:{},champ:'',duel:{}},uniq:()=>3,refresh:()=>{}
+  S:{ini:'NEW',rate:{},champ:'',duel:{}},uniq:()=>3,refresh:()=>{},icmxAccountIdentity:{ini:'NEW',handle:'qa_player',isPublic:true},validArcadeIni:v=>/^[A-Z0-9]{3}$/.test(v)
  };
  vm.createContext(context);
  vm.runInContext(storeSnippet+'\nglobalThis.store=STORE;',context);

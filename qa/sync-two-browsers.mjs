@@ -161,6 +161,7 @@ export function createClient(){
    }
   },
   from(table){
+   if(table==='player_profiles')return {select(){return this},eq(){return this},async maybeSingle(){return {data:null,error:null}}};
    if(table!=='player_snapshots')throw Error('Unexpected table');
    return {
     select(){return this},
