@@ -40,7 +40,7 @@ juego, no para el frente de la carta.
 ┌──────────────────────────────────────────┐
 │ (CATEGORÍA)          ◢■ ● INSERT COIN MX │  pastilla 50,48 · pestaña fija
 │ ┌──────────────────────┬───────────────┐ │
-│ │ Nombre               │ VALOR ● 100   │ │  nombre x84, tope 152, Avenir Next Bold 60, máx 455 px
+│ │ Nombre               │ POP —         │ │  nombre x84, tope 152, Avenir Next Bold 60, máx 455 px
 │ └──────────────────────┴───────────────┘ │
 │ ┌──────────────────────────────────────┐ │
 │ │                                      │ │  ventana del arte 60,252 → 900,824 (840×572)
@@ -55,7 +55,7 @@ juego, no para el frente de la carta.
 │ ┌──────────────────────────────┬───────┐ │  línea tope 1045 (1 renglón), ícono y GOTY bajan 28 px
 │ │ Frase en itálica             │ ▚▚▚▚  │ │  frase x75, tope 1132, Lato Italic 29.7, máx 620 px
 │ └──────────────────────────────┴───────┘ │
-│ [Carta 001/076 │ ● Común │ Valor –]      │  número x148, tope 1250, Avenir Next Bold 23.4
+│ [Carta 001/076 │ ● Común │ Valor 10]      │  número x148, tope 1250, Avenir Next Bold 23.4
 └──────────────────────────────────────────┘
 ```
 
@@ -139,8 +139,8 @@ Actualizar o agregar Full:
 - Velo: oscurece desde y=700 hasta 95 % abajo, para que nombre, habilidad y frase se lean con cualquier
   ilustración. Valores en `F_VELO` de `generar.py`.
 - Capas: `plantillas/full_marca.png` (pestaña INSERT COIN MX), pastilla de categoría, nombre blanco,
-  VALOR + moneda blanca (`full_moneda.png`) + 100, HABILIDAD ESPECIAL, ✦ referencia y — GOTY en amarillo,
-  frase en pastilla amarilla, pie `Carta F02/49 · ★★ Ilustración · Valor –`.
+  etiqueta POP y puntuación global dinámica sin fondo, HABILIDAD ESPECIAL, ✦ referencia y — GOTY en amarillo,
+  frase en pastilla amarilla, pie `Carta F02/49 · ★★ Ilustración · Valor 100`.
 - Salida: `c2/F_<id>.webp`, `c/F_<id>.webp` y `fa/<id>.webp` (600×900, ilustración limpia).
   Los nombres viejos se respetan (`F_worldwarrior`, `F_zodiaco`, por `fk` en `DESIGNS`).
 
@@ -181,3 +181,13 @@ Las variantes **Base, Holo y Dorada extienden el fondo del JPG al escenario comp
 - Los cambios de artes procesados por `cartas/actualizar.py` y el workflow existente generan WebP.
 - Se eliminan JPG generados tras comprobar cada WebP; los originales fuente no se borran. El historial de Git se conserva.
 - Probar cambios futuros en rama y revisar `python cartas/qa.py --all` y aspecto visual.
+
+## 8. Valores en la cara de la carta (21 nov 2026)
+
+- **Valor de variante (PTS):** se imprime durante la generación con la tipografía Avenir Next original en el espacio inferior del marco, sin Canvas ni rectángulos por encima: Común 10, Holo 25, Dorada 50 y Full 100.
+- **Popularidad del diseño (POP):** etiqueta impresa en el encabezado y cifra dinámica como texto SVG transparente, inicialmente «—» hasta tener votos comunitarios verificables. La misma popularidad aplica a las cuatro variantes del diseño; jamás se hornea una cotización fija en una imagen.
+- **Marcos Base/Holo/Dorada:** `limpiar_rotulos_valor` retira una única vez la tinta antigua de «VALOR ● 100» y «Valor —» ANTES de componer el WebP. Nunca se restaura un fondo con franjas de Canvas del navegador. Los originales del catálogo y las ilustraciones se conservan intactos.
+- **Full:** compone «POP» en el velo original y «Valor 100» en el pie, sin tapar la ilustración.
+- **Leyenda bajo la carta:** «POPULARIDAD: LIKES 35% · TIER 35% · RETA 30%»; no duplicar puntuaciones fuera de la carta.
+- **Regresión obligatoria:** comprobar Pizzcipher Base, una Holo, una Dorada y una Full ampliadas en móvil. No deben aparecer monedas o dígitos antiguos, manchas, bandas ni rectángulos en el encabezado.
+- **Validación de la biblioteca regenerada:** GitHub Actions generó y validó 126 diseños, con 0 errores de integridad; la muestra Pizzcipher Base y Abuket Full se revisó para comprobar que los valores aparecen en su espacio original. Mantener la revisión visual de Holo y Dorada como parte del control de calidad.

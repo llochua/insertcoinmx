@@ -1,0 +1,120 @@
+name: Rehacer cartas con valores integrados (rama de corrección v4)
+
+on:
+  push:
+    branches: [fix/render-card-values-in-generator-20261121]
+    paths:
+      - '.github/workflows/regenerar-valores-cartas.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: card-value-rebuild-20261121
+  cancel-in-progress: false
+
+jobs:
+  regenerar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - name: Obtener rama y catálogo aprobado
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Preparar generador de imágenes
+        run: python -m pip install numpy opencv-python-headless pillow
+
+      - name: Probar una carta base, holo, dorada y full
+        run: python cartas/generar.py --solo aku abuket pizzcipher --sin-web
+
+      - name: Regenerar biblioteca completa sin alterar el catálogo de juego
+        run: python cartas/generar.py --sin-web
+
+      - name: Comprobar tamaños y la integridad del catálogo
+        run: |
+          python cartas/qa.py --all
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from PIL import Image
+          cat=json.loads(Path('cartas/catalogo.json').read_text())
+          for d in cat:
+              ident=d['id']; original=d['version_original']
+              suffix={'comun':'b','holo':'e','dorada':'r'}
+              for variant in suffix:
+                  fname=ident if variant==original else ident+'_'+suffix[variant]
+                  for folder,wh in [('c',(480,670)),('c2',(960,1340))]:
+                      path=Path(folder)/(fname+'.webp')
+                      with Image.open(path) as im:
+                          assert im.size==wh,(str(path),im.size)
+          print('✓ Cartas renderizadas con sus cuatro variantes y dimensiones correctas')
+          # Regression visual: no debe quedar moneda ni 100 antiguos
+          # en el campo superior de la carta Base, que tiene fondo amarillo.
+          import numpy as np
+          from PIL import Image
+          img=np.asarray(Image.open('c2/pizzcipher.webp').convert('RGB'))
+          roi=img[151:211,675:897]
+          luminancia=roi @ np.array([0.299,0.587,0.114])
+          assert np.percentile(luminancia,1)>170, (
+              'Sigue visible tinta oscura del valor antiguo en Pizzcipher',
+              np.percentile(luminancia,1))
+          print('✓ Sin rastro de la moneda ni del 100 anterior en la plantilla')
+          PY
+
+      - name: Actualizar únicamente hashes de salidas del manifiesto si existe
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          path=Path('cartas/arte-manifest.json')
+          if not path.exists(): raise SystemExit(0)
+          content=json.loads(path.read_text())
+          for row in content.values():
+              if not isinstance(row,dict): continue
+              for name in row.get('outputs',{}):
+                  p=Path(name)
+                  if p.is_file(): row['outputs'][name]=hashlib.sha256(p.read_bytes()).hexdigest()
+          path.write_text(json.dumps(content,indent=2,ensure_ascii=False)+'\n')
+          PY
+
+      - name: Guardar WebP regenerados en esta misma rama
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A c c2
+          git add -A cartas/catalogo.json
+          if test -f cartas/arte-manifest.json; then git add cartas/arte-manifest.json; fi
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(cards): regenerar WebP sin parches y con valor integrado [skip ci]"
+            # Si se añadieron pruebas/documentación durante la regeneración,
+            # preservar ambos historiales sin forzar la rama ni perder datos.
+            # El generador puede dejar muestras o archivos auxiliares fuera
+            # de c/c2; el commit de WebP ya está guardado y esos residuos no
+            # pertenecen al cambio. Limpiar el runner antes de rebase.
+            git reset --hard HEAD
+            git clean -fd
+            git fetch origin "$GITHUB_REF_NAME"
+            git rebase "origin/$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+
+      - name: Guardar vista previa de muestra
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: muestra-cartas-valores-integrados
+          path: |
+            c2/aku.webp
+            c2/pizzcipher.webp
+            c2/abuket.webp
+            c2/F_abuket.webp
+          retention-days: 7
+          if-no-files-found: ignore

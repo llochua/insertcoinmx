@@ -1934,7 +1934,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 
 <script src="content/release-reset.js?v=20261121-launch" data-active="true" data-game-epoch="public-2026-launch-v1"></script>
 <script src="content/card-texts.js?v=20261120c"></script>
-<script src="content/card-value-overlay.js?v=20261120b"></script>
+<script src="content/card-value-overlay.js?v=20261121-template"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
    b Base · e Especial · r Rara · f Full. La clave de una carta es diseño+'_'+letra (ej. fatality_r, x_f).
@@ -2101,7 +2101,7 @@ const baseHtml=c=>{
 };
 
 
-const IMGV='webp20261120'; // versión de imágenes de cartas: súbela cuando se reemplace un arte (Arte Especial, diseño) para que los navegadores bajen la nueva
+const IMGV='cardvalues20261121'; // versión de imágenes de cartas: súbela cuando se reemplace un arte (Arte Especial, diseño) para que los navegadores bajen la nueva
 const VL=['b','e','r','f'],VN={b:'Base',e:'Holo',r:'Dorada',f:'Arte Especial'},VSHORT={b:'Base',e:'Holo',r:'Dorada',f:'Especial'},VC={b:'comun',e:'holo',r:'dorada',f:'full'},OLDV={comun:'b',holo:'e',dorada:'r'};
 const CARDS=[],DB={},ALIAS={},CB={};
 for(const d of DESIGNS){d.fk=d.f?(d.fk||'F_'+d.id):null;DB[d.id]=d;for(const a of d.al||[])ALIAS[a]=d.id;
