@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#0d0a27">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>Mi avatar · Laboratorio Insert Coin MX</title>
+<link rel="icon" href="/favicon.png">
+<style>
+@font-face{font-family:ICPixel;src:url("/ps2p.ttf") format("truetype");font-display:swap}
+:root{color-scheme:dark;--yellow:#ffd400;--ink:#f7f4ff;--muted:#b8b2d4;--outline:#403779}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;background:radial-gradient(ellipse 90% 65% at 50% 0%,#25216c,#0b0924 67%,#070613);color:var(--ink);font:500 14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:28px 16px 52px}
+body:before{content:"";inset:0;position:fixed;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 2px,transparent 2px 5px)}
+main{position:relative;max-width:770px;margin:auto}
+a{color:var(--yellow);text-underline-offset:3px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px}.brand img{width:50px;height:50px;object-fit:contain}.brand b{display:block;font-family:ICPixel,monospace;font-size:12px}.brand span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.top a{font-size:12px;font-weight:750;white-space:nowrap}
+.card{background:linear-gradient(150deg,rgba(40,34,99,.98),rgba(16,13,47,.98));border:1px solid rgba(255,212,0,.36);border-radius:20px;padding:clamp(18px,4vw,34px);box-shadow:0 25px 70px rgba(0,0,0,.4)}
+.kicker{font:10px/1.7 ICPixel,monospace;letter-spacing:.025em;color:var(--yellow);margin:0 0 9px}
+h1{margin:0;font-size:clamp(24px,4vw,33px);line-height:1.14;letter-spacing:-.02em}
+.intro{color:var(--muted);margin:9px 0 20px}
+.status{padding:12px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.status strong{font-size:13px;overflow-wrap:anywhere}.status small{font-size:12px;color:var(--muted)}
+.current{display:flex;align-items:center;gap:20px;padding:15px;border-radius:15px;background:#0a0924;border:1px solid #343068;margin-bottom:22px}
+.current img{width:clamp(116px,23vw,160px);aspect-ratio:1;object-fit:contain;border-radius:16px;background:#15113a;flex:none}
+.current .label{color:var(--yellow);font:10px/1.7 ICPixel,monospace}
+.current h2{font-size:22px;margin:5px 0 8px}
+.current p{font-size:12px;color:var(--muted);margin:0}
+legend{font-weight:800;padding:0 0 12px}
+fieldset{margin:0;padding:0;border:0;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.option{background:#131034;border:2px solid #393260;border-radius:12px;min-width:0;padding:9px 5px 11px;display:flex;align-items:center;flex-direction:column;gap:7px;color:#ded9f1;transition:background .15s,border-color .15s}
+.option[aria-pressed=true]{background:#302456;border-color:var(--yellow);box-shadow:inset 0 0 0 1px var(--yellow)}
+.option img{width:min(100%,110px);aspect-ratio:1;object-fit:contain;display:block;border-radius:8px}
+.option span{font-size:11px;line-height:1.3;font-weight:800;text-align:center}
+.option:disabled{opacity:.48;cursor:default}
+.actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:21px;align-items:center}
+.primary{background:var(--yellow);color:#121026;border:0;border-radius:10px;font-weight:900;min-height:48px;padding:12px 22px;flex:1}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.msg{font-size:13px;color:var(--muted);flex:1;min-width:210px;margin:0}
+.msg[data-type=success]{color:#a9f0c5}.msg[data-type=error]{color:#ffb2b8}
+.foot{border-top:1px solid rgba(255,255,255,.17);margin:23px 0 0;padding-top:15px;color:var(--muted);font-size:12px}
+.foot strong{color:var(--ink)}
+@media(max-width:560px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.current{gap:12px}.current h2{font-size:18px}.option{padding:7px 3px}.option span{font-size:10px}.card{padding:17px}.top a{font-size:11px}}
+</style>
+</head>
+<body>
+<main>
+<header class="top"><div class="brand"><img src="/logo.png" alt=""><div><b>INSERT COIN MX</b><span>PRUEBA DE IDENTIDAD</span></div></div><a href="/qa/registro/">Ir a mi cuenta</a></header>
+<section class="card" aria-labelledby="title">
+<p class="kicker">PLAYER 01 · LABORATORIO</p>
+<h1 id="title">Elige tu avatar</h1>
+<p class="intro">Tu personaje se guarda en tu cuenta. Esta prueba no abre sobres ni cambia tu colección.</p>
+<div class="status"><strong id="account">Comprobando tu sesión…</strong><small id="cards" aria-live="polite">Leyendo respaldo…</small></div>
+<div class="current">
+<img id="preview" src="/assets/avatars/moneda-320.webp" alt="Vista previa del avatar" width="320" height="320">
+<div><span class="label">TU PERSONAJE</span><h2 id="selectedName">Moneda</h2><p id="savedName">Sin cambios guardados</p></div>
+</div>
+<fieldset id="selection" disabled><legend>12 AVATARES DISPONIBLES</legend><div class="grid" id="grid" aria-label="Personajes"></div></fieldset>
+<div class="actions"><button type="button" class="primary" id="save" disabled>GUARDAR AVATAR</button><p class="msg" id="message" data-type="info" role="status" aria-live="polite">Conectando con Supabase…</p></div>
+<p class="foot"><strong>Prueba segura:</strong> usa el mismo inicio de sesión que el juego. Solo se actualiza <code>icmx_avatar_id</code> en los metadatos de tu cuenta. Las cartas continúan en Supabase sin modificación. Para comprobarlo en otro navegador, inicia sesión desde <a href="/qa/registro/">Prueba de acceso</a> y vuelve a esta página.</p>
+</section>
+</main>
+<script type="module">
+const AUTH_URL='https://ynugqxbtszhsupadqdkz.supabase.co';
+const PUBLISHABLE_KEY='sb_publishable_3wyMm9dwLqSb9GiYTh245Q_9TukyCLK';
+const SDK='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm';
+const AUTH_STORAGE='icmx-auth-qa-nov2026';
+const ITEMS=[['moneda','Moneda'],['pizza','Pizza'],['control','Control'],['cartucho','Cartucho'],['bote-tinta','Bote de tinta'],['mago','Mago'],['gato-afk','Gato AFK'],['jos','Jos'],['glitch','Glitch'],['playera','Playera'],['rasqueta-malla','Rasqueta y malla'],['arcade','Arcade']];
+const allowed=new Set(ITEMS.map(x=>x[0]));
+const $=id=>document.getElementById(id);
+let client=null,user=null,current='moneda',chosen='moneda',saving=false;
+const avatar=(id,size)=>'/assets/avatars/'+(allowed.has(id)?id:'moneda')+'-'+size+'.webp';
+function note(message,type='info'){$('message').textContent=message;$('message').dataset.type=type}
+function paint(){
+ const entry=ITEMS.find(x=>x[0]===chosen)||ITEMS[0];
+ $('preview').src=avatar(chosen,320);
+ $('preview').alt='Vista previa de '+entry[1];
+ $('selectedName').textContent=entry[1];
+ $('savedName').textContent=chosen===current?'Avatar actual de tu cuenta':'Vista previa, sin guardar';
+ for(const button of $('grid').querySelectorAll('[data-avatar]'))button.setAttribute('aria-pressed',String(button.dataset.avatar===chosen));
+ $('save').disabled=!user||saving||chosen===current;
+}
+$('grid').innerHTML=ITEMS.map(([id,label])=>'<button class="option" type="button" data-avatar="'+id+'" aria-label="Elegir '+label+'" aria-pressed="false"><img src="'+avatar(id,128)+'" alt="" loading="lazy" width="128" height="128"><span>'+label+'</span></button>').join('');
+$('grid').addEventListener('click',event=>{
+ const button=event.target.closest('[data-avatar]');
+ if(!user||saving||!button||!allowed.has(button.dataset.avatar))return;
+ chosen=button.dataset.avatar;paint();note('Vista previa. Pulsa Guardar avatar para confirmar.');
+});
+$('save').addEventListener('click',async()=>{
+ if(!user||!client||saving||chosen===current||!allowed.has(chosen))return;
+ saving=true;paint();note('Guardando y verificando el avatar…');
+ const beforeId=user.id,id=chosen;
+ try{
+  const {data,error}=await client.auth.updateUser({data:{icmx_avatar_id:id}});
+  if(error||data?.user?.id!==beforeId)throw Error('La actualización no fue confirmada');
+  const {data:checked,error:checkError}=await client.auth.getUser();
+  if(checkError||checked?.user?.id!==beforeId||checked.user.user_metadata?.icmx_avatar_id!==id)throw Error('El servidor no confirmó el cambio');
+  user=checked.user;current=id;chosen=id;paint();
+  note('¡Avatar guardado en tu cuenta! Ya puedes comprobarlo en otra ventana.','success');
+ }catch(_){
+  chosen=current;paint();note('No pudimos confirmar el avatar en tu cuenta. No se modificaron tus cartas.','error');
+ }finally{saving=false;paint()}
+});
+async function init(){
+ try{
+  const sdk=await import(SDK);
+  client=sdk.createClient(AUTH_URL,PUBLISHABLE_KEY,{auth:{flowType:'implicit',detectSessionInUrl:false,persistSession:true,autoRefreshToken:true,storageKey:AUTH_STORAGE}});
+  const {data,error}=await client.auth.getUser();
+  if(error||!data?.user?.id){
+   $('account').textContent='No hay una sesión activa en este navegador';
+   $('cards').textContent='Acceso pendiente';
+   note('Primero inicia sesión desde «Ir a mi cuenta».','error');return;
+  }
+  user=data.user;
+  current=allowed.has(user.user_metadata?.icmx_avatar_id)?user.user_metadata.icmx_avatar_id:'moneda';
+  chosen=current;
+  $('account').textContent='Sesión: '+(user.email||'Jugador registrado');
+  $('selection').disabled=false;paint();
+  note('Cuenta verificada. Puedes elegir otro avatar.');
+  const {data:row,error:rowError}=await client.from('player_snapshots').select('user_id,state').eq('user_id',user.id).maybeSingle();
+  if(rowError)throw Error('No se pudo consultar la colección');
+  const have=row?.state?.data?.have;
+  const total=have&&typeof have==='object'?Object.values(have).reduce((sum,q)=>sum+(Number.isFinite(Number(q))?Number(q):0),0):0;
+  $('cards').textContent=row?String(total)+' cartas en la nube':'Sin respaldo de cartas';
+ }catch(_){if(!user){$('account').textContent='No se pudo verificar la cuenta';$('cards').textContent='Sin conexión'}else{$('cards').textContent='Respaldo no disponible'}note('No se pudo completar la consulta. Tus cartas permanecen intactas.','error')}
+}
+init();
+</script>
+</body>
+</html>
