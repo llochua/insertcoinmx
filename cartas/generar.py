@@ -72,23 +72,27 @@ def limpiar_rotulos_valor(marco):
     """
     imagen = np.clip(marco, 0, 255).astype(np.uint8).copy()
     # Coordenadas en el lienzo original 960×1340. Lejos de filetes/divisores.
-    zonas = ((578, 139, 922, 225), (640, 1245, 894, 1290))
-    for x0, y0, x1, y1 in zonas:
-        roi = imagen[y0:y1, x0:x1].copy()
-        gris = cv2.cvtColor(roi, cv2.COLOR_RGB2GRAY)
-        # Median de tamaño grande reconstruye el nivel local del fondo
-        # sin eliminar sus matices horizontales ni el grano impreso.
-        fondo = cv2.medianBlur(gris, 41)
-        oscurecimiento = fondo.astype(np.int16) - gris.astype(np.int16)
-        tinta = np.uint8(oscurecimiento > 23) * 255
-        tinta = cv2.morphologyEx(tinta, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
-        tinta = cv2.dilate(tinta, np.ones((3, 3), np.uint8), iterations=1)
-        if not np.any(tinta):
-            raise ValueError('No se detectó la tinta anterior de valor en la plantilla')
-        # Reconstrucción local de las letras, nunca un rectángulo encima del
-        # fondo; el área circundante permanece bit a bit sin modificar.
-        limpio = cv2.inpaint(roi, tinta, 3, cv2.INPAINT_TELEA)
-        imagen[y0:y1, x0:x1] = limpio
+    # El icono circular y los numerales eran grandes: una máscara basada
+    # únicamente en contraste conservaba restos negros visibles (regresión
+    # detectada en Pizzcipher). Se retiran las TRES cajas impresas completas,
+    # respetando el divisor y el marco, ANTES de poner el texto definitivo.
+    mascara = np.zeros(imagen.shape[:2], dtype=np.uint8)
+    mascara[145:217, 563:672] = 255   # rótulo antiguo VALOR
+    mascara[143:221, 665:755] = 255   # moneda impresa
+    mascara[140:222, 749:901] = 255   # 100 impreso
+    imagen = cv2.inpaint(imagen, mascara, 7, cv2.INPAINT_NS)
+    # El pie tiene un texto pequeño sobre textura variable. Se recuperan
+    # solo sus trazos oscuros, sin tapar ninguna banda completa.
+    x0, y0, x1, y1 = 640, 1245, 894, 1290
+    roi = imagen[y0:y1, x0:x1].copy()
+    gris = cv2.cvtColor(roi, cv2.COLOR_RGB2GRAY)
+    fondo = cv2.medianBlur(gris, 41)
+    tinta = np.uint8((fondo.astype(np.int16) - gris.astype(np.int16)) > 23) * 255
+    tinta = cv2.morphologyEx(tinta, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+    tinta = cv2.dilate(tinta, np.ones((3, 3), np.uint8), iterations=1)
+    if not np.any(tinta):
+        raise ValueError('No se detectó el valor antiguo del pie')
+    imagen[y0:y1, x0:x1] = cv2.inpaint(roi, tinta, 3, cv2.INPAINT_TELEA)
     return imagen.astype(np.float32)
 
 
