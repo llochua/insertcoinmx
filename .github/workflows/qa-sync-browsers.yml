@@ -17,6 +17,7 @@ on:
       - 'qa/live-experience-browsers.mjs'
       - 'qa/sync-two-browsers.mjs'
       - 'qa/supabase-live-anon.mjs'
+      - 'qa/auth-public-settings.mjs'
       - 'qa/live-auth-two-browsers.mjs'
       - 'qa/registro/index.html'
       - '.github/workflows/qa-sync-browsers.yml'
@@ -136,6 +137,8 @@ jobs:
 
       - name: Comprobar acceso público sin mutaciones
         run: node qa/supabase-live-anon.mjs
+      - name: Verificar registro y confirmación por correo en GoTrue
+        run: node qa/auth-public-settings.mjs
 
   auth-real-lectura:
     name: Supabase real · dos sesiones (requiere credenciales)
