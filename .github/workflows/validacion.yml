@@ -40,6 +40,7 @@ jobs:
           node --check content/card-texts.js
           node --check content/validate.mjs
           node --check content/cloud-sync.mjs
+          node --check content/cloud-pack-session.test.mjs
           node --check content/community-value.mjs
           node --check content/card-value-overlay.js
           node --check qa/community-value.test.mjs
@@ -59,7 +60,7 @@ jobs:
 
       - name: Probar sincronización segura
         run: |
-          node --test content/cloud-sync.test.mjs content/cloud-restore.test.mjs qa/registro/cloud-snapshot.test.mjs
+          node --test content/cloud-sync.test.mjs content/cloud-restore.test.mjs content/cloud-pack-session.test.mjs qa/registro/cloud-snapshot.test.mjs
           node --test qa/profile-auth-unit.test.mjs
           node --test qa/release-reset.test.mjs
           node --test qa/records-edition.test.mjs
