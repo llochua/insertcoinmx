@@ -11,6 +11,10 @@ let authClient = null;
 let authMode = 'signup';
 let authBusy = false;
 let identityCheckVersion = 0;
+let currentGuestUser=null,guestStage='none';
+const stageFor=user=>!user?.id?'none':user.is_anonymous===true?'email':
+ user.user_metadata?.icmx_guest_upgrade===true&&user.user_metadata?.icmx_guest_password_set!==true
+  ?(user.email_confirmed_at?'password':'email'):'none';
 const iniOK = v => /^[A-Z0-9]{3}$/.test(v || '');
 const handleOK = v => /^[a-z0-9_]{3,20}$/.test(v || '');
 const enteredFromEmail = /(?:^|[?&#])(?:access_token|code)=/.test(location.hash + '&' + location.search);
@@ -21,8 +25,34 @@ function authMessage(text, kind = 'info') {
   el.textContent = text;
   el.dataset.type = kind;
 }
+function renderGuestAuthStage(){
+ const guest=guestStage!=='none',passwordStage=guestStage==='password';
+ const email=$auth('profileAuthEmail'),password=$auth('profileAuthPassword');
+ $auth('profileAuthTabLogin').hidden=guest;
+ email.required=!passwordStage;
+ password.required=!guest||passwordStage;
+ const emailField=email.closest?.('.profile-auth-field'),passwordField=password.closest?.('.profile-auth-field');
+ if(emailField)emailField.hidden=passwordStage;
+ if(passwordField)passwordField.hidden=guest&&!passwordStage;
+ for(const [container,id] of [['profileSignupInitialsField','profileAuthInitials'],['profileSignupHandleField','profileAuthHandle']]){
+  const visible=guest?!passwordStage:authMode==='signup';
+  $auth(container).hidden=!visible;$auth(id).required=visible;
+ }
+ if(guest){
+  $auth('profileAuthTabSignup').setAttribute('aria-pressed','true');
+  $auth('profileAuthSend').textContent=passwordStage?'GUARDAR CONTRASEÑA':'CONFIRMAR MI CORREO';
+  $auth('profileAuthHint').textContent=passwordStage
+   ?'Tu correo ya está confirmado. Crea una contraseña para recuperar tu colección en otros dispositivos.'
+   :'Confirma tu correo primero. Tus cartas seguirán en la misma cuenta; después crearás tu contraseña.';
+ }
+}
 function showAuthUser(user) {
-  const active = Boolean(user);
+  const previousStage=guestStage;
+  guestStage=stageFor(user);
+  currentGuestUser=guestStage==='none'?null:user;
+  if(currentGuestUser)authMode='signup';
+  if(currentGuestUser||previousStage!=='none')renderGuestAuthStage();
+  const active = Boolean(user)&&guestStage==='none';
   if(active&&globalThis.icmxAccountIdentity?.userId!==user.id){identityCheckVersion++;globalThis.icmxAccountIdentity=null;}
   const entryOpen=$auth('entryAccount')&&!$auth('entryAccount').hidden;
   // Perfil progresivo: invitado ve una sola invitación; cuenta autenticada ve su estado.
@@ -43,21 +73,21 @@ function showAuthUser(user) {
   }
   if (homeStatus) homeStatus.textContent = active
     ? 'Cuenta conectada · revisa tu respaldo'
-    : 'Tu colección, tu progreso';
+    : currentGuestUser?'Invitado · revisa tu respaldo':'Tu colección, tu progreso';
   $auth('profileAuthGuest').hidden = active;
   $auth('profileAuthSigned').hidden = !active;
   $auth('profileAuthUser').textContent = active ? (user.email || 'Cuenta conectada') : '';
   $auth('profilePlayerName').textContent = active ? 'Jugador registrado' : 'Jugador invitado';
   $auth('profilePlayerState').textContent = active
     ? 'Sesión activa · comprueba el estado de la nube'
-    : 'Invitado · progreso solo en este dispositivo';
+    : currentGuestUser?'Invitado · vincula tu correo para recuperar tus cartas':'Invitado · progreso solo en este dispositivo';
   if (!active) {
     identityCheckVersion++;
     globalThis.icmxAccountIdentity = null;
     $auth('profileSignedIdentityForm').hidden = true;
     document.dispatchEvent(new Event('icmx:player-identity'));
   }
-  globalThis.icmxAvatarAuthUser = user || null;
+  globalThis.icmxAvatarAuthUser = active?user:null;
   document.dispatchEvent(new Event('icmx:avatar-auth'));
   document.dispatchEvent(new Event('icmx:entry-auth-state'));
 
@@ -104,7 +134,7 @@ async function loadAccountIdentity(expectedId) {
   const {data:authData,error:authError}=await authClient.auth.getUser();
   if(version!==identityCheckVersion)return;
   const user=authData?.user;
-  if(authError||!user||user.id!==expectedId)return;
+  if(authError||!user||user.id!==expectedId||stageFor(user)!=='none')return;
   const meta=user.user_metadata||{};
   const draft=guestDraft();
   const wantedHandle=handleOK(meta.icmx_handle)?meta.icmx_handle.toLowerCase():'';
@@ -191,6 +221,7 @@ $auth('profileSignedIdentityForm').addEventListener('submit',async event=>{
 
 function changeAuthMode(mode) {
   if (authBusy || (mode !== 'signup' && mode !== 'login')) return;
+  if(guestStage!=='none')mode='signup';
   authMode = mode;
   $auth('profileAuthTabSignup').setAttribute('aria-pressed', String(mode === 'signup'));
   $auth('profileAuthTabLogin').setAttribute('aria-pressed', String(mode === 'login'));
@@ -205,6 +236,7 @@ function changeAuthMode(mode) {
   $auth('profileAuthHint').textContent = mode === 'signup'
     ? 'Te enviaremos un correo para confirmar tu cuenta.'
     : 'Entra con el correo y la contraseña que registraste.';
+  if(guestStage!=='none')renderGuestAuthStage();
   authMessage('');
   document.dispatchEvent(new CustomEvent('icmx:auth-entry-mode',{detail:mode}));
 }
@@ -213,11 +245,19 @@ function setAuthBusy(busy) {
   $auth('profileAuthSend').disabled = busy;
   $auth('profileAuthForm').setAttribute('aria-busy', String(busy));
   $auth('profileAuthTabSignup').disabled = busy;
-  $auth('profileAuthTabLogin').disabled = busy;
+  $auth('profileAuthTabLogin').disabled = busy||guestStage!=='none';
+}
+async function authCaptchaOptions(){
+ if(globalThis.ICMX_CAPTCHA_ENABLED!==true)return {};
+ if(typeof globalThis.icmxGuestCaptcha!=='function')throw Error('captcha_configuration_missing');
+ const captchaToken=await globalThis.icmxGuestCaptcha();
+ if(typeof captchaToken!=='string'||!captchaToken.trim())throw Error('captcha_empty');
+ return {captchaToken};
 }
 function friendlyAuthError(error, mode) {
   const text = String(error?.message || '').toLowerCase();
   const code = String(error?.code || '').toLowerCase();
+  if(/captcha/.test(code+' '+text))return 'No se completó la comprobación de seguridad. Tu progreso sigue intacto; puedes volver a intentarlo.';
   if (/over_email_send_rate_limit|email_rate_limit_exceeded|rate.limit|too.many/.test(code + ' ' + text)) {
     return 'Se alcanzó el límite de envíos. Podrás intentarlo más tarde.';
   }
@@ -250,7 +290,7 @@ async function initAccount() {
       showAuthUser(session?.user || null);
       // Evitar operaciones Supabase desde dentro del bloqueo de Auth.
       setTimeout(() => {
-        if(session?.user?.id)loadAccountIdentity(session.user.id);
+        if(session?.user?.id&&stageFor(session.user)==='none')loadAccountIdentity(session.user.id);
         document.dispatchEvent(new Event('icmx:auth-changed'));
       }, 0);
     });
@@ -260,8 +300,10 @@ async function initAccount() {
       const {data:verified, error:verifyError} = await authClient.auth.getUser();
       if (!verifyError && verified?.user) {
         showAuthUser(verified.user);
-        loadAccountIdentity(verified.user.id);
-        authMessage('Sesión activa. Confirma el estado NUBE AL DÍA antes de confiar en la recuperación de cartas.', 'success');
+        if(stageFor(verified.user)==='none')loadAccountIdentity(verified.user.id);
+        authMessage(guestStage==='password'?'Correo confirmado. Crea tu contraseña para terminar el registro.':
+          guestStage==='email'?'Tu partida de invitado sigue vinculada a este navegador.':
+          'Sesión activa. Confirma el estado NUBE AL DÍA antes de confiar en la recuperación de cartas.', 'success');
       } else {
         showAuthUser(null);
         authMessage('No pudimos verificar la sesión. Puedes iniciar sesión nuevamente.', 'error');
@@ -270,11 +312,12 @@ async function initAccount() {
       showAuthUser(null);
       authMessage('');
     }
-    if (enteredFromEmail && sessionData?.session) {
-      authMessage('¡Correo confirmado! Tu sesión ya está activa.', 'success');
+    if ((enteredFromEmail||guestStage==='password') && sessionData?.session) {
+      authMessage(guestStage==='password'?'¡Correo confirmado! Crea tu contraseña para terminar.':'¡Correo confirmado! Tu sesión ya está activa.', 'success');
       // Al volver del correo, salir de START y mostrar el perfil real.
       document.getElementById('title')?.classList.remove('on');
       document.querySelector('#home .profile-entry')?.click();
+      if(guestStage==='password')$auth('profileQuickSignup')?.click();
     }
   } catch (_error) {
     authClient = null;
@@ -302,12 +345,27 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
   const passEl = $auth('profileAuthPassword');
   const email = emailEl.value.trim();
   const password = passEl.value;
+  if(guestStage==='password'){
+   if(!passEl.checkValidity()||password.length<8){authMessage('La contraseña debe tener al menos 8 caracteres.','error');return}
+   setAuthBusy(true);
+   try{
+    const {finishGuestUpgrade}=await import('./verified-guest.mjs?v=20261121-beta2');
+    const user=await finishGuestUpgrade({auth:authClient.auth,expectedUid:currentGuestUser?.id,password});
+    passEl.value='';
+    showAuthUser(user);
+    await loadAccountIdentity(user.id);
+    document.dispatchEvent(new Event('icmx:auth-changed'));
+    authMessage('¡Cuenta lista! Tus cartas y sobres siguen en la misma colección.','success');
+   }catch(error){authMessage(friendlyAuthError(error,'signup'),'error')}
+   finally{setAuthBusy(false)}
+   return;
+  }
   if (!emailEl.checkValidity() || email.length > 254 || !email) {
     authMessage('Revisa tu correo electrónico.', 'error');
     emailEl.focus();
     return;
   }
-  if (!passEl.checkValidity() || password.length < 8) {
+  if (guestStage==='none'&&(!passEl.checkValidity() || password.length < 8)) {
     authMessage('La contraseña debe tener al menos 8 caracteres.', 'error');
     passEl.focus();
     return;
@@ -325,11 +383,20 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
   setAuthBusy(true);
   authMessage(authMode === 'signup' ? 'Preparando tu registro...' : 'Iniciando sesión...');
   try {
+    if(guestStage==='email'){
+      const {beginGuestUpgrade}=await import('./verified-guest.mjs?v=20261121-beta2');
+      const user=await beginGuestUpgrade({auth:authClient.auth,expectedUid:currentGuestUser?.id,email,
+       ini:signupIdentity?.ini,handle:signupIdentity?.handle,redirectTo:REDIRECT_URL});
+      passEl.value='';
+      showAuthUser(user);
+      authMessage('Revisa tu correo y confirma el enlace. Tus cartas permanecen en esta partida.','success');
+      return;
+    }
     if (authMode === 'signup') {
       const {data, error} = await authClient.auth.signUp({
         email,
         password,
-        options: {emailRedirectTo: REDIRECT_URL,
+        options: {emailRedirectTo: REDIRECT_URL,...await authCaptchaOptions(),
           data:{icmx_initials:signupIdentity.ini,icmx_handle:signupIdentity.handle}}
       });
       if (error) throw error;
@@ -341,20 +408,21 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
         authMessage('Solicitud recibida. Si este correo todavía no tiene cuenta, recibirás un mensaje para confirmarla. Si ya tienes cuenta, elige INICIAR SESIÓN.', 'success');
       }
     } else {
-      const {data, error} = await authClient.auth.signInWithPassword({email, password});
+      const captchaOptions=await authCaptchaOptions();
+      const {data, error} = await authClient.auth.signInWithPassword({email,password,...(captchaOptions.captchaToken?{options:captchaOptions}:{})});
       if (error) throw error;
       showAuthUser(data?.user || null);
       if(data?.user?.id)loadAccountIdentity(data.user.id);
       authMessage('Sesión iniciada. Comprueba la nube antes de cambiar de dispositivo.', 'success');
     }
   } catch (error) {
-    authMessage(friendlyAuthError(error, authMode), 'error');
+    authMessage(guestStage==='email'&&/already|exists|registered|identity_already_exists/i.test(String(error?.code||'')+' '+String(error?.message||''))?'Ese correo ya tiene cuenta. Tu partida de invitado sigue intacta; usa otro correo mientras preparamos la vinculación de cuentas existentes.':friendlyAuthError(error, authMode), 'error');
   } finally {
     setAuthBusy(false);
   }
 });
 $auth('profileAuthSignOut').addEventListener('click', async () => {
-  if (!authClient || authBusy) return;
+  if (!authClient || authBusy||guestStage!=='none') return;
   const button = $auth('profileAuthSignOut');
   button.disabled = true;
   try {
