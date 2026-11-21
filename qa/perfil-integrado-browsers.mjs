@@ -48,8 +48,10 @@ async function device(signed){
  page.on('pageerror',e=>errors.push(e.message));
  const response=await page.goto(TARGET_URL,{waitUntil:'domcontentloaded'});
  assert.equal(response.status(),200,'QA page must load correctly');
- if(await page.evaluate(()=>document.documentElement.dataset.icmxAvatarReady!=='true'))
-  assert.equal(await page.locator('#homePlayerAvatarImage').evaluate(el=>getComputedStyle(el).visibility),'hidden','avatar must stay hidden while identity is loading');
+ const avatarProbe=await page.evaluate(()=>{const el=document.getElementById('homePlayerAvatarImage');return {ready:document.documentElement.dataset.icmxAvatarReady||null,inline:el?.getAttribute('style'),computed:el?getComputedStyle(el).visibility:null,selectorMatched:el?.matches('html:not([data-icmx-avatar-ready="true"]) #homePlayerAvatarImage'),headStyle:document.querySelector('head style')?.textContent.slice(0,210)}});
+ console.log('QA avatar initial state',JSON.stringify(avatarProbe));
+ if(avatarProbe.ready!=='true')
+  assert.equal(avatarProbe.computed,'hidden','avatar must stay hidden while identity is loading');
  await page.waitForFunction(()=>document.documentElement.dataset.icmxAvatarReady==='true');
  await page.locator('#homePlayerAvatarImage').waitFor({state:'visible'});
  await page.locator('#home .home-player-card').click();
