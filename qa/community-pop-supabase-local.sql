@@ -1,7 +1,8 @@
 \set ON_ERROR_STOP on
 -- Only in the disposable, local Supabase instance created by CI.
 CREATE SCHEMA private_sync;
-CREATE TABLE private_sync.beta_access_gate(key text PRIMARY KEY,enabled boolean NOT NULL);
+CREATE TABLE private_sync.beta_access_gate(key text PRIMARY KEY CHECK(key='public_beta'),enabled boolean NOT NULL);
+INSERT INTO private_sync.beta_access_gate VALUES ('public_beta',true);
 CREATE TABLE private_sync.sync_lab_allowlist(user_id uuid PRIMARY KEY);
 CREATE TABLE private_sync.pack_pool(card_key text PRIMARY KEY,variant text NOT NULL);
 INSERT INTO private_sync.pack_pool
