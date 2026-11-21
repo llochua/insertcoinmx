@@ -6,6 +6,8 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_3wyMm9dwLqSb9GiYTh245Q_9TukyCLK
 /* Versión fija para el sitio sin build ni dependencias locales. */
 const SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/+esm';
 const REDIRECT_URL = location.origin + '/qa/registro/'; // ruta confirmada en el correo de laboratorio; la confirmación vuelve al juego
+const PASSWORD_RECOVERY_URL = location.origin + '/?icmx_recovery=1';
+const recoveryRequested = new URLSearchParams(location.search).get('icmx_recovery') === '1' || /(?:^|&)type=recovery(?:&|$)/.test(location.hash.slice(1));
 const $auth = id => document.getElementById(id);
 let authClient = null;
 let authMode = 'signup';
@@ -24,6 +26,79 @@ function authMessage(text, kind = 'info') {
   if (!el) return;
   el.textContent = text;
   el.dataset.type = kind;
+}
+/* Pantalla exclusiva para enlaces de recuperación. No toca cartas, perfil ni progreso. */
+let recoveryDialog = null;
+function recoveryMessage(message,kind='info'){
+ const target=document.getElementById('icmxRecoveryMessage');
+ if(target){target.textContent=message;target.dataset.kind=kind}
+}
+function clearRecoveryUrl(){
+ const clean=new URL(location.href);
+ clean.searchParams.delete('icmx_recovery');
+ clean.hash='';
+ history.replaceState(history.state,'',clean.pathname+clean.search);
+}
+function showRecoveryDialog(){
+ if(recoveryDialog)return;
+ const css=document.createElement('style');
+ css.textContent=`
+ #icmxRecoveryOverlay{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;padding:16px;background:#090719f2;color:#fff;font:500 14px/1.55 system-ui,sans-serif}
+ #icmxRecoveryOverlay *{box-sizing:border-box}
+ #icmxRecoveryDialog{width:min(100%,410px);max-height:95dvh;overflow:auto;border:2px solid #ffd400;border-radius:18px;background:#191432;padding:26px 22px;box-shadow:0 18px 70px #000b}
+ #icmxRecoveryDialog h2{color:#ffd400;font:800 21px/1.3 system-ui,sans-serif;margin:0 0 12px}
+ #icmxRecoveryDialog p{margin:0 0 18px;color:#e6e0f5}
+ #icmxRecoveryDialog label{display:block;margin-bottom:6px;font-weight:700}
+ #icmxRecoveryDialog input{display:block;width:100%;min-height:46px;padding:10px 12px;margin-bottom:14px;border:1px solid #a49abc;border-radius:9px;background:#100d27;color:#fff;font:500 16px system-ui,sans-serif}
+ #icmxRecoveryDialog button{display:block;width:100%;min-height:46px;margin-top:12px;border:0;border-radius:9px;background:#ffd400;color:#141027;font:800 13px system-ui,sans-serif;cursor:pointer}
+ #icmxRecoveryDialog button:disabled{opacity:.55;cursor:wait}
+ #icmxRecoveryDialog button.secondary{background:transparent;border:1px solid #a49abc;color:#fff}
+ #icmxRecoveryMessage[data-kind=error]{color:#ffb8bc}
+ #icmxRecoveryMessage[data-kind=success]{color:#b6f5c9}
+ `;
+ document.head.appendChild(css);
+ const overlay=document.createElement('div');
+ overlay.id='icmxRecoveryOverlay';
+ overlay.innerHTML=`<section id="icmxRecoveryDialog" role="dialog" aria-modal="true" aria-labelledby="icmxRecoveryHeading">
+ <h2 id="icmxRecoveryHeading">NUEVA CONTRASEÑA</h2>
+ <p id="icmxRecoveryMessage" role="status" aria-live="polite">Verificando tu enlace de recuperación…</p>
+ <form id="icmxRecoveryForm" hidden>
+  <label for="icmxRecoveryPassword">Nueva contraseña</label><input id="icmxRecoveryPassword" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Mínimo 8 caracteres">
+  <label for="icmxRecoveryConfirm">Confirmar contraseña</label><input id="icmxRecoveryConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Repítela aquí">
+  <button type="submit" id="icmxRecoverySave">GUARDAR CONTRASEÑA</button>
+ </form>
+ <button type="button" class="secondary" id="icmxRecoveryExit">VOLVER AL INICIO</button>
+ </section>`;
+ document.body.appendChild(overlay);recoveryDialog=overlay;
+ document.getElementById('icmxRecoveryExit').addEventListener('click',async()=>{
+   // Nunca dejar una sesión temporal de recuperación abierta al salir.
+   if(authClient)await authClient.auth.signOut({scope:'local'}).catch(()=>{});
+   clearRecoveryUrl();location.assign(location.origin+'/');
+ });
+ document.getElementById('icmxRecoveryForm').addEventListener('submit',async e=>{
+  e.preventDefault();const a=document.getElementById('icmxRecoveryPassword'),b=document.getElementById('icmxRecoveryConfirm'),save=document.getElementById('icmxRecoverySave');
+  if(!a.checkValidity()||!b.checkValidity()||a.value!==b.value){recoveryMessage('Revisa que las contraseñas coincidan y tengan mínimo 8 caracteres.','error');return}
+  save.disabled=true;
+  try{
+   const {data:verified,error:verifyError}=await authClient.auth.getUser();
+   if(verifyError||!verified?.user?.id)throw Error('Enlace caducado o inválido. Solicita uno nuevo.');
+   const {error}=await authClient.auth.updateUser({password:a.value});
+   if(error)throw error;
+   a.value='';b.value='';
+   document.getElementById('icmxRecoveryForm').hidden=true;
+   recoveryMessage('Contraseña actualizada. Ya puedes iniciar sesión con tu nueva contraseña.','success');
+   document.getElementById('icmxRecoveryExit').textContent='IR A INICIAR SESIÓN';
+   await authClient.auth.signOut({scope:'local'});
+   clearRecoveryUrl();
+  }catch(error){recoveryMessage(/expired|invalid|caducado|enlace/i.test(String(error?.message||''))?'El enlace ya no es válido. Solicita otro desde Iniciar sesión.':'No se pudo actualizar la contraseña. Inténtalo de nuevo.','error')}
+  finally{save.disabled=false}
+ });
+}
+function readyRecoveryForm(){
+ showRecoveryDialog();
+ document.getElementById('icmxRecoveryForm').hidden=false;
+ recoveryMessage('Escribe y confirma tu nueva contraseña.');
+ document.getElementById('icmxRecoveryPassword').focus({preventScroll:true});
 }
 function renderGuestAuthStage(){
  const guest=guestStage!=='none',passwordStage=guestStage==='password';
@@ -290,6 +365,7 @@ async function initAccount() {
       }
     });
     authClient.auth.onAuthStateChange((_event, session) => {
+      if(_event==='PASSWORD_RECOVERY')readyRecoveryForm();
       showAuthUser(session?.user || null);
       // Evitar operaciones Supabase desde dentro del bloqueo de Auth.
       setTimeout(() => {
@@ -315,7 +391,12 @@ async function initAccount() {
       showAuthUser(null);
       authMessage('');
     }
-    if ((enteredFromEmail||guestStage==='password') && sessionData?.session) {
+    if(recoveryRequested){
+      showRecoveryDialog();
+      if(sessionData?.session && /(?:^|&)type=recovery(?:&|$)/.test(location.hash.slice(1)))readyRecoveryForm();
+      else if(document.getElementById('icmxRecoveryForm').hidden)recoveryMessage('No pudimos validar el enlace. Solicita uno nuevo desde Iniciar sesión.','error');
+    }
+    if (!recoveryRequested && (enteredFromEmail||guestStage==='password') && sessionData?.session) {
       authMessage(guestStage==='password'?'¡Correo confirmado! Crea tu contraseña para terminar.':'¡Correo confirmado! Tu sesión ya está activa.', 'success');
       // Al volver del correo, salir de START y mostrar el perfil real.
       document.getElementById('title')?.classList.remove('on');
@@ -350,7 +431,7 @@ $auth('profileAuthForgot').addEventListener('click', async () => {
   try{
     const captcha=await authCaptchaOptions();
     const {error}=await authClient.auth.resetPasswordForEmail(email,{
-      redirectTo:REDIRECT_URL,...captcha
+      redirectTo:PASSWORD_RECOVERY_URL,...captcha
     });
     if(error)throw error;
     // No confirmar ni negar la existencia del correo para evitar enumeración.
