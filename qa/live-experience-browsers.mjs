@@ -32,17 +32,19 @@ try{
   const context=await browser.newContext({viewport:{width,height:850}});
   const page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/rest/v1/rpc/icmx_community_aggregates',r=>r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'[]'}));
   // El inicio real conserva la portada y ejecuta onboarding una sola vez.
   const response=await page.goto(url,{waitUntil:'domcontentloaded'});
   assert.equal(response.status(),200);
   assert.equal(await page.locator('#title.on').count(),1,'portada pública intacta');
   await page.locator('#title').click({position:{x:120,y:240}});
-  await page.locator('#onb.on').waitFor();
-  for(let n=0;n<3;n++)await page.locator('#onNext').click();
-  assert.equal(await page.locator('#onb.on').count(),0,'bienvenida terminada');
-  assert.equal(await page.locator('#home.on').count(),1,'onboarding termina en menú');
-  assert.equal(await page.locator('#pack.on').count(),0,'no abre sobre automáticamente');
-  assert.equal(await page.evaluate(()=>document.activeElement?.id),'home','foco seguro en menú');
+  await page.locator('#icmxGuestChoose').click();
+  await page.locator('#icmxGuestIni').fill('TST');
+  await page.locator('#icmxGuestHandle').fill('qa_guest');
+  await page.locator('#icmxGuestPlay').click();
+  await page.locator('#icmxGuestGate').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#home.on').count(),1,'guest identity leads to menu');
+  assert.equal(await page.locator('#pack.on').count(),0,'no automatic pack');
   const before=await page.evaluate(()=>({
    saved:localStorage.getItem('icmx-album2'),
    have:JSON.stringify(S.have),fg:S.fg,extra:S.extra,freeUsed:S.freeUsed
@@ -52,7 +54,7 @@ try{
   await page.reload({waitUntil:'domcontentloaded'});
   assert.equal(await page.evaluate(()=>S.seen),1,'progreso sobrevive recarga');
   await page.locator('#title').click({position:{x:120,y:240}});
-  assert.equal(await page.locator('#onb.on').count(),0,'bienvenida no vuelve al segundo inicio');
+  assert.equal(await page.locator('#icmxGuestGate:visible').count(),0,'guest access does not repeat after reload');
 
   const meta=await page.evaluate(()=>{
    go('pack');
