@@ -1694,6 +1694,21 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 
 
 
+
+/* Identidad de jugador: sigue el sistema AV; las iniciales arcade usan PX en el acceso. */
+#profile .guest-edit-identity{padding:5px 0;margin-top:5px;background:none;color:#ffd400;font:700 11px AV,system-ui,sans-serif;text-align:left}
+#profile .guest-edit-identity[hidden],#scores #sSave[hidden]{display:none!important}
+#scores .score-identity-note{text-align:center;font:600 11px/1.5 AV,system-ui,sans-serif;color:#c7c1dd}
+#scores #iniIn[readonly]{opacity:.75}
+#scores .rank-handle{display:block;font:600 10px/1.4 AV,system-ui,sans-serif;letter-spacing:normal;color:#bdb8d1;margin-top:5px}
+
+#profile #profileAuthInitials,#profile #profileAuthHandle,#profile #profileSignedInitials,#profile #profileSignedHandle{display:block;width:100%;min-height:46px;border:1px solid rgba(255,255,255,.27);border-radius:10px;background:#120e29;color:#fff;font:600 15px AV,system-ui,sans-serif;padding:10px 12px}
+#profile #profileAuthInitials,#profile #profileSignedInitials{font:16px PX,monospace;letter-spacing:.2em;color:#ffd400;text-transform:uppercase}
+#profile #profileAuthHandle,#profile #profileSignedHandle{text-transform:lowercase}
+#profile #profileSignedIdentityForm{display:flex;flex-direction:column;gap:10px}
+#profile #profileSignedIdentityForm[hidden],#profile #profileSignupInitialsField[hidden],#profile #profileSignupHandleField[hidden]{display:none!important}
+
+#profile .profile-head h2.arcade-initials{font:clamp(17px,4vw,22px)/1.5 PX,monospace;color:#ffd400;letter-spacing:.12em}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261120"></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -1762,7 +1777,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <div class="px" style="font-size:9px;color:var(--dim);text-align:center;line-height:1.8">TU PUNTAJE: CARTAS DISTINTAS<br><span style="color:var(--y);font-size:26px" id="sMine">0</span></div>
   <div class="px" id="sPos" style="font-size:9px;color:var(--y)"></div>
   <input id="iniIn" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
-  <button class="btn y" id="sSave">GUARDAR</button>
+  <button class="btn y" id="sSave">GUARDAR</button><p class="score-identity-note" id="scoreIdentityNote"></p>
   <section class="arcade-bonus-stats" aria-labelledby="arcadeBonusTitle">
    <h2 id="arcadeBonusTitle">— BONUS STATS —</h2>
    <div class="arcade-bonus-grid">
@@ -1803,7 +1818,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <section class="profile-passport" aria-label="Mi partida">
    <div class="profile-head">
     <button type="button" id="profileAvatarButton" class="profile-avatar" aria-label="Cambiar mi avatar"><img id="profileAvatarImage" style="visibility:hidden" src="assets/avatars/moneda-128.webp" alt="" width="54" height="54"></button>
-    <div class="profile-identity"><p class="profile-kicker">PLAYER 01 · INSERT COIN MX</p><h2 id="profilePlayerName">Jugador invitado</h2><p class="profile-status" id="profilePlayerState">Progreso en este navegador</p><p class="profile-initials" id="profileInitials" hidden></p></div>
+    <div class="profile-identity"><p class="profile-kicker">PLAYER 01 · INSERT COIN MX</p><h2 id="profilePlayerName">Jugador invitado</h2><p class="profile-status" id="profilePlayerState">Progreso en este navegador</p><p class="profile-initials" id="profileInitials" hidden></p><button type="button" class="guest-edit-identity" id="profileEditIdentity" hidden>EDITAR MI IDENTIDAD ARCADE</button></div>
    </div>
    <div class="profile-collection">
     <div class="profile-dial" id="profileDial" aria-hidden="true"><div><strong id="profileCards">0</strong><span>CARTAS</span></div></div>
@@ -1841,13 +1856,24 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
      <button type="button" id="profileAuthTabLogin" aria-pressed="false">INICIAR SESIÓN</button>
     </div>
     <form id="profileAuthForm" autocomplete="on">
+     <div class="profile-auth-field" id="profileSignupInitialsField"><label for="profileAuthInitials">Tus 3 iniciales arcade</label><input id="profileAuthInitials" type="text" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="JOS" required></div>
+     <div class="profile-auth-field" id="profileSignupHandleField"><label for="profileAuthHandle">Nombre de usuario único</label><input id="profileAuthHandle" type="text" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="josplayer" required><p class="profile-auth-help">Entre 3 y 20 caracteres: letras, números y guion bajo. Se confirmará al activar tu cuenta.</p></div>
      <div class="profile-auth-field"><label for="profileAuthEmail">Correo electrónico</label><input type="email" id="profileAuthEmail" name="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="tu@correo.com"></div>
      <div class="profile-auth-field"><label for="profileAuthPassword">Contraseña</label><input type="password" id="profileAuthPassword" name="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Mínimo 8 caracteres"></div>
      <p class="profile-auth-help" id="profileAuthHint">Te enviaremos un correo para confirmar tu cuenta.</p>
      <button type="submit" class="profile-action primary" id="profileAuthSend">CREAR MI CUENTA</button>
     </form>
    </div>
-   <div id="profileAuthSigned" hidden><p class="profile-auth-email" id="profileAuthUser"></p><p class="profile-auth-hint">Comprueba el estado de la nube antes de cambiar de dispositivo.</p><button type="button" class="profile-action secondary" id="profileAuthSignOut">CERRAR SESIÓN</button></div>
+   <div id="profileAuthSigned" hidden>
+    <p class="profile-auth-email" id="profileAuthUser"></p>
+    <p class="profile-auth-hint" id="profileSignedIdentityStatus">Comprobando tu identidad de jugador…</p>
+    <form id="profileSignedIdentityForm" hidden>
+     <div class="profile-auth-field"><label for="profileSignedInitials">Tus 3 iniciales arcade</label><input id="profileSignedInitials" type="text" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="JOS" required></div>
+     <div class="profile-auth-field"><label for="profileSignedHandle">Nombre de usuario único</label><input id="profileSignedHandle" type="text" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="josplayer" required></div>
+     <button class="profile-action primary" type="submit" id="profileSignedSave">GUARDAR MI IDENTIDAD</button>
+    </form>
+    <p class="profile-auth-hint">Tus cartas estarán protegidas cuando aparezca «NUBE AL DÍA».</p>
+    <button type="button" class="profile-action secondary" id="profileAuthSignOut">CERRAR SESIÓN</button></div>
    <p class="profile-auth-message" id="profileAuthMessage" role="status" aria-live="polite"></p>
    <div id="profileCloudStatus" class="profile-sync-box" role="status" aria-live="polite">CONSULTANDO ESTADO DE LA NUBE…</div>
    <button type="button" class="profile-action secondary" id="profileLinkCollection" hidden>VINCULAR MI COLECCIÓN LOCAL</button>
@@ -2233,8 +2259,9 @@ const packReady=()=>PRUEBA||S.test||freePacksLeft()>0||S.extra>0;
 const RECORDS_EDITION='public-2026-launch-v1';
 const STORE={db:null,uid:null,docs:[],dl:null,async init(){try{if(!window.claude)return;this.db=await claude.use('db');const u=await claude.use('user');this.uid=u?await u.id():null;try{this.dl=await claude.use('downloads')}catch(e){}
  if(!this.db)return;const data=x=>x&&typeof x.data==='function'?x.data():x;
- this.db.collection('tiers').onSnapshot(s=>{const ds=s&&s.docs?s.docs:(Array.isArray(s)?s:[]);this.docs=ds.map(data).filter(d=>d&&d.v===7&&d.edition===RECORDS_EDITION);refresh()},()=>{})}catch(e){}},
- put(){if(this.db&&this.uid)this.db.doc('tiers/'+this.uid).set({v:7,edition:RECORDS_EDITION,ini:S.ini||'???',score:uniq(),rate:S.rate,champ:S.champ||'',duel:S.duel||{}}).catch(()=>{})}};
+ this.db.collection('tiers').onSnapshot(s=>{const ds=s&&s.docs?s.docs:(Array.isArray(s)?s:[]);this.docs=ds.map(data).filter(d=>d&&d.v===7&&d.edition===RECORDS_EDITION&&validArcadeHandle(d.handle));refresh()},()=>{})}catch(e){}},
+ put(){const identity=globalThis.icmxAccountIdentity;if(this.db&&this.uid&&identity?.handle&&identity.isPublic===true&&validArcadeIni(identity.ini))
+ this.db.doc('tiers/'+this.uid).set({v:7,edition:RECORDS_EDITION,ini:identity.ini,handle:identity.handle,score:uniq(),rate:S.rate,champ:S.champ||'',duel:S.duel||{}}).catch(()=>{})}};
 /* Varias pestañas: lo guardado manda. Antes de cada acción se adopta lo que otra pestaña haya escrito,
    y save() solo escribe si lo guardado sigue siendo lo último que esta pestaña leyó o escribió.
    Adoptar nunca interrumpe: refresh() no toca sobre, reta ni un arrastre en curso. */
@@ -2481,6 +2508,56 @@ $('onNext').onclick=()=>{beep(880);if(onI<ON.length-1){onI++;showOn()}else close
 document.addEventListener('keydown',e=>{if(!$('onb').classList.contains('on'))return;
  if(e.key==='Escape'){e.preventDefault();closeOn(false)}else if(e.key==='ArrowLeft'&&onI>0){e.preventDefault();onI--;showOn()}
 });
+
+/* El nombre de invitado es local y separado del snapshot de cartas. */
+const GUEST_HANDLE_KEY='icmx-guest-handle-v1';
+const validArcadeIni=v=>/^[A-Z0-9]{3}$/.test(v||'');
+const validArcadeHandle=v=>/^[a-z0-9_]{3,20}$/.test(v||'');
+const storedGuestHandle=()=>{const v=LS.get(GUEST_HANDLE_KEY)||'';return validArcadeHandle(v)?v:''};
+function arcadeIdentity(){
+ const registered=globalThis.icmxAccountIdentity;
+ if(registered?.handle)return {ini:validArcadeIni(registered.ini)?registered.ini:S.ini,handle:registered.handle,registered:true};
+ return {ini:S.ini||'',handle:storedGuestHandle(),registered:false};
+}
+globalThis.icmxGuestIdentity={
+ get:()=>({ini:S.ini||'',handle:storedGuestHandle()}),
+ markSeenForAccount:ini=>{
+  syncIn();const prev={ini:S.ini,seen:S.seen};
+  if(!validArcadeIni(S.ini)&&validArcadeIni(ini)&&!Object.keys(S.have||{}).length)S.ini=ini;
+  S.seen=1;
+  if(prev.ini===S.ini&&prev.seen===S.seen)return true;
+  if(save())return true;
+  S.ini=prev.ini;S.seen=prev.seen;return false;
+ }
+};
+const guestUIModule=import('./content/guest-access.mjs');
+async function openArcadeEntry(step='welcome'){
+ try{
+  const ui=await guestUIModule;
+  const identity=arcadeIdentity();
+  ui.openGuestAccess({
+   ini:identity.ini,handle:identity.handle,
+   onCreate:()=>{go('profile');revealProfileAuth('signup')},
+   onPlay:({ini,handle})=>{
+    syncIn();
+    try{localStorage.setItem(GUEST_HANDLE_KEY,handle);if(localStorage.getItem(GUEST_HANDLE_KEY)!==handle)return false}
+    catch(_){return false}
+    const previous={ini:S.ini,seen:S.seen};
+    S.ini=ini;S.seen=1;
+    if(!save()){S.ini=previous.ini;S.seen=previous.seen;return false}
+    refresh();return true;
+   }
+  },step);
+ }catch(_){if(step==='welcome')showOn()}
+}
+$('profileEditIdentity').onclick=()=>{go('home');openArcadeEntry('identity')};
+document.addEventListener('icmx:player-identity',()=>{
+ if(cur==='profile')renderProfile();
+ else if(cur==='scores')renderScores();
+ else if(cur==='home')renderHome();
+ STORE.put();
+});
+
 /* ---------- inicio ---------- */
 function nextGoal(){return GOALS.find(g=>uniq()<g[0])}
 const MLK='<svg viewBox="0 0 8 8" fill="#fff" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="6" y="1" width="1" height="3"/><rect x="0" y="4" width="8" height="4"/></svg>';
@@ -2509,7 +2586,8 @@ const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs
 function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,imgDir=light?'c':'c2';
  $('hCount').textContent=u+' / '+N;
  $('homePlayerCards').textContent=u;
- $('homePlayerStatus').textContent=u?'Tu colección está creciendo':'Comienza tu colección';
+ const identity=arcadeIdentity();
+ $('homePlayerStatus').textContent=identity.handle?'@'+identity.handle+(identity.registered?'':' · invitado'):(u?'Tu colección está creciendo':'Comienza tu colección');
  const fan=$('mFan');if(fan.children.length!==M.length){fan.innerHTML=M.map(m=>`<div class="mc"><div class="fx idle r-${m.rr}"><img src="${imgDir}/${m.img}.webp" alt="" decoding="async"><i class="foil"></i><i class="glare"></i></div><div class="lk">${MLK}</div><div class="lab"><small></small><b></b><span></span></div></div>`).join('');
   [...fan.children].forEach((el,i)=>el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()})}
  [...fan.children].forEach((el,i)=>{const m=M[i],pic=el.querySelector('.fx>img'),src=imgDir+'/'+m.img+'.webp';menuArtLoad(pic,m,imgDir);el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
@@ -2958,7 +3036,16 @@ function renderTitle(){$('tiOne').textContent=uniq();const docs=(STORE.docs||[])
  const list=docs.slice(0,5).map((d,i)=>`<i>${i+1}.</i> ${d.ini||'???'} ${d.score||0}`).join('   ·   ');
  $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'5 SOBRES DE BIENVENIDA · 2 DIARIOS   ·   JUNTA '+NAV+' CARTAS   ·   INSERTCOINMX.COM'}
 renderTitle();
-$('title').addEventListener('click',e=>{if(e.target.closest('[data-sound-toggle]'))return;beep(880,.06);setTimeout(()=>beep(1320,.08),70);$('title').classList.remove('on');renderHome();if(!S.seen)showOn()});
+$('title').addEventListener('click',e=>{
+ if(e.target.closest('[data-sound-toggle]'))return;
+ beep(880,.06);setTimeout(()=>beep(1320,.08),70);
+ $('title').classList.remove('on');renderHome();
+ if(ON_PREVIEW)return;
+ if(!S.seen&&!globalThis.icmxAccountIdentity?.handle){
+  const previous=!!(S.ini||S.last||Object.keys(S.have||{}).length||(Array.isArray(S.pk)&&S.pk.length));
+  if(previous)showOn();else openArcadeEntry();
+ }
+});
 document.addEventListener('pointermove',e=>{if(!$('title').classList.contains('on'))return;const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;$('tiHero').style.transform=`rotateY(${x*14}deg) rotateX(${-y*10}deg)`});
 window.addEventListener('deviceorientation',e=>{if(!$('title').classList.contains('on')||e.gamma==null)return;const x=Math.max(-1,Math.min(1,e.gamma/30)),y=Math.max(-1,Math.min(1,(e.beta-45)/30));$('tiHero').style.transform=`rotateY(${x*12}deg) rotateX(${-y*8}deg)`});
 
@@ -3388,7 +3475,7 @@ function localRankRecord(){
 }
 function persistLocalRecord(){
  if(!/^[A-Z0-9]{3}$/.test(S.ini))return false;
- const record={v:1,ini:S.ini,...currentRecordScores()};
+ const record={v:1,ini:S.ini,handle:arcadeIdentity().handle,...currentRecordScores()};
  try{localStorage.setItem(LOCAL_RANKING_KEY,JSON.stringify(record));return true}
  catch(_){return false}
 }
@@ -3396,14 +3483,14 @@ function scoreBoard(metric=selectedRanking){
  const field=RANKING_FIELDS[metric]?.field||'score';
  // Documentos anteriores solo tienen «score»; desconocido nunca equivale a cero.
  const remotely=STORE.docs.filter(r=>r&&/^[A-Z0-9]{3}$/.test(r.ini||'')&&safeRankValue(r[field])!==null)
-  .map(r=>({ini:r.ini,score:r[field]}));
+  .map(r=>({ini:r.ini,handle:r.handle||'',score:r[field]}));
  if(remotely.length)return {rows:remotely.sort((a,b)=>b.score-a.score||a.ini.localeCompare(b.ini)).slice(0,10),origin:'available'};
  const mine=localRankRecord();
- if(mine)return {rows:[{ini:mine.ini,score:mine[metric]}],origin:'local'};
+ if(mine)return {rows:[{ini:mine.ini,handle:mine.handle||'',score:mine[metric]}],origin:'local'};
  // La sesión en curso aún puede tener iniciales sin un registro local recuperable.
  if(S.ini&&/^[A-Z0-9]{3}$/.test(S.ini)){
   const count=currentRecordScores()[metric];
-  return {rows:[{ini:S.ini,score:count}],origin:'session'};
+  return {rows:[{ini:S.ini,handle:arcadeIdentity().handle,score:count}],origin:'session'};
  }
  return {rows:[],origin:STORE.docs.length?'missing':'empty'};
 }
@@ -3415,9 +3502,13 @@ function renderScores(){
   el.textContent=String(n).padStart(3,'0');
   el.setAttribute('aria-label',n+' '+label);
  }
- $('iniIn').value=S.ini;
+ const own=arcadeIdentity();
+ $('iniIn').value=own.ini||'';
+ $('iniIn').readOnly=!!own.handle;
+ $('sSave').hidden=!!own.handle;
+ $('scoreIdentityNote').textContent=own.handle?'@'+own.handle+(own.registered?' · cuenta':' · récord local'):'Tu récord se guarda en este navegador';
  const metric=RANKING_FIELDS[selectedRanking],listing=scoreBoard(selectedRanking);
- const available=listing.rows,position=available.findIndex(r=>r.ini===S.ini&&S.ini);
+ const available=listing.rows,position=available.findIndex(r=>r.ini===own.ini&&(own.handle?r.handle===own.handle:true));
  $('sPos').textContent=position>=0?(listing.origin==='available'?'VAS EN EL LUGAR #':'RÉCORD LOCAL · LUGAR #')+(position+1):'PON TUS INICIALES PARA ENTRAR';
  $('scoreRankColumn').textContent=metric.label;
  $('tbl').setAttribute('aria-label','Top 10 de '+metric.aria);
@@ -3428,11 +3519,12 @@ function renderScores(){
   listing.origin==='missing'?'AÚN NO HAY REGISTROS PARA ESTA CATEGORÍA':'RÉCORDS DE ESTA VISTA';
  // Diez espacios reales: los huecos nunca contienen jugadores inventados.
  $('tbl').innerHTML=Array.from({length:10},(_,i)=>{
-  const r=available[i],mine=!!r&&r.ini===S.ini;
+  const r=available[i],mine=!!r&&r.ini===own.ini&&(own.handle?r.handle===own.handle:true);
   const cl='r rank-'+(i+1)+(r?'':' rank-empty')+(mine?' rank-player':'');
   const name=r?esc(String(r.ini).slice(0,3)):'---';
   const count=r?String(r.score).padStart(3,'0'):'---';
-  return `<div class="${cl}"${r?' data-score-entry="true"':''}><span>${String(i+1).padStart(2,'0')}</span><span>${name}</span><span>${count}</span></div>`
+  const handle=r&&validArcadeHandle(r.handle)?'<small class="rank-handle">@'+esc(r.handle)+'</small>':'';
+  return `<div class="${cl}"${r?' data-score-entry="true"':''}><span>${String(i+1).padStart(2,'0')}</span><span>${name}${handle}</span><span>${count}</span></div>`
  }).join('');
 }
 $('scores').addEventListener('click',e=>{
@@ -3443,6 +3535,7 @@ $('scores').addEventListener('click',e=>{
 });
 $('iniIn').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3)};
 $('sSave').onclick=()=>{
+ if(arcadeIdentity().handle){toast('EDITA TU IDENTIDAD EN MI PERFIL');return}
  const value=$('iniIn').value;
  if(value.length<3){toast('3 LETRAS');return}
  syncIn();S.ini=value;
@@ -3707,9 +3800,14 @@ function renderProfile(){
  $('profileDesigns').textContent=DESIGNS.filter(d=>!d.bx&&dState(d).own).length;
  $('profileDuplicates').textContent=dups();
  $('profileRatings').textContent=Object.keys(S.rate||{}).length;
+ const identity=arcadeIdentity();
+ $('profilePlayerName').textContent=validArcadeIni(identity.ini)?identity.ini:(identity.registered?'Jugador registrado':'Jugador invitado');
+ $('profilePlayerName').classList.toggle('arcade-initials',validArcadeIni(identity.ini));
+ $('profilePlayerState').textContent=identity.registered?'Cuenta conectada · revisa tu respaldo':'Invitado · progreso en este dispositivo';
  const initials=$('profileInitials');
- initials.hidden=!S.ini;
- initials.textContent=S.ini?'Iniciales en Récords: '+S.ini:'';
+ initials.hidden=!identity.handle;
+ initials.textContent=identity.handle?'@'+identity.handle+(identity.registered?'':' · provisional'):'';
+ $('profileEditIdentity').hidden=identity.registered;
 }
 $('profileExport').onclick=()=>$('bkExp').click();
 $('profileImport').onclick=()=>$('bkImp').click();
