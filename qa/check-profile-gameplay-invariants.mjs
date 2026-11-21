@@ -31,6 +31,8 @@ const allowed=new Set([
   'qa/auth-public-settings.mjs',
   'supabase/sql/reset_for_public_launch_STAGED.sql',
   'content/release-reset.js',
+  'content/auth-account.js',
+  'qa/registro/index.html',
   'qa/perfil-main-browsers.mjs',
   'qa/check-profile-gameplay-invariants.mjs',
   '.github/workflows/validacion.yml',
