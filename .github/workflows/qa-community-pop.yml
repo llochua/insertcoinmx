@@ -33,3 +33,16 @@ jobs:
         env:
           PGPASSWORD: ranking-test-only
         run: psql -h localhost -U postgres -d ranking_test -v ON_ERROR_STOP=1 -f qa/community-pop-isolated.sql
+      - name: Instalar Chromium para las dos sesiones de prueba
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Ranking y POP en navegadores aislados
+        run: node qa/community-ranking-browsers.mjs
+      - name: Capturas móvil y escritorio
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ranking-pop-capturas
+          path: qa/screenshots/global-pop-*.png
+          if-no-files-found: ignore
