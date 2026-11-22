@@ -48,7 +48,7 @@ export async function beginGuestUpgrade({auth,expectedUid,email,ini,handle,redir
  if(error)throw error;
  if(!expectedUid||before?.user?.id!==expectedUid||before.user.is_anonymous!==true)
   throw fail('guest_identity_changed');
- if(typeof email!=='string'||!email.includes('@')||!/^[A-Z0-9]{3}$/.test(ini||'')||!/^[a-z0-9_]{3,20}$/.test(handle||''))
+ if(typeof email!=='string'||!email.includes('@')||!/^[A-Z0-9!?*+.@#$%-]{3}$/.test(ini||'')||!/^[a-z0-9_]{3,20}$/.test(handle||''))
   throw fail('guest_invalid_identity');
  // Supabase requiere verificar el correo primero. No usar signUp aquí:
  // crearía un UID distinto y perdería el vínculo con todos los sobres.
