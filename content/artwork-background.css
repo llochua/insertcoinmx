@@ -15,3 +15,30 @@
 /* Efecto de material no debe teñir el fondo sólido extendido. */
 .disc.dx.v-e .dx-mat,.disc.dx.v-r .dx-mat,
 .rs2 .rh.dx.v-e .dx-mat,.rs2 .rh.dx.v-r .dx-mat{display:none!important}
+
+/* DS-ART-02 · IMPORTANT: A gradient OVER the artwork is still a gradient on
+ * screen, even when the CSS background-color is technically correct.
+ * Base/Holo/Dorada must retain a continuous flat-color canvas through text.
+ * Full cinematic scenery is deliberately a separate composition. */
+.disc.dx.v-b .dx-fade,
+.disc.dx.v-e .dx-fade,
+.disc.dx.v-r .dx-fade,
+.rs2 .rh.dx.v-b .dx-fade,
+.rs2 .rh.dx.v-e .dx-fade,
+.rs2 .rh.dx.v-r .dx-fade{display:none!important}
+
+/* Copy remains legible without tinting or dimming the image canvas. */
+.disc.dx:not(.v-f) .dx-info,
+.rs2 .rh.dx:not(.v-f) .dx-info{
+  text-shadow:0 1px 3px rgba(0,0,0,.85),0 0 8px rgba(0,0,0,.45);
+}
+.disc.dx.bg-light:not(.v-f) .dx-info,
+.rs2 .rh.dx.bg-light:not(.v-f) .dx-info{
+  color:#120f1a;
+  text-shadow:0 1px 3px rgba(255,255,255,.9),0 0 8px rgba(255,255,255,.65);
+}
+.disc.dx.bg-light .dx-narrative p,
+.rs2 .rh.dx.bg-light .dx-narrative p{
+  color:#120f1a;
+  text-shadow:0 1px 3px rgba(255,255,255,.9);
+}
