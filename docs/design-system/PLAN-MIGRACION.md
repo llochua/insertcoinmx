@@ -1,6 +1,6 @@
 # Plan de migración a sistema de diseño
 
-**Estado:** fase 1 implementada en rama independiente; **`main` y producción siguen sin cambios**. Fase 0 de validación visual y fases 2–4 aún pendientes.
+**Estado:** fase 1 y 2A implementadas en rama independiente; **`main` y producción siguen sin cambios**. Validación visual, cierre de fase 2 y fases 3–4 pendientes.
 
 ## Orden recomendado
 
@@ -27,11 +27,11 @@
 
 ### Fase 2 — Fundamentos y componentes (P1)
 
-- [ ] Crear `content/design-tokens.css` con aliases hacia `--y`, `--ink`, `--dim` para una transición sin ruptura.
+- [x] Crear `content/design-tokens.css` con aliases hacia `--y`, `--ink`, `--dim` para una transición sin ruptura (**implementado en rama**).
 - [x] Primera consolidación de objetivos de `IconButton` y cabeceras (44 px, dibujo de 20/24 px) en CSS compartido; [ ] ampliar catálogo y validar responsive.
-- [ ] Consolidar botones `.btn`, `.big`, `.mgo`, `.profile-action`, `.avatar-save`, `.ux-primary` bajo variantes semánticas.
+- [x] Introducir contrato `.ic-button` y variantes semánticas sobre `.btn`, `.big`, `.mgo`, `.profile-action`, `.avatar-save`, `.ux-primary` (**migración inicial en rama**). [ ] Eliminar duplicados heredados después del QA.
 - [ ] Definir y aplicar escala de tipografía y espacios, verificando textos de 6–9 px que transmitan información necesaria.
-- [ ] Unificar tabs/segmentos, cards UI, modales, feedback, contadores y estados bloqueados.
+- [x] Contrato `.ic-segment` sobre Home, Álbum, acceso y `.ic-surface` sobre paneles de cuenta/Perfil (**en rama**). [ ] Resto de tarjetas UI, modales, feedback, contadores y estados bloqueados.
 - [ ] Extraer gradualmente CSS por capas y reducir `!important`; **no** aplicar reemplazo masivo que afecte layout de las cartas.
 - [ ] Definir estados `hover`, `pressed`, `focus-visible`, `disabled`, `selected`, `loading` y `prefers-reduced-motion`.
 
@@ -57,6 +57,8 @@ Orden sugerido, empezando por los patrones más compartidos:
 - [ ] Documentar motivos de excepción (arte/rareza/emojis de reacción) para evitar falsos positivos.
 - [ ] Revisar que cada PR tenga capturas o registro de pruebas de estados; actualizar documentación en el mismo cambio.
 - [ ] Fusionar a `main` solo por entregas pequeñas y verificables.
+
+Ver [Catálogo de componentes](COMPONENTES.md) y [registro Fase 2A](IMPLEMENTACION-FASE-2.md).
 
 ## Matriz de QA obligatoria
 
