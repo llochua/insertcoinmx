@@ -15,7 +15,7 @@ let currentGuestUser=null,guestStage='none';
 const stageFor=user=>!user?.id?'none':user.is_anonymous===true?'email':
  user.user_metadata?.icmx_guest_upgrade===true&&user.user_metadata?.icmx_guest_password_set!==true
   ?(user.email_confirmed_at?'password':'email'):'none';
-const iniOK = v => /^[A-Z0-9]{3}$/.test(v || '');
+const iniOK = v => /^[A-Z0-9!?*+.@#$%-]{3}$/.test(v || '');
 const handleOK = v => /^[a-z0-9_]{3,20}$/.test(v || '');
 const enteredFromEmail = /(?:^|[?&#])(?:access_token|code)=/.test(location.hash + '&' + location.search);
 
@@ -173,7 +173,7 @@ async function loadAccountIdentity(expectedId) {
   }else{
     globalThis.icmxAccountIdentity=null;
     if(!$auth('profileSignedIdentityStatus').textContent.startsWith('Ese nombre ya'))
-      showMissingIdentity(ini,wantedHandle||draft.handle,'Completa tus 3 letras para el récord y un @usuario único.');
+      showMissingIdentity(ini,wantedHandle||draft.handle,'Completa tus 3 caracteres para el récord y un @usuario único.');
   }
   document.dispatchEvent(new Event('icmx:player-identity'));
 }
@@ -181,7 +181,7 @@ function normalizeIdentityField(id,type) {
   const input=$auth(id);
   input.addEventListener('input',()=>{
     input.value=type==='ini'
-      ?input.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3)
+      ?input.value.toUpperCase().replace(/[^A-Z0-9!?*+.@#$%-]/g,'').slice(0,3)
       :input.value.toLowerCase().replace(/[^a-z0-9_]/g,'').slice(0,20);
   });
 }
@@ -193,7 +193,7 @@ $auth('profileSignedIdentityForm').addEventListener('submit',async event=>{
   const ini=$auth('profileSignedInitials').value.toUpperCase();
   const handle=$auth('profileSignedHandle').value.toLowerCase();
   if(!iniOK(ini)||!handleOK(handle)){
-    $auth('profileSignedIdentityStatus').textContent='Necesitamos 3 letras para tu récord y un usuario de 3 a 20 caracteres.';
+    $auth('profileSignedIdentityStatus').textContent='Necesitamos 3 caracteres para tu récord y un usuario de 3 a 20 caracteres.';
     return;
   }
   const button=$auth('profileSignedSave');
@@ -211,7 +211,7 @@ $auth('profileSignedIdentityForm').addEventListener('submit',async event=>{
     }
     const {error:metaError}=await authClient.auth.updateUser({data:{icmx_initials:ini,icmx_handle:handle}});
     if(metaError){
-      $auth('profileSignedIdentityStatus').textContent='Tu usuario está reservado, pero faltó guardar las 3 letras del récord. Inténtalo de nuevo.';
+      $auth('profileSignedIdentityStatus').textContent='Tu usuario está reservado, pero faltó guardar los 3 caracteres del récord. Inténtalo de nuevo.';
       return;
     }
     await loadAccountIdentity(data.user.id);
@@ -400,7 +400,7 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
     const ini=$auth('profileAuthInitials').value.toUpperCase();
     const handle=$auth('profileAuthHandle').value.toLowerCase();
     if(!iniOK(ini)||!handleOK(handle)){
-      authMessage('Elige 3 letras para tu récord y un @usuario de 3 a 20 caracteres.', 'error');
+      authMessage('Elige 3 caracteres para tu récord y un @usuario de 3 a 20 caracteres.', 'error');
       return;
     }
     signupIdentity={ini,handle};
