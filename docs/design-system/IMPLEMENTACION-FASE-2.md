@@ -30,7 +30,7 @@
 
 ## Pendiente para declarar concluida la Fase 2
 
-- [ ] La comprobación CI del contrato de componentes debe reportar éxito después del último commit.
+- [x] **CI `UI system contract` aprobada** (run [45081455310](https://github.com/llochua/insertcoinmx/actions/runs/45081455310)): scripts de iconos y componentes completados con éxito.
 - [ ] Probar diseño renderizado en móviles de 320/360/390/430 px y escritorio.
 - [ ] Comprobar que las pestañas de Home de 44 px no desplazan el CTA en pantallas de poca altura.
 - [ ] Evaluar contraste real de texto/placeholder y foco en formularios.
@@ -39,4 +39,4 @@
 - [ ] Continuar normalización gradual de `!important`, fuentes y radios en etapas posteriores.
 - [ ] Aprobación visual antes de fusionar PR #130.
 
-**Estado real:** Fase 2A implementada en rama, sujeta a validación visual. **No está en producción**.
+**Estado real:** Fase 2A implementada en rama con contrato CI verde; sujeta a validación visual y pruebas del juego. **No está en producción**.
