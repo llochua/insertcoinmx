@@ -35,7 +35,8 @@
   min-height:var(--ic-target);flex:0 0 var(--ic-target);
 }
 @media(max-width:700px){
-  #torneo>.top{height:52px;min-height:52px;flex:0 0 52px}
+  /* Keep Reta's compact header while making its 44px controls actually fit. */
+  #torneo>.top{height:44px;min-height:44px;flex:0 0 44px;padding-block:0!important}
 }
 .dx-top .sound-toggle{
   box-sizing:border-box;width:var(--ic-target);height:var(--ic-target);
