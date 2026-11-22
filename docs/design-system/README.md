@@ -1,7 +1,7 @@
 # Insert Coin MX — Sistema de diseño
 
 **Versión:** 0.1 · **Fecha:** 22 de noviembre de 2026  
-**Estado:** propuesta documentada a partir de auditoría estática de `main`. **Todavía no está aplicada a la interfaz.**  
+**Estado:** auditoría estática de `main` + primera implementación de iconografía en la rama `docs/design-system-audit-2026-11-22`. **No está en producción ni en `main`; QA visual y móvil pendiente.**  
 **Alcance:** El Álbum (inicio, sobres, álbum, Tier, Reta, Récords, perfil, acceso, avatares, onboarding, fichas y modales).
 
 ## Propósito
@@ -98,4 +98,4 @@ Referencias de QA: 320, 360, 390, 430, 768 y 1024 px; también dispositivos de p
 - [Contrato de iconografía](ICONOGRAFIA.md)
 - [Plan de migración y criterios de aceptación](PLAN-MIGRACION.md)
 
-> Este paquete es documentación inicial trazable. **No certifica que la interfaz actual ya cumpla estas reglas ni sustituye pruebas en navegadores reales.**
+> La primera migración ya agrega `content/ui-system.css` y un sprite SVG de 16 símbolos en `index.html`. [Ver implementación y verificaciones](IMPLEMENTACION-FASE-1.md). **No certifica que la interfaz ya cumpla todas las reglas ni sustituye pruebas en navegadores reales.**
