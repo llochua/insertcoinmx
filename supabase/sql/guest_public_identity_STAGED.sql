@@ -3,7 +3,7 @@
 BEGIN;
 CREATE TABLE IF NOT EXISTS private_sync.guest_public_identities(
  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
- ini text NOT NULL CHECK(ini ~ '^[A-Z0-9]{3}$'),
+ ini text NOT NULL CHECK(ini ~ '^[A-Z0-9!?*+.@#$%-]{3}$'),
  handle text NOT NULL UNIQUE CHECK(handle ~ '^[a-z0-9_]{3,20}$'),
  created_at timestamptz NOT NULL DEFAULT now()
 );
@@ -25,7 +25,7 @@ BEGIN
                   WHERE id=v_uid AND is_anonymous IS TRUE) THEN
   RAISE EXCEPTION 'Invitado no verificado' USING ERRCODE='42501';
  END IF;
- IF p_ini !~ '^[A-Z0-9]{3}$' OR p_handle !~ '^[a-z0-9_]{3,20}$'
+ IF p_ini !~ '^[A-Z0-9!?*+.@#$%-]{3}$' OR p_handle !~ '^[a-z0-9_]{3,20}$'
     OR p_ini IS NULL OR p_handle IS NULL THEN
   RAISE EXCEPTION 'Identidad arcade inválida' USING ERRCODE='22023';
  END IF;
