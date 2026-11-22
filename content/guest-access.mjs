@@ -34,7 +34,7 @@ const STYLE = `
 `;
 let root;
 const q=id=>root.querySelector('#'+id);
-const validIni=v=>/^[A-Z0-9]{3}$/.test(v||'');
+const validIni=v=>/^[A-Z0-9!?*+.@#$%-]{3}$/.test(v||'');
 const validHandle=v=>/^[a-z0-9_]{3,20}$/.test(v||'');
 let handlers=null;
 function ensure(){
@@ -49,8 +49,8 @@ function ensure(){
  <button id="icmxGuestChoose" class="tertiary" type="button">JUGAR COMO INVITADO</button>
  <p class="guest-warning">Como invitado, tus cartas se guardan en este navegador, pero podrías perderlas si borras sus datos o cambias de dispositivo.</p>
  </section>
- <section id="icmxGuestIdentity" hidden><h2>Tu identidad arcade</h2><p>Elige 3 letras para tu récord. Pueden ser las que quieras.</p>
- <label for="icmxGuestIni">TUS 3 LETRAS PARA EL RÉCORD</label><input id="icmxGuestIni" type="text" maxlength="3" autocapitalize="characters" spellcheck="false" autocomplete="off" placeholder="AAA">
+ <section id="icmxGuestIdentity" hidden><h2>Tu identidad arcade</h2><p>Elige 3 caracteres para tu récord. Usa letras, números o símbolos.</p>
+ <label for="icmxGuestIni">TUS 3 CARACTERES PARA EL RÉCORD</label><input id="icmxGuestIni" type="text" maxlength="3" autocapitalize="characters" spellcheck="false" autocomplete="off" placeholder="R!6">
  <label for="icmxGuestHandle">NOMBRE DE USUARIO</label><div class="guest-handle"><span aria-hidden="true">@</span><input id="icmxGuestHandle" type="text" maxlength="20" autocapitalize="none" spellcheck="false" autocomplete="off" placeholder="nombre_usuario"></div>
  <p class="guest-help">De 3 a 20 caracteres: letras, números o guion bajo. Tu @usuario es provisional hasta crear una cuenta.</p>
  <p id="icmxGuestError" role="status" aria-live="polite"></p>
@@ -62,7 +62,7 @@ function ensure(){
  q('icmxGuestBack').onclick=()=>show('welcome');
  q('icmxGuestCreate').onclick=()=>{hide();handlers?.onCreate?.()};
  q('icmxGuestLogin').onclick=()=>{hide();handlers?.onLogin?.()};
- q('icmxGuestIni').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3);validate()});
+ q('icmxGuestIni').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9!?*+.@#$%-]/g,'').slice(0,3);validate()});
  q('icmxGuestHandle').addEventListener('input',e=>{e.target.value=e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,'').slice(0,20);validate()});
  q('icmxGuestPlay').onclick=async()=>{
   const ini=q('icmxGuestIni').value,handle=q('icmxGuestHandle').value,button=q('icmxGuestPlay');
