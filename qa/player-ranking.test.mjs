@@ -19,6 +19,18 @@ test('Ranking: rechaza fuentes incompletas, valores negativos o datos privados',
  assert.equal(got[0].mine,false);
  assert.equal('email' in got[1],false);
 });
+test('Ranking: acepta exactamente tres caracteres arcade, incluidos símbolos seguros',()=>{
+ const data=empty();
+ data.cards=[
+  {ini:'R56',handle:'player_numbers',score:2},
+  {ini:'R!6',handle:'player_symbol',score:3},
+  {ini:'?56',handle:'player_question',score:4},
+  {ini:'A<B',handle:'player_unsafe',score:5},
+  {ini:'AB',handle:'player_short',score:6},
+  {ini:'ABCD',handle:'player_long',score:7}
+ ];
+ assert.deepEqual(normalizePlayerBoards(data).cards.map(row=>row.ini),['?56','R!6','R56']);
+});
 test('Ranking: cinco tablas, solo primeras diez posiciones reales',()=>{
  const data=empty();
  data.pts=Array.from({length:12},(_,i)=>({ini:'P'+String(i).padStart(2,'0'),handle:'p_'+String(i).padStart(3,'0'),score:200-i}));
