@@ -173,7 +173,7 @@ async function loadAccountIdentity(expectedId) {
   }else{
     globalThis.icmxAccountIdentity=null;
     if(!$auth('profileSignedIdentityStatus').textContent.startsWith('Ese nombre ya'))
-      showMissingIdentity(ini,wantedHandle||draft.handle,'Completa tus iniciales y un @usuario único.');
+      showMissingIdentity(ini,wantedHandle||draft.handle,'Completa tus 3 letras para el récord y un @usuario único.');
   }
   document.dispatchEvent(new Event('icmx:player-identity'));
 }
@@ -193,7 +193,7 @@ $auth('profileSignedIdentityForm').addEventListener('submit',async event=>{
   const ini=$auth('profileSignedInitials').value.toUpperCase();
   const handle=$auth('profileSignedHandle').value.toLowerCase();
   if(!iniOK(ini)||!handleOK(handle)){
-    $auth('profileSignedIdentityStatus').textContent='Necesitamos 3 iniciales y un usuario de 3 a 20 caracteres.';
+    $auth('profileSignedIdentityStatus').textContent='Necesitamos 3 letras para tu récord y un usuario de 3 a 20 caracteres.';
     return;
   }
   const button=$auth('profileSignedSave');
@@ -211,7 +211,7 @@ $auth('profileSignedIdentityForm').addEventListener('submit',async event=>{
     }
     const {error:metaError}=await authClient.auth.updateUser({data:{icmx_initials:ini,icmx_handle:handle}});
     if(metaError){
-      $auth('profileSignedIdentityStatus').textContent='Tu usuario está reservado, pero faltó guardar las iniciales. Inténtalo de nuevo.';
+      $auth('profileSignedIdentityStatus').textContent='Tu usuario está reservado, pero faltó guardar las 3 letras del récord. Inténtalo de nuevo.';
       return;
     }
     await loadAccountIdentity(data.user.id);
@@ -400,7 +400,7 @@ $auth('profileAuthForm').addEventListener('submit', async event => {
     const ini=$auth('profileAuthInitials').value.toUpperCase();
     const handle=$auth('profileAuthHandle').value.toLowerCase();
     if(!iniOK(ini)||!handleOK(handle)){
-      authMessage('Elige 3 iniciales y un @usuario de 3 a 20 caracteres.', 'error');
+      authMessage('Elige 3 letras para tu récord y un @usuario de 3 a 20 caracteres.', 'error');
       return;
     }
     signupIdentity={ini,handle};
