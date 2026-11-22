@@ -31,7 +31,7 @@ jobs:
           node --check qa/design-system/avatar-lab.js
           node --check qa/design-system-browsers.mjs
       - name: Instalar Playwright
-        run: npm install --no-save --no-package-lock playwright@1.56.1
+        run: npm install --no-save --no-package-lock playwright@1.56.1 pngjs@7.0.0
       - name: Instalar Chromium
         run: npx playwright install --with-deps chromium
       - name: Validar sobres, Reta, avatar e independencia de cuentas
