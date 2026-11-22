@@ -32,7 +32,7 @@ test('La pista está dentro de las cartas del resumen, también en la protagonis
 test('Al tocar una pista se llega primero a la historia sin perder la vista ampliada',()=>{
  const narrative=html.indexOf('id="zNarrative"');
  const voting=html.indexOf('id="zVoting"');
- assert.ok(narrative>=0&&voting>narrative,'El relato aparece antes de la calificación');
+ assert.ok(voting>=0&&narrative>voting,'Se conserva la calificación primero; el CTA lleva directamente al relato');
  assert.match(html,/storyFirst:!!e\.target\.closest\('\.rc-story-cta,\.rh-story-cta'\)/);
  assert.match(html,/narrative\.scrollIntoView\(\{block:'start',behavior:'auto'\}\)/);
  assert.match(html,/function openCard\(k,options=\{\}\)/);
