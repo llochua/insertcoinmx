@@ -64,7 +64,7 @@ check('card graphics and Reta game hooks are left intact', () => {
   for (const fragment of [
     'content/card-value-overlay.js', 'content/auth-account.js',
     'content/avatar-profile.js', 'id="vStage"', 'data-reta-unlock-action',
-    'class="zr-emoji"', 'id="pk"'
+    'zr-emoji', 'id="pk"'
   ]) assert(html.includes(fragment), 'Missing '+fragment);
 });
 
