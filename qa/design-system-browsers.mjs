@@ -131,8 +131,9 @@ try{
    if(variant==='r'){
     await page.evaluate(()=>showSum());
     await page.waitForFunction(()=>{
-     const d=document.querySelector('#sum .rh');
-     return !!d?.dataset.artSource&&!d.classList.contains('ic-art-bg-pending');
+     const d=document.querySelector('#sum .rh'),img=d?.querySelector('.dx-art img');
+     return !!d?.dataset.artSource&&!d.classList.contains('ic-art-bg-pending')
+      &&!!img?.complete&&img?.naturalWidth>0;
     },null,{timeout:15000});
     const sum=await page.evaluate(()=>{
      const d=document.querySelector('#sum .rh'),img=d.querySelector('.dx-art img');
