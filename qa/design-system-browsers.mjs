@@ -97,6 +97,54 @@ try{
   assert.equal(await page.evaluate(()=>packReady()),true,'packs remain infinite after opening');
   await page.screenshot({path:'qa/screenshots/ui-lab-pack-'+width+'.png'});
 
+  // DS-ART-01 · El color original del borde se extiende a todo el escenario.
+  // Una carta real por variante, también la Full con un archivo diferente.
+  await page.locator('#disc.on').waitFor({state:'visible'});
+  for(const variant of ['b','e','r','f']){
+   const id=variant==='b'?'evilexes':'gatosamurai';
+   await page.evaluate(({id,variant})=>{
+    const c=CB[id+'_'+variant];
+    if(!c)throw Error('Missing known artwork variant '+id+'_'+variant);
+    hand=[{...c,_new:false,_dnew:false,_doneB:false,_comp:false,_prev:[]}];
+    idx=0;REV=new Set([0]);showCard();
+   },{id,variant});
+   await page.waitForFunction(()=>{
+    const d=document.querySelector('#disc'),im=d?.querySelector('.dx-art img,.dx-full-view img');
+    return d?.classList.contains('on')&&!d?.classList.contains('ic-art-bg-pending')
+     &&!!d.dataset.artSource&&im?.complete&&im?.naturalWidth>0;
+   },null,{timeout:15000});
+   const color=await page.evaluate(()=>{
+    const d=document.querySelector('#disc'),img=d.querySelector('.dx-art img,.dx-full-view img');
+    const expected=bgFromArtwork(img),actual=d.style.getPropertyValue('--bg');
+    const computed=getComputedStyle(d),mat=d.querySelector('.dx-mat');
+    const rect=d.getBoundingClientRect();
+    return {expected,actual,css:computed.backgroundColor,backgroundImage:computed.backgroundImage,
+     matDisplay:mat?getComputedStyle(mat).display:null,rect:{left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom}};
+   });
+   assert(color.expected,'must detect image border for '+variant);
+   assert.equal(color.actual,color.expected,'stage color equals actual image pixels '+variant);
+   assert.equal(color.css,'rgb('+parseInt(color.expected.slice(1,3),16)+', '+parseInt(color.expected.slice(3,5),16)+', '+parseInt(color.expected.slice(5,7),16)+')','solid CSS color matches image '+variant);
+   assert.equal(color.backgroundImage,'none','no generic gradient for '+variant);
+   if(variant==='e'||variant==='r')assert.equal(color.matDisplay,'none','material must not tint flat screen');
+   assert(color.rect.left>=-1&&color.rect.right>=width-1&&color.rect.top>=-1,'full viewport backdrop '+variant);
+   await page.screenshot({path:'qa/screenshots/ui-lab-art-bg-'+variant+'-'+width+'.png'});
+   if(variant==='r'){
+    await page.evaluate(()=>showSum());
+    await page.waitForFunction(()=>{
+     const d=document.querySelector('#sum .rh');
+     return !!d?.dataset.artSource&&!d.classList.contains('ic-art-bg-pending');
+    },null,{timeout:15000});
+    const sum=await page.evaluate(()=>{
+     const d=document.querySelector('#sum .rh'),img=d.querySelector('.dx-art img');
+     return {expected:bgFromArtwork(img),actual:d.style.getPropertyValue('--bg'),
+      css:getComputedStyle(d).backgroundColor,backgroundImage:getComputedStyle(d).backgroundImage};
+    });
+    assert(sum.expected&&sum.expected===sum.actual,'summary must use the real same-color backdrop');
+    assert.equal(sum.backgroundImage,'none','no gradient on summary');
+    await page.screenshot({path:'qa/screenshots/ui-lab-summary-art-bg-'+width+'.png'});
+   }
+  }
+
   await page.locator('#icmxLabToggle').click();
   await page.locator('[data-lab-action="profile"]').click();
   await page.locator('#profile.on').waitFor({state:'visible'});
