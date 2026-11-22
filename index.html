@@ -4153,7 +4153,7 @@ $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
- Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261121-v1')]).then(([mod,auth,players])=>{
+ Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261122chars')]).then(([mod,auth,players])=>{
   playerRanking=players.createPlayerRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{if(cur==='scores')renderScores();if(cur==='home'||cur==='title')refresh()}});
   playerRanking.refresh();
   communityRanking=mod.createCommunityRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{
