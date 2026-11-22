@@ -1,0 +1,17 @@
+/* Insert Coin MX DS-ART-01
+ * Fondo sólido del mismo archivo de arte en toda la revelación.
+ * Ninguna rareza debe introducir gradientes que sustituyan el color de base.
+ * Los efectos de la carta y el fade de legibilidad son independientes.
+ */
+.disc.dx:not(.cov),.rs2 .rh.dx{
+  background-color:var(--bg,#1b1826)!important;
+  background-image:none!important;
+}
+/* No revelar imagen sobre un fondo desactualizado; primero medir sus bordes. */
+.disc.dx.ic-art-bg-pending .dx-art,
+.disc.dx.ic-art-bg-pending .dx-scene,
+.rs2 .rh.dx.ic-art-bg-pending .dx-art,
+.rs2 .rh.dx.ic-art-bg-pending .dx-scene{visibility:hidden!important}
+/* Efecto de material no debe teñir el fondo sólido extendido. */
+.disc.dx.v-e .dx-mat,.disc.dx.v-r .dx-mat,
+.rs2 .rh.dx.v-e .dx-mat,.rs2 .rh.dx.v-r .dx-mat{display:none!important}
