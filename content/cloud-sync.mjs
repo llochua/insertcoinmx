@@ -113,7 +113,10 @@ export function decideSync({local,remote,base,remoteRevision}){
  const remoteSig=progressSignature(remote);
  if(!base){
   if(localSig===remoteSig)return 'matched';
-  return hasGameProgress(local)?'conflict':'download';
+  // Un navegador nuevo puede contener únicamente iniciales de perfil:
+  // no hay otra colección que fusionar. Recuperar la del mismo UID.
+  // Cartas, calificaciones, sobres y cuotas consumidas exigen revisión.
+  return isFreshGuest(local)?'download':'conflict';
  }
  if(!Number.isInteger(remoteRevision)||remoteRevision<1)return 'conflict';
  const baseSig=progressSignature(base.backup);

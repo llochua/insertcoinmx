@@ -18,6 +18,27 @@ test('Diferencias en exportación o revisión local no duplican progreso',()=>{
 test('Navegador recién creado recibe las cartas de la cuenta sin mezclar',()=>{
  assert.equal(decideSync({local:backup(),remote:backup({gato_b:5}),base:null,remoteRevision:1}),'download');
 });
+test('Regresión móvil 25 / escritorio 0: recuperar la nube aunque el perfil local ya tenga iniciales',()=>{
+ const remote=backup({gato_b:10,perro_e:15},{
+  ini:'JOS',fg:1,pk:['qa000001','qa000002','qa000003','qa000004','qa000005'],
+  welcomeLeft:0,last:'2026-11-21'
+ });
+ const local=backup({}, {ini:'JOS',seen:1,fg:0,pk:[],freeCycle:0});
+ const unchanged=JSON.stringify(remote);
+ assert.equal(isFreshGuest(local),true);
+ assert.equal(hasGameProgress(local),true,'las iniciales solas eran la causa del falso conflicto');
+ assert.equal(decideSync({local,remote,base:null,remoteRevision:7}),'download');
+ assert.equal(JSON.stringify(remote),unchanged,'la prueba no debe modificar el respaldo de 25 cartas');
+});
+test('Sin referencia común, actividad verdadera nunca se sobreescribe automáticamente',()=>{
+ const remote=backup({gato_b:25},{ini:'JOS',fg:1,welcomeLeft:0});
+ for(const local of [
+  backup({perro_b:1},{ini:'JOS',fg:1,welcomeLeft:4}),
+  backup({}, {ini:'JOS',rate:{perro:2}}),
+  backup({}, {ini:'JOS',pk:['abcdef12'],fg:1,welcomeLeft:4}),
+  backup({}, {ini:'JOS',welcomeLeft:4})
+ ])assert.equal(decideSync({local,remote,base:null,remoteRevision:7}),'conflict');
+});
 test('Cuenta con respaldo y otra colección local diferente: conflicto seguro',()=>{
  const a=backup({gato_b:4}),b=backup({gato_b:2});
  assert.equal(decideSync({local:a,remote:b,base:null,remoteRevision:1}),'conflict');

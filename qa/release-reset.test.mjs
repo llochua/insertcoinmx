@@ -41,8 +41,8 @@ const legacy=()=>storage({
  'sb-ynugqxbtszhsupadqdkz-auth-token':'auth',
  'unrelated-setting':'keep'
 });
-test('La versión candidata prepara el reinicio en el dominio oficial',()=>{
- assert.match(html,/release-reset\.js[^>]*data-active="true"[^>]*data-game-epoch="public-2026-launch-v2"/);
+test('El reinicio queda preparado pero DESACTIVADO hasta la autorización de lanzamiento',()=>{
+ assert.match(html,/release-reset\.js[^>]*data-active="false"[^>]*data-game-epoch="public-2026-launch-v2"/);
  const s=legacy();
  assert.equal(launch(s,false).result.status,'staged');
  assert.equal(JSON.parse(s.getItem('icmx-album2')).have.abuket_b,3);
