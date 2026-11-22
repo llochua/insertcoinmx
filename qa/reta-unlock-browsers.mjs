@@ -117,9 +117,12 @@ try{
   assert.match(display,/^\d{2}:\d{2}:\d{2}$/);
   let actual=await page.evaluate(()=>nextPackCountdown());
   assert.ok(Math.abs(seconds(display)-seconds(actual))<=1,'usa el reloj del juego, no uno nuevo');
-  await page.waitForTimeout(1250);
+  await page.waitForFunction(before=>{
+   const time=document.querySelector('.reta-unlock-wait time');
+   return time&&time.textContent!==before;
+  },display,{timeout:8000,polling:200});
   const advanced=await page.locator('.reta-unlock-wait time').textContent();
-  assert.ok(seconds(advanced)<seconds(display),'el reloj disminuye en tiempo real');
+  assert.ok(seconds(advanced)<seconds(display),'el reloj disminuye en tiempo real: '+display+' → '+advanced);
   await inspectMobile(page,width);
   await page.screenshot({path:'qa/screenshots/reta-unlock-7-agotados-'+width+'.png',fullPage:true});
   await page.locator('[data-reta-unlock-action]').click();
