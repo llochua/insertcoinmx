@@ -1,6 +1,6 @@
 /** Insert Coin MX · Top 10 global de jugadores. Solo lectura, ninguna estadística se envía. */
 const METRICS=Object.freeze(['pts','cards','designs','duplicates','ratings']);
-const validRow=row=>row&&/^[A-Z0-9]{3}$/.test(row.ini)&&
+const validRow=row=>row&&/^[A-Z0-9!?*+.@#$%-]{3}$/.test(row.ini)&&
  /^[a-z0-9_]{3,20}$/.test(row.handle)&&
  Number.isSafeInteger(row.score)&&row.score>0&&row.score<=100000000;
 export function normalizePlayerBoards(data){
