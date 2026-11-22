@@ -127,6 +127,17 @@ try{
    assert.equal(color.backgroundImage,'none','no generic gradient for '+variant);
    if(variant==='e'||variant==='r')assert.equal(color.matDisplay,'none','material must not tint flat screen');
    assert(color.rect.left>=-1&&color.rect.right>=width-1&&color.rect.top>=-1,'full viewport backdrop '+variant);
+   // Real visual assertions run after animation has finished, not at DOM load.
+   await page.waitForTimeout(850);
+   const visual=await page.evaluate(()=>{
+    const el=document.querySelector('#disc'),art=el.querySelector('.dx-art'),im=el.querySelector('.dx-art img'),fade=el.querySelector('.dx-fade');
+    const measure=node=>node?{display:getComputedStyle(node).display,visibility:getComputedStyle(node).visibility,opacity:getComputedStyle(node).opacity,
+     animation:getComputedStyle(node).animationName,z:getComputedStyle(node).zIndex,rect:node.getBoundingClientRect().toJSON()}:null;
+    return {variant:el.className,art:measure(art),img:measure(im),fade:measure(fade)};
+   });
+   console.log('VISUAL-ART '+width+' '+variant+' '+JSON.stringify(visual));
+   assert(visual.art&&visual.art.visibility==='visible'&&Number(visual.art.opacity)>.95,'art container must be visible after transition for '+variant);
+   assert(visual.img&&visual.img.visibility==='visible'&&visual.img.rect.width>50&&visual.img.rect.height>100,'actual art must be visible and on screen for '+variant);
    await page.screenshot({path:'qa/screenshots/ui-lab-art-bg-'+variant+'-'+width+'.png'});
    if(variant==='r'){
     await page.evaluate(()=>showSum());
