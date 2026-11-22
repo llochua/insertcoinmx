@@ -16,12 +16,13 @@ Unificar la interfaz sin borrar la personalidad arcade-retro ni alterar el arte 
 4. **Retro legible:** la tipografía pixel es identidad; el texto funcional debe ser fácil de leer en móvil.
 5. **Acceso primero:** controles táctiles, foco visible, etiquetas accesibles y respeto a movimiento reducido.
 6. **Cambios seguros:** migrar un componente a la vez, sin reescribir lógica de colección, Auth, nube o ranking.
+7. **Fondo de ilustración continuo — DS-ART-01 (regla existente):** ninguna imagen tiene transparencia; el mismo color sólido de su archivo se expande por todo el escenario. Nunca usar fondos inventados o degradados por rareza.
 
 ## Capas del sistema
 
 | Capa | Qué incluye | Regla |
 | --- | --- | --- |
-| **Identidad / arte** | Logo, moneda, cartas, sobre, avatares, efectos holo y dorado, elementos CRT | No convertir en íconos funcionales ni alterar ilustraciones |
+| **Identidad / arte** | Logo, moneda, cartas, sobre, avatares, efectos holo y dorado, elementos CRT | No convertir en íconos funcionales, ni alterar ilustraciones; aplicar [DS-ART-01](ILUSTRACIONES-FONDOS.md) a cualquier escena con ilustraciones |
 | **Iconografía UI** | Flechas, cerrar, editar, búsqueda, compartir, sonido, descarga y métricas | SVG con la misma retícula, peso, tamaño y semántica |
 | **Componentes** | Botones, encabezados, pestañas, progreso, tarjetas, diálogos, estados vacíos | Variantes y estados compartidos; no versiones nuevas por pantalla |
 
@@ -98,6 +99,7 @@ Referencias de QA: 320, 360, 390, 430, 768 y 1024 px; también dispositivos de p
 - [Contrato de iconografía](ICONOGRAFIA.md)
 - [Plan de migración y criterios de aceptación](PLAN-MIGRACION.md)
 - [Catálogo real de componentes y estados](COMPONENTES.md)
+- [DS-ART-01 · Fondos sólidos continuos de las ilustraciones](ILUSTRACIONES-FONDOS.md)
 - [Implementación Fase 2A y límites de validación](IMPLEMENTACION-FASE-2.md)
 
 > La implementación ya agrega `content/design-tokens.css`, `content/ui-system.css`, `content/ui-components.css` y el sprite SVG de 16 símbolos. [Fase 1](IMPLEMENTACION-FASE-1.md) · [Fase 2A](IMPLEMENTACION-FASE-2.md). **No certifica que la interfaz cumpla todas las reglas ni sustituye pruebas en navegadores reales.**
