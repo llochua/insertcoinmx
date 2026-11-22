@@ -1,6 +1,6 @@
 # Plan de migración a sistema de diseño
 
-**Estado:** backlog propuesto y criterios de salida. **Ningún componente de producción se modificó con esta auditoría.**
+**Estado:** fase 1 implementada en rama independiente; **`main` y producción siguen sin cambios**. Fase 0 de validación visual y fases 2–4 aún pendientes.
 
 ## Orden recomendado
 
@@ -16,19 +16,19 @@
 
 ### Fase 1 — Iconografía (P0, bajo riesgo funcional)
 
-- [ ] Consolidar el SVG de volver usado en las cabeceras; sustituir `←` en `#avatarSelect`.
-- [ ] Sustituir `✦`, `▣`, `★` de métricas de Perfil por pictogramas semánticos.
-- [ ] Consolidar `✎` de editar avatar y eliminar fuente visual duplicada después de validar DOM renderizado.
-- [ ] Normalizar chevron y descargar del respaldo manual.
-- [ ] Definir sprite local/componente reutilizable + contrato de nombres y pruebas de carga.
-- [ ] Mantener reacciones emoji como lenguaje de votación; no modificar arte de cartas ni rarezas.
+- [x] Consolidar el SVG de volver usado en las cabeceras; sustituir `←` en `#avatarSelect` (**implementado en rama**).
+- [x] Sustituir `✦`, `▣`, `★` de métricas de Perfil por pictogramas semánticos (**implementado en rama**).
+- [x] Consolidar `✎` de editar avatar y eliminar fuente visual duplicada a nivel código (**revisión visual pendiente**).
+- [x] Normalizar chevron y descargar del respaldo manual (**implementado en rama**).
+- [x] Definir sprite local reutilizable y contrato de nombres (**implementado en rama**); [ ] pruebas de carga en navegador real.
+- [x] Mantener reacciones emoji como lenguaje de votación; no modificar arte de cartas ni rarezas.
 
-**Salida:** cero glifos usados como íconos operativos en las áreas migradas; `aria-label` correcto y sin regresiones.
+**Salida provisional:** íconos de Perfil, respaldo y navegación migrados en código, pero **no declarar fase aprobada** hasta revisar la apariencia y el funcionamiento en móvil y escritorio.
 
 ### Fase 2 — Fundamentos y componentes (P1)
 
 - [ ] Crear `content/design-tokens.css` con aliases hacia `--y`, `--ink`, `--dim` para una transición sin ruptura.
-- [ ] Consolidar `IconButton` / `ScreenHeader`; objetivo >=44×44 px, dibujo de 20/24 px.
+- [x] Primera consolidación de objetivos de `IconButton` y cabeceras (44 px, dibujo de 20/24 px) en CSS compartido; [ ] ampliar catálogo y validar responsive.
 - [ ] Consolidar botones `.btn`, `.big`, `.mgo`, `.profile-action`, `.avatar-save`, `.ux-primary` bajo variantes semánticas.
 - [ ] Definir y aplicar escala de tipografía y espacios, verificando textos de 6–9 px que transmitan información necesaria.
 - [ ] Unificar tabs/segmentos, cards UI, modales, feedback, contadores y estados bloqueados.
