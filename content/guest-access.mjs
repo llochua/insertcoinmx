@@ -49,8 +49,8 @@ function ensure(){
  <button id="icmxGuestChoose" class="tertiary" type="button">JUGAR COMO INVITADO</button>
  <p class="guest-warning">Como invitado, tus cartas se guardan en este navegador, pero podrías perderlas si borras sus datos o cambias de dispositivo.</p>
  </section>
- <section id="icmxGuestIdentity" hidden><h2>Tu identidad arcade</h2><p>Elige tus tres iniciales y un nombre de usuario.</p>
- <label for="icmxGuestIni">TUS INICIALES</label><input id="icmxGuestIni" type="text" maxlength="3" autocapitalize="characters" spellcheck="false" autocomplete="off" placeholder="AAA">
+ <section id="icmxGuestIdentity" hidden><h2>Tu identidad arcade</h2><p>Elige 3 letras para tu récord. Pueden ser las que quieras.</p>
+ <label for="icmxGuestIni">TUS 3 LETRAS PARA EL RÉCORD</label><input id="icmxGuestIni" type="text" maxlength="3" autocapitalize="characters" spellcheck="false" autocomplete="off" placeholder="AAA">
  <label for="icmxGuestHandle">NOMBRE DE USUARIO</label><div class="guest-handle"><span aria-hidden="true">@</span><input id="icmxGuestHandle" type="text" maxlength="20" autocapitalize="none" spellcheck="false" autocomplete="off" placeholder="nombre_usuario"></div>
  <p class="guest-help">De 3 a 20 caracteres: letras, números o guion bajo. Tu @usuario es provisional hasta crear una cuenta.</p>
  <p id="icmxGuestError" role="status" aria-live="polite"></p>
