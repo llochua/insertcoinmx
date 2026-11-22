@@ -2,6 +2,15 @@
 
 **Estado:** fase 1 y 2A implementadas en rama independiente; **`main` y producción siguen sin cambios**. Validación visual, cierre de fase 2 y fases 3–4 pendientes.
 
+## Regla de arte existente y protegida
+
+- [x] Documentar **DS-ART-01**: los fondos sólidos de cada imagen se extienden al escenario completo sin bordes ni degradados; el color se toma del archivo y no de una paleta global.
+- [x] Implementar lector compartido de bordes y fondo plano en revelación y resumen (**solo en rama de PR #130**).
+- [x] Añadir pruebas unitarias y prueba Chromium móvil de continuidad del color (**verificar su resultado CI antes de aceptar**).
+- [ ] Aprobar capturas visuales de diferentes ilustraciones y variantes en móvil y escritorio antes de fusionar.
+
+Referencia obligatoria: [DS-ART-01 · Ilustraciones y fondos](ILUSTRACIONES-FONDOS.md).
+
 ## Orden recomendado
 
 ### Fase 0 — Congelar la referencia y aprobar especificación
@@ -64,7 +73,7 @@ Ver [Catálogo de componentes](COMPONENTES.md) y [registro Fase 2A](IMPLEMENTACI
 
 | Grupo | Comprobación |
 | --- | --- |
-| Viewports | 320, 360, 390, 430, 768 y 1024 px; alturas pequeñas, apaisado y safe areas |
+| Viewports | 320, 360, 390, 430, 768 y 1024 px; alturas pequeñas, apaisado y safe areas; comprobar además DS-ART-01 en revelación y resumen |
 | Entrada | Touch, mouse, teclado, foco, zoom de texto; sin controles fuera de área |
 | Estados | Normal, seleccionado, bloqueado, deshabilitado, cargando, vacío y error |
 | Reta | 5/8 → faltan 3, 7/8 → falta 1, 8/8 → se permite jugar; con/sin sobres y reloj |
