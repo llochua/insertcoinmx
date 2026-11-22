@@ -1,6 +1,6 @@
 # Iconografía UI — contrato v0.1
 
-**Estado:** especificación propuesta; **aún no hay una librería de íconos implementada**.
+**Estado:** contrato propuesto y primera librería implementada en rama de auditoría (16 símbolos SVG inline). **Aún requiere aprobación y pruebas visuales, no está en `main`.**
 
 ## Tres cosas distintas
 
@@ -24,9 +24,11 @@ Por lo anterior, **30 etiquetas SVG en `index.html` no equivalen a 30 íconos de
 | Dependencias | Preferir catálogo SVG local; no introducir biblioteca externa solo para unos íconos |
 | Doble representación | Prohibido tener al mismo tiempo glifo y pseudo-elemento para la misma acción |
 
-**Ruta objetivo a crear en implementación:** `assets/ui/icons.svg` o un componente `Icon` central. No referenciar la ruta en producción hasta incluir el archivo en la misma entrega.
+**Implementación actual en la rama:** un único bloque de `<symbol id="ic-icon-*">` en el inicio del `<body>` de `index.html`. Los controles reutilizan `<use href="#ic-icon-*">`, con geometría común en `content/ui-system.css`. Puede extraerse a `assets/ui/icons.svg` en una fase posterior si se valida compatibilidad del hosting.
 
 ## Inventario funcional
+
+La implementación inicial ya convierte los glifos principales de Perfil/Avatar/Respaldo y los controles de cabecera, sonido, compartir y Reta. El inventario indica el **origen detectado antes de la migración**; ver [registro de cambios](IMPLEMENTACION-FASE-1.md).
 
 | Nombre semántico | Dónde aparece | Situación actual | Acción propuesta |
 | --- | --- | --- | --- |
@@ -57,17 +59,17 @@ Por lo anterior, **30 etiquetas SVG en `index.html` no equivalen a 30 íconos de
 - **Focus:** contorno visible de 2 px con offset, incluso en controles solo con ícono.
 - **Loading:** si la acción espera, deshabilitar reactivaciones y anunciar el estado; no usar íconos ambiguos.
 
-## Ejemplo de integración (ilustrativo, no implementado)
+## Ejemplo de integración (implementado en rama)
 
 ```html
 <button class="ic-icon-button" type="button" aria-label="Volver al álbum">
   <svg class="ic-icon" viewBox="0 0 24 24" aria-hidden="true">
-    <use href="assets/ui/icons.svg#arrow-left"></use>
+    <use href="#ic-icon-back"></use>
   </svg>
 </button>
 ```
 
-En producción el identificador y la carga del sprite se validan también con el hosting. Hasta entonces se conserva el SVG actual.
+El sprite está inline para no depender de una petición externa; falta validarlo visualmente en el hosting de preproducción antes de fusionarlo.
 
 ## Lista de control para aceptar un ícono nuevo
 
