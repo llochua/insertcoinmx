@@ -8,6 +8,7 @@ import {readFile,mkdir} from 'node:fs/promises';
 import {resolve,dirname,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
+import {PNG} from 'pngjs';
 
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript','.mjs':'text/javascript',
@@ -136,9 +137,39 @@ try{
     return {variant:el.className,art:measure(art),img:measure(im),fade:measure(fade)};
    });
    console.log('VISUAL-ART '+width+' '+variant+' '+JSON.stringify(visual));
-   assert(visual.art&&visual.art.visibility==='visible'&&Number(visual.art.opacity)>.95,'art container must be visible after transition for '+variant);
-   assert(visual.img&&visual.img.visibility==='visible'&&visual.img.rect.width>50&&visual.img.rect.height>100,'actual art must be visible and on screen for '+variant);
-   await page.screenshot({path:'qa/screenshots/ui-lab-art-bg-'+variant+'-'+width+'.png'});
+   if(variant!=='f'){
+    assert(visual.art&&visual.art.visibility==='visible'&&Number(visual.art.opacity)>.95,'art container must be visible after transition for '+variant);
+    assert(visual.img&&visual.img.visibility==='visible'&&visual.img.rect.width>50&&visual.img.rect.height>100,'actual art must be visible and on screen for '+variant);
+    assert.equal(visual.fade?.display,'none','the black text gradient must not obscure a solid canvas '+variant);
+   }
+   const screenshot=await page.screenshot({path:'qa/screenshots/ui-lab-art-bg-'+variant+'-'+width+'.png'});
+   if(variant!=='f'){
+     const shot=PNG.sync.read(screenshot);
+     const px=(x,y)=>{
+       const offset=(Math.round(y)*shot.width+Math.round(x))*4;
+       return [shot.data[offset],shot.data[offset+1],shot.data[offset+2]];
+     };
+     const expected=[1,3,5].map(i=>parseInt(color.expected.slice(i,i+2),16));
+     // Screenshot must remain the image's *literal* RGB all the way down
+     // the left border. A CSS background-color test alone misses fade overlays.
+     for(const yf of [.16,.32,.5,.66,.88]){
+       const actual=px(2,shot.height*yf);
+       const diff=Math.max(...actual.map((v,i)=>Math.abs(v-expected[i])));
+       assert(diff<=5,variant+' '+width+'px: screenshot seam at '+Math.round(yf*100)+'% of viewport: '+actual+' expected '+expected);
+     }
+     // Check that the source illustration actually paints (not merely loads).
+     // Top-center should contain visible non-background image pixels.
+     let different=0,total=0;
+     for(let y=Math.round(shot.height*.17);y<shot.height*.46;y+=9){
+       for(let x=Math.round(shot.width*.18);x<shot.width*.83;x+=9){
+         const actual=px(x,y);
+         const diff=Math.max(...actual.map((v,i)=>Math.abs(v-expected[i])));
+         if(diff>35)different++;
+         total++;
+       }
+     }
+     assert(different>total*.025,variant+' '+width+'px: artwork is blank despite loaded image ('+different+'/'+total+' visible colored pixels)');
+   }
    if(variant==='r'){
     await page.evaluate(()=>showSum());
     await page.waitForFunction(()=>{
