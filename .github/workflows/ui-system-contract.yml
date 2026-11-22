@@ -1,0 +1,33 @@
+name: UI system contract
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "content/ui-system.css"
+      - "scripts/check-ui-icons.mjs"
+      - "docs/design-system/**"
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "content/ui-system.css"
+      - "scripts/check-ui-icons.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  icon-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get only files needed for icon contract
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            index.html
+            content/ui-system.css
+            scripts/check-ui-icons.mjs
+          sparse-checkout-cone-mode: false
+      - name: Verify icon catalog and inline scripts
+        run: node scripts/check-ui-icons.mjs
