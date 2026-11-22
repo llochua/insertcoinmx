@@ -1,0 +1,48 @@
+name: QA · Reta bloqueada en móvil
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'reta-diaria.js'
+      - 'reta-diaria.html'
+      - 'qa/reta-unlock-browsers.mjs'
+      - '.github/workflows/qa-reta-unlock-mobile.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'qa/reta-unlock-browsers.mjs'
+      - '.github/workflows/qa-reta-unlock-mobile.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reta-movil:
+    name: Chromium · 5, 7 y 8 diseños (390px y 320px)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar sintaxis
+        run: node --check qa/reta-unlock-browsers.mjs
+      - name: Instalar Playwright
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Instalar Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Probar estados en pantallas móviles y entrada a Reta
+        run: node qa/reta-unlock-browsers.mjs
+      - name: Conservar capturas móviles
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reta-unlock-mobile
+          path: qa/screenshots/reta-unlock-*.png
+          if-no-files-found: ignore

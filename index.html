@@ -1133,7 +1133,16 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .reta-unlock strong{font:700 19px AV;color:#FFD400}
 .reta-unlock p{max-width:330px;font:600 13px/1.5 AV;color:rgba(255,255,255,.77)}
 .reta-unlock b{color:#FFD400}
-.reta-unlock button{margin-top:8px;min-height:44px}
+.reta-unlock button{margin-top:8px;min-height:44px;min-width:min(100%,240px)}
+.reta-unlock-copy{max-width:340px}
+.reta-unlock-progress{width:min(100%,300px);height:9px;overflow:hidden;border:1px solid rgba(255,212,0,.55);border-radius:999px;background:rgba(255,255,255,.12)}
+.reta-unlock-progress i{display:block;height:100%;border-radius:inherit;background:#FFD400}
+.reta-unlock-wait{display:flex;flex-direction:column;align-items:center;gap:5px;color:#fff}
+.reta-unlock-wait[hidden]{display:none!important}
+.reta-unlock-wait span{font:9px/1.5 PX,monospace;letter-spacing:.06em;color:#FFD400}
+.reta-unlock-wait time{font:700 21px/1.25 AV,system-ui,sans-serif;color:#fff;font-variant-numeric:tabular-nums}
+.reta-unlock button:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
+@media(max-width:360px), (max-height:620px){.reta-unlock{gap:11px;padding:18px 14px}.reta-unlock p{font-size:12px}.reta-unlock strong{font-size:17px}.reta-unlock-wait time{font-size:19px}}
 /* Reta: tres cambios diarios sin una segunda fila. */
 #torneo .reta-reroll{height:36px;min-width:59px;padding:0 9px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(255,212,0,.5);border-radius:10px;background:rgba(255,212,0,.11);color:#FFD400;font:700 13px AV;touch-action:manipulation}
 #torneo .reta-reroll svg{width:18px;height:18px;flex:none}
@@ -3692,11 +3701,40 @@ $('retaReroll').onclick=()=>{
  if(r.round>0)uxShow({kicker:'RETA · CAMBIAR RETADORES',title:r.done?'¿Jugar otra Reta?':'¿Cambiar los enfrentamientos?',desc:r.done?'Tu resultado de hoy será reemplazado por el de la nueva Reta. Tus cartas y sobres siguen intactos.':'Se reiniciarán tus elecciones de esta Reta. Tus cartas y sobres siguen intactos.',note:'Te quedan '+(RETA_REROLLS-(r.rerolls|0))+' cambios hoy.',primary:'CAMBIAR PLAYERAS',secondary:'SEGUIR JUGANDO',onPrimary:restart});
  else restart();
 };
+function retaUnlockCopy(count){
+ const missing=8-count;
+ return 'Tienes '+count+' de 8 diseños. '+(missing===1?'Te falta 1':'Te faltan '+missing)+' para jugar tu primera Reta';
+}
+function refreshRetaUnlock(){
+ if(cur!=='torneo')return;
+ const panel=$('vStage').querySelector('.reta-unlock');
+ if(!panel)return;
+ // Si la nube u otra pestaña añadió el octavo diseño, entrar a jugar sin quedarse bloqueado.
+ if(retaPool().length!==Number(panel.dataset.designs)){startTorneo();return}
+ const available=!!packReady(),button=panel.querySelector('[data-reta-unlock-action]');
+ if(!button)return;
+ button.dataset.go=available?'pack':'album';
+ button.textContent=available?'Abrir un sobre':'Ver mi álbum';
+ const wait=panel.querySelector('.reta-unlock-wait');
+ if(wait){
+  wait.hidden=available;
+  const clock=wait.querySelector('time');
+  if(!available&&clock)clock.textContent=nextPackCountdown();
+ }
+}
+// El reloj es el de sobres del juego; no se crea un contador ni un estado paralelo.
+setInterval(refreshRetaUnlock,1000);
 function startTorneo(){
  syncIn();const pool=retaPool();
  if(pool.length<8){
-  const missing=8-pool.length;
-  $('vStage').innerHTML='<div class="reta-unlock" role="status"><strong>RETA AÚN NO DISPONIBLE</strong><p>Necesitas 8 diseños distintos en tu álbum para enfrentar 7 retadores.</p><p>Ya descubriste <b>'+pool.length+' de 8</b> · faltan '+missing+'.</p><button type="button" class="btn y" data-go="album">VER MI ÁLBUM</button></div>';
+  const count=pool.length,available=!!packReady();
+  $('vStage').innerHTML=`<div class="reta-unlock" data-designs="${count}" role="status">
+   <strong>RETA AÚN NO DISPONIBLE</strong>
+   <p class="reta-unlock-copy">${retaUnlockCopy(count)}</p>
+   <div class="reta-unlock-progress" role="progressbar" aria-label="Diseños para jugar Reta" aria-valuemin="0" aria-valuemax="8" aria-valuenow="${count}"><i style="width:${count/8*100}%"></i></div>
+   <button type="button" class="btn y" data-reta-unlock-action data-go="${available?'pack':'album'}">${available?'Abrir un sobre':'Ver mi álbum'}</button>
+   <div class="reta-unlock-wait" ${available?'hidden':''}><span>PRÓXIMOS 2 SOBRES EN</span><time>${nextPackCountdown()}</time></div>
+  </div>`;
   retaRerollUI(pool);return;
  }
  if(!retaValid(S.reta2,pool)){
