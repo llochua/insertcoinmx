@@ -1682,7 +1682,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-width:399px){#scores .arcade-ranking-switch{grid-template-columns:repeat(2,minmax(0,1fr));gap:1px 7px}#scores .arcade-ranking-switch button{font-size:8px;min-height:25px;padding-top:4px;padding-bottom:4px}}
 
 /* High score board · tipografía de los arcades originales.
-   El marcador e ingreso de iniciales arriba conservan exactamente su estilo previo. */
+   El marcador y código de récord arriba conservan exactamente su estilo previo. */
 #scores .arcade-scoreboard{width:min(440px,100%);box-sizing:border-box;flex:none;margin:8px auto 6px;padding:14px 12px 10px;background:rgba(0,2,15,.43);border-top:2px solid rgba(255,212,0,.72);border-bottom:2px solid rgba(255,212,0,.35);border-radius:0;box-shadow:none}
 #scores .arcade-scoreboard-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;margin-bottom:14px}
 #scores .arcade-scoreboard-brand{font:8px/1.4 PX,monospace;color:#EC008B;letter-spacing:.11em}
@@ -1817,7 +1817,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 }
 
 
-/* Récords toma las iniciales guardadas del jugador: sin segunda edición. */
+/* Récords toma el código de 3 caracteres guardado del jugador: sin segunda edición. */
 #scores #scorePlayerIdentity[hidden],#scores #scoreLegacySetup[hidden]{display:none!important}
 #scores .score-player-identity{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:min(100%,300px);margin:9px auto 18px;padding:14px 16px;border:1px solid rgba(255,212,0,.28);border-radius:12px;background:rgba(255,212,0,.07);text-align:center}
 #scores .score-player-identity strong{color:#ffd400;font:clamp(16px,4vw,21px)/1.5 PX,monospace;letter-spacing:.12em}
@@ -1934,7 +1934,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="wrap">
   <div class="px" style="font-size:9px;color:var(--dim);text-align:center;line-height:1.8">TU PUNTAJE: CARTAS DISTINTAS<br><span style="color:var(--y);font-size:26px" id="sMine">0</span></div>
   <div class="px" id="sPos" style="font-size:9px;color:var(--y)"></div>
-  <div class="score-player-identity" id="scorePlayerIdentity" aria-label="Mis iniciales arcade" hidden>
+  <div class="score-player-identity" id="scorePlayerIdentity" aria-label="Mis 3 caracteres del récord" hidden>
    <strong id="scorePlayerInitials">---</strong><span id="scoreIdentityNote">IDENTIDAD DE JUGADOR</span>
   </div>
   <section class="arcade-bonus-stats" aria-labelledby="arcadeBonusTitle">
@@ -2029,7 +2029,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
      <button type="button" id="profileAuthTabLogin" aria-pressed="false">INICIAR SESIÓN</button>
     </div>
     <form id="profileAuthForm" autocomplete="on">
-     <div class="profile-auth-field" id="profileSignupInitialsField"><label for="profileAuthInitials">Tus 3 iniciales arcade</label><input id="profileAuthInitials" type="text" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="AAA" required></div>
+     <div class="profile-auth-field" id="profileSignupInitialsField"><label for="profileAuthInitials">Elige 3 caracteres para tu récord</label><input id="profileAuthInitials" type="text" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="R!6" required><p class="profile-auth-help">Puedes usar letras, números o símbolos como !, ? y *.</p></div>
      <div class="profile-auth-field" id="profileSignupHandleField"><label for="profileAuthHandle">Nombre de usuario único</label><input id="profileAuthHandle" type="text" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="nombre_usuario" required><p class="profile-auth-help">Entre 3 y 20 caracteres: letras, números y guion bajo. Se confirmará al activar tu cuenta.</p></div>
      <div class="profile-auth-field"><label for="profileAuthEmail">Correo electrónico</label><input type="email" id="profileAuthEmail" name="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="tu@correo.com"></div>
      <div class="profile-auth-field"><label for="profileAuthPassword">Contraseña</label><input type="password" id="profileAuthPassword" name="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Mínimo 8 caracteres"></div>
@@ -2042,7 +2042,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
     <p class="profile-auth-email" id="profileAuthUser"></p>
     <p class="profile-auth-hint" id="profileSignedIdentityStatus">Comprobando tu identidad de jugador…</p>
     <form id="profileSignedIdentityForm" hidden>
-     <div class="profile-auth-field"><label for="profileSignedInitials">Tus 3 iniciales arcade</label><input id="profileSignedInitials" type="text" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="AAA" required></div>
+     <div class="profile-auth-field"><label for="profileSignedInitials">Elige 3 caracteres para tu récord</label><input id="profileSignedInitials" type="text" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="R!6" required><p class="profile-auth-help">Puedes usar letras, números o símbolos como !, ? y *.</p></div>
      <div class="profile-auth-field"><label for="profileSignedHandle">Nombre de usuario único</label><input id="profileSignedHandle" type="text" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="nombre_usuario" required></div>
      <button class="profile-action primary" type="submit" id="profileSignedSave">GUARDAR MI IDENTIDAD</button>
     </form>
@@ -2734,7 +2734,7 @@ document.addEventListener('keydown',e=>{if(!$('onb').classList.contains('on'))re
 });
 /* El nombre de invitado es local y separado del snapshot de cartas. */
 const GUEST_HANDLE_KEY='icmx-guest-handle-v1';
-const validArcadeIni=v=>/^[A-Z0-9]{3}$/.test(v||'');
+const validArcadeIni=v=>/^[A-Z0-9!?*+.@#$%-]{3}$/.test(v||'');
 const validArcadeHandle=v=>/^[a-z0-9_]{3,20}$/.test(v||'');
 const storedGuestHandle=()=>{const v=LS.get(GUEST_HANDLE_KEY)||'';return validArcadeHandle(v)?v:''};
 function arcadeIdentity(){
@@ -2753,7 +2753,7 @@ globalThis.icmxGuestIdentity={
   S.ini=prev.ini;S.seen=prev.seen;return false;
  }
 };
-const guestUIModule=import('./content/guest-access.mjs?v=20261121tres');
+const guestUIModule=import('./content/guest-access.mjs?v=20261122chars');
 async function openArcadeEntry(step='welcome'){
  try{
   const ui=await guestUIModule;
@@ -3749,13 +3749,13 @@ function safeRankValue(n){return Number.isSafeInteger(n)&&n>=0&&n<=999999?n:null
 function localRankRecord(){
  try{
   const r=JSON.parse(localStorage.getItem(LOCAL_RANKING_KEY)||'null');
-  if(!r||r.v!==1||!/^[A-Z0-9]{3}$/.test(r.ini))return null;
+  if(!r||r.v!==1||!/^[A-Z0-9!?*+.@#$%-]{3}$/.test(r.ini))return null;
   if(!['cards','designs','duplicates','ratings'].every(k=>safeRankValue(r[k])!==null))return null;
   return r
  }catch(_){return null}
 }
 function persistLocalRecord(){
- if(!/^[A-Z0-9]{3}$/.test(S.ini))return false;
+ if(!/^[A-Z0-9!?*+.@#$%-]{3}$/.test(S.ini))return false;
  const record={v:1,ini:S.ini,handle:arcadeIdentity().handle,...currentRecordScores()};
  try{localStorage.setItem(LOCAL_RANKING_KEY,JSON.stringify(record));return true}
  catch(_){return false}
@@ -3867,7 +3867,7 @@ function validateBackup(text,{fromCloud=false}={}){const E=m=>({ok:false,err:m})
      const r=RETAS[+i],dc=designId(c)||c;if(r&&(r[0]===dc||r[1]===dc))out.duel[i]=dc;else x.pendDuel[i]=c}}
    else if(k==='rhoy'){if(!Array.isArray(v)||v.length>50||!v.every(n=>isInt(n,0,9999)))throw 'Las retas de hoy del respaldo no son válidas.';
     out.rhoy=v.slice()}
-   else if(k==='ini'){if(typeof v!=='string'||!/^[A-Z0-9]{0,3}$/.test(v))throw 'Las iniciales del respaldo no son válidas.';out.ini=v}
+   else if(k==='ini'){if(typeof v!=='string'||!/^[A-Z0-9!?*+.@#$%-]{0,3}$/.test(v))throw 'Los 3 caracteres del récord en el respaldo no son válidos.';out.ini=v}
    else if(k==='seen'||k==='test'){if(!(v===0||v===1||v===true||v===false))throw 'El respaldo trae un dato inválido ('+k+').';out[k]=+v}
    else if(k==='last'||k==='rdia'){if(!isDay(v))throw 'Una fecha del respaldo no es válida.';out[k]=v}
    else if(k==='extra'){if(!isInt(v,0,999))throw 'Los sobres extra del respaldo no son válidos.';out.extra=v}
@@ -3997,7 +3997,7 @@ $('bkFile').onchange=()=>{const f=$('bkFile').files[0];if(!f)return;if(f.size>10
 function bkReview(text){const v=validateBackup(text);if(!v.ok){bkMsg(v.err,'bkerr');beep(150,.2);return}
  syncIn();const m=v.meta,nowC=uniq(),nowR=Object.keys(S.rate).length,d=new Date(m.at),when=isNaN(d)?'fecha desconocida':d.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
  bkOpen(`<h2>¿REEMPLAZAR TU PROGRESO?</h2><p>Respaldo del ${esc(when)}</p>
- <div class="bkcmp"><span></span><span>AHORA</span><span>RESPALDO</span><b>Cartas distintas</b><span>${nowC}</span><span>${m.cards}</span><b>Calificaciones</b><span>${nowR}</span><span>${m.rates}</span><b>Iniciales</b><span>${esc(S.ini||'—')}</span><span>${m.ini||'—'}</span></div>
+ <div class="bkcmp"><span></span><span>AHORA</span><span>RESPALDO</span><b>Cartas distintas</b><span>${nowC}</span><span>${m.cards}</span><b>Calificaciones</b><span>${nowR}</span><span>${m.rates}</span><b>Récord (3 caracteres)</b><span>${esc(S.ini||'—')}</span><span>${m.ini||'—'}</span></div>
  ${m.cards<nowC?'<p class="bkwarn">Ojo: el respaldo tiene MENOS cartas que tu progreso actual.</p>':''}
  ${m.pend?`<p>${m.pend} ${m.pend===1?'carta del respaldo todavía no existe':'cartas del respaldo todavía no existen'} en el álbum; se guardan aparte y aparecerán cuando se agreguen.</p>`:''}
  <p>Antes de reemplazar, tu progreso actual se guarda en una copia de seguridad.</p>
@@ -4153,7 +4153,7 @@ $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
- Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261121-beta2'),import('./content/player-ranking.mjs?v=20261121-v1')]).then(([mod,auth,players])=>{
+ Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261121-v1')]).then(([mod,auth,players])=>{
   playerRanking=players.createPlayerRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{if(cur==='scores')renderScores();if(cur==='home'||cur==='title')refresh()}});
   playerRanking.refresh();
   communityRanking=mod.createCommunityRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{
@@ -4268,4 +4268,4 @@ import('./content/cloud-sync.mjs?v=20261121-guest').then(({startCloudSync,samePr
  cloudSync.check();
 })
 .catch(()=>{for(const id of ['cloudState','profileCloudStatus']){const e=$(id);if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}}});
-</script><script type="module" src="content/auth-account.js?v=20261121-beta2"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
+</script><script type="module" src="content/auth-account.js?v=20261122chars"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
