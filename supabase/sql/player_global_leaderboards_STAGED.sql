@@ -22,7 +22,7 @@ BEGIN
   WITH identities AS (
    SELECT s.user_id,s.state,
     CASE WHEN u.is_anonymous IS TRUE THEN g.ini
-         WHEN s.state->'data'->>'ini' ~ '^[A-Z0-9]{3}$'
+         WHEN s.state->'data'->>'ini' ~ '^[A-Z0-9!?*+.@#$%-]{3}$'
          THEN s.state->'data'->>'ini'
          ELSE u.raw_user_meta_data->>'icmx_initials' END AS ini,
     CASE
@@ -43,7 +43,7 @@ BEGIN
   ),
   eligible AS (
    SELECT * FROM identities
-   WHERE ini ~ '^[A-Z0-9]{3}$'
+   WHERE ini ~ '^[A-Z0-9!?*+.@#$%-]{3}$'
      AND handle ~ '^[a-z0-9_]{3,20}$'
   ),
   cards AS (
