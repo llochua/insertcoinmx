@@ -43,7 +43,16 @@ try{
   await context.route(/https?:\/\/[^/]*supabase\.co\//,route=>{
    unexpectedRemote.push(route.request().url());return route.abort();
   });
-  await page.goto(URL,{waitUntil:'domcontentloaded'});
+  const response=await page.goto(URL,{waitUntil:'domcontentloaded'});
+  const probe=await page.evaluate(()=>{const el=document.getElementById('icmxLabToggle');return {
+   href:location.href,base:document.baseURI,title:document.title,
+   bodyLength:document.body?.innerHTML.length,buttonCount:document.querySelectorAll('button').length,
+   labExists:!!el,display:el?getComputedStyle(el).display:null,visibility:el?getComputedStyle(el).visibility:null,
+   rect:el?el.getBoundingClientRect().toJSON():null,bodySample:document.body?.innerHTML.slice(0,260)
+  }});
+  console.log('LAB LOAD',JSON.stringify({url:URL,status:response?.status(),probe,errors}));
+  await page.screenshot({path:'qa/screenshots/ui-lab-debug-start-'+width+'.png'});
+  assert.equal(response?.status(),200,'LAB should return 200');
   await page.locator('#icmxLabToggle').waitFor({state:'visible'});
   await page.locator('#home.on').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.getElementById('homePlayerAvatarImage').getAttribute('src')?.includes('assets/avatars/'));
