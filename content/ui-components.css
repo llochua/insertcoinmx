@@ -1,0 +1,96 @@
+/* Insert Coin MX — shared component primitives v0.2.
+   All rules are opt-in. Existing layouts, motion, shadows and selected skins stay in place.
+   Avoid arbitrary global button/input selectors: each component opts in via ic-* classes. */
+
+/* BUTTON — semantics from data-ui-variant: primary / secondary / ghost */
+.ic-button{
+  box-sizing:border-box;
+  min-height:var(--ic-control-height);
+  border-radius:var(--ic-radius-md);
+  font-family:var(--ic-font-ui);
+  touch-action:manipulation;
+}
+.ic-button[data-ui-variant="primary"]{
+  --ic-button-accent:var(--ic-color-accent);
+  --ic-button-foreground:var(--ic-color-on-accent);
+}
+.ic-button[data-ui-variant="secondary"]{
+  --ic-button-neutral:var(--ic-color-neutral-fill);
+}
+.ic-button:disabled,.ic-button[aria-disabled="true"]{cursor:default}
+.ic-button:focus-visible{
+  outline:var(--ic-focus-ring);
+  outline-offset:3px;
+}
+/* Keep the arcade relief on Start/Open; the tokens do not replace its shadow.
+   Functional waiting countdown is not a disabled-button redesign. */
+
+/* FIELDS — scoped to account forms, not to file upload or backups */
+.ic-field{
+  box-sizing:border-box;
+  display:block;
+  min-height:var(--ic-input-height);
+  width:100%;
+  border:1px solid var(--ic-color-field-border);
+  border-radius:var(--ic-radius-md);
+  background:var(--ic-color-field);
+  color:var(--ic-color-text);
+  font-family:var(--ic-font-ui);
+  font-size:var(--ic-font-body-size);
+  line-height:1.4;
+  padding:10px 12px;
+}
+.ic-field::placeholder{color:#ABA5C4;opacity:1}
+.ic-field:focus-visible{outline:var(--ic-focus-ring);outline-offset:3px}
+.ic-field[aria-invalid="true"]{border-color:var(--ic-color-error)}
+.ic-field:disabled{opacity:.6;cursor:not-allowed}
+#profile .profile-auth-field .ic-field,
+#entryAccount .profile-auth-field .ic-field{min-height:var(--ic-input-height)}
+/* Records code is a deliberate display-font field, never restyle it as body text. */
+
+/* SEGMENTS — selected styling stays different for Home, Album and Auth.
+   Their shared contract is hit target, keyboard focus, and programmatic state. */
+#home .ic-segment,
+#album .ic-segment,
+#profile .ic-segment,
+#entryAccount .ic-segment{
+  box-sizing:border-box;
+  min-height:var(--ic-control-height);
+  touch-action:manipulation;
+}
+.ic-segment:focus-visible{outline:var(--ic-focus-ring);outline-offset:3px}
+.ic-segment[disabled]{opacity:.5;cursor:not-allowed}
+
+/* SURFACES — only structural contract; the original arcade gradients remain. */
+.ic-surface{box-sizing:border-box;min-width:0}
+.ic-surface[hidden]{display:none!important}
+
+/* Explicit sizes for compact, text-only actions. */
+#profile .profile-auth-forgot,
+#entryAccount .profile-auth-forgot,
+#entryAccountBack,
+#profile .guest-edit-identity{
+  min-height:var(--ic-control-height);
+}
+
+/* Unify the focus treatment at opt-in component boundaries. */
+#profile .ic-button:focus-visible,
+#entryAccount .ic-button:focus-visible,
+#avatarSelect .ic-button:focus-visible,
+.onb .ic-button:focus-visible,
+.ux-actions .ic-button:focus-visible,
+#home .ic-button:focus-visible,
+#tier .ic-button:focus-visible,
+#profile .ic-segment:focus-visible,
+#entryAccount .ic-segment:focus-visible{
+  outline:var(--ic-focus-ring);
+  outline-offset:3px;
+}
+#entryAccount .ic-field:focus-visible,
+#profile .ic-field:focus-visible{
+  outline:var(--ic-focus-ring);
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  .ic-button,.ic-field,.ic-segment{transition:none}
+}
