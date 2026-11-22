@@ -5,29 +5,40 @@ on:
     paths:
       - "index.html"
       - "content/ui-system.css"
+      - "content/design-tokens.css"
+      - "content/ui-components.css"
       - "scripts/check-ui-icons.mjs"
+      - "scripts/check-ui-components.mjs"
       - "docs/design-system/**"
   push:
     branches: [main]
     paths:
       - "index.html"
       - "content/ui-system.css"
+      - "content/design-tokens.css"
+      - "content/ui-components.css"
       - "scripts/check-ui-icons.mjs"
+      - "scripts/check-ui-components.mjs"
 
 permissions:
   contents: read
 
 jobs:
-  icon-contract:
+  ui-contract:
     runs-on: ubuntu-latest
     steps:
-      - name: Get only files needed for icon contract
+      - name: Checkout UI system without large card assets
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
             index.html
             content/ui-system.css
+            content/design-tokens.css
+            content/ui-components.css
             scripts/check-ui-icons.mjs
+            scripts/check-ui-components.mjs
           sparse-checkout-cone-mode: false
-      - name: Verify icon catalog and inline scripts
+      - name: Verify icon registry and inline scripts
         run: node scripts/check-ui-icons.mjs
+      - name: Verify shared component contracts
+        run: node scripts/check-ui-components.mjs
