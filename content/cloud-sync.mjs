@@ -92,7 +92,7 @@ export function isFreshGuest(backup){
   (d.fg===undefined||d.fg===0)&&!d.last&&!d.champ&&!d.extra&&!d.test&&
   d.welcomeLeft===5&&!d.freeUsed&&!d.freeDay&&
   (d.freeCycle===undefined||d.freeCycle===0)&&
-  (!d.ini||/^[A-Z0-9]{3}$/.test(d.ini))&&
+  (!d.ini||/^[A-Z0-9!?*+.@#$%-]{3}$/.test(d.ini))&&
   (d.seen===undefined||d.seen===0||d.seen===1);
 }
 export function hasGameProgress(backup){
@@ -390,7 +390,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus,verifiedGu
   */
  async function enrollGuestIdentity({ini,handle}){
   if(!verifiedGuests||typeof guestSession!=='function')return {status:'disabled'};
-  if(!/^[A-Z0-9]{3}$/.test(ini||'')||!/^[a-z0-9_]{3,20}$/.test(handle||''))return {status:'invalid'};
+  if(!/^[A-Z0-9!?*+.@#$%-]{3}$/.test(ini||'')||!/^[a-z0-9_]{3,20}$/.test(handle||''))return {status:'invalid'};
   if(localStorage.getItem(ACCOUNT_BINDING)&&!hasStoredSession())return {status:'auth_required'};
   // Mismo UID de Auth para la cuenta futura. No inventar identidades o subir cartas locales.
   const user=await guestSession(client.auth);
