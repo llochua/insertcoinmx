@@ -229,7 +229,11 @@ async function run(){
  let result;
  try{
   const A=await device(USER,baseState());
-  const B=await device(USER,null);
+  // Regresión: navegador con 0 cartas pero iniciales de perfil tras reset.
+  // No es otra colección; debe recuperar las cartas del mismo usuario.
+  const pristineWithIdentity={...baseState(),have:{},ini:'JOS',seen:1,
+   fg:0,pk:[],last:'',welcomeLeft:5,freeDay:'',freeUsed:0,freeCycle:0};
+  const B=await device(USER,pristineWithIdentity);
   await until(async()=> (await read(B.page))?.have?.abuket_b===2,
     'B debe recuperar de la nube');
   assert.equal((await read(B.page)).freeCycle,baseState().freeCycle);
