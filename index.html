@@ -2142,8 +2142,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx" role="button" tabindex="0" aria-label="Tocar carta para regresar" title="Tocar para regresar"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <p class="z-return-hint" aria-hidden="true">TOCA LA CARTA PARA VOLVER</p>
+ <section class="z-narrative" id="zNarrative" tabindex="-1" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
  <div id="zVoting" hidden><p class="z-rate-title">¿Qué te parece este diseño?</p><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><div id="zGoty"></div><p id="zLikeStatus" role="status" aria-live="polite"></p></div>
- <section class="z-narrative" id="zNarrative" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
 </dialog>
 <div class="toast" id="toast"></div>
 <div class="ux-backdrop" id="uxOverlay" role="dialog" aria-modal="true" aria-labelledby="uxTitle" aria-describedby="uxDesc" aria-hidden="true">
@@ -3437,7 +3437,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
  mountFaceValueLazy(s.querySelector('.rh .dx-card .fx'),H);
  if(entering){s.scrollTop=0;ga('resumen_sobre_visto',{tipo:lastOpenedPack?.kind||'extra',paso:lastOpenedPack?.number||0})}
  refreshSummaryActions();
- s.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>openCard(b.dataset.k));
+ s.querySelectorAll('[data-k]').forEach(b=>b.onclick=e=>openCard(b.dataset.k,{storyFirst:!!e.target.closest('.rc-story-cta,.rh-story-cta')}));
  if($('sTrade'))$('sTrade').onclick=()=>trade(()=>{showSum();$('sOtro').focus({preventScroll:false})});
  $('sOtro').onclick=()=>{syncIn();const more=packReady();ga('resumen_sobre_accion',{accion:more?'abrir_siguiente':'ver_album'});go(more?'pack':'album')};
  $('sAlb').onclick=()=>{syncIn();const more=packReady();ga('resumen_sobre_accion',{accion:more?'ver_album':'volver_menu'});go(more?'album':'home')};
@@ -3502,8 +3502,9 @@ let zk=null,zLoadToken=0,zReturnFocus=null;
 function cardFor(k){if(CB[k])return CB[k];const d=designId(k);if(!d)return null;const L=VL.map(v=>CB[d+'_'+v]);return L.find(c=>c.img&&S.have[c.k])||L.find(c=>S.have[c.k])||L.find(c=>c.img)||L[0]}
 const zd=()=>CB[zk]?CB[zk].d:zk; // las calificaciones son por diseño, no por versión
 const zGo=()=>{const t=communityRanking?.state.status==='ready'?communityRanking.state.aggregates.find(r=>r.id===zd())?.tiers:null;const total=t?Object.values(t).reduce((a,b)=>a+b,0):0;$('zGoty').textContent=total?Math.round(100*t.goty/total)+'% la pone GOTY':communityRanking?.state.status==='ready'?'Sin calificaciones globales todavía':communityRanking?.state.status==='loading'?'Cargando calificaciones…':'Calificaciones globales no disponibles'};
-function openCard(k){
+function openCard(k,options={}){
  const cc=cardFor(k);if(!cc)return;
+ const storyFirst=!!options.storyFirst&&!!storyFor(cc);
  const token=++zLoadToken,zoom=$('zoom'),img=$('zImg'),fx=$('zFx'),status=$('zLoad');
  zReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
  zk=cc.k;
@@ -3533,6 +3534,13 @@ function openCard(k){
  if(!zoom.open)zoom.showModal();
  if(communityRanking&&communityRanking.state.status!=='loading')communityRanking.refresh();
  zoom.scrollTop=0;
+ // Un toque en «Así se diseñó» o «Leer la anécdota» lleva al relato directamente.
+ if(storyFirst)requestAnimationFrame(()=>{
+  if(token!==zLoadToken||!zoom.open)return;
+  const narrative=$('zNarrative');
+  narrative.scrollIntoView({block:'start',behavior:'auto'});
+  narrative.focus({preventScroll:true});
+ });
  img.src=imgOf(cc,'c2');
  mountFaceValue(fx,cc);
  // decode garantiza que el primer fotograma visible ya pertenece a la carta nueva.
