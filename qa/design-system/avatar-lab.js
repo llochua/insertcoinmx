@@ -120,3 +120,5 @@ document.addEventListener('icmx:avatar-auth',()=>{
  }
 });
 setAvatarIdentity(globalThis.icmxAvatarAuthUser||null);
+// In production Auth marks this gate ready; the LAB has no Auth module.
+document.documentElement.dataset.icmxAvatarReady='true';
