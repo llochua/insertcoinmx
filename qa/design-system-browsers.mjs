@@ -141,16 +141,22 @@ try{
     const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
     return D.dataset.artId===id&&!!im?.naturalWidth
       &&D.classList.contains('art-edge-extended')
-      &&D.style.backgroundImage.includes('data:image/png');
+      &&(['solid','extended'].includes(D.dataset.artBackgroundMode))
+      &&(D.dataset.artBackgroundMode==='solid'||D.style.backgroundImage.includes('data:image/png'));
    },[designId,variant],{timeout:10000});
    const result=await page.evaluate(async()=>{
     const D=document.getElementById('disc'),img=D.querySelector('.dx-art img');
     const scene=D.getBoundingClientRect(),element=img.getBoundingClientRect();
+    const mode=D.dataset.artBackgroundMode;
     const bgUrl=D.style.backgroundImage.match(/data:image\/png;base64,[A-Za-z0-9+/=]+/)?.[0];
-    if(!bgUrl)throw Error('Fondo no generado');
-    const bg=new Image();bg.src=bgUrl;await bg.decode();
-    const bc=document.createElement('canvas');bc.width=bg.naturalWidth;bc.height=bg.naturalHeight;
-    const bx=bc.getContext('2d',{willReadFrequently:true});bx.drawImage(bg,0,0);
+    const bg=new Image();
+    if(mode==='extended'){if(!bgUrl)throw Error('Fondo extendido ausente');bg.src=bgUrl;await bg.decode();}
+    const bc=document.createElement('canvas');
+    bc.width=mode==='solid'?Math.round(scene.width):bg.naturalWidth;
+    bc.height=mode==='solid'?Math.round(scene.height):bg.naturalHeight;
+    const bx=bc.getContext('2d',{willReadFrequently:true});
+    if(mode==='solid'){bx.fillStyle=D.style.getPropertyValue('--bg');bx.fillRect(0,0,bc.width,bc.height);}
+    else bx.drawImage(bg,0,0);
     let paint={left:element.left,top:element.top,width:element.width,height:element.height};
     if(getComputedStyle(img).objectFit==='contain'){
      const scale=Math.min(element.width/img.naturalWidth,element.height/img.naturalHeight);
