@@ -1,0 +1,103 @@
+{
+  "designs": {
+    "babyonboard": {
+      "outputs": {
+        "c/babyonboard.webp": "ea9e41dd114c74133375e1a8c73e60bc36d2647c7ba049970cd3fd340910b6e6",
+        "c/babyonboard_e.webp": "18c52a10e80694403f57b47499ffff35c6a25e4b54c69da90e4ef570d5a5d8c2",
+        "c/babyonboard_r.webp": "f347e850edc6c8c8efee143cd570a5d5f7056442f7d4778f079a38b84c541b57",
+        "c2/babyonboard.webp": "ddca9585dfd77f833b92888ba6cc0bcd0a10b7b47b06051448242b8c211cc423",
+        "c2/babyonboard_e.webp": "ffbf160ab875e0c18b91c40c03dfe196f9cc709a0496a504326763db6bfbbbce",
+        "c2/babyonboard_r.webp": "5157a7ee7ffeb02ebd7442b24c149ff3a6c228a108622950b044c932d19de21c",
+        "d/babyonboard.webp": "5939e7af7a2195f2366a7d55c65503333d05cc99684cdf06ddb938ee8428f8df"
+      },
+      "sources": {
+        "cartas/arte/babyonboard.png": "e0f85b7ce79d1a4d9d74d4dba71cf3858b87a4dda06db81a28a6d568e59dfbef"
+      }
+    },
+    "bitwars": {
+      "outputs": {
+        "c/bitwars.webp": "1807002596a475c9ac0dfd6012653044ef723cf1f2b44fc663588590d33067bf",
+        "c/bitwars_e.webp": "ab1bf8600e4381761074db0cd6b63daadba999db573d2372678eb3d4a4f9126a",
+        "c/bitwars_r.webp": "ee801acf0b093d34ee73a4efbc3558b160699eb2a326706d810186197e244a4b",
+        "c2/bitwars.webp": "e48a93c3f34a02a1deead400eb7808001918202021a2853f897a0ca8b0410084",
+        "c2/bitwars_e.webp": "decaf1c0ccbf56ab4e6dbf0451409066c896715e1ba509df55e9102912263e86",
+        "c2/bitwars_r.webp": "e9a6a6de87c0340ab558511916aa716e7041125a9f0334489c008a4c2dfdc998",
+        "d/bitwars.webp": "93b11b7505c2afba4152fd840beaa914adba8588b58cbdad169baf603540e0d9"
+      },
+      "sources": {
+        "cartas/arte/bitwars.png": "50720129c4f8c2bdb5992c251aab6bcf58ad9bfcf0562c635fc1beb189ebd080"
+      }
+    },
+    "enjoy": {
+      "outputs": {
+        "c/enjoy.webp": "b1709c974ac069386a1d8d8028d1a761ecc1c4df634d9a115a840a2128206b17",
+        "c/enjoy_e.webp": "2dcb5e1a6be87cf0dd3c03789258b8a3b9c3eff44bd2db97066564e36248cffc",
+        "c/enjoy_r.webp": "879894fcb6888a969e17769d1c436f4b1224adbd0ec8150ac88bd84abd595e9c",
+        "c2/enjoy.webp": "b2ed4521eb949dfa51931c739f5696498409183c2d0fcc9a224abe6ee90349ab",
+        "c2/enjoy_e.webp": "6aa769a4b6e073152babed41611afcadaa47c810c94b89baa27d13325fd62b88",
+        "c2/enjoy_r.webp": "5341194f944602614337648b5aa7973f4d50434b3b207af020abafd0038bb3bf",
+        "d/enjoy.webp": "52165d0d1cbaf74bbdce1c31875c240c1b9deeeccabab8b4e14f36032522adc6"
+      },
+      "sources": {
+        "cartas/arte/enjoy.png": "074d597250ca8dab49996b2494f39b9500a78867c11d2d56900a63460f64ecb0"
+      }
+    },
+    "piccolovolution": {
+      "outputs": {
+        "c/piccolovolution.webp": "6587ce8e25d8f38836de8028ed71bb522174bfd6874e1c31e8a253bace70fd6a",
+        "c/piccolovolution_e.webp": "e3d48df0db2ddd47140ea632fb19952dc8a5666389e4e8b05f17b13ace9508b4",
+        "c/piccolovolution_r.webp": "51841bb9a323e76fdd4f8038168bbafa3c680dd2338926097ce2185804bee7fd",
+        "c2/piccolovolution.webp": "33dc03b76c6957d354005b24b24682565d73079706c8b6622fd3099a64e3b867",
+        "c2/piccolovolution_e.webp": "eb369159b09f84ee00297cde182977a2eb03afd84c20628a18eebbca02c91e67",
+        "c2/piccolovolution_r.webp": "1885dc169c9ec420469c3bd143d55101cee1d0e07eac9a02f5c0651aa9537a73",
+        "d/piccolovolution.webp": "5837f865f08cc533fafd038ecb47d93f1b0b401ca4ddb93e4bd781bf59118f8d"
+      },
+      "sources": {
+        "cartas/arte/piccolovolution.png": "68fe3542f879557d433fe5c5a4fb51884bffd617e6ec1ba28db8dab897f6d7db"
+      }
+    },
+    "thelostgame": {
+      "outputs": {
+        "c/thelostgame.webp": "08649dfe33034af041cef2a6863056e19dec0983e231f257ffa99eac1853ef13",
+        "c/thelostgame_e.webp": "df76c4e56cf0b0ab634d5c62ec8fc3b5ebff4e908995bda231fa7a4f042e7e91",
+        "c/thelostgame_r.webp": "2911f61dbe70047a3e3dc143a3cbc6b960c56f9fa36aec1dadae68bdaf47a407",
+        "c2/thelostgame.webp": "6f35da93f33e9b4a8109d8ff980cbad6a2954248f2dcb45d500ac0fbee0d0458",
+        "c2/thelostgame_e.webp": "5544c4a8942ffd1720d42c65aa3cf83a1ce8cc3bdd8b0b6e0ca4dfe01553e597",
+        "c2/thelostgame_r.webp": "85496e6a554f824dd5f72bd52ae71bd3fbdfad149ba3adf04b722ea457e83397",
+        "d/thelostgame.webp": "ce9c9ecaf731c2c986ab7beb15e5193e688fc5d8726e818fac3269a7c1036e7c"
+      },
+      "sources": {
+        "cartas/arte/thelostgame.png": "32770ce722d0e0e09734d067323c13ec9b5d74195489c69610e336314c827b01"
+      }
+    },
+    "vegetavolution": {
+      "outputs": {
+        "c/vegetavolution.webp": "9af9c7e6d1d369b08f656678d8485b457946eb7bebf89681d2c36e04477462d3",
+        "c/vegetavolution_e.webp": "85dc73084e2fecdb79a3277efadbe826141486d4faf8636572a50a73b2bd1d17",
+        "c/vegetavolution_r.webp": "ba06b349f1c013535252f3f8a48ad4c3cfcc22346820836decf6b75e21bca972",
+        "c2/vegetavolution.webp": "a7de775bb6d57ac9000526d8b6f5b241af45420ed0c4bec48d8a9f40b0d4ab56",
+        "c2/vegetavolution_e.webp": "abbe90c60ddabe74ad5a6fac5c2dd9e201c9f3e87552aa257eafd511d6fe3c8a",
+        "c2/vegetavolution_r.webp": "90e39f80d5e67aa0fbba2368e852dda90bebae7e283fb144f46d5cdd59c98e84",
+        "d/vegetavolution.webp": "ec73385b97bd6db7bd1bdb55bfc99b3e4a32558f1c3c9af9fbab501ecd2d441b"
+      },
+      "sources": {
+        "cartas/arte/vegetavolution.png": "4bf49dfbe2197ebfe0b82b61e713d4f8c1dc235c51265b150fe011cb51546a07"
+      }
+    },
+    "virtual": {
+      "outputs": {
+        "c/virtual.webp": "27d7df2e2b46b810133b32ecb53978281c404e6944b423e861891cb52ad12915",
+        "c/virtual_e.webp": "1bae65318300b70f8d75a71c11a7f303a74f462ee6543da49fee0a0f2404a8b4",
+        "c/virtual_r.webp": "8306ed85a74da57ed8e84a3042763e7d8553312e12f62c918372f128657c3244",
+        "c2/virtual.webp": "a252ef747d0296b09bff9ce648c562279160739d3a9ea9267c8fbf0278a2e7c4",
+        "c2/virtual_e.webp": "b4971fd88dea267a5dfcbfbf8c0fb2e7477fc084c85399dbb6f70e715ae41168",
+        "c2/virtual_r.webp": "5e22983b1c4f02438e8e720be56fb93f695dee86a50158a502903bf21080e395",
+        "d/virtual.webp": "4fe9dcd332f7609adde01383dd726e5d8e2c4e1e6aa67d848231254076c9a5b9"
+      },
+      "sources": {
+        "cartas/arte/virtual.png": "2cc9061ee14c749178714dc59a1d43d36dac2a8da838b12936f8bb6e2de49f93"
+      }
+    }
+  },
+  "version": 1
+}
