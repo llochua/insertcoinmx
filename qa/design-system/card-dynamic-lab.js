@@ -52,7 +52,7 @@ container.innerHTML=`<div class="icmx-lab-inner">
 <label>Habilidad<input id="dynSkill" type="text" maxlength="200"></label>
 <label>Frase<input id="dynPhrase" type="text" maxlength="180"></label>
 </div>
-<p>Propuesta de jerarquía visual. Las estrellas antiguas de Holo y Dorada aún están impresas en los marcos y NO se taparán con parches.</p>
+<p><strong>Comparación:</strong> la carta izquierda conserva el diseño anterior para referencia. En la derecha, Base no lleva estrellas, Holo tiene 1, Dorada 2 y Full 3. El pie completo y los datos son independientes del arte.</p>
 <div class="dyn-rarity-preview" id="dynRarityPreview" aria-label="Jerarquía de rarezas propuesta"></div>
 <div class="dyn-columns">
 <div class="dyn-column"><h3>CARTA ACTUAL</h3><img id="dynOld" alt="Carta actual del laboratorio"></div>
