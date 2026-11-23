@@ -234,9 +234,35 @@ try{
   assert.equal(fromLab.measured,fromMain.measured,
     id+'/'+v+': fondo fuente distinto de main');
   assert.equal(fromLab.artOpacity,'1',id+'/'+v+': ilustración no visible en LAB');
-  await main.screenshot({path:'qa/screenshots/ui-lab-compare-main-'+id+'-'+v+'.png'});
-  await lab.screenshot({path:'qa/screenshots/ui-lab-compare-lab-'+id+'-'+v+'.png'});
-  console.log('✓ MAIN = LAB '+id+'/'+v,JSON.stringify({main:fromMain.background,lab:fromLab.background}));
+  const mainCapture=await main.screenshot({path:'qa/screenshots/ui-lab-compare-main-'+id+'-'+v+'.png'});
+  const labCapture=await lab.screenshot({path:'qa/screenshots/ui-lab-compare-lab-'+id+'-'+v+'.png'});
+  // Comparación del RESULTADO VISIBLE, no sólo de los estilos.
+  // Muestrea el exterior izquierdo/derecho del arte donde aparecían recuadros.
+  async function capturePixels(page,png){
+   return page.evaluate(async base64=>{
+    const D=document.getElementById('disc'),bounds=D.getBoundingClientRect();
+    const im=new Image();im.src='data:image/png;base64,'+base64;await im.decode();
+    const cv=document.createElement('canvas');cv.width=im.width;cv.height=im.height;
+    const ctx=cv.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);
+    const get=(x,y)=>Array.from(ctx.getImageData(Math.round(bounds.x+bounds.width*x),
+     Math.round(bounds.y+bounds.height*y),1,1).data).slice(0,3);
+    return [get(.08,.16),get(.92,.16),get(.08,.25),get(.92,.25)];
+   },png.toString('base64'));
+  }
+  const mainPixels=await capturePixels(main,mainCapture);
+  const labPixels=await capturePixels(lab,labCapture);
+  const delta=(a,b)=>Math.max(...a.map((n,i)=>Math.abs(n-b[i])));
+  for(let i=0;i<mainPixels.length;i++)
+   assert(delta(mainPixels[i],labPixels[i])<=12,
+    id+'/'+v+': píxeles visibles de Lab distintos de main: '+JSON.stringify({i,main:mainPixels[i],lab:labPixels[i]}));
+  // Los fondos planos deben coincidir con el original incluso FUERA del dibujo.
+  if(v==='b'&&['oneplayer','continuara','booit','hipstermario','carton','guardianes'].includes(id)){
+   const rgb=[1,3,5].map(i=>parseInt(fromMain.measured.slice(i,i+2),16));
+   for(let i=0;i<labPixels.length;i++)
+    assert(delta(rgb,labPixels[i])<=14,
+     id+'/'+v+': rectángulo visible (fondo de imagen y escenario no continúan)');
+  }
+  console.log('✓ MAIN = LAB (CSS + píxeles) '+id+'/'+v,JSON.stringify({background:fromMain.background,pixels:labPixels}));
  }
  // Verificación de COBERTURA: no se aprueba el motor si quedan diseños fuera.
  const entireCatalog=await lab.evaluate(()=>{
