@@ -40,7 +40,6 @@ try{
   },sentinel);
   const page=await context.newPage(),errors=[],unexpectedRemote=[];
   page.on('pageerror',err=>errors.push(err.message));
-  page.on('console',message=>{if(message.type()==='warning'||message.type()==='error')console.log('BROWSER '+message.type()+': '+message.text())});
   await context.route(/https?:\/\/[^/]*supabase\.co\//,route=>{
    unexpectedRemote.push(route.request().url());return route.abort();
   });
@@ -130,14 +129,6 @@ try{
     hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
     idx=0;showCard();
    },[designId,variant]);
-   await page.waitForTimeout(400);
-   console.log('EDGE DEBUG '+designId+'/'+variant,JSON.stringify(await page.evaluate(()=>{
-    const D=document.getElementById('disc'),im=D?.querySelector('.dx-art img');
-    return {id:D?.dataset.artId,classes:D?.className,background:D?.style.backgroundImage.slice(0,90),
-      image:im?.getAttribute('src'),loaded:im?.complete,naturalWidth:im?.naturalWidth,
-      scene:D?.getBoundingClientRect().toJSON(),imageRect:im?.getBoundingClientRect().toJSON(),
-      hasRenderer:typeof D?._refreshEdgeBackdrop};
-   })));
    await page.waitForFunction(([id])=>{
     const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
     return D.dataset.artId===id&&!!im?.naturalWidth
@@ -200,6 +191,43 @@ try{
   console.log('✓ LAB '+width+'px: 5/7/8 designs, unlimited pack, avatar, isolated storage, no Supabase');
   await context.close();
  }
+
+ // Escritorio: comprobación visual independiente del flujo móvil. Reproduce el
+ // escenario de las capturas reportadas (CRT centrado) con fondos sin recuadros.
+ const desktop=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'reduce'});
+ const screen=await desktop.newPage(),desktopErrors=[];
+ screen.on('pageerror',error=>desktopErrors.push(error.message));
+ await screen.goto(LAB_URL,{waitUntil:'domcontentloaded'});
+ await screen.locator('#icmxLabToggle').click();
+ await screen.locator('[data-lab-action="pack"]').click();
+ await screen.locator('#pack.on').waitFor({state:'visible'});
+ for(const [id,variant] of [['sonic','b'],['carton','b'],['karma','e'],['evilexes','b'],['sonic','r']]){
+  await screen.evaluate(([design,v])=>{
+   const card=CB[design+'_'+v];
+   hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
+   idx=0;showCard();
+  },[id,variant]);
+  await screen.waitForFunction(([design])=>{
+   const D=document.getElementById('disc');
+   return D.dataset.artId===design&&D.dataset.artBackgroundMode==='solid'
+     &&D.classList.contains('art-edge-extended');
+  },[id,variant],{timeout:12000});
+  const state=await screen.evaluate(()=>{
+   const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
+   return {expected:solidArtworkBackground(im),actual:D.style.getPropertyValue('--bg'),
+    scene:D.getBoundingClientRect().toJSON(),
+    art:getComputedStyle(D.querySelector('.dx-art')).backgroundColor,
+    backdrop:getComputedStyle(D).backgroundColor};
+  });
+  assert(state.expected&&state.actual===state.expected,
+   id+'/'+variant+' escritorio: fondo debe coincidir con el color real');
+  assert.equal(state.art,'rgba(0, 0, 0, 0)','escritorio: sin panel opaco tras arte');
+  assert(state.scene.width>500,'el CRT de escritorio debe estar abierto');
+  await screen.screenshot({path:'qa/screenshots/ui-lab-edge-desktop-'+id+'-'+variant+'.png'});
+ }
+ assert.deepEqual(desktopErrors,[],'sin errores del navegador en escritorio');
+ console.log('✓ LAB escritorio 1280px: continuidad de fondo por muestreo para cinco cartas/variantes');
+ await desktop.close();
 }finally{
  await browser.close();
  await new Promise(resolve=>server.close(resolve));
