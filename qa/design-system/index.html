@@ -3173,6 +3173,33 @@ const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;ret
    ilustración. Es un 9-slice por bordes: no recorta, estira ni re-renderiza
    el arte visible; conserva también degradados y fondos texturizados.
    Base, Holo y Dorada comparten exactamente este algoritmo. */
+/* Estándar: tomar el color de fondo del propio arte, nunca de una tabla de IDs.
+   Muestreamos las cuatro esquinas del archivo original, fuera de la estampa. */
+function solidArtworkBackground(img){
+ try{
+  const cv=document.createElement('canvas');cv.width=40;cv.height=50;
+  const ctx=cv.getContext('2d',{willReadFrequently:true});if(!ctx)return null;
+  ctx.drawImage(img,0,0,40,50);
+  const raw=ctx.getImageData(0,0,40,50).data,colors=[];
+  for(let y=0;y<50;y++){
+   if(y>=6&&y<44)continue;
+   for(let x=0;x<40;x++){
+    if(x>=6&&x<34)continue;
+    const i=(y*40+x)*4;
+    if(raw[i+3]<250)continue;
+    colors.push([raw[i],raw[i+1],raw[i+2]]);
+   }
+  }
+  if(colors.length<90)return null;
+  const med=[0,1,2].map(k=>{
+   const sorted=colors.map(c=>c[k]).sort((a,b)=>a-b);
+   return sorted[Math.floor(sorted.length/2)];
+  });
+  const deviations=colors.map(c=>Math.max(...c.map((n,k)=>Math.abs(n-med[k])))).sort((a,b)=>a-b);
+  if(deviations[Math.floor(deviations.length*.9)]>18)return null;
+  return '#'+med.map(v=>v.toString(16).padStart(2,'0')).join('');
+ }catch(_){return null}
+}
 function extendArtworkEdges(d,D){
  if(D.classList.contains('v-f')||D.classList.contains('cov'))return;
  const original=D.querySelector('.dx-art img');
@@ -3182,6 +3209,15 @@ function extendArtworkEdges(d,D){
   const fullView=D.querySelector('#dcFullView');
   const img=(fullView&&!fullView.hidden?fullView.querySelector('img'):null)||original;
   if(!img.complete||!img.naturalWidth||!img.naturalHeight)return;
+  const solid=solidArtworkBackground(img);
+  if(solid){
+   D.style.setProperty('--bg',solid);
+   D.style.removeProperty('background-image');
+   D.dataset.artBackgroundMode='solid';
+   D.classList.add('art-edge-extended');
+   D.classList.toggle('bg-light',lum(solid)>.72);
+   return;
+  }
   try{
    const scene=D.getBoundingClientRect();
    const element=img.getBoundingClientRect();
@@ -3235,6 +3271,7 @@ function extendArtworkEdges(d,D){
    D.style.backgroundImage='url("'+c.toDataURL('image/png')+'")';
    D.style.backgroundSize='100% 100%';
    D.style.backgroundRepeat='no-repeat';
+   D.dataset.artBackgroundMode='extended';
    D.classList.add('art-edge-extended');
   }catch(error){
    // Sin canvas (p. ej. imagen externa): queda el color de respaldo original.
@@ -3369,7 +3406,7 @@ function startCinematicReveal(c,D){
 }
 
 function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
- D.style.removeProperty('background-image');D.style.removeProperty('background-size');D.classList.remove('art-edge-extended');D._refreshEdgeBackdrop=null;
+ D.style.removeProperty('background-image');D.style.removeProperty('background-size');D.style.removeProperty('background-repeat');D.classList.remove('art-edge-extended');delete D.dataset.artBackgroundMode;D._refreshEdgeBackdrop=null;
  D.onclick=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._dxToastTimer);clearTimeout(D._cinemaTimer);
  if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
   D.className=`disc on dx cov v-${c.v}`;D.dataset.artId='';D.style.setProperty('--bg','#0c0a14');
