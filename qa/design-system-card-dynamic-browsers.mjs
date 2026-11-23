@@ -22,7 +22,7 @@ const server=createServer(async(req,res)=>{
 });
 await new Promise(ok=>server.listen(0,'127.0.0.1',ok));
 const url='http://127.0.0.1:'+server.address().port+'/qa/design-system/';
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch(process.env.ICMX_CHROME==='true'?{headless:true,channel:'chrome'}:{headless:true});
 await mkdir('qa/screenshots',{recursive:true});
 try{
  for(const [width,height] of [[320,640],[390,844],[1280,850]]){
