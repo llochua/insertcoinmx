@@ -24,7 +24,7 @@ const server=createServer(async(req,res)=>{
  }catch{res.writeHead(404);res.end('not found')}
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch(process.env.ICMX_CHROME==='true'?{headless:true,channel:'chrome'}:{headless:true});
 await mkdir('qa/screenshots',{recursive:true});
 const LAB_URL='http://127.0.0.1:'+server.address().port+'/qa/design-system/';
 const sentinel='{"have":{"gatosamurai_f":777},"ini":"LIVE","seen":1}';
