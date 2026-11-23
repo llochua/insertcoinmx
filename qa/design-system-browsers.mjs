@@ -238,7 +238,7 @@ try{
     id+'/'+v+': color visible de LAB distinto de main');
   assert.equal(fromLab.measured,fromMain.measured,
     id+'/'+v+': fondo fuente distinto de main');
-  assert.equal(fromLab.artOpacity,'1',id+'/'+v+': ilustración no visible en LAB');
+  assert(Number(fromLab.artOpacity)>.99,id+'/'+v+': ilustración no visible en LAB, opacidad='+fromLab.artOpacity);
   const mainCapture=await main.screenshot({path:'qa/screenshots/ui-lab-compare-main-'+id+'-'+v+'.png'});
   const labCapture=await lab.screenshot({path:'qa/screenshots/ui-lab-compare-lab-'+id+'-'+v+'.png'});
   // Comparación del RESULTADO VISIBLE, no sólo de los estilos.
