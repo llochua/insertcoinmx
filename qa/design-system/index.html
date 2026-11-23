@@ -1936,6 +1936,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <button type="button" data-lab-seed="8">Reta · 8 diseños</button>
    <button type="button" data-lab-action="profile">Perfil</button>
    <button type="button" data-lab-action="album">Álbum</button>
+   <button type="button" id="icmxLabDynamicCards">Comparar cartas dinámicas</button>
    <button type="button" data-lab-action="reset">Reiniciar LAB</button>
   </div>
   <p>La colección LAB es independiente. Las calificaciones son locales, sin votos o premios públicos.</p>
@@ -4329,4 +4330,4 @@ if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
  }
  $('onAccount').onclick=()=>{closeOn(false);go('profile');$('profileQuickSignup').click()};
 }
-</script><script type="module" src="qa/design-system/avatar-lab.js"></script></body></html>
+</script><script src="content/card-renderer.js?v=lab-dynamic1"></script><script src="qa/design-system/card-dynamic-lab.js?v=1"></script><script type="module" src="qa/design-system/avatar-lab.js"></script></body></html>
