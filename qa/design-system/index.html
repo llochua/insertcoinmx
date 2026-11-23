@@ -3218,6 +3218,8 @@ function extendArtworkEdges(d,D){
     if(aw>0&&ah>0&&dw>.01&&dh>.01)
      ctx.drawImage(img,ax,ay,aw,ah,dx,dy,dw,dh);
    };
+   // Base opaca de emergencia: incluso en coordenadas fraccionarias no hay grietas negras.
+   draw(sx,sy,edge,edge,0,0,W,H);
    // Centro (oculto por la imagen original, pero útil para transparencias).
    draw(sx,sy,sw,sh,x0,y0,x1-x0,y1-y0);
    // Bordes exteriores: copiar la orilla real, expandir sólo el fondo.
