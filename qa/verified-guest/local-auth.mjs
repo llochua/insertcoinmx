@@ -52,8 +52,8 @@ assert.deepEqual(duplicate.state,pack.state);
 pack=await rpc(a.c,'issue_player_pack',{p_request_id:randomUUID(),p_expected_revision:pack.revision});
 assert.equal(count(pack.state),10);
 const guestBoard=await rpc(a.c,'icmx_player_leaderboards');
-assert.ok(guestBoard.cards.some(row=>row.handle==='qa_guest_a'&&row.score>0),'invitado entra al ranking solo con cartas verificadas');
-assert.ok(guestBoard.pts.some(row=>row.handle==='qa_guest_a'&&row.score>0),'PTS obtenidos de sobres del servidor');
+assert.ok(!guestBoard.cards.some(row=>row.handle==='qa_guest_a'),'invitado no ocupa ranking de cartas, aunque tenga sobres verificados');
+assert.ok(!guestBoard.pts.some(row=>row.handle==='qa_guest_a'),'invitado no ocupa ranking de PTS; puntos y sobres se conservan localmente');
 assert.ok(!JSON.stringify(guestBoard).includes(a.uid),'nunca exponer UID en respuesta');
 
 assert.equal(pack.state.data.welcomeLeft,3);
@@ -130,6 +130,9 @@ const blocked=await second.from('player_profiles').insert({user_id:a.uid,public_
 assert.ok(blocked.error,'cuenta registrada no puede duplicar el @handle reservado por invitado');
 const owned=await second.from('player_profiles').insert({user_id:a.uid,public_handle:'qa_guest_a',is_public:true});
 assert.ok(!owned.error,'invitado convertido conserva su mismo @handle registrado');
+const registeredBoard=await rpc(second,'icmx_player_leaderboards');
+assert.ok(registeredBoard.cards.some(row=>row.handle==='qa_guest_a'&&row.score>0),'cuenta confirmada aparece en ranking con sus cartas preservadas');
+assert.ok(registeredBoard.pts.some(row=>row.handle==='qa_guest_a'&&row.score>0),'cuenta confirmada aparece en ranking con PTS de sobres del servidor');
 
 assert.equal(login.data.user.id,a.uid);
 assert.deepEqual(await state(second,a.uid),before);
