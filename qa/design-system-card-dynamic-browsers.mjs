@@ -36,6 +36,10 @@ try{
   await page.locator('#icmxLabToggle').click();
   await page.locator('#icmxLabDynamicCards').click();
   await page.locator('#icmxDynamicLab').waitFor({state:'visible'});
+  const rarityCounts=await page.locator('#dynRarityPreview .dyn-rarity-item').evaluateAll(items=>
+    items.map(el=>({tier:el.dataset.tier,stars:el.querySelectorAll('svg polygon').length})));
+  assert.deepEqual(rarityCounts,[{tier:'b',stars:0},{tier:'e',stars:1},
+    {tier:'r',stars:2},{tier:'f',stars:3}],'jerarquía de rareza 0/1/2/3');
   await page.waitForFunction(()=>{
     const images=[document.querySelector('#dynOld'),document.querySelector('#dynNew .icmx-shell')];
     return images.every(x=>x?.complete&&x.naturalWidth>0);
@@ -63,6 +67,10 @@ try{
   await page.waitForFunction(()=>document.querySelector('#dynNew .icmx-shell')?.complete &&
     document.querySelector('#dynNew .icmx-shell')?.naturalWidth>0);
   await page.screenshot({path:'qa/screenshots/ui-lab-dynamic-full-'+width+'.png',fullPage:true});
+  const svgStarCount=await page.locator('#dynNew .icmx-data path[data-icmx-star]').count();
+  assert.equal(svgStarCount,4,'Full tiene 1 estrella vectorial de habilidad + 3 de rareza');
+  assert.equal(await page.locator('#dynNew .icmx-data text').filter({hasText:'★★'}).count(),0,
+    'ninguna estrella Full se dibuja como carácter tipográfico');
   assert.deepEqual(errors,[],'sin errores del navegador');
   assert.deepEqual(external,[],'sin solicitudes a Supabase');
   await page.locator('#icmxDynamicLabClose').click();
