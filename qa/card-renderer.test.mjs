@@ -56,6 +56,14 @@ test('BONUS no tiene número ni total de álbum',()=>{
   const a=api.makeLayers(bonus,'b',{assetRoot:'../'});
   assert.ok(a.some(x=>x.text==='BONUS'));
 });
+test('jerarquía vectorial Full: 1 símbolo de habilidad y 3 estrellas de rareza',()=>{
+  const layers=api.makeLayers(sample,'f',{fullTotal:74});
+  const symbols=layers.filter(x=>x.type==='star');
+  assert.equal(symbols.length,4);
+  assert.equal(symbols.filter(x=>x.points===4).length,1);
+  assert.equal(symbols.filter(x=>x.points===5).length,3);
+  assert(!layers.some(x=>x.type==='text'&&/[✦★]/.test(x.text)),'no estrellas tipográficas');
+});
 test('la Full conserva numeración independiente',()=>{
   const layers=api.makeLayers(sample,'f',{fullTotal:74,points:125,pop:90,assetRoot:'../'});
   assert.ok(layers.some(x=>x.text==='Carta F32/74'));
