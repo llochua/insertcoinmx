@@ -821,6 +821,10 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .disc.dx{background:var(--bg)}
 /* LAB: ninguna caja interna puede ocultar el fondo del escenario expandido. */
 .disc.dx.art-edge-extended .dx-art,.disc.dx.art-edge-extended .dx-full-view {background:transparent!important}
+/* LAB: el arte no puede desaparecer durante una animación o al avanzar de carta.
+   Se conserva su encuadre y la transición del resto de la revelación. */
+.disc.dx:not(.cov):not(.v-f) .dx-art{animation:none!important;opacity:1!important;transform:none!important}
+
 
 
 
