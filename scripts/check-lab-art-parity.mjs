@@ -31,9 +31,10 @@ for(const [label,start,end,after] of regions){
   const functionStart='function bgFromArtwork(img){';
   const a=inLab.indexOf(functionStart),b=original.indexOf(functionStart);
   assert(a>0&&b>0,'Missing original/artwork sampler');
-  const labConfig=inLab.slice(0,a).replace(
-   'const dcol=id=>AUTO_BG_COLORS[id]||RBG[id]||ICOL[id]||NEU;',
-   'const dcol=id=>RBG[id]||ICOL[id]||AUTO_BG_COLORS[id]||NEU;');
+  const labConfig=inLab.slice(0,a)
+   .replace('const dcol=id=>AUTO_BG_COLORS[id]||RBG[id]||ICOL[id]||NEU;',
+            'const dcol=id=>RBG[id]||ICOL[id]||AUTO_BG_COLORS[id]||NEU;')
+   .replace("/* Fondo automático y universal del arte:\n   El color nace de los píxeles del archivo, jamás de una lista de diseños.\n   Muestreo de esquinas + perímetro, clúster predominante y mediana robusta. */\n","/* Color plano de las orillas del arte original. Mismo criterio de fondo_de()\n   usado por cartas/generar.py, a tamaño reducido para no procesar una imagen grande.\n   Solo se llama para los 21 diseños nuevos que no tienen color definido. */\n");
   assert.equal(labConfig,original.slice(0,b),'LAB altered protected catalog or framing metadata');
   const universal=inLab.slice(a);
   assert(universal.includes('const corner='),'LAB must sample corners');
