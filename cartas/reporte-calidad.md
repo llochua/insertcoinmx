@@ -1,6 +1,6 @@
 # Revisión de artes
 
-Diseños procesados: babyonboard, bitwars, enjoy, piccolovolution, virtual, vegetavolution, thelostgame
+Diseños procesados: babyonboard, bitwars, enjoy, piccolovolution, thelostgame, vegetavolution, virtual
 
 Se han regenerado las rarezas, encuadres, color de fondo y caché.
 

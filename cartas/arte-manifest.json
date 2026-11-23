@@ -2,13 +2,13 @@
   "designs": {
     "babyonboard": {
       "outputs": {
-        "c/babyonboard.webp": "ea9e41dd114c74133375e1a8c73e60bc36d2647c7ba049970cd3fd340910b6e6",
-        "c/babyonboard_e.webp": "18c52a10e80694403f57b47499ffff35c6a25e4b54c69da90e4ef570d5a5d8c2",
-        "c/babyonboard_r.webp": "f347e850edc6c8c8efee143cd570a5d5f7056442f7d4778f079a38b84c541b57",
-        "c2/babyonboard.webp": "ddca9585dfd77f833b92888ba6cc0bcd0a10b7b47b06051448242b8c211cc423",
-        "c2/babyonboard_e.webp": "ffbf160ab875e0c18b91c40c03dfe196f9cc709a0496a504326763db6bfbbbce",
-        "c2/babyonboard_r.webp": "5157a7ee7ffeb02ebd7442b24c149ff3a6c228a108622950b044c932d19de21c",
-        "d/babyonboard.webp": "5939e7af7a2195f2366a7d55c65503333d05cc99684cdf06ddb938ee8428f8df"
+        "c/babyonboard.webp": "86a9e945a0b81239aae82f3acd363dbe9a2826979c367b2c7f19f2273dd1a7d8",
+        "c/babyonboard_e.webp": "b70598c58c1287eb1e75e936ad0fe38df3ddd6e29e058518304bb6e25ee0fb07",
+        "c/babyonboard_r.webp": "6ac3e99ec5d2ba1c85cb85d8c98b5101ab298e07b27252d4b0a148a3636aa79b",
+        "c2/babyonboard.webp": "6588b6e281c83f7d4cb759468e9b069d4a6d9aa18e69250ab76b12084a638de3",
+        "c2/babyonboard_e.webp": "c825d939d500fa419a03d0a4e10cbb685ad644425ffd4372c55c3e97b2bd7c23",
+        "c2/babyonboard_r.webp": "8706b33cbf2f7e4fee36b31c3792e4300d0ae252e29e258db47ee00bebac654a",
+        "d/babyonboard.webp": "1e0a784424a53fb4d8b54b3ce70b41d8a370704f40d093d22945c91275358180"
       },
       "sources": {
         "cartas/arte/babyonboard.png": "e0f85b7ce79d1a4d9d74d4dba71cf3858b87a4dda06db81a28a6d568e59dfbef"
@@ -16,13 +16,13 @@
     },
     "bitwars": {
       "outputs": {
-        "c/bitwars.webp": "1807002596a475c9ac0dfd6012653044ef723cf1f2b44fc663588590d33067bf",
-        "c/bitwars_e.webp": "ab1bf8600e4381761074db0cd6b63daadba999db573d2372678eb3d4a4f9126a",
-        "c/bitwars_r.webp": "ee801acf0b093d34ee73a4efbc3558b160699eb2a326706d810186197e244a4b",
-        "c2/bitwars.webp": "e48a93c3f34a02a1deead400eb7808001918202021a2853f897a0ca8b0410084",
-        "c2/bitwars_e.webp": "decaf1c0ccbf56ab4e6dbf0451409066c896715e1ba509df55e9102912263e86",
-        "c2/bitwars_r.webp": "e9a6a6de87c0340ab558511916aa716e7041125a9f0334489c008a4c2dfdc998",
-        "d/bitwars.webp": "93b11b7505c2afba4152fd840beaa914adba8588b58cbdad169baf603540e0d9"
+        "c/bitwars.webp": "3953454575a14319af20903358a87243c9df30a03acff0a7b8c6398ecb7a8f44",
+        "c/bitwars_e.webp": "e15edc1c2da91a42f1fee7c98f38c6e50c73e15ec1b6bd6ef8919438068f369e",
+        "c/bitwars_r.webp": "868f479ef0625bf379f1523b40a9c559db7a440aef6dd24e2baf0c8b0810db23",
+        "c2/bitwars.webp": "01ffcbc68d527935ae1f924b884de8250aca47e328ba68e69d7eef2dbc30ddf0",
+        "c2/bitwars_e.webp": "d352f9c7ad76fc113c93dbfc97db8cebc166f7899ab66266c1919247a36e52b0",
+        "c2/bitwars_r.webp": "e3dc7e1c7b9a8eff91742f4f7dcaa73d32cf461ca2fa644988eea6d51d7453c8",
+        "d/bitwars.webp": "6d97d52daf52b25cfe4443a8f733687e9ca48953fb8389bbc144c82873102ec4"
       },
       "sources": {
         "cartas/arte/bitwars.png": "50720129c4f8c2bdb5992c251aab6bcf58ad9bfcf0562c635fc1beb189ebd080"
@@ -31,12 +31,12 @@
     "enjoy": {
       "outputs": {
         "c/enjoy.webp": "b1709c974ac069386a1d8d8028d1a761ecc1c4df634d9a115a840a2128206b17",
-        "c/enjoy_e.webp": "2dcb5e1a6be87cf0dd3c03789258b8a3b9c3eff44bd2db97066564e36248cffc",
-        "c/enjoy_r.webp": "879894fcb6888a969e17769d1c436f4b1224adbd0ec8150ac88bd84abd595e9c",
-        "c2/enjoy.webp": "b2ed4521eb949dfa51931c739f5696498409183c2d0fcc9a224abe6ee90349ab",
-        "c2/enjoy_e.webp": "6aa769a4b6e073152babed41611afcadaa47c810c94b89baa27d13325fd62b88",
-        "c2/enjoy_r.webp": "5341194f944602614337648b5aa7973f4d50434b3b207af020abafd0038bb3bf",
-        "d/enjoy.webp": "52165d0d1cbaf74bbdce1c31875c240c1b9deeeccabab8b4e14f36032522adc6"
+        "c/enjoy_e.webp": "da86f74a919e5ff89e0633e5b6777e287df353755ab763fb868a4edc5f3d6795",
+        "c/enjoy_r.webp": "e38af8d615033052477f168493ec80be35866c8ad21c302dc3b272c69344c56b",
+        "c2/enjoy.webp": "1ef3a87dfc25d41c048fe430ee18ab62c2450ba488004ea2ea9a2214920625ea",
+        "c2/enjoy_e.webp": "2b393e0c0f608cabf6279e5e34be4a73e90eef5e0fab4114e5cb60c7ce09d371",
+        "c2/enjoy_r.webp": "42ac0f072668a2cff21c8db670a5232b7e7d0d3a29f726e79c315b1cb6a45fb9",
+        "d/enjoy.webp": "94578a76ae7a49c5373547475bf089cd1525a660310dd8ec715121325f98aca3"
       },
       "sources": {
         "cartas/arte/enjoy.png": "074d597250ca8dab49996b2494f39b9500a78867c11d2d56900a63460f64ecb0"
@@ -44,13 +44,13 @@
     },
     "piccolovolution": {
       "outputs": {
-        "c/piccolovolution.webp": "6587ce8e25d8f38836de8028ed71bb522174bfd6874e1c31e8a253bace70fd6a",
-        "c/piccolovolution_e.webp": "e3d48df0db2ddd47140ea632fb19952dc8a5666389e4e8b05f17b13ace9508b4",
-        "c/piccolovolution_r.webp": "51841bb9a323e76fdd4f8038168bbafa3c680dd2338926097ce2185804bee7fd",
-        "c2/piccolovolution.webp": "33dc03b76c6957d354005b24b24682565d73079706c8b6622fd3099a64e3b867",
-        "c2/piccolovolution_e.webp": "eb369159b09f84ee00297cde182977a2eb03afd84c20628a18eebbca02c91e67",
-        "c2/piccolovolution_r.webp": "1885dc169c9ec420469c3bd143d55101cee1d0e07eac9a02f5c0651aa9537a73",
-        "d/piccolovolution.webp": "5837f865f08cc533fafd038ecb47d93f1b0b401ca4ddb93e4bd781bf59118f8d"
+        "c/piccolovolution.webp": "0399bf7aa11fb27924a7033775d1c91bcd4a71a9a6917369ab6a183cc7c499f7",
+        "c/piccolovolution_e.webp": "7f0ffe33f15e71306698b7702e624eaaddcf3fc231d866977823bb4a9bcc68b6",
+        "c/piccolovolution_r.webp": "08e47137214a787934fad9398c406e81b311532f5fa9a699bd7fff10771f73f1",
+        "c2/piccolovolution.webp": "d5e000913a073cd5ee9b64404539d104367abd21bc724d7fd15b681892018368",
+        "c2/piccolovolution_e.webp": "304ece7ed80a091736405d877f6b941371bc3c2949e9d7758185ac3363d9fee0",
+        "c2/piccolovolution_r.webp": "fdc1b85df2af7f377870c70881f55331d33d21616e9c5c4274b765e1904b8a60",
+        "d/piccolovolution.webp": "26d6357a27cf78cda990431b5388cefa252bb6a78d5b6fedac7b68573f15de46"
       },
       "sources": {
         "cartas/arte/piccolovolution.png": "68fe3542f879557d433fe5c5a4fb51884bffd617e6ec1ba28db8dab897f6d7db"
@@ -58,13 +58,13 @@
     },
     "thelostgame": {
       "outputs": {
-        "c/thelostgame.webp": "08649dfe33034af041cef2a6863056e19dec0983e231f257ffa99eac1853ef13",
-        "c/thelostgame_e.webp": "df76c4e56cf0b0ab634d5c62ec8fc3b5ebff4e908995bda231fa7a4f042e7e91",
-        "c/thelostgame_r.webp": "2911f61dbe70047a3e3dc143a3cbc6b960c56f9fa36aec1dadae68bdaf47a407",
-        "c2/thelostgame.webp": "6f35da93f33e9b4a8109d8ff980cbad6a2954248f2dcb45d500ac0fbee0d0458",
-        "c2/thelostgame_e.webp": "5544c4a8942ffd1720d42c65aa3cf83a1ce8cc3bdd8b0b6e0ca4dfe01553e597",
-        "c2/thelostgame_r.webp": "85496e6a554f824dd5f72bd52ae71bd3fbdfad149ba3adf04b722ea457e83397",
-        "d/thelostgame.webp": "ce9c9ecaf731c2c986ab7beb15e5193e688fc5d8726e818fac3269a7c1036e7c"
+        "c/thelostgame.webp": "5590137fec253805350c989823aa5de6aa4181114714b9f72638c908bedcaf8e",
+        "c/thelostgame_e.webp": "ec90e2ee33de4bb26c0e6f3b806c94daeba0a4657f83b3a336afd66e0eaa9ad6",
+        "c/thelostgame_r.webp": "c880a813f3988c6c2129c448451942b4e072e9963512062d4df9e5f77b58c320",
+        "c2/thelostgame.webp": "0a71ddf69fcf10d01a9aaba5d9787789267cd583cd248fc271ac59b373307b99",
+        "c2/thelostgame_e.webp": "ed951d25559644f2c74ad06f641b9a802a62ab468b05f42426925bb64a5c6069",
+        "c2/thelostgame_r.webp": "80c6c0ef0965a7fb71b5adc51bbfd7b8d51426bc1f10e9070803a8c7efa20d05",
+        "d/thelostgame.webp": "191ae2be4a133198da3552477989cda93c6c9827c91e01cbb447861bbd2cbfff"
       },
       "sources": {
         "cartas/arte/thelostgame.png": "32770ce722d0e0e09734d067323c13ec9b5d74195489c69610e336314c827b01"
@@ -72,13 +72,13 @@
     },
     "vegetavolution": {
       "outputs": {
-        "c/vegetavolution.webp": "9af9c7e6d1d369b08f656678d8485b457946eb7bebf89681d2c36e04477462d3",
-        "c/vegetavolution_e.webp": "85dc73084e2fecdb79a3277efadbe826141486d4faf8636572a50a73b2bd1d17",
-        "c/vegetavolution_r.webp": "ba06b349f1c013535252f3f8a48ad4c3cfcc22346820836decf6b75e21bca972",
-        "c2/vegetavolution.webp": "a7de775bb6d57ac9000526d8b6f5b241af45420ed0c4bec48d8a9f40b0d4ab56",
-        "c2/vegetavolution_e.webp": "abbe90c60ddabe74ad5a6fac5c2dd9e201c9f3e87552aa257eafd511d6fe3c8a",
-        "c2/vegetavolution_r.webp": "90e39f80d5e67aa0fbba2368e852dda90bebae7e283fb144f46d5cdd59c98e84",
-        "d/vegetavolution.webp": "ec73385b97bd6db7bd1bdb55bfc99b3e4a32558f1c3c9af9fbab501ecd2d441b"
+        "c/vegetavolution.webp": "9db56814f657c17e7f8f401776c4422ab831b3959165898e3a36a826c6abab8f",
+        "c/vegetavolution_e.webp": "38ec47557bc209c147dbb9f05bb8a3f706a9256d92efb14633b088d536a71d70",
+        "c/vegetavolution_r.webp": "da56c592ec18330386520e56bb28822f9c33e0dccbb7748589dfdfb6090d3ea3",
+        "c2/vegetavolution.webp": "113392c457f7380e65639a3852dec058a991e0bfaf6e55b653adf8a5a603ba1f",
+        "c2/vegetavolution_e.webp": "eee0bb6e07e41686ccd0c30dc1e07ffb87fcbea86f0f40c4889cd4b10bed2a61",
+        "c2/vegetavolution_r.webp": "1600d5b4d4148711d9157963cdcf68f59c0d2269b60e1438a5e133f987c01482",
+        "d/vegetavolution.webp": "f97ffe242771ee68ade6f501b99f98964309f897c11a75d25d72fdec4ceee309"
       },
       "sources": {
         "cartas/arte/vegetavolution.png": "4bf49dfbe2197ebfe0b82b61e713d4f8c1dc235c51265b150fe011cb51546a07"
@@ -86,13 +86,13 @@
     },
     "virtual": {
       "outputs": {
-        "c/virtual.webp": "27d7df2e2b46b810133b32ecb53978281c404e6944b423e861891cb52ad12915",
-        "c/virtual_e.webp": "1bae65318300b70f8d75a71c11a7f303a74f462ee6543da49fee0a0f2404a8b4",
+        "c/virtual.webp": "f0b9119855b3dc0599e03e8118d3751e8bc924307c083b5a7b3c8e69fc6e8ae3",
+        "c/virtual_e.webp": "f6fc48e8026f0c42d81a3e7a8990d2aa7ddaec8fb12bc01ab3870ff1622cc273",
         "c/virtual_r.webp": "8306ed85a74da57ed8e84a3042763e7d8553312e12f62c918372f128657c3244",
-        "c2/virtual.webp": "a252ef747d0296b09bff9ce648c562279160739d3a9ea9267c8fbf0278a2e7c4",
-        "c2/virtual_e.webp": "b4971fd88dea267a5dfcbfbf8c0fb2e7477fc084c85399dbb6f70e715ae41168",
-        "c2/virtual_r.webp": "5e22983b1c4f02438e8e720be56fb93f695dee86a50158a502903bf21080e395",
-        "d/virtual.webp": "4fe9dcd332f7609adde01383dd726e5d8e2c4e1e6aa67d848231254076c9a5b9"
+        "c2/virtual.webp": "134528e06f775e974681c9d3d091e68dbe1041b7dd3f5e3a1198dcf993b511e0",
+        "c2/virtual_e.webp": "ec9419cdb95b5253b0ad4a022c1b8220b70a04038bcda64216c3673c6c5ceaf7",
+        "c2/virtual_r.webp": "402c9dd7a89bce3901aa81a6e1d92d1f8f61447274e68bb2919cadf9c931c150",
+        "d/virtual.webp": "2a3473a399348a121c7745434fd6fb78c38e8b5cb074766cdfc088e1754fba9d"
       },
       "sources": {
         "cartas/arte/virtual.png": "2cc9061ee14c749178714dc59a1d43d36dac2a8da838b12936f8bb6e2de49f93"
