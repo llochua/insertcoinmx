@@ -32,8 +32,14 @@ jobs:
           node --check qa/design-system-browsers.mjs
       - name: Instalar Playwright
         run: npm install --no-save --no-package-lock playwright@1.56.1
-      - name: Instalar Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Chrome del runner, o Chromium si no está disponible
+        run: |
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo 'ICMX_CHROME=true' >> "$GITHUB_ENV"
+            google-chrome --version
+          else
+            npx playwright install --with-deps chromium
+          fi
       - name: Validar sobres, Reta, avatar e independencia de cuentas
         run: node qa/design-system-browsers.mjs
       - name: Conservar capturas del LAB
