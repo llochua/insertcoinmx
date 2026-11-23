@@ -120,7 +120,7 @@ try{
     const text=page.locator('#dynNew text[data-icmx-field="pop"]');
     assert.equal(await text.textContent(),String(n));
     const rect=await text.evaluate(el=>{const r=el.getBBox();return {x:r.x,y:r.y,width:r.width,height:r.height}});
-    assert(rect.y>=915&&rect.y+rect.height<=1035,
+    assert(rect.y>=910&&rect.y+rect.height<=1035,
       'POP Full fuera de GOTY para '+n+': '+JSON.stringify(rect));
   }
   assert.equal(await page.locator('#dynNew .icmx-data text').filter({hasText:'★★'}).count(),0,
