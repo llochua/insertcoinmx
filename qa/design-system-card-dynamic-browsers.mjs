@@ -67,6 +67,19 @@ try{
   assert.equal(await page.locator('#dynNew .icmx-data path[data-icmx-star="5"]').count(),1,'Holo = 1 estrella SVG');
   await page.locator('#dynVariant').selectOption('r');
   assert.equal(await page.locator('#dynNew .icmx-data path[data-icmx-star="5"]').count(),2,'Dorada = 2 estrellas SVG');
+  await page.waitForFunction(()=>document.querySelector('#dynNew .icmx-shell')?.complete &&
+    document.querySelector('#dynNew .icmx-shell')?.naturalWidth>0);
+  // La antigua palabra Dorada y las tres estrellas NO deben existir en el raster base.
+  const rawFooter=await page.evaluate(()=>{
+    const im=document.querySelector('#dynNew .icmx-shell');
+    const cv=document.createElement('canvas');cv.width=960;cv.height=1340;
+    const ctx=cv.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0,960,1340);
+    const pix=ctx.getImageData(470,1248,106,28).data;
+    let ink=0;
+    for(let i=0;i<pix.length;i+=4)if((pix[i]+pix[i+1]+pix[i+2])/3<65)ink++;
+    return ink;
+  });
+  assert(rawFooter<30,'pie Dorada sin letras antiguas impresas: '+rawFooter+' píxeles');
   await page.screenshot({path:'qa/screenshots/ui-lab-dynamic-gold-'+width+'.png',fullPage:true});
   await page.locator('#dynVariant').selectOption('e');
   await page.waitForFunction(()=>document.querySelector('#dynNew .icmx-shell')?.complete &&
