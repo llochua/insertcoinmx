@@ -37,16 +37,16 @@ Se conservan las funciones originales `dcol`, `bgFromArtwork`, `resolveArtworkBa
 - [ ] Aprobación final del usuario antes de fusionar el sistema de diseño.
 
 
-## Estándar de ilustraciones · LAB utiliza el motor original de main (23 nov. 2026)
+## Estándar universal de fondos por píxeles · LAB (23 nov. 2026)
 
-**Fuente de verdad:** \`index.html\` de \`main\`. LAB no tiene un segundo motor de ilustraciones y no debe modificar la imagen original, encuadrarla distinto, ni extender sus bordes mediante otro canvas o un 9-slice.
+**Regla única, aplicable a cualquier diseño:** leer la ilustración que se está mostrando, detectar el color predominante de sus esquinas y perímetro, y aplicar ese mismo color al fondo de toda la pantalla. El dibujo mantiene intactos su tamaño, encuadre, archivo y proporciones. El fondo no se configura por nombre de carta.
 
-El mismo código de \`main\` para \`dcol\`, \`hasCol\`, \`artBox\`, \`bgFromArtwork\` y \`resolveArtworkBackground\` se utiliza en \`qa/design-system/index.html\`, junto con el CSS original del escenario. El flujo \`showCard\` llama a \`resolveArtworkBackground(d,D)\`, exactamente como \`main\`.
+**Implementación aislada en LAB:** \`qa/design-system/index.html\` usa \`bgFromArtwork(img)\` (muestreo de 48×60, predominancia en el borde y mediana robusta) y \`resolveArtworkBackground(d,D)\` (cambio de \`--bg\`, color de la escena y sincronización con la capa de arte al cargarse el archivo). La caché \`AUTO_BG_COLORS\` guarda resultados detectados para el siguiente fotograma; no es una lista editada a mano. Cuando falla la carga o el muestreo, el estado queda registrado para QA. No existe un \`if\` para un diseño concreto.
 
-El estándar de \`main\` usa \`RBG\` e \`ICOL\` para colores existentes y \`AUTO_BG_IDS\` para diseños cuyos colores se miden a partir del borde del archivo. **Cobertura comprobada: 126 entradas del catálogo fuente, ninguna sin resolver.** Esto describe la cobertura de código, no cuántas cartas están publicadas en el álbum.
+El diseño original de \`main\` se mantiene para la geometría y las variantes de carta. Base, Holo y Dorada usan el mismo detector. Las capas de foil de Holo/Dorada siguen transparentes y la variante Full conserva su fondo inmersivo original. No se duplica la imagen, no se usa \`cover\` para recortar el arte de origen y no se genera una imagen de fondo mediante un segundo canvas de 9-slice.
 
-Se retiraron de LAB los experimentos \`solidArtworkBackground\`, \`extendArtworkEdges\`, \`art-edge-extended\`, canvas de 9-slice, reglas CSS para forzar opacidad de la imagen y excepciones por diseño. No restaurarlos como parches independientes: cualquier cambio futuro del motor de arte debe verificarse primero en \`main\`, coordinarse y conservar la paridad.
+**Motivo:** la paridad de código con \`main\` por sí sola no resolvió los cortes de color detectados por el usuario. Por eso LAB tiene una única mejora de fondo, protegida por un contrato que exige que el resto de la presentación permanezca como en \`main\`. Los arreglos específicos previos (por ID y por variante) se descartan.
 
-**QA obligatorio** (\`qa/design-system-browsers.mjs\`): carga el \`index.html\` real de \`origin/main\`, compara las regiones fuente de arte con LAB, abre las cartas en ambos navegadores a 1280×900 y compara fondo calculado y píxeles exteriores de versiones Base. También comprueba Holo y Dorada (el foil animado no es píxel-estable) y la cobertura completa del catálogo. Hay capturas comparativas y pruebas móviles 320/390 px.
+**Validación:** \`qa/design-system-browsers.mjs\` debe cargar realmente los archivos de todo el catálogo disponible y comprobar en el navegador que el fondo renderizado coincide con el resultado de analizar los píxeles de cada ilustración; probar Base, Holo y Dorada; conservar capturas de casos difíciles; seguir validando la independencia de los datos de Lab y las resoluciones móviles.
 
-**Alcance:** esta restauración afecta solo a las dos ramas del laboratorio (PR #130 y PR #137). \`main\` no se modifica. Cualquier publicación sigue requiriendo revisión visual y aprobación explícita.
+**Alcance:** solo ramas LAB asociadas a PR #130 y PR #137. Nunca se modifica o fusiona \`main\` sin autorización explícita.
