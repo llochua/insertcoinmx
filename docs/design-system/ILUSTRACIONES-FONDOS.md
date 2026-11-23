@@ -35,3 +35,20 @@ Se conservan las funciones originales `dcol`, `bgFromArtwork`, `resolveArtworkBa
 - [x] Retirado del PR el experimento de muestreo, el CSS que ocultaba arte y la eliminación de degradados.
 - [ ] Comparación visual directa de `main` y laboratorio para las mismas ilustraciones, además de validación del enlace externo.
 - [ ] Aprobación final del usuario antes de fusionar el sistema de diseño.
+
+
+## Estándar universal del fondo full · LAB (23 nov. 2026)
+
+**Alcance: todos los diseños, sin excepciones por nombre.** La ilustración conserva su tamaño, proporciones y posición; el fondo original se extiende a todo el escenario. No es válido que el arte quede dentro de un rectángulo con un color distinto detrás.
+
+Implementación en \`qa/design-system/index.html\`:
+- Al cargarse la imagen, toma los píxeles del perímetro realmente visible del archivo.
+- Construye el fondo de todo el escenario por extensión de los cuatro bordes y las esquinas (9-slice). Un fondo plano se vuelve un color continuo; un fondo con degradado mantiene su continuidad; no se usa \`cover\` para ampliar o recortar la imagen original.
+- Opera sobre **Base, Holo y Dorada para cualquier ID**; Full usa su arte inmersivo original. El diseño no se rasteriza de nuevo y su \`img\` original permanece encima.
+- El proceso no depende de \`AUTO_BG_IDS\`, \`ICOL\`, \`RBG\`, \`ABOX\` ni colores asignados manualmente para elegir el fondo. El encuadre existente de \`ABOX\` se respeta sin alterar la imagen.
+- Al cambiar de carta o de dimensiones de pantalla se recalcula el fondo; también en la vista ampliada.
+- Este cambio queda **únicamente en la copia aislada de LAB**. \`main\` no se modifica.
+
+**Prueba de regresión:** \`qa/design-system-browsers.mjs\` comprueba el fondo generado frente a los píxeles de la imagen en Sonic, Recojo Cartón, Karma, Evil Exes y Robogodín, en móvil, y conserva capturas. No se aceptan soluciones por diseño ni por captura aislada.
+
+**Estado:** implementación enviada a LAB; aprobación de apariencia sujeta a revisar capturas y resultados del navegador.
