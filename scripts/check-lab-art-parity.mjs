@@ -53,8 +53,10 @@ AUTO_BG_COLORS.robogodin='#ffffff';`;
   normalized=normalized.replace(
     'const dcol=id=>AUTO_BG_COLORS[id]||RBG[id]||ICOL[id]||NEU;',
     'const dcol=id=>RBG[id]||ICOL[id]||AUTO_BG_COLORS[id]||NEU;');
-  const oldFunctions=between(baseline,'function bgFromArtwork(img){','const lum=h=>');
-  const newFunctions=between(normalized,'function bgFromArtwork(img){','const lum=h=>');
+  const oldFunctions=baseline.slice(baseline.indexOf('function bgFromArtwork(img){'));
+  const newFunctions=normalized.slice(normalized.indexOf('function bgFromArtwork(img){'));
+  assert(oldFunctions.startsWith('function bgFromArtwork(img){'),'missing baseline detection');
+  assert(newFunctions.startsWith('function bgFromArtwork(img){'),'missing LAB detection');
   normalized=normalized.replace(newFunctions,oldFunctions);
   assert.equal(normalized,baseline,
    'LAB sampling differs beyond the allowed solid-background implementation');
