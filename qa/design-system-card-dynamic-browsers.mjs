@@ -44,6 +44,12 @@ try{
     const images=[document.querySelector('#dynOld'),document.querySelector('#dynNew .icmx-shell')];
     return images.every(x=>x?.complete&&x.naturalWidth>0);
   });
+  const plate=page.locator('#dynNew .icmx-data rect[data-icmx-footer-plate="true"]');
+  assert.equal(await plate.count(),1,'una sola placa continua bajo número, rareza y valor');
+  const plateBounds=await plate.evaluate(el=>{const r=el.getBBox();return {x:r.x,y:r.y,width:r.width,height:r.height}});
+  assert(plateBounds.x<=75 && plateBounds.x+plateBounds.width>=870 &&
+    plateBounds.y<=1250 && plateBounds.y+plateBounds.height>=1280,
+    'placa cubre la zona completa, no parches detrás de cifras');
   assert.equal(await page.locator('#dynNew .icmx-data mask').count(),2,'mask luminance en etiquetas');
   const pop=page.locator('#dynNew text[data-icmx-field="pop"]');
   assert.equal(await pop.count(),1,'POP dinámico único');
@@ -90,6 +96,8 @@ try{
     return ink;
   });
   assert(rawFooter<30,'pie Dorada sin letras antiguas impresas: '+rawFooter+' píxeles');
+  assert.equal(await page.locator('#dynNew .icmx-data rect[data-icmx-footer-plate="true"]').count(),1,
+    'Dorada: mismo fondo continuo, sin parches por rareza');
   await page.screenshot({path:'qa/screenshots/ui-lab-dynamic-gold-'+width+'.png',fullPage:true});
   await page.locator('#dynVariant').selectOption('e');
   await page.waitForFunction(()=>document.querySelector('#dynNew .icmx-shell')?.complete &&
