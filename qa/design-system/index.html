@@ -819,6 +819,9 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 
 /* ===== descubrimiento (calidad): ilustración de orilla a orilla, luz, degradado para el texto, carta chica al lado ===== */
 .disc.dx{background:var(--bg)}
+/* LAB: al prolongar el degradado real de los bordes, ningún panel plano tapa el fondo continuo. */
+.disc.dx.art-edge-extended .dx-art{background:transparent!important}
+
 
 .dx-mv{display:block;position:relative}
 /* El arte original se muestra nítido: sin máscaras, halos ni sombras de borde.
@@ -3173,6 +3176,83 @@ function resolveArtworkBackground(d,D){
  else im.addEventListener('load',update,{once:true});
 }
 const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255};
+/* LAB · DS-ART-02: fondos con degradado real.
+   Solo prolonga píxeles de las orillas del propio archivo. El dibujo central
+   conserva proporción, encuadre y nitidez; no se duplica, estira ni usa cover.
+   Si las dos orillas difieren mucho, no se inventa un fondo. */
+function extendArtworkEdgeGradient(d,D){
+ if(!AUTO_BG_IDS.has(d.id))return;
+ const img=D.querySelector('.dx-art img'),art=D.querySelector('.dx-art');
+ if(!img||!art)return;
+ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+ const redraw=()=>{
+  if(!img.isConnected||D.dataset.artId!==d.id||D.classList.contains('cov')||!img.naturalWidth)return;
+  try{
+   const scene=D.getBoundingClientRect(),picture=img.getBoundingClientRect();
+   const clip=(img.closest('.ab')||img).getBoundingClientRect();
+   if(scene.height<1||picture.width<1||picture.height<1||clip.height<1)return;
+   const sx0=clamp((clip.left-picture.left)/picture.width,0,1);
+   const sx1=clamp((clip.right-picture.left)/picture.width,0,1);
+   const sy0=clamp((clip.top-picture.top)/picture.height,0,1);
+   const sy1=clamp((clip.bottom-picture.top)/picture.height,0,1);
+   if(sx1<=sx0||sy1<=sy0)return;
+   const sample=document.createElement('canvas');sample.width=96;sample.height=192;
+   const sc=sample.getContext('2d',{willReadFrequently:true});if(!sc)return;
+   sc.drawImage(img,0,0,96,192);
+   const pixels=sc.getImageData(0,0,96,192).data;
+   const read=(x,y)=>{
+    const ix=clamp(Math.round(x*95),1,94),iy=clamp(Math.round(y*191),0,191);
+    const channels=[[],[],[]];
+    for(let dx=-1;dx<=1;dx++){
+     const o=(iy*96+ix+dx)*4;
+     if(pixels[o+3]<245)return null;
+     for(let c=0;c<3;c++)channels[c].push(pixels[o+c]);
+    }
+    return channels.map(c=>c.sort((a,b)=>a-b)[1]);
+   };
+   const rows=[],bad=[];
+   const inset=(sx1-sx0)*.012;
+   for(let i=0;i<144;i++){
+    const y=sy0+(sy1-sy0)*i/143;
+    const left=read(sx0+inset,y),right=read(sx1-inset,y);
+    if(!left||!right)return;
+    const delta=Math.max(...left.map((v,c)=>Math.abs(v-right[c])));
+    bad.push(delta);
+    rows.push(left.map((v,c)=>Math.round((v+right[c])/2)));
+   }
+   // Se necesita continuidad horizontal y variación vertical real.
+   bad.sort((a,b)=>a-b);
+   if(bad[Math.floor(bad.length*.87)]>32)return;
+   const variations=[0,1,2].map(c=>Math.max(...rows.map(r=>r[c]))-Math.min(...rows.map(r=>r[c])));
+   if(Math.max(...variations)<24)return; // el color plano ya tiene su tratamiento existente
+   const strip=document.createElement('canvas');strip.width=1;strip.height=256;
+   const ctx=strip.getContext('2d');if(!ctx)return;
+   const out=ctx.createImageData(1,256);
+   const top=(clip.top-scene.top)/scene.height,height=clip.height/scene.height;
+   for(let y=0;y<256;y++){
+    const source=clamp((((y+.5)/256)-top)/height,0,1)*143;
+    const low=Math.floor(source),high=Math.min(143,low+1),fraction=source-low;
+    for(let c=0;c<3;c++)out.data[y*4+c]=Math.round(rows[low][c]*(1-fraction)+rows[high][c]*fraction);
+    out.data[y*4+3]=255;
+   }
+   ctx.putImageData(out,0,0);
+   if(!img.isConnected||D.dataset.artId!==d.id)return;
+   D.style.backgroundImage='url("'+strip.toDataURL('image/png')+'")';
+   D.style.backgroundSize='100% 100%';
+   D.style.backgroundRepeat='no-repeat';
+   D.classList.add('art-edge-extended');
+  }catch(_){/* Seguridad: conservar el fondo original si no puede leerse el lienzo. */}
+ };
+ D._refreshEdgeGradient=redraw;
+ if(!D._edgeGradientResizeWired){
+  window.addEventListener('resize',()=>{if(D._refreshEdgeGradient)D._refreshEdgeGradient()});
+  D._edgeGradientResizeWired=true;
+ }
+ if(img.complete&&img.naturalWidth)requestAnimationFrame(redraw);
+ else img.addEventListener('load',()=>requestAnimationFrame(redraw),{once:true});
+ art.addEventListener('animationend',e=>{if(e.target===art)redraw()},{once:true});
+}
+
 const icAwardsSeen=new Set(); // sellos vistos en el sobre actual
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
 function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();CINEMATIC_SHOWN.clear();icAwardsSeen.clear();
@@ -3288,6 +3368,7 @@ function startCinematicReveal(c,D){
 }
 
 function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
+ D.style.removeProperty('background-image');D._refreshEdgeGradient=null;
  D.onclick=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._dxToastTimer);clearTimeout(D._cinemaTimer);
  if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
   D.className=`disc on dx cov v-${c.v}`;D.dataset.artId='';D.style.setProperty('--bg','#0c0a14');
@@ -3338,6 +3419,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
    <div class="dx-tags"><span class="dx-v">${VSHORT[v].toUpperCase()}</span>${c._new?`<span class="dx-s">${c._dnew?'NUEVA':'NUEVA VARIANTE'}</span>`:`<span class="dx-s">×${S.have[c.k]}</span>`}${c._new&&PCT[v]?`<span class="dx-p">${PCT[v]} de cada 100</span>`:''}</div>${storyHtml(c)}</div>
   <button class="dx-card" id="dcCard" aria-label="Ampliar carta"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><span class="dx-read" aria-hidden="true"><svg class="ic-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#ic-icon-zoom-in"></use></svg></span>${icAward(c)}</button><div class="dx-art-flash" id="dcArtStatus" role="status" aria-live="polite"></div>`;
  resolveArtworkBackground(d,D);
+ extendArtworkEdgeGradient(d,D);
  mountFaceValue($('dcCard').querySelector('.fx'),c);
  $('dcCard').onclick=()=>openCard(c.k);
  dxNav();
