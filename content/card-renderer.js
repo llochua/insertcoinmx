@@ -93,6 +93,12 @@
     }
     return path+'Z';
   }
+  function layerFooterRule(layers,x,color) {
+    layers.push({type:'footer-rule',x,color});
+  }
+  function layerFooterDot(layers,cx,cy,color) {
+    layers.push({type:'footer-dot',cx,cy,color});
+  }
   function layerImage(layers, url, x, y, options={}) {
     layers.push({type:'image',url,x,y,anchor:options.anchor||'start',
       width:options.width||0,height:options.height||0,tint:options.tint||null});
@@ -141,12 +147,24 @@
         {maxWidth:800,family:'"Carlito", Arial, sans-serif',weight:400}));
       layerText(layers,card.frase,75,1132,29.7,ink,
         {maxWidth:620,family:'"Carlito", Arial, sans-serif',weight:400,italic:true});
-      if(variant==='e')layerStar(layers,405,1271,12,5,ink);
-      if(variant==='r')[393,423].forEach(cx=>layerStar(layers,cx,1271,12,5,ink));
-      // Numeración exclusivamente en texto SVG sin fondo, máscara ni parche.
+      // Interior inferior recreado como UN solo fondo de plantilla, sin parches.
+      // Todos sus rótulos y divisores son dinámicos y comparten el mismo sistema.
+      layerText(layers,'Carta',75,1250,23.4,ink,{maxWidth:63,field:'collection-label'});
       layerText(layers,numLabel(card,variant,options),148,1250,23.4,ink,
         {maxWidth:206,field:'collection-number'});
-      layerText(layers,'Valor '+pointsOf(variant,options),651,1250,23.4,ink,{maxWidth:194});
+      layerFooterRule(layers,336,ink);
+      if(variant==='b'){
+        layerFooterDot(layers,370,1261,ink);
+        layerText(layers,'Común',398,1250,23.4,ink,{maxWidth:165});
+      } else if(variant==='e'){
+        layerStar(layers,375,1261,12,5,ink);
+        layerText(layers,'Holo',408,1250,23.4,ink,{maxWidth:172});
+      } else {
+        [374,408].forEach(cx=>layerStar(layers,cx,1261,12,5,ink));
+        layerText(layers,'Dorada',472,1250,23.4,ink,{maxWidth:145});
+      }
+      layerFooterRule(layers,622,ink);
+      layerText(layers,'Valor '+pointsOf(variant,options),647,1250,23.4,ink,{maxWidth:204});
     } else {
       layerImage(layers,pill,32,30);
       layerText(layers,card.nombre,48,922,64,'#ffffff',{maxWidth:590});
@@ -179,7 +197,13 @@
     const svg=el('svg',{viewBox:'0 0 960 1340',class:'icmx-data',
       preserveAspectRatio:'xMidYMid meet','aria-hidden':'true'});
     for (const lay of layers) {
-      if (lay.type==='ability-icon') {
+      if (lay.type==='footer-rule'){
+        svg.appendChild(el('line',{x1:lay.x,x2:lay.x,y1:1245,y2:1280,
+          stroke:lay.color,'stroke-width':3,'data-icmx-footer-rule':'true'}));
+      } else if(lay.type==='footer-dot'){
+        svg.appendChild(el('circle',{cx:lay.cx,cy:lay.cy,r:5,fill:lay.color,
+          'data-icmx-footer-dot':'true'}));
+      } else if (lay.type==='ability-icon') {
         // Un rayo comunica HABILIDAD (acción); las estrellas se reservan para rareza.
         svg.appendChild(el('circle',{cx:lay.cx,cy:lay.cy,r:44,fill:'#f8f2eb',
           stroke:'#20191d','stroke-width':5}));
