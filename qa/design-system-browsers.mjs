@@ -24,7 +24,7 @@ const server=createServer(async(req,res)=>{
  }catch{res.writeHead(404);res.end('not found')}
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch(process.env.ICMX_CHROME==='true'?{headless:true,channel:'chrome'}:{headless:true});
 await mkdir('qa/screenshots',{recursive:true});
 const LAB_URL='http://127.0.0.1:'+server.address().port+'/qa/design-system/';
 const sentinel='{"have":{"gatosamurai_f":777},"ini":"LIVE","seen":1}';
@@ -115,6 +115,7 @@ try{
    lab:localStorage.getItem('icmx-ui-lab-progress-v1')
   }));
 
+
   // La escena debe estar visible: el QA venía de Perfil (pack oculto).
   await page.locator('#icmxLabToggle').click();
   await page.locator('[data-lab-action="pack"]').click();
@@ -193,7 +194,7 @@ try{
 
  // Escritorio: comprobación visual independiente del flujo móvil. Reproduce el
  // escenario de las capturas reportadas (CRT centrado) con fondos sin recuadros.
- const desktop=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'reduce'});
+ const desktop=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'no-preference'});
  const screen=await desktop.newPage(),desktopErrors=[];
  screen.on('pageerror',error=>desktopErrors.push(error.message));
  await screen.goto(LAB_URL,{waitUntil:'domcontentloaded'});
@@ -223,6 +224,60 @@ try{
   assert.equal(state.art,'rgba(0, 0, 0, 0)','escritorio: sin panel opaco tras arte');
   assert(state.scene.width>500,'el CRT de escritorio debe estar abierto');
   await screen.screenshot({path:'qa/screenshots/ui-lab-edge-desktop-'+id+'-'+variant+'.png'});
+ }
+
+
+ // REGRESIÓN VISUAL REAL: la prueba anterior sólo inspeccionaba CSS.
+ // Muestreamos píxeles de la captura que realmente ve el jugador,
+ // sin excepciones de lógica en el renderizador.
+ for(const [id,variant] of [['guardianes','b'],['booit','b'],['hipstermario','b'],['carton','e'],['versus','r']]){
+  await screen.evaluate(([design,v])=>{
+   const c=CB[design+'_'+v];if(!c)throw Error('Falta '+design+v);
+   hand=[{...c,_new:false,_dnew:false,_comp:false,_doneB:true}];
+   idx=0;showCard();
+  },[id,variant]);
+  await screen.waitForFunction(([design])=>{
+   const D=document.getElementById('disc'),im=D?.querySelector('.dx-art img');
+   return D.dataset.artId===design&&im?.complete&&im.naturalWidth>0
+     &&D.classList.contains('art-edge-extended');
+  },[id,variant],{timeout:12000});
+  await screen.waitForTimeout(850); // capturar estado estable, con animaciones habilitadas
+  const capture=await screen.screenshot({type:'png',
+    path:'qa/screenshots/ui-lab-visual-'+id+'-'+variant+'-desktop.png'});
+  const pixelCheck=await screen.evaluate(async encoded=>{
+   const D=document.getElementById('disc'),art=D.querySelector('.dx-art'),im=art.querySelector('img');
+   const sample=solidArtworkBackground(im);
+   const expected=sample?.match(/[0-9a-f]{2}/gi)?.map(x=>parseInt(x,16));
+   if(!expected)throw Error('El original no tiene color de fondo medible');
+   const snap=new Image();snap.src='data:image/png;base64,'+encoded;await snap.decode();
+   const canvas=document.createElement('canvas');canvas.width=snap.naturalWidth;canvas.height=snap.naturalHeight;
+   const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(snap,0,0);
+   const bounds=D.getBoundingClientRect(),left=Math.round(bounds.left),top=Math.round(bounds.top),
+     width=bounds.width,height=bounds.height;
+   const rgb=(x,y)=>Array.from(ctx.getImageData(Math.round(x),Math.round(y),1,1).data).slice(0,3);
+   const diff=(a,b)=>Math.max(...a.map((n,i)=>Math.abs(n-b[i])));
+   const outside=[rgb(left+12,top+150),rgb(left+width-12,top+150)];
+   // La estampa debe ser visible, no solamente estar cargada o tener opacity 1.
+   let marks=0,total=0;
+   for(let y=top+height*.19;y<top+height*.59;y+=4){
+    for(let x=left+width*.25;x<left+width*.75;x+=4){
+     total++;
+     if(diff(rgb(x,y),expected)>40)marks++;
+    }
+   }
+   return {mode:D.dataset.artBackgroundMode,color:sample,
+    artOpacity:getComputedStyle(art).opacity,
+    sideDifferences:outside.map(color=>diff(color,expected)),
+    activePixels:marks,total,activeRatio:marks/total};
+  },capture.toString('base64'));
+  assert.equal(pixelCheck.mode,'solid',id+'/'+variant+': debe detectar el fondo original');
+  assert.equal(pixelCheck.artOpacity,'1',id+'/'+variant+': el arte debe estar visible');
+  const maxSideDifference=variant==='b'?12:45;
+  assert(pixelCheck.sideDifferences.every(d=>d<=maxSideDifference),
+   id+'/'+variant+': recuadro todavía visible en captura: '+JSON.stringify(pixelCheck));
+  assert(pixelCheck.activeRatio>0.025,
+   id+'/'+variant+': la ilustración no aparece en los píxeles: '+JSON.stringify(pixelCheck));
+  console.log('✓ Arte visible y fondo continuo '+id+'/'+variant+' '+JSON.stringify(pixelCheck));
  }
  assert.deepEqual(desktopErrors,[],'sin errores del navegador en escritorio');
  console.log('✓ LAB escritorio 1280px: continuidad de fondo por muestreo para cinco cartas/variantes');
