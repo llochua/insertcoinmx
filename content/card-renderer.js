@@ -73,7 +73,7 @@
   }
   function layerImage(layers, url, x, y, options={}) {
     layers.push({type:'image',url,x,y,anchor:options.anchor||'start',
-      width:options.width||0,height:options.height||0});
+      width:options.width||0,height:options.height||0,tint:options.tint||null});
   }
   function splitRef(card) {
     const first=card.ref.trim(),second=(card.ref2||'').trim();
@@ -107,8 +107,8 @@
       layerText(layers,'POP',594,160,23.4,ink,{maxWidth:95});
       layerText(layers,popOf(options),909,209,74,ink,{maxWidth:270,align:'end'});
       const [r1,r2]=splitRef(card),offset=r2?28:0;
-      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',186,884);
-      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_goty.png',790,900+offset);
+      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',186,884,{tint:ink});
+      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_goty.png',790,900+offset,{tint:ink});
       layerImage(layers,rootPath+'cartas/plantillas/icono.png',125.5,929.5+offset,{anchor:'center'});
       layerText(layers,r1,193,926,49.2,ink,{maxWidth:590});
       if (r2) layerText(layers,r2,193,982,49.2,ink,{maxWidth:590});
@@ -150,6 +150,7 @@
     for (const lay of layers) {
       if (lay.type==='image') {
         const im=el('image',{href:lay.url,x:lay.x,y:lay.y,width:lay.width||1,height:lay.height||1});
+        if(lay.tint)im.style.filter='brightness(0)'; // piloto: revisar igualación exacta de tinta antes de publicar
         svg.appendChild(im);
         const probe=new Image();
         probe.onload=()=>{
