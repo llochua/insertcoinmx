@@ -25,6 +25,11 @@ css.textContent=`
 #${ID} h3{font:700 12px AV;color:#ffd400;margin:0 0 8px;min-height:18px}
 #${ID} .dyn-column>img{display:block;width:100%;aspect-ratio:960/1340;object-fit:contain;border-radius:4.6%}
 #${ID} .icmx-dynamic-card{width:100%}
+#${ID} .dyn-rarity-preview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0 16px}
+#${ID} .dyn-rarity-item{border:1px solid #ffffff33;border-radius:9px;padding:9px 4px;text-align:center;font-size:11px;background:#1e1935}
+#${ID} .dyn-rarity-item>svg{display:block;margin:0 auto 6px;width:72px;max-width:100%;height:22px}
+#${ID} .dyn-rarity-item[data-tier="f"]{border-color:#ffce34}
+#${ID} .dyn-rarity-item small{display:block;color:#aaa3ba}
 #${ID} .dyn-note{border:1px solid #4e496b;border-radius:9px;padding:10px;margin:12px 0 0;color:#d6d1e7;min-height:40px;font-size:12px}
 #${ID} .dyn-note[data-error="true"]{border-color:#df8395;color:#ffc3cd}
 @media(max-width:420px){#${ID} .dyn-fields{grid-template-columns:repeat(2,minmax(0,1fr))}#${ID} h3{font-size:10px}#${ID} .dyn-columns{gap:8px}}
@@ -47,6 +52,8 @@ container.innerHTML=`<div class="icmx-lab-inner">
 <label>Habilidad<input id="dynSkill" type="text" maxlength="200"></label>
 <label>Frase<input id="dynPhrase" type="text" maxlength="180"></label>
 </div>
+<p>Propuesta de jerarquía visual. Las estrellas antiguas de Holo y Dorada aún están impresas en los marcos y NO se taparán con parches.</p>
+<div class="dyn-rarity-preview" id="dynRarityPreview" aria-label="Jerarquía de rarezas propuesta"></div>
 <div class="dyn-columns">
 <div class="dyn-column"><h3>CARTA ACTUAL</h3><img id="dynOld" alt="Carta actual del laboratorio"></div>
 <div class="dyn-column"><h3>CARTA DINÁMICA</h3><div id="dynNew"></div></div>
@@ -54,6 +61,25 @@ container.innerHTML=`<div class="icmx-lab-inner">
 <div class="dyn-note" id="dynStatus" role="status"></div></div>`;
 document.body.appendChild(container);
 let byId={},fullTotal=0,loaded=false,lastFocus=null;
+function makeStar(cx,cy,radius=9) {
+  const P=5,inner=radius*.48,pts=[];
+  for(let i=0;i<P*2;i++){
+    const a=-Math.PI/2+Math.PI*i/P;
+    const r=i%2?inner:radius;
+    pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r].map(v=>v.toFixed(2)).join(','));
+  }
+  return '<polygon points="'+pts.join(' ')+'" fill="#ffd21f"/>';
+}
+function tierPreview(){
+  const labels=[['b','Base',0,10],['e','Holo',1,25],['r','Dorada',2,50],['f','Full',3,100]];
+  qs('dynRarityPreview').innerHTML=labels.map(([code,label,stars,pts])=>{
+    const shapes=stars?Array.from({length:stars},(_,j)=>makeStar(18+j*23,11)).join(''):
+      '<circle cx="18" cy="11" r="4" fill="#ffd21f"/>';
+    return '<div class="dyn-rarity-item" data-tier="'+code+'"><svg viewBox="0 0 82 22" aria-hidden="true">'+shapes+
+      '</svg><strong>'+label+'</strong><small>'+pts+' PTS</small></div>';
+  }).join('');
+}
+tierPreview();
 const fieldNames=['dynNumber','dynName','dynRef','dynSkill','dynPhrase'];
 const inputValue=(key,fallback)=>qs(key).value||fallback;
 function restoreDefaults(){
