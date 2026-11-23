@@ -5,6 +5,7 @@ on:
     paths:
       - 'qa/design-system/**'
       - 'qa/design-system-browsers.mjs'
+      - 'scripts/generate-artwork-backgrounds.py'
       - 'content/design-tokens.css'
       - 'content/ui-components.css'
       - 'content/ui-system.css'
@@ -32,6 +33,10 @@ jobs:
         run: |
           node --check qa/design-system/avatar-lab.js
           node --check qa/design-system-browsers.mjs
+      - name: Generar colores de fondo desde todos los archivos originales
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 scripts/generate-artwork-backgrounds.py --print
       - name: Instalar Playwright
         run: npm install --no-save --no-package-lock playwright@1.56.1
       - name: Chrome del runner, o Chromium si no está disponible
