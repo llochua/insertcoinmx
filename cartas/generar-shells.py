@@ -42,11 +42,19 @@ def vaciar_pie_inferior(marco):
 
     # Filas de fondo limpio, una por encima y otra por debajo del pie viejo.
     # Interpolación por columna: respeta la transición cromática de cada rareza.
-    upper = orig[y0 - 1, x0:x1].copy()
-    lower = orig[y1, x0:x1].copy()
+    # Promediar muestras vecinas y suavizarlas horizontalmente evita las
+    # rayas verticales que se produjeron al estirar una fila texturizada.
+    upper_raw = np.mean(orig[y0 - 5:y0, x0:x1], axis=0)
+    lower_raw = np.mean(orig[y1:y1 + 5, x0:x1], axis=0)
+    upper = cv2.GaussianBlur(upper_raw[None, :, :], (151, 1), 48)[0]
+    lower = cv2.GaussianBlur(lower_raw[None, :, :], (151, 1), 48)[0]
     t = ((np.arange(y0, y1, dtype=np.float32) - y0 + 1) /
          float(y1 - y0 + 1))[:, None, None]
     blank = upper[None, :, :] * (1 - t) + lower[None, :, :] * t
+    # Grano casi imperceptible y reproducible, similar al papel del marco.
+    noise = np.random.default_rng(20261123).normal(
+        0, 0.45, (y1 - y0, x1 - x0, 1)).astype(np.float32)
+    blank = np.clip(blank + noise, 0, 255)
 
     # El feather cae exclusivamente sobre fondo libre de tinta, lejos de
     # cualquier línea del pie antiguo (x>=47, y>=1232, x<=913, y<=1293).
