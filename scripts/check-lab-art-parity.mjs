@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-/* Design-system guard: production rendering must stay byte-for-byte aligned
-   with main. The LAB has ONE authorized exception: extend uniform artwork
-   backgrounds to the full discovery scene, with explicit browser regression QA.
-   No other artwork presentation changes are allowed. */
+/* Design-system guard: artwork rendering is owned by the existing main branch.
+   Keep the lab and this PR EXACTLY aligned with main's artwork CSS and logic.
+   No palette, image or background manipulation may enter the UI refactor. */
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
@@ -28,42 +27,11 @@ const regions=[
 ];
 for(const [name,a,b,after]of regions){
  const baseline=between(reference,a,b,after);
- // The design system and production code are never allowed to diverge.
- assert.equal(between(branch,a,b,after),baseline,name+' in main-based design system');
- const actual=between(lab,a,b,after);
- if(name==='Artwork placement and fade CSS'){
-  const permitted=`/* Un mismo color ocupa todo el descubrimiento cuando el arte tiene fondo sólido.
-   La ilustración conserva su encuadre original; nunca se usa cover para recortarla. */
-.disc.dx:not(.cov) .dx-art,
-.rh .dx-art{background:var(--bg)}
-`;
-  assert(actual.includes(permitted),'LAB must explicitly extend solid background to the art area');
-  assert.equal(actual.replace(permitted+String.fromCharCode(10),''),baseline,
-   'LAB artwork CSS differs beyond the approved solid-background rule');
- }else if(name==='Original sampling and color lookup'){
-  const seed=`// Primer fotograma coherente: Robogodín tiene orillas blancas (#fff).
-// Para el resto de fondos sólidos se detecta el color real del arte al cargar.
-AUTO_BG_COLORS.robogodin='#ffffff';`;
-  assert(actual.includes(seed),'LAB missing Robogodín white first-frame fallback');
-  assert(actual.includes('deviations[Math.floor(deviations.length*.90)]>26'),
-   'LAB must detect only uniform-color artwork');
-  assert(actual.includes("D.style.setProperty('--bg',color)"),
-   'LAB must match the entire discovery scene to detected artwork color');
-  let normalized=actual.replace('\n'+seed,'');
-  normalized=normalized.replace(
-    'const dcol=id=>AUTO_BG_COLORS[id]||RBG[id]||ICOL[id]||NEU;',
-    'const dcol=id=>RBG[id]||ICOL[id]||AUTO_BG_COLORS[id]||NEU;');
-  const oldFunctions=baseline.slice(baseline.indexOf('function bgFromArtwork(img){'));
-  const newFunctions=normalized.slice(normalized.indexOf('function bgFromArtwork(img){'));
-  assert(oldFunctions.startsWith('function bgFromArtwork(img){'),'missing baseline detection');
-  assert(newFunctions.startsWith('function bgFromArtwork(img){'),'missing LAB detection');
-  normalized=normalized.replace(newFunctions,oldFunctions);
-  assert.equal(normalized,baseline,
-   'LAB sampling differs beyond the allowed solid-background implementation');
- }else{
-  assert.equal(actual,baseline,name+' differs from main');
+ for(const [target,s] of [['design-system branch',branch],['isolated LAB',lab]]){
+  const actual=between(s,a,b,after);
+  assert.equal(actual,baseline,name+' in '+target+' differs from current main baseline. Do not change original art during UI refactor.');
  }
- console.log('OK · protected illustration contract: '+name);
+ console.log('OK · main matches PR and LAB: '+name);
 }
 for(const [name,s] of [['PR',branch],['LAB',lab]]){
   assert(!s.includes('content/artwork-background.js'),name+' unexpectedly references the abandoned art experiment');
@@ -71,4 +39,4 @@ for(const [name,s] of [['PR',branch],['LAB',lab]]){
 }
 assert(branch.includes('const PRUEBA=false;'),'Unlimited packs must never be enabled in production file');
 assert(lab.includes('const PRUEBA=true;'),'Unlimited packs belong only to the isolated lab');
-console.log('OK · only authorized LAB solid-background extension; unlimited packs stay isolated.');
+console.log('OK · art is untouched by UI changes; unlimited packs are lab-only.');
