@@ -225,6 +225,40 @@ try{
   assert(state.scene.width>500,'el CRT de escritorio debe estar abierto');
   await screen.screenshot({path:'qa/screenshots/ui-lab-edge-desktop-'+id+'-'+variant+'.png'});
  }
+
+ // Diagnóstico de las capturas reportadas: arte visible, CSS computado y captura.
+ for(const [id,variant] of [['guardianes','b'],['booit','b'],['hipstermario','b'],['carton','e'],['versus','r']]){
+  await screen.evaluate(([design,v])=>{
+   const c=CB[design+'_'+v];if(!c)throw Error('Falta '+design+v);
+   hand=[{...c,_new:false,_dnew:false,_comp:false,_doneB:true}];idx=0;showCard();
+  },[id,variant]);
+  await screen.waitForFunction(([design])=>{
+   const D=document.getElementById('disc'),im=D?.querySelector('.dx-art img');
+   return D?.dataset.artId===design&&im?.complete&&im.naturalWidth>0
+       &&D.classList.contains('art-edge-extended');
+  },[id,variant],{timeout:12000});
+  const snapshot=await screen.evaluate(()=>{
+   const D=document.getElementById('disc'),art=D.querySelector('.dx-art'),im=art?.querySelector('img'),
+    wrapper=im?.closest('.ab'),mv=im?.closest('.dx-mv');
+   const describe=el=>el?{
+    rect:el.getBoundingClientRect().toJSON(),background:getComputedStyle(el).background,
+    opacity:getComputedStyle(el).opacity,display:getComputedStyle(el).display,
+    visibility:getComputedStyle(el).visibility,transform:getComputedStyle(el).transform,
+    zIndex:getComputedStyle(el).zIndex
+   }:null;
+   return {id:D.dataset.artId,mode:D.dataset.artBackgroundMode,color:D.style.getPropertyValue('--bg'),
+    sampled:solidArtworkBackground(im),natural:[im.naturalWidth,im.naturalHeight],
+    D:describe(D),art:describe(art),img:describe(im),wrapper:describe(wrapper),mv:describe(mv),
+    fade:describe(D.querySelector('.dx-fade'))};
+  });
+  console.log('ART_DIAG '+id+'/'+variant+' '+JSON.stringify(snapshot));
+  const shot=await screen.screenshot({type:'jpeg',quality:45});
+  const data=shot.toString('base64');
+  console.log('ART_SHOT_START '+id+'/'+variant+' '+data.length);
+  for(let i=0;i<data.length;i+=9000)console.log('ART_SHOT '+id+'/'+variant+' '+i+' '+data.slice(i,i+9000));
+  console.log('ART_SHOT_END '+id+'/'+variant);
+ }
+
  assert.deepEqual(desktopErrors,[],'sin errores del navegador en escritorio');
  console.log('✓ LAB escritorio 1280px: continuidad de fondo por muestreo para cinco cartas/variantes');
  await desktop.close();
