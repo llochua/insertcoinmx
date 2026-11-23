@@ -68,9 +68,9 @@ test('rechaza ID, rareza y categoría desconocidos',()=>{
   assert.throws(()=>api.assertData({...sample,categoria:'HTML'},'b'),/Categoría/);
   assert.throws(()=>api.assertData({...sample,full:null},'f'),/Full/);
 });
-test('las fuentes anteriores y el código publicado no se modifican en este PR',()=>{
-  // Este test impide que la prueba se promueva accidentalmente desde la página QA.
-  const preview=fs.readFileSync(path.join(root,'qa/cards-dynamic-preview.html'),'utf8');
-  assert.match(preview,/ICMX_CARD_RENDERER\.create/);
-  assert.doesNotMatch(preview,/localStorage\.(setItem|removeItem|clear)/);
+test('motor aislado: no toca archivos de juego ni crea un laboratorio duplicado',()=>{
+  const renderer=fs.readFileSync(path.join(root,'content/card-renderer.js'),'utf8');
+  assert.doesNotMatch(renderer,/localStorage\\.(setItem|removeItem|clear)/);
+  assert.doesNotMatch(renderer,/supabase\\.co/);
+  assert.equal(fs.existsSync(path.join(root,'qa/cards-dynamic-preview.html')),false);
 });
