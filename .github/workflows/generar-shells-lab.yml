@@ -1,0 +1,63 @@
+name: LAB · generar bases de cartas dinámicas
+on:
+  push:
+    branches:
+      - feature/cartas-dinamicas-en-lab
+    paths:
+      - cartas/generar-shells.py
+      - content/card-renderer.js
+      - qa/design-system/card-dynamic-lab.js
+      - qa/design-system/index.html
+      - .github/workflows/generar-shells-lab.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cartas-dinamicas-lab
+  cancel-in-progress: false
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar dependencias del generador existente
+        run: python -m pip install pillow numpy opencv-python-headless
+      - name: Crear solamente las tres muestras del LAB
+        run: python cartas/generar-shells.py 1up sonic abuket
+      - name: Verificar archivos de cartas del LAB
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          ids=['1up','sonic','abuket']
+          files=[Path(folder)/(id + suffix + '.webp')
+              for folder in ('cs','cs2') for id in ids
+              for suffix in ('','_e','_r')]
+          files += [Path(folder)/('F_'+id+'.webp')
+              for folder in ('cs','cs2') for id in ('sonic','abuket')]
+          assert len(files)==22
+          for path in files:
+              assert path.is_file(), f'Falta: {path}'
+              with Image.open(path) as im:
+                  expected=(480,670) if path.parts[0]=='cs' else (960,1340)
+                  assert im.size==expected, (str(path), im.size, expected)
+          print('22 archivos de muestras, dimensiones válidas; biblioteca antigua intacta.')
+          PY
+      - name: Registrar solamente assets de demostración en la rama del LAB
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add cs cs2
+          if ! git diff --cached --quiet; then
+            git commit -m "test(lab): publicar 22 bases dinámicas para comparación visual"
+            git push
+          fi
