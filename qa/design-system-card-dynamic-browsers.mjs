@@ -57,7 +57,7 @@ try{
     await page.locator('#dynPop').fill(String(n));
     const text=page.locator('#dynNew text[data-icmx-field="pop"]');
     assert.equal(await text.textContent(),String(n));
-    const rect=await text.evaluate(el=>el.getBBox().toJSON());
+    const rect=await text.evaluate(el=>{const r=el.getBBox();return {x:r.x,y:r.y,width:r.width,height:r.height}});
     assert(rect.y>=120&&rect.y+rect.height<=227,
       'POP Base dentro del encabezado para '+n+': '+JSON.stringify(rect));
   }
@@ -111,7 +111,7 @@ try{
     await page.locator('#dynPop').fill(String(n));
     const text=page.locator('#dynNew text[data-icmx-field="pop"]');
     assert.equal(await text.textContent(),String(n));
-    const rect=await text.evaluate(el=>el.getBBox().toJSON());
+    const rect=await text.evaluate(el=>{const r=el.getBBox();return {x:r.x,y:r.y,width:r.width,height:r.height}});
     assert(rect.y>=915&&rect.y+rect.height<=1035,
       'POP Full fuera de GOTY para '+n+': '+JSON.stringify(rect));
   }
