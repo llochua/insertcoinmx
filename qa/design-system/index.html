@@ -3121,9 +3121,6 @@ function artBox(id,cls=''){const src=artOf(id),b=src.startsWith('d/')&&ABOX[id];
  let x0=0,y0=0,x1=1,y1=1;if(b){x0=Math.max(0,b[0]-m);y0=Math.max(0,b[1]-m*.8);x1=Math.min(1,b[2]+m);y1=Math.min(1,b[3]+m*.8)}
  const cw=x1-x0,ch=y1-y0,ratio=(cw*(src.startsWith('d/')?640:600))/(ch*(src.startsWith('d/')?800:900));
  return `<span class="ab ${cls}${hasCol(id)?'':' neu'}" style="--ar:${ratio.toFixed(3)}"><img src="${src}" alt="" loading="lazy" style="width:${(100/cw).toFixed(2)}%;left:${(-x0/cw*100).toFixed(2)}%;top:${(-y0/ch*100).toFixed(2)}%"></span>`}
-/* Color plano de las orillas del arte original. Mismo criterio de fondo_de()
-   usado por cartas/generar.py, a tamaño reducido para no procesar una imagen grande.
-   Solo se llama para los 21 diseños nuevos que no tienen color definido. */
 /* Fondo automático y universal del arte:
    El color nace de los píxeles del archivo, jamás de una lista de diseños.
    Muestreo de esquinas + perímetro, clúster predominante y mediana robusta. */
