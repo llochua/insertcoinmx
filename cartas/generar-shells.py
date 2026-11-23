@@ -31,7 +31,9 @@ def quitar_estrellas_impresas(marco, rareza):
     if rareza not in ("holo", "dorada"):
         return marco
     img = np.clip(marco, 0, 255).astype(np.uint8)
-    x0, y0, x1, y1 = 367, 1240, 492, 1297
+    # Zona exclusiva de estrellas: antes de la D de Dorada y sin tocar
+    # ni el divisor de la izquierda ni la línea inferior del pie.
+    x0, y0, x1, y1 = 355, 1246, 463, 1279
     zona = img[y0:y1, x0:x1].copy()
     gris = cv2.cvtColor(zona, cv2.COLOR_RGB2GRAY)
     # Tinta casi negra sobre fondos luminosos; conservar granos y tonos originales.
@@ -43,9 +45,37 @@ def quitar_estrellas_impresas(marco, rareza):
     return img.astype(np.float32)
 
 
+def quitar_sombra_numero(marco):
+    """Restaura la zona del número que YA venía emborronada en marco_*.png.
+
+    Síntesis a partir de las filas limpias de esa MISMA plantilla, por columna:
+    conserva el degradado horizontal en lugar de poner un parche uniforme.
+    La transición usa feather suave; NO toca "Carta", los divisores ni los bordes.
+    """
+    img = np.asarray(marco, dtype=np.float32).copy()
+    x0, x1 = 140, 264
+    y0, y1 = 1244, 1288
+    h, w = img.shape[:2]
+    assert w == 960 and h == 1340
+    sample_top = np.mean(img[1240:1245, x0:x1], axis=0)
+    sample_bottom = np.mean(img[1285:1289, x0:x1], axis=0)
+    ys = np.arange(y0, y1)[:, None, None].astype(np.float32)
+    t = np.clip((ys - y0) / float(y1 - y0 - 1), 0, 1)
+    smooth = sample_top[None,:,:] * (1 - t) + sample_bottom[None,:,:] * t
+    xx = np.arange(x0, x1, dtype=np.float32)
+    yy = np.arange(y0, y1, dtype=np.float32)
+    ax = np.minimum(np.clip((xx - 140) / 17, 0, 1),
+                    np.clip((263 - xx) / 17, 0, 1))
+    ay = np.minimum(np.clip((yy - 1244) / 12, 0, 1),
+                    np.clip((1287 - yy) / 9, 0, 1))
+    alpha = (ax[None, :] * ay[:, None])[:, :, None]
+    img[y0:y1, x0:x1] = img[y0:y1, x0:x1] * (1-alpha) + smooth*alpha
+    return img
+
+
 def imagen_base(d, rareza, plantillas):
     """Marco aprobado + arte original. SIN categoría, título, texto, POP, PTS ni número."""
-    salida = quitar_estrellas_impresas(plantillas["marco_" + rareza], rareza)
+    salida = quitar_sombra_numero(quitar_estrellas_impresas(plantillas["marco_" + rareza], rareza))
     arte = g.leer_arte(d["id"])
     x0, y0, x1, y1 = g.VENTANA
     dibujo = g.acomodar_arte(arte, x1-x0, y1-y0, g.MARGEN_ARTE)
