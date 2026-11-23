@@ -156,7 +156,10 @@
         const probe=new Image();
         probe.onload=()=>{
           const w=lay.width||probe.naturalWidth,h=lay.height||probe.naturalHeight;
-          if (lay.anchor==='center') im.setAttribute('x',lay.x-w/2);
+          if (lay.anchor==='center') {
+            im.setAttribute('x',lay.x-w/2);
+            im.setAttribute('y',lay.y-h/2);
+          }
           im.setAttribute('width',w);im.setAttribute('height',h);
         };
         probe.src=lay.url;
