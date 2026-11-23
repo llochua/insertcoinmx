@@ -1,0 +1,66 @@
+name: Protección de main · conservación
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conservacion:
+    name: Main · conservación sin reinicio
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Obtener código y referencia de main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar que el reinicio siga apagado
+        run: node --test qa/release-reset.test.mjs
+
+      - name: Comprobar inventario y contrato de publicación (solo lectura)
+        run: |
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+          const fs = require('node:fs');
+          const read = (p) => fs.readFileSync(p, 'utf8');
+          assert.equal(read('CNAME').trim(), 'insertcoinmx.com', 'No cambiar el dominio de producción por accidente');
+          const html = read('index.html');
+          assert.match(html, /release-reset\\.js[^>]*data-active="false"[^>]*data-game-epoch="public-2026-launch-v2"/,
+            'El reinicio del juego NO está autorizado');
+          const catalog = JSON.parse(read('cartas/catalogo.json'));
+          assert.ok(Array.isArray(catalog) && catalog.length >= 126,
+            'El inventario publicado no debe perder diseños');
+          const ids = catalog.map(card => card.id);
+          assert.equal(new Set(ids).size, ids.length, 'Hay IDs duplicados en el catálogo');
+          for(const p of [
+            'index.html', 'reta-diaria.js', 'cartas/catalogo.json',
+            'content/auth-account.js', 'content/cloud-sync.mjs',
+            'content/release-reset.js', 'content/community-ranking.mjs',
+            'content/card-texts.js'
+          ])assert.ok(fs.existsSync(p), 'Falta un módulo publicado: '+p);
+          for(const d of ['c','c2','d','fa','assets/avatars'])
+            assert.ok(fs.statSync(d).isDirectory(), 'Faltan ilustraciones o avatares: '+d);
+          console.log('PASS: dominio, reinicio desactivado, inventario y módulos esenciales.');
+          NODE
+
+      - name: Bloquear eliminaciones accidentales de ilustraciones y avatares
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          removed="$(git diff --name-only --diff-filter=D origin/main...HEAD -- c/ c2/ d/ fa/ assets/avatars/ cartas/catalogo.json index.html)"
+          if [ -n "$removed" ]; then
+            echo "::error::La PR elimina recursos publicados. Requiere un cambio deliberado y autorización expresa."
+            printf '%s\\n' "$removed"
+            exit 1
+          fi
+          echo "PASS: sin eliminación de ilustraciones, avatares ni archivos base."
