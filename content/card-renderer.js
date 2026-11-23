@@ -71,10 +71,11 @@
     layers.push({type:'text',text:String(text),x,y,size,color,
       maxWidth:options.maxWidth || 900,align:options.align || 'start',
       family:options.family || 'AV, "Avenir Next", sans-serif',
-      weight:options.weight || 700,italic:!!options.italic,spacing:options.spacing || 0});
+      weight:options.weight || 700,italic:!!options.italic,spacing:options.spacing || 0,
+      field:options.field||null,clipBox:options.clipBox||null});
   }
-  // Un solo vector reutilizable. La estrella de habilidad es de 4 puntas;
-  // la jerarquía de rareza usa 5 puntas. No usamos caracteres de fuente.
+  // Las estrellas de rareza son un sistema independiente del símbolo de habilidad.
+  // El ícono de habilidad representa energía/acción (rayo); nunca una estrella.
   function layerAbilityIcon(layers,cx,cy) {
     layers.push({type:'ability-icon',cx,cy});
   }
@@ -126,7 +127,9 @@
       layerImage(layers,pill,50,48);
       layerText(layers,card.nombre,84,151,60,ink,{maxWidth:455});
       layerText(layers,'POP',594,160,23.4,ink,{maxWidth:95});
-      layerText(layers,popOf(options),909,209,74,ink,{maxWidth:270,align:'end'});
+      // POP siempre dentro del encabezado (y=133–219): jamás invade el arte.
+      layerText(layers,popOf(options),909,135,74,ink,
+        {maxWidth:205,align:'end',field:'pop',clipBox:{x:699,y:132,width:214,height:88}});
       const [r1,r2]=splitRef(card),offset=r2?28:0;
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',186,884,{tint:ink,width:264,height:26});
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_goty.png',790,900+offset,{tint:ink,width:102,height:78});
@@ -138,13 +141,19 @@
         {maxWidth:800,family:'"Carlito", Arial, sans-serif',weight:400}));
       layerText(layers,card.frase,75,1132,29.7,ink,
         {maxWidth:620,family:'"Carlito", Arial, sans-serif',weight:400,italic:true});
-      layerText(layers,numLabel(card,variant,options),148,1250,23.4,ink,{maxWidth:200});
+      if(variant==='e')layerStar(layers,405,1271,12,5,ink);
+      if(variant==='r')[393,423].forEach(cx=>layerStar(layers,cx,1271,12,5,ink));
+      // Numeración exclusivamente en texto SVG sin fondo, máscara ni parche.
+      layerText(layers,numLabel(card,variant,options),148,1250,23.4,ink,
+        {maxWidth:206,field:'collection-number'});
       layerText(layers,'Valor '+pointsOf(variant,options),651,1250,23.4,ink,{maxWidth:194});
     } else {
       layerImage(layers,pill,32,30);
       layerText(layers,card.nombre,48,922,64,'#ffffff',{maxWidth:590});
       layerText(layers,'POP',910,892,21,'#ffffff',{align:'end',spacing:4});
-      layerText(layers,popOf(options),909,1011,79,'#ffffff',{align:'end',maxWidth:250});
+      // Full: bloque numérico encima de habilidad/GOTY, no a la altura de esa fila.
+      layerText(layers,popOf(options),909,924,79,'#ffffff',
+        {align:'end',maxWidth:230,field:'pop',clipBox:{x:665,y:922,width:249,height:100}});
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',48,1006,{tint:'#ffffff',width:264,height:26});
       layerStar(layers,62,1064,15,4);
       layerText(layers,(card.ref+' '+(card.ref2||'')).trim(),84,1050,38,'#ffd21f',{maxWidth:560});
@@ -171,11 +180,15 @@
       preserveAspectRatio:'xMidYMid meet','aria-hidden':'true'});
     for (const lay of layers) {
       if (lay.type==='ability-icon') {
-        // Misma silueta circular de habilidad, ahora 100 % SVG y nítida en móviles.
+        // Un rayo comunica HABILIDAD (acción); las estrellas se reservan para rareza.
         svg.appendChild(el('circle',{cx:lay.cx,cy:lay.cy,r:44,fill:'#f8f2eb',
           stroke:'#20191d','stroke-width':5}));
-        svg.appendChild(el('path',{d:starPath({cx:lay.cx,cy:lay.cy,radius:20,points:4}),
-          fill:'#20191d','data-icmx-ability-icon':'true'}));
+        svg.appendChild(el('path',{
+          d:'M -2 -27 L -19 2 H -4 L -12 27 L 22 -8 H 5 L 14 -27 Z',
+          fill:'#20191d',stroke:'#20191d','stroke-linejoin':'round',
+          transform:'translate('+lay.cx+' '+lay.cy+')',
+          'data-icmx-ability-icon':'zap'
+        }));
       } else if (lay.type==='star') {
         svg.appendChild(el('path',{d:starPath(lay),fill:lay.color,'data-icmx-star':lay.points,
           'aria-hidden':'true'}));
@@ -210,6 +223,14 @@
           'font-weight':lay.weight,'dominant-baseline':'hanging',
           'text-anchor':lay.align,'font-style':lay.italic?'italic':'normal',
           'letter-spacing':lay.spacing,fill:lay.color},lay.text);
+        if(lay.field)tx.setAttribute('data-icmx-field',lay.field);
+        if(lay.clipBox) {
+          const id='icmx-pop-clip-'+(++maskSequence),b=lay.clipBox;
+          const clip=el('clipPath',{id,clipPathUnits:'userSpaceOnUse'});
+          clip.appendChild(el('rect',{x:b.x,y:b.y,width:b.width,height:b.height}));
+          svg.appendChild(clip);
+          tx.setAttribute('clip-path','url(#'+id+')');
+        }
         svg.appendChild(tx);
         Promise.resolve(document.fonts && document.fonts.ready).then(()=>resizeText(tx,lay));
       }
