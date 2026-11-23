@@ -42,8 +42,8 @@ Se conservan las funciones originales `dcol`, `bgFromArtwork`, `resolveArtworkBa
 **Alcance: todos los diseños, sin excepciones por nombre.** La ilustración conserva su tamaño, proporciones y posición; el fondo original se extiende a todo el escenario. No es válido que el arte quede dentro de un rectángulo con un color distinto detrás.
 
 Implementación en \`qa/design-system/index.html\`:
-- Al cargarse la imagen, toma los píxeles del perímetro realmente visible del archivo.
-- Construye el fondo de todo el escenario por extensión de los cuatro bordes y las esquinas (9-slice). Un fondo plano se vuelve un color continuo; un fondo con degradado mantiene su continuidad; no se usa \`cover\` para ampliar o recortar la imagen original.
+- Al cargar cualquier imagen, detecta su **color sólido real** comparando las cuatro esquinas del archivo original. Si coinciden, utiliza ese color como fondo de todo el escenario; nunca depende de una lista de IDs.
+- Si el perímetro no es uniforme, prolonga los cuatro bordes y las esquinas de la imagen visible (9-slice) para preservar su continuidad, sin escalar ni recortar el arte original.
 - Opera sobre **Base, Holo y Dorada para cualquier ID**; Full usa su arte inmersivo original. El diseño no se rasteriza de nuevo y su \`img\` original permanece encima.
 - El proceso no depende de \`AUTO_BG_IDS\`, \`ICOL\`, \`RBG\`, \`ABOX\` ni colores asignados manualmente para elegir el fondo. El encuadre existente de \`ABOX\` se respeta sin alterar la imagen.
 - Al cambiar de carta o de dimensiones de pantalla se recalcula el fondo; también en la vista ampliada.
