@@ -1,7 +1,10 @@
 \set ON_ERROR_STOP on
 -- Only run in an ephemeral PostgreSQL database; never against the live project.
-CREATE ROLE anon NOLOGIN;
-CREATE ROLE authenticated NOLOGIN;
+-- Roles PostgreSQL compartidos por las dos bases desechables del mismo cluster.
+DO $qa$ BEGIN CREATE ROLE anon NOLOGIN;
+ EXCEPTION WHEN duplicate_object THEN NULL; END $qa$;
+DO $qa$ BEGIN CREATE ROLE authenticated NOLOGIN;
+ EXCEPTION WHEN duplicate_object THEN NULL; END $qa$;
 CREATE SCHEMA auth;
 CREATE TABLE auth.users(id uuid PRIMARY KEY);
 CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$SELECT nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
