@@ -56,6 +56,11 @@ test('BONUS no tiene número ni total de álbum',()=>{
   const a=api.makeLayers(bonus,'b',{assetRoot:'../'});
   assert.ok(a.some(x=>x.text==='BONUS'));
 });
+test('el icono de habilidad estándar es vectorial, sin imagen PNG',()=>{
+  const layers=api.makeLayers(sample,'b',{});
+  assert.equal(layers.filter(x=>x.type==='ability-icon').length,1);
+  assert(!layers.some(x=>x.type==='image'&&/icono\\.png/.test(x.url)));
+});
 test('jerarquía vectorial Full: 1 símbolo de habilidad y 3 estrellas de rareza',()=>{
   const layers=api.makeLayers(sample,'f',{fullTotal:74});
   const symbols=layers.filter(x=>x.type==='star');
