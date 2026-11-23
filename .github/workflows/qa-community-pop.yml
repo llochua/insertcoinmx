@@ -33,6 +33,12 @@ jobs:
         env:
           PGPASSWORD: ranking-test-only
         run: psql -h localhost -U postgres -d ranking_test -v ON_ERROR_STOP=1 -f qa/community-pop-isolated.sql
+      - name: Invitados verificados · gate cerrado, voto, límites y Reta aislados
+        env:
+          PGPASSWORD: ranking-test-only
+        run: |
+          createdb -h localhost -U postgres guest_vote_test
+          psql -h localhost -U postgres -d guest_vote_test -v ON_ERROR_STOP=1 -f qa/community-guest-ratings-isolated.sql
       - name: Instalar Chromium para las dos sesiones de prueba
         run: |
           npm install --no-save playwright@1.56.1
