@@ -25,7 +25,7 @@ const url='http://127.0.0.1:'+server.address().port+'/qa/design-system/';
 const browser=await chromium.launch({headless:true});
 await mkdir('qa/screenshots',{recursive:true});
 try{
- for(const [width,height] of [[390,844],[1280,850]]){
+ for(const [width,height] of [[320,640],[390,844],[1280,850]]){
   const context=await browser.newContext({viewport:{width,height},reducedMotion:'reduce'});
   const page=await context.newPage(),errors=[],external=[];
   page.on('pageerror',error=>errors.push(error.message));
@@ -51,6 +51,16 @@ try{
   assert.equal(await page.locator('#dynNew .icmx-data path[data-icmx-ability-icon="zap"]').count(),1,
     'habilidad usa rayo vectorial, no estrellas');
   assert.equal(await page.locator('#icmxDynamicLab .dyn-note[data-error="true"]').count(),0);
+  assert.equal(await page.locator('#dynNumber').inputValue(),'001/???',
+    'el LAB presenta numeración abierta sin cambiar el catálogo persistente');
+  for(const n of [7,26,143]){
+    await page.locator('#dynPop').fill(String(n));
+    const text=page.locator('#dynNew text[data-icmx-field="pop"]');
+    assert.equal(await text.textContent(),String(n));
+    const rect=await text.evaluate(el=>el.getBBox().toJSON());
+    assert(rect.y>=120&&rect.y+rect.height<=227,
+      'POP Base dentro del encabezado para '+n+': '+JSON.stringify(rect));
+  }
   let before=await page.locator('#dynNew .icmx-shell').getAttribute('src');
   await page.locator('#dynNumber').fill('001/250');
   await page.locator('#dynPoints').fill('75');
@@ -97,6 +107,14 @@ try{
   const popFull=page.locator('#dynNew text[data-icmx-field="pop"]');
   assert.match(await popFull.getAttribute('clip-path'),/url\(#icmx-pop-clip-/);
   assert.equal(await popFull.getAttribute('y'),'924','Full POP arriba de GOTY');
+  for(const n of [7,26,143]){
+    await page.locator('#dynPop').fill(String(n));
+    const text=page.locator('#dynNew text[data-icmx-field="pop"]');
+    assert.equal(await text.textContent(),String(n));
+    const rect=await text.evaluate(el=>el.getBBox().toJSON());
+    assert(rect.y>=915&&rect.y+rect.height<=1035,
+      'POP Full fuera de GOTY para '+n+': '+JSON.stringify(rect));
+  }
   assert.equal(await page.locator('#dynNew .icmx-data text').filter({hasText:'★★'}).count(),0,
     'ninguna estrella Full se dibuja como carácter tipográfico');
   assert.deepEqual(errors,[],'sin errores del navegador');
