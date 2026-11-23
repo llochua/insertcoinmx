@@ -205,7 +205,7 @@ try{
   await page.evaluate(([id,v])=>{
    const card=CB[id+'_'+v];
    if(!card)throw Error('No existe '+id+'/'+v);
-   document.querySelectorAll('.crt > .screen.on').forEach(el=>el.classList.remove('on'));
+   document.querySelectorAll('.crt > section.on').forEach(el=>el.classList.remove('on'));
    document.getElementById('pack').classList.add('on');
    hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
    idx=0;showCard();
@@ -217,6 +217,7 @@ try{
    const expected=bgFromArtwork(im),actual=D.style.getPropertyValue('--bg');
    return expected&&actual&&Math.max(...rgb(expected).map((v,i)=>Math.abs(v-rgb(actual)[i])))<=3;
   },design,{timeout:10000});
+  await page.locator('#disc').waitFor({state:'visible'});
   await page.waitForTimeout(750);
   return await page.evaluate(()=>{
    const D=document.getElementById('disc'),im=D.querySelector('.dx-art img'),art=D.querySelector('.dx-art');
