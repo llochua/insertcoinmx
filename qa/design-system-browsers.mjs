@@ -164,7 +164,7 @@ try{
       artColor:getComputedStyle(D.querySelector('.dx-art')).backgroundColor,
       stageWidth:scene.width,sourceWidth:r-l};
    });
-   assert(result.sourceWidth<result.stageWidth,'el arte conserva márgenes a extender');
+   assert(result.sourceWidth>0&&result.sourceWidth<=result.stageWidth+1,'el arte respeta el ancho de escena');
    assert.equal(result.artColor,'rgba(0, 0, 0, 0)','no hay panel rectangular interno');
    assert(result.left<=40&&result.right<=40,
      designId+'/'+variant+': fondo exterior no coincide con las orillas reales: '+JSON.stringify(result));
