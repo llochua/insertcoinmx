@@ -21,16 +21,18 @@ const region=(html,begin,end)=>{
  assert(a>=0&&b>a,'No se encontró región compartida '+begin);
  return html.slice(a,b);
 };
+/* Conservar arte, colocación y CSS originales; el fondo en LAB ahora
+   se mide del archivo y NO se compara con la paleta manual de main. */
 for(const [begin,end] of [
- ['const dcol=id=>','const icAwardsSeen='],
  ['.disc.dx{background:var(--bg)}','.dx-top{position:'],
- [' const art=fa?',' D.className='+'\`disc on dx'],
+ [' const art=fa?',' D.className='+String.fromCharCode(96)+'disc on dx'],
 ]){
  assert.equal(region(LAB_HTML,begin,end),region(MAIN_HTML,begin,end),
-  'El laboratorio debe conservar EXACTAMENTE el motor de arte de main: '+begin);
+  'La colocación del arte de LAB debe seguir main: '+begin);
 }
-assert(!LAB_HTML.includes('extendArtworkEdges('),'No conservar renderizadores experimentales en Lab');
-assert(LAB_HTML.includes(' resolveArtworkBackground(d,D);'),'El LAB debe invocar la función original de main');
+assert(LAB_HTML.includes('const color=bgFromArtwork(im);'),'Falta muestreo universal');
+assert(LAB_HTML.includes('D.style.backgroundColor=color'),'El fondo no ocupa toda la escena');
+assert(!LAB_HTML.includes('extendArtworkEdges('),'Eliminar extensiones experimentales');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript','.mjs':'text/javascript',
  '.css':'text/css','.json':'application/json','.png':'image/png','.webp':'image/webp',
  '.svg':'image/svg+xml','.woff':'font/woff','.woff2':'font/woff2','.ttf':'font/ttf'};
@@ -182,103 +184,77 @@ try{
  }
 
 
- // Comparación en navegador REAL de main vs LAB, misma pantalla y mismos
- // archivos: cada prueba guarda captura de ambas implementaciones.
+ // Auditar el renderizador sobre TODAS las cartas con arte disponible.
+ // Nada de aprobar el motor por una selección pequeña de cartas.
  const desktop=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'no-preference'});
- const lab=await desktop.newPage();
- const main=await desktop.newPage();
- const desktopErrors=[];
- lab.on('pageerror',error=>desktopErrors.push('LAB '+error.message));
- await Promise.all([
-  lab.goto(LAB_URL,{waitUntil:'domcontentloaded'}),
-  main.goto('http://127.0.0.1:'+server.address().port+'/qa-main-reference.html',{waitUntil:'domcontentloaded'})
- ]);
- await lab.locator('#icmxLabToggle').click();
- await lab.locator('[data-lab-action="pack"]').click();
- await lab.locator('#pack.on').waitFor({state:'visible'});
- const cases=[
-  ['oneplayer','b'],['continuara','b'],['booit','b'],['hipstermario','b'],
-  ['carton','b'],['carton','e'],['guardianes','b'],['versus','r'],
-  ['sonic','b'],['evilexes','b'],['karma','e']
- ];
- async function render(page,design,variant){
-  await page.evaluate(([id,v])=>{
-   const card=CB[id+'_'+v];
-   if(!card)throw Error('No existe '+id+'/'+v);
-   document.querySelectorAll('.crt > section.on').forEach(el=>el.classList.remove('on'));
-   document.getElementById('pack').classList.add('on');
+ const screen=await desktop.newPage(),desktopErrors=[];
+ screen.on('pageerror',error=>desktopErrors.push(error.message));
+ await screen.goto(LAB_URL,{waitUntil:'domcontentloaded'});
+ await screen.locator('#icmxLabToggle').click();
+ await screen.locator('[data-lab-action="pack"]').click();
+ await screen.locator('#pack.on').waitFor({state:'visible'});
+ const ids=await screen.evaluate(()=>DESIGNS.map(d=>d.id));
+ const tested=[],missing=[],variants={b:0,e:0,r:0};
+ const samples=new Set(['jokers/b','friendzone/e','oneplayer/b','continuara/b','booit/b',
+  'hipstermario/b','guardianes/b','evilexes/b','sonic/b','carton/e','karma/r']);
+ for(const id of ids)for(const v of ['b','e','r']){
+  const state=await screen.evaluate(async ([design,variant])=>{
+   const card=CB[design+'_'+variant];
+   if(!card)return {skip:'no-card'};
    hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
    idx=0;showCard();
-  },[design,variant]);
-  await page.waitForFunction(id=>{
-   const D=document.getElementById('disc'),im=D?.querySelector('.dx-art img');
-   if(!D||D.dataset.artId!==id||!im?.naturalWidth)return false;
-   const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
-   const expected=bgFromArtwork(im),actual=D.style.getPropertyValue('--bg');
-   return expected&&actual&&Math.max(...rgb(expected).map((v,i)=>Math.abs(v-rgb(actual)[i])))<=3;
-  },design,{timeout:10000});
-  await page.locator('#disc').waitFor({state:'visible'});
-  // El motor original anima la entrada; inspeccionar sólo tras su finalización.
-  await page.waitForFunction(()=>{
-   const art=document.querySelector('#disc .dx-art');
-   return art&&Number(getComputedStyle(art).opacity)>.99;
-  },null,{timeout:5000});
-  return await page.evaluate(()=>{
-   const D=document.getElementById('disc'),im=D.querySelector('.dx-art img'),art=D.querySelector('.dx-art');
-   return {measured:bgFromArtwork(im),actual:D.style.getPropertyValue('--bg'),
-    background:getComputedStyle(D).backgroundColor,artOpacity:getComputedStyle(art).opacity,
-    imageSize:[im.naturalWidth,im.naturalHeight],
-    viewport:[D.getBoundingClientRect().width,D.getBoundingClientRect().height]};
-  });
- }
- for(const [id,v] of cases){
-  const fromMain=await render(main,id,v);
-  const fromLab=await render(lab,id,v);
-  assert.equal(fromLab.background,fromMain.background,
-    id+'/'+v+': color visible de LAB distinto de main');
-  assert.equal(fromLab.measured,fromMain.measured,
-    id+'/'+v+': fondo fuente distinto de main');
-  assert(Number(fromLab.artOpacity)>.99,id+'/'+v+': ilustración no visible en LAB, opacidad='+fromLab.artOpacity);
-  const mainCapture=await main.screenshot({path:'qa/screenshots/ui-lab-compare-main-'+id+'-'+v+'.png'});
-  const labCapture=await lab.screenshot({path:'qa/screenshots/ui-lab-compare-lab-'+id+'-'+v+'.png'});
-  // Comparación del RESULTADO VISIBLE, no sólo de los estilos.
-  // Muestrea el exterior izquierdo/derecho del arte donde aparecían recuadros.
-  async function capturePixels(page,png){
-   return page.evaluate(async base64=>{
-    const D=document.getElementById('disc'),bounds=D.getBoundingClientRect();
-    const im=new Image();im.src='data:image/png;base64,'+base64;await im.decode();
-    const cv=document.createElement('canvas');cv.width=im.width;cv.height=im.height;
-    const ctx=cv.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);
-    const get=(x,y)=>Array.from(ctx.getImageData(Math.round(bounds.x+bounds.width*x),
-     Math.round(bounds.y+bounds.height*y),1,1).data).slice(0,3);
-    return [get(.08,.16),get(.92,.16),get(.08,.25),get(.92,.25)];
-   },png.toString('base64'));
+   const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
+   if(!im)return {skip:'no-illustration'};
+   if(!im.complete)await new Promise(resolve=>{
+    im.addEventListener('load',resolve,{once:true});
+    im.addEventListener('error',resolve,{once:true});
+    setTimeout(resolve,6500);
+   });
+   if(!im.naturalWidth)return {skip:'missing-file'};
+   // El listener del motor se registró ANTES de esta espera.
+   await Promise.resolve();
+   const expected=bgFromArtwork(im);
+   const actual=D.style.getPropertyValue('--bg');
+   const bg=getComputedStyle(D).backgroundColor;
+   const artColor=getComputedStyle(D.querySelector('.dx-art')).backgroundColor;
+   const rgb=hex=>hex&&hex.length===7?[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)):null;
+   const difference=(a,b)=>Math.max(...a.map((x,i)=>Math.abs(x-b[i])));
+   const fromCss=bg.match(/[\d.]+/g)?.slice(0,3).map(Number);
+   const scene=D.getBoundingClientRect();
+   return {id:design,variant,status:D.dataset.artBgStatus,expected,actual,bg,artColor,
+    computedDiff:expected&&fromCss?difference(rgb(expected),fromCss):null,
+    sceneWidth:scene.width,sceneHeight:scene.height,
+    artVisible:Number(getComputedStyle(D.querySelector('.dx-art')).opacity)};
+  },[id,v]);
+  if(state.skip){if(state.skip==='missing-file')missing.push(id+'/'+v);continue}
+  const key=id+'/'+v;
+  assert(state.expected&&state.actual===state.expected,
+   key+': el fondo no coincide con los píxeles originales '+JSON.stringify(state));
+  assert.equal(state.status,'sampled',key+': muestreo no aplicado');
+  assert(state.computedDiff<=2,key+': CSS del fondo no coincide con la imagen');
+  assert(state.sceneWidth>500&&state.sceneHeight>500,key+': visor oculto');
+  assert.equal(state.artColor,state.bg,key+': capa de arte y escenario tienen fondos distintos');
+  tested.push(key);variants[v]++;
+  if(samples.has(key)){
+   await screen.waitForTimeout(800);
+   const shot=await screen.screenshot({type:'png',
+     path:'qa/screenshots/ui-lab-universal-'+id+'-'+v+'.png'});
+   if(key==='jokers/b'||key==='friendzone/e'){
+    const b64=shot.toString('base64');
+    console.log('ART_SHOT_BEGIN '+key+' '+b64.length);
+    for(let pos=0;pos<b64.length;pos+=9000)
+     console.log('ART_SHOT '+key+' '+pos+' '+b64.slice(pos,pos+9000));
+    console.log('ART_SHOT_END '+key);
+   }
   }
-  const mainPixels=await capturePixels(main,mainCapture);
-  const labPixels=await capturePixels(lab,labCapture);
-  const delta=(a,b)=>Math.max(...a.map((n,i)=>Math.abs(n-b[i])));
-  // Holo y Dorada tienen material animado; la fase de brillo puede variar
-  // entre las dos páginas aun con motor idéntico. Base sí se compara píxel a píxel.
-  if(v==='b')for(let i=0;i<mainPixels.length;i++)
-   assert(delta(mainPixels[i],labPixels[i])<=12,
-    id+'/'+v+': píxeles visibles de Lab distintos de main: '+JSON.stringify({i,main:mainPixels[i],lab:labPixels[i]}));
-  // Los fondos planos deben coincidir con el original incluso FUERA del dibujo.
-  if(v==='b'&&['oneplayer','continuara','booit','hipstermario','carton','guardianes'].includes(id)){
-   const rgb=[1,3,5].map(i=>parseInt(fromMain.measured.slice(i,i+2),16));
-   for(let i=0;i<labPixels.length;i++)
-    assert(delta(rgb,labPixels[i])<=14,
-     id+'/'+v+': rectángulo visible (fondo de imagen y escenario no continúan)');
-  }
-  console.log('✓ MAIN = LAB (CSS + píxeles) '+id+'/'+v,JSON.stringify({background:fromMain.background,pixels:labPixels}));
  }
- // Verificación de COBERTURA: no se aprueba el motor si quedan diseños fuera.
- const entireCatalog=await lab.evaluate(()=>{
-  const supported=new Set([...Object.keys(RBG),...Object.keys(ICOL),...AUTO_BG_IDS]);
-  return {count:DESIGNS.length,missing:DESIGNS.map(d=>d.id).filter(id=>!supported.has(id))};
- });
- assert.deepEqual(entireCatalog.missing,[],'Todo diseño de main debe tener un fondo respaldado');
- console.log('✓ Cobertura heredada de main: '+entireCatalog.count+' diseños');
- assert.deepEqual(desktopErrors,[],'sin errores de navegador LAB');
+ assert(tested.length>=100,'Se deben probar al menos 100 cartas reales del catálogo');
+ assert(variants.b>=85,'Cobertura insuficiente de diseños Base');
+ assert(variants.e>0&&variants.r>0,'Faltan pruebas Holo o Dorada');
+ assert.deepEqual(missing,[],'Hay ilustraciones faltantes en cartas que declaran arte');
+ assert.deepEqual(desktopErrors,[],'Errores en navegador de Lab');
+ console.log('✓ FONDO UNIVERSAL REAL: '+tested.length+' variantes / '+ids.length+
+  ' diseños de catálogo, Base '+variants.b+', Holo '+variants.e+', Dorada '+variants.r);
  await desktop.close();
 }finally{
  await browser.close();
