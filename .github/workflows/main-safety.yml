@@ -35,7 +35,7 @@ jobs:
           const read = (p) => fs.readFileSync(p, 'utf8');
           assert.equal(read('CNAME').trim(), 'insertcoinmx.com', 'No cambiar el dominio de producción por accidente');
           const html = read('index.html');
-          assert.match(html, /release-reset\\.js[^>]*data-active="false"[^>]*data-game-epoch="public-2026-launch-v2"/,
+          assert.match(html, /release-reset\.js[^>]*data-active="false"[^>]*data-game-epoch="public-2026-launch-v2"/,
             'El reinicio del juego NO está autorizado');
           const catalog = JSON.parse(read('cartas/catalogo.json'));
           assert.ok(Array.isArray(catalog) && catalog.length >= 126,
@@ -60,7 +60,7 @@ jobs:
           removed="$(git diff --name-only --diff-filter=D origin/main...HEAD -- c/ c2/ d/ fa/ assets/avatars/ cartas/catalogo.json index.html)"
           if [ -n "$removed" ]; then
             echo "::error::La PR elimina recursos publicados. Requiere un cambio deliberado y autorización expresa."
-            printf '%s\\n' "$removed"
+            printf '%s\n' "$removed"
             exit 1
           fi
           echo "PASS: sin eliminación de ilustraciones, avatares ni archivos base."
