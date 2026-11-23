@@ -72,6 +72,7 @@ jobs:
           node --test qa/community-ranking.test.mjs
           node --test qa/value-screens.test.mjs
           node --test qa/card-renderer.test.mjs
+          node --test qa/card-data-adapter.test.mjs
           node --test qa/summary-story-cues.test.mjs
           node - <<'NODE'
           const fs = require('node:fs');
