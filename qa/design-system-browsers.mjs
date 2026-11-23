@@ -40,6 +40,7 @@ try{
   },sentinel);
   const page=await context.newPage(),errors=[],unexpectedRemote=[];
   page.on('pageerror',err=>errors.push(err.message));
+  page.on('console',message=>{if(message.type()==='warning'||message.type()==='error')console.log('BROWSER '+message.type()+': '+message.text())});
   await context.route(/https?:\/\/[^/]*supabase\.co\//,route=>{
    unexpectedRemote.push(route.request().url());return route.abort();
   });
@@ -124,6 +125,14 @@ try{
     hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
     idx=0;showCard();
    },[designId,variant]);
+   await page.waitForTimeout(400);
+   console.log('EDGE DEBUG '+designId+'/'+variant,JSON.stringify(await page.evaluate(()=>{
+    const D=document.getElementById('disc'),im=D?.querySelector('.dx-art img');
+    return {id:D?.dataset.artId,classes:D?.className,background:D?.style.backgroundImage.slice(0,90),
+      image:im?.getAttribute('src'),loaded:im?.complete,naturalWidth:im?.naturalWidth,
+      scene:D?.getBoundingClientRect().toJSON(),imageRect:im?.getBoundingClientRect().toJSON(),
+      hasRenderer:typeof D?._refreshEdgeBackdrop};
+   })));
    await page.waitForFunction(([id])=>{
     const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
     return D.dataset.artId===id&&!!im?.naturalWidth
