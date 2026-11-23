@@ -71,10 +71,13 @@ No subirlas ni habilitar el nuevo renderizador hasta aprobar la paridad visual.<
     node.querySelector('img').addEventListener('error',()=>{
       $('status').textContent='Faltan los archivos cs/cs2. Ejecuta primero el generador local.';});
   }
-  for(const id of ['design','variant','points','pop','name','ability','number'])
+  for(const id of ['design','points','pop','name','ability','number'])
     $(id).addEventListener('input',render);
   $('variant').addEventListener('change',()=>{
-    const map={b:10,e:25,r:50,f:100};$('points').value=map[$('variant').value];});
+    const map={b:10,e:25,r:50,f:100};
+    $('points').value=map[$('variant').value];
+    render();
+  });
   await document.fonts.ready;render();
 })().catch(e=>document.getElementById('status').textContent=e.message);
 </script>
