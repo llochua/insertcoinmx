@@ -73,6 +73,22 @@
       family:options.family || 'AV, "Avenir Next", sans-serif',
       weight:options.weight || 700,italic:!!options.italic,spacing:options.spacing || 0});
   }
+  // Un solo vector reutilizable. La estrella de habilidad es de 4 puntas;
+  // la jerarquía de rareza usa 5 puntas. No usamos caracteres de fuente.
+  function layerStar(layers, cx, cy, radius, points=5, color='#ffd21f') {
+    layers.push({type:'star',cx,cy,radius,points,color});
+  }
+  function starPath(lay) {
+    const inner=lay.radius*(lay.points===4?0.25:0.48);
+    let path='';
+    for(let k=0;k<lay.points*2;k++) {
+      const a=-Math.PI/2+Math.PI*k/lay.points;
+      const r=k%2?inner:lay.radius;
+      const x=lay.cx+Math.cos(a)*r, y=lay.cy+Math.sin(a)*r;
+      path+=(k?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)+' ';
+    }
+    return path+'Z';
+  }
   function layerImage(layers, url, x, y, options={}) {
     layers.push({type:'image',url,x,y,anchor:options.anchor||'start',
       width:options.width||0,height:options.height||0,tint:options.tint||null});
@@ -127,13 +143,14 @@
       layerText(layers,'POP',910,892,21,'#ffffff',{align:'end',spacing:4});
       layerText(layers,popOf(options),909,1011,79,'#ffffff',{align:'end',maxWidth:250});
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',48,1006,{tint:'#ffffff',width:264,height:26});
-      layerText(layers,'✦',62,1052,37,'#ffd21f',{maxWidth:60,align:'middle'});
+      layerStar(layers,62,1064,15,4);
       layerText(layers,(card.ref+' '+(card.ref2||'')).trim(),84,1050,38,'#ffd21f',{maxWidth:560});
       layerText(layers,'— GOTY',910,1050,38,'#ffd21f',{align:'end',maxWidth:210});
       layerText(layers,card.frase,78,1145,30,'#191200',
         {maxWidth:800,family:'"Carlito", Arial, sans-serif',weight:400});
       layerText(layers,'Carta '+numLabel(card,variant,options),48,1262,23.4,'#ffffff',{maxWidth:270});
-      layerText(layers,'★★ Arte Especial',508,1262,23.4,'#ffffff',{align:'middle',maxWidth:300});
+      [374,396,418].forEach(cx=>layerStar(layers,cx,1274,11,5));
+      layerText(layers,'Arte Especial',552,1262,23.4,'#ffffff',{align:'middle',maxWidth:205});
       layerText(layers,'Valor '+pointsOf(variant,options),912,1262,23.4,'#ffffff',
         {align:'end',maxWidth:230});
     }
@@ -150,7 +167,10 @@
     const svg=el('svg',{viewBox:'0 0 960 1340',class:'icmx-data',
       preserveAspectRatio:'xMidYMid meet','aria-hidden':'true'});
     for (const lay of layers) {
-      if (lay.type==='image') {
+      if (lay.type==='star') {
+        svg.appendChild(el('path',{d:starPath(lay),fill:lay.color,'data-icmx-star':lay.points,
+          'aria-hidden':'true'}));
+      } else if (lay.type==='image') {
         if(lay.tint) {
           // Archivos etiqueta_*.png son máscaras de luminancia (gris), NO PNG transparentes.
           // Rasterizar directamente el archivo añadiría un bloque negro al marco.
