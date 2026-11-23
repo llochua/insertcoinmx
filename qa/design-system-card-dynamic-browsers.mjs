@@ -44,6 +44,20 @@ try{
     const images=[document.querySelector('#dynOld'),document.querySelector('#dynNew .icmx-shell')];
     return images.every(x=>x?.complete&&x.naturalWidth>0);
   });
+  // Comprobar los PÍXELES del shell, no solamente las capas SVG.
+  // El antiguo pie tenía bordes/trazos oscuros en todo este rectángulo.
+  const shellInk=await page.evaluate(()=>{
+    const im=document.querySelector('#dynNew .icmx-shell');
+    const cv=document.createElement('canvas');cv.width=960;cv.height=1340;
+    const ctx=cv.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(im,0,0,960,1340);
+    const pixels=ctx.getImageData(43,1232,875,62).data;
+    let dark=0;
+    for(let i=0;i<pixels.length;i+=4)
+      if(pixels[i]<85&&pixels[i+1]<85&&pixels[i+2]<85)dark++;
+    return dark;
+  });
+  assert.equal(shellInk,0,'ningún borde anterior puede quedar bajo la placa SVG');
   const plate=page.locator('#dynNew .icmx-data rect[data-icmx-footer-plate="true"]');
   assert.equal(await plate.count(),1,'una sola placa continua bajo número, rareza y valor');
   const plateBounds=await plate.evaluate(el=>{const r=el.getBBox();return {x:r.x,y:r.y,width:r.width,height:r.height}});
