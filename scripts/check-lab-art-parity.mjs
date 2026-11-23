@@ -32,6 +32,11 @@ for(const [label,start,end,after] of regions){
   const a=inLab.indexOf(functionStart),b=original.indexOf(functionStart);
   assert(a>0&&b>0,'Missing original/artwork sampler');
   const labConfig=inLab.slice(0,a)
+   .replace(/^const ART_BG_GENERATED=.*\n/m,'')
+   .replace('const dcol=id=>AUTO_BG_COLORS[id]||ART_BG_GENERATED[id]||RBG[id]||ICOL[id]||NEU;',
+            'const dcol=id=>RBG[id]||ICOL[id]||AUTO_BG_COLORS[id]||NEU;')
+   .replace('const hasCol=id=>!!(ART_BG_GENERATED[id]||RBG[id]||ICOL[id]||AUTO_BG_IDS.has(id));',
+            'const hasCol=id=>!!(RBG[id]||ICOL[id]||AUTO_BG_IDS.has(id));')
    .replace('const dcol=id=>AUTO_BG_COLORS[id]||RBG[id]||ICOL[id]||NEU;',
             'const dcol=id=>RBG[id]||ICOL[id]||AUTO_BG_COLORS[id]||NEU;')
    .replace("/* Fondo automático y universal del arte:\n   El color nace de los píxeles del archivo, jamás de una lista de diseños.\n   Muestreo de esquinas + perímetro, clúster predominante y mediana robusta. */\n","/* Color plano de las orillas del arte original. Mismo criterio de fondo_de()\n   usado por cartas/generar.py, a tamaño reducido para no procesar una imagen grande.\n   Solo se llama para los 21 diseños nuevos que no tienen color definido. */\n");
@@ -39,7 +44,8 @@ for(const [label,start,end,after] of regions){
   const universal=inLab.slice(a);
   assert(universal.includes('const corner='),'LAB must sample corners');
   assert(universal.includes('const perimeter='),'LAB must sample the perimeter');
-  assert(universal.includes('const color=bgFromArtwork(im);'),'LAB must derive color from loaded image');
+  assert(universal.includes('const sampled=bgFromArtwork(im);'),'LAB must sample image');
+  assert(universal.includes('sampled||ART_BG_GENERATED[d.id]'),'LAB must recover on canvas/CORS failure');
   assert(universal.includes("D.style.setProperty('--bg',color)"),'LAB must assign sampled backdrop');
   assert(universal.includes('D.style.backgroundColor=color'),'LAB must fill the scene');
   assert(universal.includes('D.dataset.artBgStatus='),'LAB must expose sampling status for QA');
@@ -50,6 +56,12 @@ for(const [label,start,end,after] of regions){
  }
  console.log('OK artwork contract: '+label);
 }
+const embedded=lab.match(/const ART_BG_GENERATED=(\{[^\n]*\});/);
+assert(embedded,'LAB must embed a generated manifest');
+const checked=JSON.parse(embedded[1]);
+const generated=JSON.parse(readFileSync('qa/design-system/artwork-backgrounds.generated.json','utf8'));
+assert.deepEqual(checked,generated,'The inline map must match generated data');
+assert(Object.keys(checked).length>=120,'Do not leave any source design without a fallback');
 assert(lab.includes("D.style.removeProperty('background-color');delete D.dataset.artBgStatus;"),
  'Each LAB card must clear the previous background before sampling');
 assert(lab.includes('const PRUEBA=true;'),'Infinite packs stay LAB only');
