@@ -5,9 +5,10 @@
 ## Regla de arte existente y protegida
 
 - [x] Documentar **DS-ART-01**: los fondos sólidos de cada imagen se extienden al escenario completo sin bordes ni degradados; el color se toma del archivo y no de una paleta global.
-- [x] Implementar lector compartido de bordes y fondo plano en revelación y resumen (**solo en rama de PR #130**).
-- [x] Añadir pruebas unitarias y prueba Chromium móvil de continuidad del color (**verificar su resultado CI antes de aceptar**).
-- [ ] Aprobar capturas visuales de diferentes ilustraciones y variantes en móvil y escritorio antes de fusionar.
+- [x] Comparar los estilos y funciones de fondos en `main` con la versión del PR anterior al experimento: **coinciden**.
+- [x] Revertir el intento experimental de cambio de fondos de la rama y el laboratorio; no llevarlo a producción.
+- [ ] Comparar capturas reales de `main` y del laboratorio con las mismas ilustraciones antes de aprobar cualquier nueva modificación de arte.
+- [ ] Aprobar visualmente el sistema de componentes en móvil y escritorio antes de fusionar.
 
 Referencia obligatoria: [DS-ART-01 · Ilustraciones y fondos](ILUSTRACIONES-FONDOS.md).
 
