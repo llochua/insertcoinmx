@@ -1,9 +1,11 @@
-# Insert Coin MX — Registro maestro de decisiones (v0.1)
+# Insert Coin MX — Registro maestro de decisiones (v0.2)
 
-**Corte:** 23 de noviembre de 2026. **Base de código comprobada:** `main@b9e5e3de89ab306bc261cff74787247697d387f2`.  
+**Corte revisado:** 23 de noviembre de 2026. **Estado actual de `main` verificado:** `7513a4362fa4df70b1cf06e0515ae3fa6c6f796c` (PR #131 fusionado). **Baseline original de auditoría:** `b9e5e3de89ab306bc261cff74787247697d387f2` (PR #130).  
 **Estado de este registro:** **BORRADOR DE CONSOLIDACIÓN PARA REVISIÓN DEL CREADOR**. No es autorización de publicación ni reemplaza las aprobaciones originales.  
 **Fuentes de control:** decisiones explícitas del creador en conversaciones del proyecto; auditoría [PR #130](https://github.com/llochua/insertcoinmx/pull/130); archivos y workflows de `main` al corte.  
 **Alcance:** documentar, no modificar el juego, sus ilustraciones, cuentas, colecciones, SQL, Auth, reglas productivas o despliegue.
+
+**Criterio de corte:** la Fase 1 se cerró administrativamente y el [PR #131](https://github.com/llochua/insertcoinmx/pull/131) fue fusionado con autorización expresa. El nuevo commit solo introdujo workflows, una plantilla de PR y documentación. `index.html` y `cartas/catalogo.json` conservan sus blob SHA anteriores (`c4e1cdcb9204bab07af8f766c43785ed6a4bbafc` y `9f6d30cfba657a2c7a5139caa6322eb42a99ffb8`). La auditoría del backend en el PR #130 fue una **fotografía de su fecha**; no equivale a una nueva inspección en vivo de Supabase.
 
 > **Regla esencial:** `APROBADO` es una decisión de producto, `IMPLEMENTADO` es un hecho de código y `VALIDADO` es evidencia de QA. Nunca usarlos como sinónimos. Ningún PR verde convierte una propuesta visual en aprobada.
 
@@ -34,7 +36,7 @@
 | IC-GOV-02 | **No fusionar, reiniciar, borrar, migrar datos productivos ni publicar cambios sin autorización específica del creador.** La autorización de un trabajo no autoriza otra operación. | **APROBADA** (2026-11-20 a 23) | Regla operativa vigente; no depende del estado técnico de un PR. |
 | IC-GOV-03 | `main` es la referencia vigente del juego; laboratorios, ramas y previews son **aislados**. Si un LAB presenta una regresión que `main` no tiene, se corrige el LAB. | **APROBADA** (2026-11-22) | `main` auditado; PR #130 continúa en borrador. Ver [DS-ART-01](https://github.com/llochua/insertcoinmx/blob/docs/design-system-audit-2026-11-22/docs/design-system/ILUSTRACIONES-FONDOS.md). |
 | IC-GOV-04 | El juego y la cuenta real no son instrumentos de QA mutadora: usar sesiones, datos y bases **desechables**; producción solo lectura salvo permiso específico. | **APROBADA** | Workflows de QA y auditoría #130. |
-| IC-GOV-05 | Cada cambio nuevo debe relacionarse con un ID de decisión, indicar qué se preserva y mostrar pruebas; un cambio visual necesita **comparación real de capturas y aprobación visual**. | **APROBADA COMO REGLA DE PROCESO** | Protección de `main` preparada en [PR #131](https://github.com/llochua/insertcoinmx/pull/131), **no fusionada**. |
+| IC-GOV-05 | Cada cambio nuevo debe relacionarse con un ID de decisión, indicar qué se preserva y mostrar pruebas; un cambio visual necesita **comparación real de capturas y aprobación visual**. | **APROBADA COMO REGLA DE PROCESO** | **EN MAIN** la plantilla y checks del [PR #131 fusionado](https://github.com/llochua/insertcoinmx/pull/131). [Ruleset activo](https://github.com/llochua/insertcoinmx/settings/rules/27900704); la revisión/aprobación visual es una obligación de proceso, **no una aprobación automática de GitHub**. |
 
 ## 2. Ilustraciones, cartas y sobres
 
@@ -89,20 +91,35 @@
 | IC-ARCH-01 | El **Archivo** debe conservar el carácter de memoria: información, documentos, fotografías/anécdotas y procedencia de piezas. | **APROBADA COMO OBJETIVO EDITORIAL** (2026-11-18/19) | **NO ACREDITADO** como flujo completo y final; no convertirlo en requisito técnico de la fase de seguridad. |
 | IC-PREMIOS-01 | Premios físicos, ventajas exclusivas y método de entrega de Bonus son **ideas a diseñar**, no funcionalidades que deban anunciarse como existentes. | **POR DEFINIR** | **NO ACREDITADO** como sistema completo; conservar prioridad de identidad registrada si en el futuro se implementan premios. |
 
-## 6. Discrepancias y tareas futuras (NO son autorización de implementación)
+## 6. Discrepancias y seguimiento (NO son autorización de implementación)
+
+**Estado al corte:** 8 entradas registradas; **1 resuelta (INC-03)** y **7 abiertas o pendientes de comprobación**. La existencia de una incidencia no autoriza cambiar SQL, UI, datos ni permisos.
 
 | ID | Gravedad | Contradicción o deuda | Acción futura que necesita decisión/QA |
 | --- | --- | --- | --- |
 | INC-01 | **ALTA** | Decisión IC-AUTH-03 / IC-RANK-01 vs SQL de `icmx_player_leaderboards`: usuarios de Auth anónimo verificado potencialmente elegibles. | Diseñar filtro servidor para ranking público solo registrado; probar dos identidades, resultado vacío y ranking sin progreso ajeno. **No tocar SQL ahora.** |
 | INC-02 | **ALTA** | Decisión IC-AUTH-04 vs el rechazo actual de votos anónimos por `community_can_vote()`. | Definir canal de opinión invitada verificable, límites antiabuso y qué agrega a POP; test de duplicados. **No habilitar voto anónimo arbitrario.** |
-| INC-03 | **ALTA** | `main` todavía reporta `protected:false`. | Completar la configuración administrativa de branch protection y checks de Fase 1; [PR #131](https://github.com/llochua/insertcoinmx/pull/131) sigue en borrador. |
+| INC-03 | **RESUELTA (23-nov-2026)** | `main` carecía de protección obligatoria en la auditoría del 22-nov. | **CERRADA:** GitHub reporta `protected:true`; ruleset #27900704 activo, PR requerido, cuatro checks obligatorios, rama al día, conversaciones resueltas, bloqueo de borrado/force push y bypass vacío. [PR #131 fusionado](https://github.com/llochua/insertcoinmx/pull/131). |
 | INC-04 | **ALTA** | Fuente de verdad de aprobaciones de artes no coincide con `estado: "Propuesta · revisar"` en las 126 filas del catálogo. | Crear inventario de aprobación arte por ID con referencia al creador. **No degradar aprobaciones ni modificar catálogos solo por la etiqueta.** |
 | INC-05 | **MEDIA** | PR #130 y algunos LAB no tienen confirmación visual de paridad con el juego publicado. | Capturas mismo diseño, variante y tamaño en `main`/LAB; corregir exclusivamente LAB cuando `main` esté bien. |
 | INC-06 | **MEDIA** | Documentos `BETA_PLAN.md`, `RANKING_GLOBAL_POP_20261121.md`, `SYNC_AUTOMATICA_QA.md` y algunos READMEs conservan estados históricos. | Añadir avisos de fecha y enlaces al registro. **No borrar historia ni asumir que «no publicado» sigue vigente.** |
 | INC-07 | **MEDIA** | QA Auth real, configuración SMTP/callbacks y pruebas visuales completas no corren automáticamente en cada SHA. | Establecer pruebas con cuentas desechables autorizadas; verificar Dashboard y sin tocar inventarios reales. |
 | INC-08 | **PENDIENTE** | Obtención de Bonus, premios, extensión del Archivo y detalles de UI de POP requieren especificación. | Mantener como pendientes, no anunciar como implementados. |
 
-## 7. Precedencia de fuentes y prohibiciones de reinterpretación
+## 7. Protección técnica vigente y alcance de la autorización
+
+El [ruleset #27900704](https://github.com/llochua/insertcoinmx/settings/rules/27900704) está **activo** y apunta a la rama predeterminada `main`. Exige Pull Request, ramas al día, conversaciones resueltas y cuatro checks de GitHub Actions:
+
+1. `Main · conservación sin reinicio` — conserva dominio, catálogo, módulos críticos y el reset apagado; bloquea bajas accidentales de assets.
+2. `Catálogo, integridad de imágenes y UI` — tests de código, catálogo, integridad y recursos.
+3. `Chromium · 5, 7 y 8 diseños (390px y 320px)` — Reta bloqueada/desbloqueada en móvil.
+4. `Chromium · dos sesiones · nube simulada` — prueba de sincronización simulada, **no** Auth real.
+
+Además, impide borrado y force push de la rama. La lista de bypass está vacía y el umbral de aprobaciones formales de GitHub está en **0** (único mantenedor); **por eso ninguna regla automática sustituye la autorización personal explícita del creador para fusionar**. Los checks automáticos pueden ser insuficientes para declarar aprobadas ilustraciones, diseños, accesibilidad, correos reales o economía del servidor.
+
+**Advertencia de integración del PR #132:** se creó antes de fusionar #131, por lo que su rama está **detrás de `main`**. Antes de fusionarlo será necesario actualizarla sobre el `main` protegido y ejecutar los cuatro checks con el resultado vigente. Esta documentación **no ejecuta ni autoriza** esa actualización ni ninguna fusión.
+
+## 8. Precedencia de fuentes y prohibiciones de reinterpretación
 
 1. **Última instrucción explícita del creador** para esa decisión.
 2. Aprobación anterior documentada del creador, si no fue sustituida.
@@ -120,7 +137,7 @@
 - «Nueva edición desde cero» es una **decisión futura de producto**, no un permiso de ejecutar el reinicio hoy.
 - Tener un PR, un test verde o un archivo con la palabra «aprobado» no autoriza una fusión.
 
-## 8. Protocolo para agregar o modificar una decisión
+## 9. Protocolo para agregar o modificar una decisión
 
 Cada entrada nueva debe registrar como mínimo:
 
@@ -139,15 +156,21 @@ Aprobación explícita del creador para el cambio de estado:
 
 **Flujo:** recuperar fuentes → comparar contra `main` → redactar/actualizar ID → señalar discrepancias → validar con el creador → en otra rama implementar únicamente lo autorizado → QA y capturas → solicitar autorización de merge. **No actualizar el estado `APROBADA` por inferencia ni borrarlo porque un LAB sea diferente.**
 
-## 9. Referencias verificables y vigencia
+## 10. Referencias verificables y vigencia
 
 - [Auditoría de main (PR #130, 22-nov-2026)](https://github.com/llochua/insertcoinmx/blob/docs/design-system-audit-2026-11-22/docs/design-system/AUDITORIA_MAIN_2026-11-22.md) — fotografía del código, backend y CI; no certifica todas las pantallas.
 - [Regla sólida de fondos DS-ART-01](https://github.com/llochua/insertcoinmx/blob/docs/design-system-audit-2026-11-22/docs/design-system/ILUSTRACIONES-FONDOS.md) — restauración del LAB, paridad visual pendiente.
-- [PR #131 — Fase 1 protección de main](https://github.com/llochua/insertcoinmx/pull/131) — **borrador**, controles CI preparados, protección administrativa todavía desactivada en el corte.
+- [PR #131 — Fase 1 protección de main](https://github.com/llochua/insertcoinmx/pull/131) — **fusionado** con autorización; commit `7513a4362fa4df70b1cf06e0515ae3fa6c6f796c`, reglas vigentes en [GitHub Settings](https://github.com/llochua/insertcoinmx/settings/rules/27900704).
+- [Workflow de preservación incorporado](https://github.com/llochua/insertcoinmx/blob/main/.github/workflows/main-safety.yml) — comprobaciones no destructivas en los PR a `main`.
+- [SQL de leaderboard registrado](https://github.com/llochua/insertcoinmx/blob/main/supabase/sql/player_global_leaderboards_STAGED.sql) y [cliente de votos](https://github.com/llochua/insertcoinmx/blob/main/content/auth-account.js) — evidencias de las discrepancias INC-01/INC-02; el nombre del archivo SQL no basta para afirmar cuándo se aplicó al servidor real.
 - [Motor PTS/POP](MOTOR_PUNTOS_VALOR_COMUNITARIO_20261120.md), [Perfil/cuentas](PERFIL_CUENTAS_INTEGRACION_20261120.md), [Ranking POP histórico](RANKING_GLOBAL_POP_20261121.md), [Plan beta histórico](BETA_PLAN.md).
 - [Catálogo en main](https://github.com/llochua/insertcoinmx/blob/main/cartas/catalogo.json), [Validación](https://github.com/llochua/insertcoinmx/blob/main/.github/workflows/validacion.yml), [Reta móvil](https://github.com/llochua/insertcoinmx/blob/main/.github/workflows/qa-reta-unlock-mobile.yml).
 - Conversaciones de producto del 18 al 23 de noviembre de 2026: acuerdos sobre sobres/gestos, narrativas, identidad, invitado, ranking, lanzamiento, fondos y QA. Cuando no existe URL pública verificable se identifica la conversación por fecha, **sin inventar un enlace**.
 
-### Estado de Fase 2
+### Estado de Fase 2 y control de revisión
 
-**v0.1 propuesta para validar.** Conservar identificadores para revisiones; no declarar el conjunto de decisiones definitivamente ratificado por la sola creación del archivo. Los hallazgos `INC-*` son para planificación posterior, no órdenes de implementación. No se modifican producción, cuentas, colecciones ni ilustraciones.
+**Historial mínimo:** v0.1 creó el inventario inicial sobre `b9e5e3de89ab`; v0.2 incorpora el estado verificado tras la fusión del PR #131, aclara evidencia y separa cierre de una incidencia de las siete aún abiertas. Ninguna de estas modificaciones documentales es autorización de cambios a la lógica del juego.
+
+**Revisión previa a publicación del registro:** confirmar con el creador los acuerdos editoriales cuyo origen es conversacional (no un commit), especialmente experiencia de Archivo, relatos, gestos y premios; no interpretarlos como evidencia de una función completa. Comprobar que la próxima actualización de la rama no introduzca archivos de ejecución y que pase los checks obligatorios.
+
+**v0.2 revisada, aún en PR #132 para validación del creador.** Se corrigió el corte de Fase 1 y se mantiene la numeración de 38 decisiones/criterios y 8 observaciones (1 resuelta). No declarar el conjunto definitivamente ratificado por la sola creación del archivo. Los hallazgos `INC-*` son para planificación posterior, no órdenes de implementación. **No se modifican producción, cuentas, colecciones ni ilustraciones.**
