@@ -78,7 +78,9 @@ try{
     document.querySelector('#dynNew .icmx-shell')?.naturalWidth>0);
   await page.screenshot({path:'qa/screenshots/ui-lab-dynamic-full-'+width+'.png',fullPage:true});
   const svgStarCount=await page.locator('#dynNew .icmx-data path[data-icmx-star]').count();
-  assert.equal(svgStarCount,4,'Full tiene 1 estrella vectorial de habilidad + 3 de rareza');
+  assert.equal(svgStarCount,3,'Full tiene únicamente 3 estrellas de rareza');
+  assert.equal(await page.locator('#dynNew .icmx-data path[data-icmx-ability-icon="zap"]').count(),1,
+    'Full usa el mismo rayo de habilidad (no una estrella adicional)');
   const popFull=page.locator('#dynNew text[data-icmx-field="pop"]');
   assert.match(await popFull.getAttribute('clip-path'),/url\(#icmx-pop-clip-/);
   assert.equal(await popFull.getAttribute('y'),'924','Full POP arriba de GOTY');
