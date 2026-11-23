@@ -20,52 +20,50 @@ BASE = ROOT / "cartas/full"
 VERSIONES = ("comun", "holo", "dorada")
 
 
-def limpiar_pie_completo(marco, rareza):
-    """Una sola superficie limpia para TODOS los datos del pie.
+def vaciar_pie_inferior(marco):
+    """Quita COMPLETA la antigua placa inferior (incluidos sus 4 bordes).
 
-    Las tres plantillas antiguas ya contenían un parche detrás del número,
-    texto de categoría y estrellas impresas. No se borran por zonas: se
-    recompone EL INTERIOR COMPLETO de la placa inferior, sin tocar su borde.
-    Cada columna mantiene su gradiente original. El renderer SVG añade
-    'Carta', numeración, rareza, estrellas/divisores y PTS.
-    Solo se ejecuta al generar bases de este LAB, nunca sobre c/ ni c2/.
+    La plantilla sigue aportando el marco EXTERIOR y el fondo según rareza.
+    El pie original ocupa aprox. x=47..913, y=1232..1293; eliminamos un
+    rectángulo mayor x=39..921, y=1227..1299. Sus píxeles se sustituyen
+    por el FONDO circundante, no por una mezcla de dos zonas con texto.
+    Así NO queda trazo negro detrás del único pie vectorial del renderer.
+
+    Solo se transforma la nueva base de muestra cs/cs2.
+    La plantilla original permanece inalterada.
     """
-    original = np.asarray(marco, dtype=np.float32)
-    if original.shape != (1340, 960, 3):
-        raise ValueError('Plantilla inesperada: ' + str(original.shape))
-    out = original.copy()
-    x0,x1,y0,y1 = 52,908,1238,1288
-    # Filas sin tipografía en el interior de la placa aprobada.
-    top = np.mean(original[1238:1244], axis=0)
-    bot = np.mean(original[1283:1288], axis=0)
-    # Suavizar únicamente artefactos de texto/foil en las referencias, no
-    # el encuadre ni ninguna otra región del marco.
-    top = cv2.GaussianBlur(top[np.newaxis,:,:], (27,1), 6)[0]
-    bot = cv2.GaussianBlur(bot[np.newaxis,:,:], (27,1), 6)[0]
-    ys=np.arange(y0,y1,dtype=np.float32)
-    t=np.clip((ys-y0)/float(y1-y0-1),0,1)[:,None,None]
-    surface=top[None,x0:x1,:]*(1-t)+bot[None,x0:x1,:]*t
+    orig = np.asarray(marco, dtype=np.float32)
+    if orig.shape != (1340, 960, 3):
+        raise ValueError("Plantilla inesperada: " + str(orig.shape))
 
-    # Grano mínimo determinista: evita una banda plana artificial.
-    # Dorada conserva su textura con tono uniforme; Holo conserva su gama.
-    rng=np.random.default_rng({'comun':31,'holo':37,'dorada':41}[rareza])
-    grain=rng.normal(0,0.65,size=(y1-y0,x1-x0,1)).astype(np.float32)
-    surface=np.clip(surface+grain,0,255)
+    out = orig.copy()
+    x0, x1 = 39, 921
+    y0, y1 = 1226, 1299
 
-    # Bordes suaves: el interior se integra dentro del filete ORIGINAL.
-    xx=np.arange(x0,x1,dtype=np.float32)
-    ay=np.minimum(np.clip((ys-y0)/6,0,1),
-                  np.clip((y1-1-ys)/5,0,1))
-    ax=np.minimum(np.clip((xx-x0)/7,0,1),
-                  np.clip((x1-1-xx)/7,0,1))
-    alpha=(ay[:,None]*ax[None,:])[:,:,None]
-    out[y0:y1,x0:x1]=original[y0:y1,x0:x1]*(1-alpha)+surface*alpha
+    # Filas de fondo limpio, una por encima y otra por debajo del pie viejo.
+    # Interpolación por columna: respeta la transición cromática de cada rareza.
+    upper = orig[y0 - 1, x0:x1].copy()
+    lower = orig[y1, x0:x1].copy()
+    t = ((np.arange(y0, y1, dtype=np.float32) - y0 + 1) /
+         float(y1 - y0 + 1))[:, None, None]
+    blank = upper[None, :, :] * (1 - t) + lower[None, :, :] * t
+
+    # El feather cae exclusivamente sobre fondo libre de tinta, lejos de
+    # cualquier línea del pie antiguo (x>=47, y>=1232, x<=913, y<=1293).
+    xs = np.arange(x0, x1, dtype=np.float32)
+    ys = np.arange(y0, y1, dtype=np.float32)
+    fx = np.minimum(np.clip((xs - x0) / 5, 0, 1),
+                    np.clip((x1 - 1 - xs) / 5, 0, 1))
+    fy = np.minimum(np.clip((ys - y0) / 5, 0, 1),
+                    np.clip((y1 - 1 - ys) / 5, 0, 1))
+    alpha = (fy[:, None] * fx[None, :])[:, :, None]
+    out[y0:y1, x0:x1] = orig[y0:y1, x0:x1] * (1 - alpha) + blank * alpha
     return out
 
 
 def imagen_base(d, rareza, plantillas):
     """Marco aprobado + arte original. SIN categoría, título, texto, POP, PTS ni número."""
-    salida = limpiar_pie_completo(plantillas["marco_" + rareza], rareza)
+    salida = vaciar_pie_inferior(plantillas["marco_" + rareza])
     arte = g.leer_arte(d["id"])
     x0, y0, x1, y1 = g.VENTANA
     dibujo = g.acomodar_arte(arte, x1-x0, y1-y0, g.MARGEN_ARTE)
