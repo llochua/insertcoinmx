@@ -251,6 +251,33 @@ try{
    }
   }
  }
+
+ // Diagnóstico visual de los tres reportes más recientes: leer píxeles
+ // REALMENTE pintados, no sólo getComputedStyle().
+ for(const [id,v] of [['queenpower','b'],['friezainfinito','b'],['caritele','b']]){
+  await screen.evaluate(([design,variant])=>{
+   const card=CB[design+'_'+variant];
+   hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
+   idx=0;showCard();
+  },[id,v]);
+  await screen.waitForFunction(design=>document.getElementById('disc')?.dataset.artBgStatus==='sampled'&&
+    document.getElementById('disc')?.dataset.artId===design,id);
+  await screen.waitForTimeout(750);
+  const report=await screen.evaluate(()=>{
+   const D=document.getElementById('disc'),im=D.querySelector('.dx-art img'),art=D.querySelector('.dx-art');
+   return {id:D.dataset.artId,hex:bgFromArtwork(im),inline:D.style.getPropertyValue('--bg'),
+    computed:getComputedStyle(D).background,art:getComputedStyle(art).background,
+    drect:D.getBoundingClientRect().toJSON(),arect:art.getBoundingClientRect().toJSON(),
+    imageRect:im.getBoundingClientRect().toJSON(),classes:D.className};
+  });
+  console.log('VISUAL_DIAG '+id+' '+JSON.stringify(report));
+  const shot=await screen.screenshot({path:'qa/screenshots/ui-lab-visual-diag-'+id+'.png'});
+  const base64=shot.toString('base64');
+  console.log('VISUAL_BEGIN '+id+' '+base64.length);
+  for(let i=0;i<base64.length;i+=9000)console.log('VISUAL_PART '+id+' '+i+' '+base64.slice(i,i+9000));
+  console.log('VISUAL_END '+id);
+ }
+
  assert(tested.length>=100,'Se deben probar al menos 100 cartas reales del catálogo');
  assert(variants.b>=85,'Cobertura insuficiente de diseños Base');
  assert(variants.e>0&&variants.r>0,'Faltan pruebas Holo o Dorada');
