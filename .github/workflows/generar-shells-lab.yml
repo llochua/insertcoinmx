@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: cartas-dinamicas-lab
@@ -66,16 +66,12 @@ jobs:
           assert not np.array_equal(before[1248:1278,470:570],after[1248:1278,470:570]), 'Texto fijo sin limpiar'
           print('Pie vacío generado; contorno original preservado píxel a píxel.')
           PY
-      - name: Registrar solamente assets de demostración en la rama del LAB
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add cs cs2
-          if ! git diff --cached --quiet; then
-            git commit -m "test(lab): publicar 22 bases dinámicas para comparación visual"
-            # El renderizador puede recibir commits mientras se generan las bases.
-            # Rebasea únicamente sobre la rama de prueba (nunca force-push).
-            git fetch origin "$GITHUB_REF_NAME"
-            git rebase "origin/$GITHUB_REF_NAME"
-            git push origin "HEAD:$GITHUB_REF_NAME"
-          fi
+      - name: Conservar las 22 bases como artefacto de revisión, sin commits automáticos
+        uses: actions/upload-artifact@v4
+        with:
+          name: cartas-dinamicas-bases-lab
+          path: |
+            cs/*.webp
+            cs2/*.webp
+          if-no-files-found: error
+          retention-days: 14
