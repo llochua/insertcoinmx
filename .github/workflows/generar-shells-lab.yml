@@ -51,6 +51,14 @@ jobs:
                   expected=(480,670) if path.parts[0]=='cs' else (960,1340)
                   assert im.size==expected, (str(path), im.size, expected)
           print('22 archivos de muestras, dimensiones válidas; biblioteca antigua intacta.')
+          # La limpieza del pie jamás puede borrar Dorada, los separadores o el contorno.
+          import numpy as np
+          before=np.asarray(Image.open('cartas/plantillas/marco_dorada.png').convert('RGB'))
+          after=np.asarray(Image.open('cs2/sonic_r.webp').convert('RGB'))
+          for box in ((466,1241,572,1283),(330,1239,348,1290),(350,1290,510,1315)):
+              x0,y0,x1,y1=box
+              assert np.array_equal(before[y0:y1,x0:x1],after[y0:y1,x0:x1]), f'Zona protegida alterada: {box}'
+          print('Dorada, separador y contorno preservados píxel a píxel.')
           PY
       - name: Registrar solamente assets de demostración en la rama del LAB
         run: |
