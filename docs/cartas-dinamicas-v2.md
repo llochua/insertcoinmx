@@ -13,9 +13,15 @@ cuando cambian número/total del álbum, valor PTS, POP, nombre, categoría, hab
    IDs seleccionados. Deja las cartas existentes en `c/` y `c2/` intactas.
 2. `content/card-renderer.js` ofrece `window.ICMX_CARD_RENDERER.create(card, rareza, opciones)`
    y combina cada base sin textos con capas SVG basadas en datos.
-3. El **LAB ya existente** de sobres ilimitados se usa para comparar cartas desde el PR #137, sin crear otro laboratorio.
-4. `qa/card-renderer.test.mjs` valida numeración, versiones, aliases, Bonus y valores.
-5. El workflow de validación **incluye** este test y `py_compile`.
+   Mantiene POP dentro de su espacio, renderiza el pie completo sin textos impresos,
+   usa un rayo vectorial para habilidad y rarezas Base 0 / Holo 1 / Dorada 2 / Full 3 estrellas.
+3. `content/card-data-adapter.js` mapea los IDs y variantes persistentes del juego
+   al catálogo editorial; separa POP comunitario (nunca inventado) y PTS por rareza,
+   ofrece numeración abierta `089/???` cuando se solicita sin cambiar datos ni IDs.
+4. El **LAB ya existente** de sobres ilimitados se usa para comparar cartas desde el PR #137, sin crear otro laboratorio.
+5. `qa/card-renderer.test.mjs` y `qa/card-data-adapter.test.mjs` validan
+   los ID, numeración, variantes, Bonus, POP, PTS y catálogo completo.
+6. La validación de CI **incluye** ambas pruebas y `py_compile`.
 
 Este PR **no cambia index.html ni el juego principal**; no publica ni cambia
 cartas de jugadores, claves, colecciones, Supabase, Auth, odds ni estados de rareza.
@@ -26,7 +32,7 @@ Desde la raíz del repo, con Python (numpy, opencv-python, pillow) y Node 22:
 
 ```sh
 python cartas/generar-shells.py 1up sonic abuket
-node --test qa/card-renderer.test.mjs
+node --test qa/card-renderer.test.mjs qa/card-data-adapter.test.mjs
 python -m http.server 8000
 ```
 
@@ -79,3 +85,20 @@ La migración inicial puede generar bases sin textos una sola vez. Después se r
 el catálogo y los valores NO disparan cambios de WebP.
 
 **No fusionar, no activar y no reiniciar cuentas sin autorización.**
+
+## Revisión de salida antes de integrar en producción
+
+- [x] Diseño aprobado visualmente para Base en LAB (POP puede quedar un poco alto; tolerancia aceptada).
+- [x] Holo 1 estrella / Dorada 2 / Full 3. Habilidad = rayo, no estrellas.
+- [x] Pie dinámico sin textos antiguos impresos ni parches de valor/número.
+- [x] Tests de LAB: sobres infinitos, Reta, aislamiento de cuentas y comparador móvil/escritorio.
+- [x] Adaptador de 126 diseños y 452 variantes del catálogo de main, sin cambios a IDs.
+- [ ] Evaluación visual final de las cuatro variantes por el editor (incluyendo Full y tamaño móvil).
+- [ ] Prueba de rendimiento de álbum completo en dispositivos de gama media.
+- [ ] Migrar funciones reales (sobres, zoom, fichas, álbum, ranking y Reta) bajo flag y fallback.
+- [ ] Migrar **compartir/exportar PNG**; `shareGrid` aún depende de WebP antiguos.
+- [ ] Generar las bases del catálogo completo **una sola vez**, verificando la fuente de cada arte y sin alterar los WebP anteriores.
+- [ ] Conciliar el catálogo de main con los 5 diseños adicionales del PR #135 **sin fusionar por accidente**.
+- [ ] Aprobar y ejecutar PR de integración solo con autorización explícita.
+
+El LAB de PR #137 contiene 22 bases de ejemplo, no toda la biblioteca. **No anunciar migración terminada** hasta que cada punto pendiente tenga verificación.
