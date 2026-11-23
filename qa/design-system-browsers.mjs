@@ -115,40 +115,62 @@ try{
    lab:localStorage.getItem('icmx-ui-lab-progress-v1')
   }));
 
-  // Regresión DS-ART-02: Evil Exes tiene degradado azul vertical, no fondo sólido.
-  // Base, Holo y Dorada deben prolongar sus orillas sin crear un rectángulo.
-  for(const variant of ['b','e','r']){
-   await page.evaluate(v=>{
-    const card=CB['evilexes_'+v];
-    if(!card?.img)throw Error('Falta Evil Exes '+v+' para QA');
+
+  // Contrato visual UNIVERSAL: todos los diseños usan el perímetro real del
+  // arte, sin IDs privilegiados. Verificamos variantes, colores y degradados.
+  for(const [designId,variant] of [["sonic","b"],["sonic","r"],["carton","b"],["karma","e"],["evilexes","b"],["robogodin","b"]]){
+   await page.evaluate(([id,v])=>{
+    const card=CB[id+'_'+v];
+    if(!card)throw Error('No existe carta '+id+'/'+v);
     hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
     idx=0;showCard();
-   },variant);
-   await page.waitForFunction(()=>{
+   },[designId,variant]);
+   await page.waitForFunction(([id])=>{
     const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
-    return D.dataset.artId==='evilexes'&&!!im?.naturalWidth
+    return D.dataset.artId===id&&!!im?.naturalWidth
       &&D.classList.contains('art-edge-extended')
       &&D.style.backgroundImage.includes('data:image/png');
+   },[designId,variant],{timeout:10000});
+   const result=await page.evaluate(async()=>{
+    const D=document.getElementById('disc'),img=D.querySelector('.dx-art img');
+    const scene=D.getBoundingClientRect(),element=img.getBoundingClientRect();
+    const bgUrl=D.style.backgroundImage.match(/data:image\/png;base64,[A-Za-z0-9+/=]+/)?.[0];
+    if(!bgUrl)throw Error('Fondo no generado');
+    const bg=new Image();bg.src=bgUrl;await bg.decode();
+    const bc=document.createElement('canvas');bc.width=bg.naturalWidth;bc.height=bg.naturalHeight;
+    const bx=bc.getContext('2d',{willReadFrequently:true});bx.drawImage(bg,0,0);
+    let paint={left:element.left,top:element.top,width:element.width,height:element.height};
+    if(getComputedStyle(img).objectFit==='contain'){
+     const scale=Math.min(element.width/img.naturalWidth,element.height/img.naturalHeight);
+     const w=img.naturalWidth*scale,h=img.naturalHeight*scale;
+     paint={left:element.left+(element.width-w)/2,top:element.top+(element.height-h)/2,width:w,height:h};
+    }
+    const clip=(img.closest('.ab')||img.closest('.dx-art')).getBoundingClientRect();
+    const l=Math.max(scene.left,clip.left,paint.left),r=Math.min(scene.right,clip.right,paint.left+paint.width);
+    const t=Math.max(scene.top,clip.top,paint.top),b=Math.min(scene.bottom,clip.bottom,paint.top+paint.height);
+    const midY=(t+b)/2;
+    const xLeft=Math.round(Math.max(1,(l-scene.left-3)*bc.width/scene.width));
+    const xRight=Math.round(Math.min(bc.width-2,(r-scene.left+3)*bc.width/scene.width));
+    const y=Math.round((midY-scene.top)*bc.height/scene.height);
+    const color=x=>Array.from(bx.getImageData(x,y,1,1).data).slice(0,3);
+    const source=document.createElement('canvas');source.width=img.naturalWidth;source.height=img.naturalHeight;
+    const sx=source.getContext('2d',{willReadFrequently:true});sx.drawImage(img,0,0);
+    const sy=Math.max(0,Math.min(img.naturalHeight-1,Math.round((midY-paint.top)/paint.height*img.naturalHeight)));
+    const leftX=Math.max(0,Math.min(img.naturalWidth-1,Math.round((l-paint.left)/paint.width*img.naturalWidth)));
+    const rightX=Math.max(0,Math.min(img.naturalWidth-1,Math.round((r-paint.left)/paint.width*img.naturalWidth)-1));
+    const pixel=x=>Array.from(sx.getImageData(x,sy,1,1).data).slice(0,3);
+    const delta=(a,b)=>Math.max(...a.map((v,i)=>Math.abs(v-b[i])));
+    return {left:delta(color(xLeft),pixel(leftX)),
+      right:delta(color(xRight),pixel(rightX)),
+      artColor:getComputedStyle(D.querySelector('.dx-art')).backgroundColor,
+      stageWidth:scene.width,sourceWidth:r-l};
    });
-   const continuity=await page.evaluate(async()=>{
-    const D=document.getElementById('disc');
-    const url=D.style.backgroundImage.match(/data:image\/png;base64,[A-Za-z0-9+/=]+/)?.[0];
-    if(!url)return null;
-    const gradient=new Image();gradient.src=url;await gradient.decode();
-    const cv=document.createElement('canvas');cv.width=1;cv.height=256;
-    const ctx=cv.getContext('2d');ctx.drawImage(gradient,0,0);
-    const sample=y=>Array.from(ctx.getImageData(0,y,1,1).data).slice(0,3);
-    return {artBackground:getComputedStyle(D.querySelector('.dx-art')).backgroundColor,
-      top:sample(14),bottom:sample(240)};
-   });
-   assert(continuity,'se genera el fondo a partir de la orilla original');
-   assert.equal(continuity.artBackground,'rgba(0, 0, 0, 0)',
-      'la ilustración no tiene un panel opaco rectangular');
-   assert(Math.max(...continuity.top.map((x,i)=>Math.abs(x-continuity.bottom[i])))>30,
-      'el fondo conserva el degradado vertical real de Evil Exes');
-   await page.screenshot({path:'qa/screenshots/ui-lab-evilexes-'+variant+'-'+width+'.png'});
+   assert(result.sourceWidth<result.stageWidth,'el arte conserva márgenes a extender');
+   assert.equal(result.artColor,'rgba(0, 0, 0, 0)','no hay panel rectangular interno');
+   assert(result.left<=40&&result.right<=40,
+     designId+'/'+variant+': fondo exterior no coincide con las orillas reales: '+JSON.stringify(result));
+   await page.screenshot({path:'qa/screenshots/ui-lab-edge-'+designId+'-'+variant+'-'+width+'.png'});
   }
-
   assert.equal(storage.live,sentinel,'real save is unchanged');
   assert.equal(storage.liveHandle,'real_guest','real handle untouched');
   assert.equal(storage.liveRanking,'SENTINEL_REAL_RANKING','real ranking untouched');
