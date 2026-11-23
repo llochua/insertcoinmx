@@ -38,7 +38,7 @@ for(const [name,a,b,after]of regions){
 .rh .dx-art{background:var(--bg)}
 `;
   assert(actual.includes(permitted),'LAB must explicitly extend solid background to the art area');
-  assert.equal(actual.replace(permitted+'\\n',''),baseline,
+  assert.equal(actual.replace(permitted+String.fromCharCode(10),''),baseline,
    'LAB artwork CSS differs beyond the approved solid-background rule');
  }else if(name==='Original sampling and color lookup'){
   const seed=`// Primer fotograma coherente: Robogodín tiene orillas blancas (#fff).
