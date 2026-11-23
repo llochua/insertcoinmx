@@ -37,18 +37,16 @@ Se conservan las funciones originales `dcol`, `bgFromArtwork`, `resolveArtworkBa
 - [ ] Aprobación final del usuario antes de fusionar el sistema de diseño.
 
 
-## Estándar universal del fondo full · LAB (23 nov. 2026)
+## Estándar de ilustraciones · LAB utiliza el motor original de main (23 nov. 2026)
 
-**Alcance: todos los diseños, sin excepciones por nombre.** La ilustración conserva su tamaño, proporciones y posición; el fondo original se extiende a todo el escenario. No es válido que el arte quede dentro de un rectángulo con un color distinto detrás.
+**Fuente de verdad:** \`index.html\` de \`main\`. LAB no tiene un segundo motor de ilustraciones y no debe modificar la imagen original, encuadrarla distinto, ni extender sus bordes mediante otro canvas o un 9-slice.
 
-Implementación en \`qa/design-system/index.html\`:
-- Al cargar cualquier imagen, detecta su **color sólido real** comparando las cuatro esquinas del archivo original. Si coinciden, utiliza ese color como fondo de todo el escenario; nunca depende de una lista de IDs.
-- Si el perímetro no es uniforme, prolonga los cuatro bordes y las esquinas de la imagen visible (9-slice) para preservar su continuidad, sin escalar ni recortar el arte original.
-- Opera sobre **Base, Holo y Dorada para cualquier ID**; Full usa su arte inmersivo original. El diseño no se rasteriza de nuevo y su \`img\` original permanece encima.
-- El proceso no depende de \`AUTO_BG_IDS\`, \`ICOL\`, \`RBG\`, \`ABOX\` ni colores asignados manualmente para elegir el fondo. El encuadre existente de \`ABOX\` se respeta sin alterar la imagen.
-- Al cambiar de carta o de dimensiones de pantalla se recalcula el fondo; también en la vista ampliada.
-- Este cambio queda **únicamente en la copia aislada de LAB**. \`main\` no se modifica.
+El mismo código de \`main\` para \`dcol\`, \`hasCol\`, \`artBox\`, \`bgFromArtwork\` y \`resolveArtworkBackground\` se utiliza en \`qa/design-system/index.html\`, junto con el CSS original del escenario. El flujo \`showCard\` llama a \`resolveArtworkBackground(d,D)\`, exactamente como \`main\`.
 
-**Prueba de regresión:** \`qa/design-system-browsers.mjs\` comprueba el fondo generado frente a los píxeles de la imagen en Sonic, Recojo Cartón, Karma, Evil Exes y Robogodín, en móvil, y conserva capturas. No se aceptan soluciones por diseño ni por captura aislada.
+El estándar de \`main\` usa \`RBG\` e \`ICOL\` para colores existentes y \`AUTO_BG_IDS\` para diseños cuyos colores se miden a partir del borde del archivo. **Cobertura comprobada: 126 entradas del catálogo fuente, ninguna sin resolver.** Esto describe la cobertura de código, no cuántas cartas están publicadas en el álbum.
 
-**Estado:** implementación enviada a LAB; aprobación de apariencia sujeta a revisar capturas y resultados del navegador.
+Se retiraron de LAB los experimentos \`solidArtworkBackground\`, \`extendArtworkEdges\`, \`art-edge-extended\`, canvas de 9-slice, reglas CSS para forzar opacidad de la imagen y excepciones por diseño. No restaurarlos como parches independientes: cualquier cambio futuro del motor de arte debe verificarse primero en \`main\`, coordinarse y conservar la paridad.
+
+**QA obligatorio** (\`qa/design-system-browsers.mjs\`): carga el \`index.html\` real de \`origin/main\`, compara las regiones fuente de arte con LAB, abre las cartas en ambos navegadores a 1280×900 y compara fondo calculado y píxeles exteriores de versiones Base. También comprueba Holo y Dorada (el foil animado no es píxel-estable) y la cobertura completa del catálogo. Hay capturas comparativas y pruebas móviles 320/390 px.
+
+**Alcance:** esta restauración afecta solo a las dos ramas del laboratorio (PR #130 y PR #137). \`main\` no se modifica. Cualquier publicación sigue requiriendo revisión visual y aprobación explícita.
