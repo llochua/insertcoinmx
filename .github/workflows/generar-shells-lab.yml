@@ -19,7 +19,7 @@ permissions:
 
 concurrency:
   group: cartas-dinamicas-lab
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   generar:
@@ -60,7 +60,8 @@ jobs:
           import numpy as np
           before=np.asarray(Image.open('cartas/plantillas/marco_dorada.png').convert('RGB'))
           after=np.asarray(Image.open('cs2/sonic_r.webp').convert('RGB'))
-          for box in ((30,1220,930,1230),(30,1292,930,1315),(20,1240,50,1289),(911,1240,937,1289)):
+          # Las cuatro bandas están FUERA del rectángulo eliminado.
+          for box in ((30,1215,930,1226),(30,1299,930,1315),(20,1240,39,1289),(921,1240,937,1289)):
               x0,y0,x1,y1=box
               assert np.array_equal(before[y0:y1,x0:x1],after[y0:y1,x0:x1]), f'Contorno alterado: {box}'
           assert not np.array_equal(before[1248:1278,470:570],after[1248:1278,470:570]), 'Texto fijo sin limpiar'
