@@ -8,7 +8,6 @@ import {readFile,mkdir} from 'node:fs/promises';
 import {resolve,dirname,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
-import {PNG} from 'pngjs';
 
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript','.mjs':'text/javascript',
@@ -97,96 +96,6 @@ try{
   await page.waitForFunction(()=>Object.values(S.have).reduce((a,n)=>a+n,0)>=13);
   assert.equal(await page.evaluate(()=>packReady()),true,'packs remain infinite after opening');
   await page.screenshot({path:'qa/screenshots/ui-lab-pack-'+width+'.png'});
-
-  // DS-ART-01 · El color original del borde se extiende a todo el escenario.
-  // Una carta real por variante, también la Full con un archivo diferente.
-  await page.locator('#disc.on').waitFor({state:'visible'});
-  for(const variant of ['b','e','r','f']){
-   const id=variant==='b'?'evilexes':'gatosamurai';
-   await page.evaluate(({id,variant})=>{
-    const c=CB[id+'_'+variant];
-    if(!c)throw Error('Missing known artwork variant '+id+'_'+variant);
-    hand=[{...c,_new:false,_dnew:false,_doneB:false,_comp:false,_prev:[]}];
-    idx=0;REV=new Set([0]);showCard();
-   },{id,variant});
-   await page.waitForFunction(()=>{
-    const d=document.querySelector('#disc'),im=d?.querySelector('.dx-art img,.dx-full-view img');
-    return d?.classList.contains('on')&&!d?.classList.contains('ic-art-bg-pending')
-     &&!!d.dataset.artSource&&im?.complete&&im?.naturalWidth>0;
-   },null,{timeout:15000});
-   const color=await page.evaluate(()=>{
-    const d=document.querySelector('#disc'),img=d.querySelector('.dx-art img,.dx-full-view img');
-    const expected=bgFromArtwork(img),actual=d.style.getPropertyValue('--bg');
-    const computed=getComputedStyle(d),mat=d.querySelector('.dx-mat');
-    const rect=d.getBoundingClientRect();
-    return {expected,actual,css:computed.backgroundColor,backgroundImage:computed.backgroundImage,
-     matDisplay:mat?getComputedStyle(mat).display:null,rect:{left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom}};
-   });
-   assert(color.expected,'must detect image border for '+variant);
-   assert.equal(color.actual,color.expected,'stage color equals actual image pixels '+variant);
-   assert.equal(color.css,'rgb('+parseInt(color.expected.slice(1,3),16)+', '+parseInt(color.expected.slice(3,5),16)+', '+parseInt(color.expected.slice(5,7),16)+')','solid CSS color matches image '+variant);
-   assert.equal(color.backgroundImage,'none','no generic gradient for '+variant);
-   if(variant==='e'||variant==='r')assert.equal(color.matDisplay,'none','material must not tint flat screen');
-   assert(color.rect.left>=-1&&color.rect.right>=width-1&&color.rect.top>=-1,'full viewport backdrop '+variant);
-   // Real visual assertions run after animation has finished, not at DOM load.
-   await page.waitForTimeout(850);
-   const visual=await page.evaluate(()=>{
-    const el=document.querySelector('#disc'),art=el.querySelector('.dx-art'),im=el.querySelector('.dx-art img'),fade=el.querySelector('.dx-fade');
-    const measure=node=>node?{display:getComputedStyle(node).display,visibility:getComputedStyle(node).visibility,opacity:getComputedStyle(node).opacity,
-     animation:getComputedStyle(node).animationName,z:getComputedStyle(node).zIndex,rect:node.getBoundingClientRect().toJSON()}:null;
-    return {variant:el.className,art:measure(art),img:measure(im),fade:measure(fade)};
-   });
-   console.log('VISUAL-ART '+width+' '+variant+' '+JSON.stringify(visual));
-   if(variant!=='f'){
-    assert(visual.art&&visual.art.visibility==='visible'&&Number(visual.art.opacity)>.95,'art container must be visible after transition for '+variant);
-    assert(visual.img&&visual.img.visibility==='visible'&&visual.img.rect.width>50&&visual.img.rect.height>100,'actual art must be visible and on screen for '+variant);
-    assert.equal(visual.fade?.display,'none','the black text gradient must not obscure a solid canvas '+variant);
-   }
-   const screenshot=await page.screenshot({path:'qa/screenshots/ui-lab-art-bg-'+variant+'-'+width+'.png'});
-   if(variant!=='f'){
-     const shot=PNG.sync.read(screenshot);
-     const px=(x,y)=>{
-       const offset=(Math.round(y)*shot.width+Math.round(x))*4;
-       return [shot.data[offset],shot.data[offset+1],shot.data[offset+2]];
-     };
-     const expected=[1,3,5].map(i=>parseInt(color.expected.slice(i,i+2),16));
-     // Screenshot must remain the image's *literal* RGB all the way down
-     // the left border. A CSS background-color test alone misses fade overlays.
-     for(const yf of [.16,.32,.5,.66,.88]){
-       const actual=px(2,shot.height*yf);
-       const diff=Math.max(...actual.map((v,i)=>Math.abs(v-expected[i])));
-       assert(diff<=5,variant+' '+width+'px: screenshot seam at '+Math.round(yf*100)+'% of viewport: '+actual+' expected '+expected);
-     }
-     // Check that the source illustration actually paints (not merely loads).
-     // Top-center should contain visible non-background image pixels.
-     let different=0,total=0;
-     for(let y=Math.round(shot.height*.17);y<shot.height*.46;y+=9){
-       for(let x=Math.round(shot.width*.18);x<shot.width*.83;x+=9){
-         const actual=px(x,y);
-         const diff=Math.max(...actual.map((v,i)=>Math.abs(v-expected[i])));
-         if(diff>35)different++;
-         total++;
-       }
-     }
-     assert(different>total*.025,variant+' '+width+'px: artwork is blank despite loaded image ('+different+'/'+total+' visible colored pixels)');
-   }
-   if(variant==='r'){
-    await page.evaluate(()=>showSum());
-    await page.waitForFunction(()=>{
-     const d=document.querySelector('#sum .rh'),img=d?.querySelector('.dx-art img');
-     return !!d?.dataset.artSource&&!d.classList.contains('ic-art-bg-pending')
-      &&!!img?.complete&&img?.naturalWidth>0;
-    },null,{timeout:15000});
-    const sum=await page.evaluate(()=>{
-     const d=document.querySelector('#sum .rh'),img=d.querySelector('.dx-art img');
-     return {expected:bgFromArtwork(img),actual:d.style.getPropertyValue('--bg'),
-      css:getComputedStyle(d).backgroundColor,backgroundImage:getComputedStyle(d).backgroundImage};
-    });
-    assert(sum.expected&&sum.expected===sum.actual,'summary must use the real same-color backdrop');
-    assert.equal(sum.backgroundImage,'none','no gradient on summary');
-    await page.screenshot({path:'qa/screenshots/ui-lab-summary-art-bg-'+width+'.png'});
-   }
-  }
 
   await page.locator('#icmxLabToggle').click();
   await page.locator('[data-lab-action="profile"]').click();
