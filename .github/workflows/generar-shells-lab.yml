@@ -81,7 +81,11 @@ jobs:
               # Marco exterior (extremos del diseño) sin modificaciones.
               assert np.array_equal(shell[1227:1300,0:38],orig[1227:1300,0:38]), rareza+' lado izquierdo'
               assert np.array_equal(shell[1227:1300,922:960],orig[1227:1300,922:960]), rareza+' lado derecho'
-          print('Pie antiguo eliminado en Base, Holo y Dorada, sin residuos negros.')
+              # El nuevo fondo no puede producir barras verticales.
+              sample=shell[1255:1275,100:860].astype(float)
+              banding=float(np.abs(np.diff(sample,axis=1)).mean())
+              assert banding<3.0, f'Bandas verticales en {rareza}: {banding:.3f}'
+          print('Pie antiguo eliminado en Base, Holo y Dorada, sin residuos negros ni bandas.')
           PY
       - name: Conservar las 22 bases como artefacto de revisión, sin commits automáticos
         uses: actions/upload-artifact@v4
