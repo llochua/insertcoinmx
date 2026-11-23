@@ -8,14 +8,39 @@ import {readFile,mkdir} from 'node:fs/promises';
 import {resolve,dirname,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
+import {execFileSync} from 'node:child_process';
+
 
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+
+/* Comparación con la versión REAL de main, no con una copia de sus colores. */
+const MAIN_HTML=execFileSync('git',['show','origin/main:index.html'],{cwd:ROOT,encoding:'utf8'});
+const LAB_HTML=await readFile(resolve(ROOT,'qa/design-system/index.html'),'utf8');
+const region=(html,begin,end)=>{
+ const a=html.indexOf(begin),b=html.indexOf(end,a+begin.length);
+ assert(a>=0&&b>a,'No se encontró región compartida '+begin);
+ return html.slice(a,b);
+};
+for(const [begin,end] of [
+ ['const dcol=id=>','const icAwardsSeen='],
+ ['.disc.dx{background:var(--bg)}','.dx-top{position:'],
+ [' const art=fa?',' D.className='+'\`disc on dx'],
+]){
+ assert.equal(region(LAB_HTML,begin,end),region(MAIN_HTML,begin,end),
+  'El laboratorio debe conservar EXACTAMENTE el motor de arte de main: '+begin);
+}
+assert(!LAB_HTML.includes('extendArtworkEdges('),'No conservar renderizadores experimentales en Lab');
+assert(LAB_HTML.includes(' resolveArtworkBackground(d,D);'),'El LAB debe invocar la función original de main');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript','.mjs':'text/javascript',
  '.css':'text/css','.json':'application/json','.png':'image/png','.webp':'image/webp',
  '.svg':'image/svg+xml','.woff':'font/woff','.woff2':'font/woff2','.ttf':'font/ttf'};
 const server=createServer(async(req,res)=>{
  try{
   const pathname=decodeURIComponent(new URL(req.url,'http://127.0.0.1').pathname);
+  if(pathname==='/qa-main-reference.html'){
+   res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});
+   res.end(MAIN_HTML);return;
+  }
   const file=resolve(ROOT,'.'+(pathname.endsWith('/')?pathname+'index.html':pathname));
   if(!file.startsWith(ROOT+sep))throw Error('Outside repository');
   const data=await readFile(file);
@@ -116,70 +141,34 @@ try{
   }));
 
 
-  // La escena debe estar visible: el QA venía de Perfil (pack oculto).
+
+  // Al volver al sobre, comprueba el renderizador de main en cartas reales.
   await page.locator('#icmxLabToggle').click();
   await page.locator('[data-lab-action="pack"]').click();
   await page.locator('#pack.on').waitFor({state:'visible'});
-  // Contrato visual UNIVERSAL: todos los diseños usan el perímetro real del
-  // arte, sin IDs privilegiados. Verificamos variantes, colores y degradados.
-  for(const [designId,variant] of [["sonic","b"],["sonic","r"],["carton","b"],["karma","e"],["evilexes","b"],["robogodin","b"]]){
-   await page.evaluate(([id,v])=>{
-    const card=CB[id+'_'+v];
-    if(!card)throw Error('No existe carta '+id+'/'+v);
+  for(const id of ['oneplayer','continuara','booit','evilexes','carton','guardianes']){
+   await page.evaluate(design=>{
+    const card=CB[design+'_b'];
+    if(!card)throw Error('Carta faltante '+design);
     hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
     idx=0;showCard();
-   },[designId,variant]);
-   await page.waitForFunction(([id])=>{
+   },id);
+   await page.waitForFunction(design=>{
     const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
-    return D.dataset.artId===id&&!!im?.naturalWidth
-      &&D.classList.contains('art-edge-extended')
-      &&(['solid','extended'].includes(D.dataset.artBackgroundMode))
-      &&(D.dataset.artBackgroundMode==='solid'||D.style.backgroundImage.includes('data:image/png'));
-   },[designId,variant],{timeout:10000});
-   const result=await page.evaluate(async()=>{
-    const D=document.getElementById('disc'),img=D.querySelector('.dx-art img');
-    const scene=D.getBoundingClientRect(),element=img.getBoundingClientRect();
-    const mode=D.dataset.artBackgroundMode;
-    const bgUrl=D.style.backgroundImage.match(/data:image\/png;base64,[A-Za-z0-9+/=]+/)?.[0];
-    const bg=new Image();
-    if(mode==='extended'){if(!bgUrl)throw Error('Fondo extendido ausente');bg.src=bgUrl;await bg.decode();}
-    const bc=document.createElement('canvas');
-    bc.width=mode==='solid'?Math.round(scene.width):bg.naturalWidth;
-    bc.height=mode==='solid'?Math.round(scene.height):bg.naturalHeight;
-    const bx=bc.getContext('2d',{willReadFrequently:true});
-    if(mode==='solid'){bx.fillStyle=D.style.getPropertyValue('--bg');bx.fillRect(0,0,bc.width,bc.height);}
-    else bx.drawImage(bg,0,0);
-    let paint={left:element.left,top:element.top,width:element.width,height:element.height};
-    if(getComputedStyle(img).objectFit==='contain'){
-     const scale=Math.min(element.width/img.naturalWidth,element.height/img.naturalHeight);
-     const w=img.naturalWidth*scale,h=img.naturalHeight*scale;
-     paint={left:element.left+(element.width-w)/2,top:element.top+(element.height-h)/2,width:w,height:h};
-    }
-    const clip=(img.closest('.ab')||img.closest('.dx-art')).getBoundingClientRect();
-    const l=Math.max(scene.left,clip.left,paint.left),r=Math.min(scene.right,clip.right,paint.left+paint.width);
-    const t=Math.max(scene.top,clip.top,paint.top),b=Math.min(scene.bottom,clip.bottom,paint.top+paint.height);
-    const midY=(t+b)/2;
-    const xLeft=Math.round(Math.max(1,(l-scene.left-3)*bc.width/scene.width));
-    const xRight=Math.round(Math.min(bc.width-2,(r-scene.left+3)*bc.width/scene.width));
-    const y=Math.round((midY-scene.top)*bc.height/scene.height);
-    const color=x=>Array.from(bx.getImageData(x,y,1,1).data).slice(0,3);
-    const source=document.createElement('canvas');source.width=img.naturalWidth;source.height=img.naturalHeight;
-    const sx=source.getContext('2d',{willReadFrequently:true});sx.drawImage(img,0,0);
-    const sy=Math.max(0,Math.min(img.naturalHeight-1,Math.round((midY-paint.top)/paint.height*img.naturalHeight)));
-    const leftX=Math.max(0,Math.min(img.naturalWidth-1,Math.round((l-paint.left)/paint.width*img.naturalWidth)));
-    const rightX=Math.max(0,Math.min(img.naturalWidth-1,Math.round((r-paint.left)/paint.width*img.naturalWidth)-1));
-    const pixel=x=>Array.from(sx.getImageData(x,sy,1,1).data).slice(0,3);
-    const delta=(a,b)=>Math.max(...a.map((v,i)=>Math.abs(v-b[i])));
-    return {left:delta(color(xLeft),pixel(leftX)),
-      right:delta(color(xRight),pixel(rightX)),
-      artColor:getComputedStyle(D.querySelector('.dx-art')).backgroundColor,
-      stageWidth:scene.width,sourceWidth:r-l};
+    if(D.dataset.artId!==design||!im?.naturalWidth)return false;
+    const bg=bgFromArtwork(im),paint=D.style.getPropertyValue('--bg');
+    if(!bg||!paint)return false;
+    const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+    return Math.max(...rgb(bg).map((v,i)=>Math.abs(v-rgb(paint)[i])))<=3;
+   },id,{timeout:10000});
+   const state=await page.evaluate(()=>{
+    const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
+    return {color:D.style.getPropertyValue('--bg'),
+      original:bgFromArtwork(im),visible:getComputedStyle(D).backgroundColor};
    });
-   assert(result.sourceWidth>0&&result.sourceWidth<=result.stageWidth+1,'el arte respeta el ancho de escena');
-   assert.equal(result.artColor,'rgba(0, 0, 0, 0)','no hay panel rectangular interno');
-   assert(result.left<=40&&result.right<=40,
-     designId+'/'+variant+': fondo exterior no coincide con las orillas reales: '+JSON.stringify(result));
-   await page.screenshot({path:'qa/screenshots/ui-lab-edge-'+designId+'-'+variant+'-'+width+'.png'});
+   assert(state.original,'Se puede medir el borde original');
+   assert.equal(state.visible,'rgb('+[1,3,5].map(i=>parseInt(state.color.slice(i,i+2),16)).join(', ')+')');
+   await page.screenshot({path:'qa/screenshots/ui-lab-main-render-'+id+'-'+width+'.png'});
   }
   assert.equal(storage.live,sentinel,'real save is unchanged');
   assert.equal(storage.liveHandle,'real_guest','real handle untouched');
@@ -192,95 +181,71 @@ try{
   await context.close();
  }
 
- // Escritorio: comprobación visual independiente del flujo móvil. Reproduce el
- // escenario de las capturas reportadas (CRT centrado) con fondos sin recuadros.
+
+ // Comparación en navegador REAL de main vs LAB, misma pantalla y mismos
+ // archivos: cada prueba guarda captura de ambas implementaciones.
  const desktop=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'no-preference'});
- const screen=await desktop.newPage(),desktopErrors=[];
- screen.on('pageerror',error=>desktopErrors.push(error.message));
- await screen.goto(LAB_URL,{waitUntil:'domcontentloaded'});
- await screen.locator('#icmxLabToggle').click();
- await screen.locator('[data-lab-action="pack"]').click();
- await screen.locator('#pack.on').waitFor({state:'visible'});
- for(const [id,variant] of [['sonic','b'],['carton','b'],['karma','e'],['evilexes','b'],['sonic','r']]){
-  await screen.evaluate(([design,v])=>{
-   const card=CB[design+'_'+v];
+ const lab=await desktop.newPage();
+ const main=await desktop.newPage();
+ const desktopErrors=[];
+ lab.on('pageerror',error=>desktopErrors.push('LAB '+error.message));
+ await Promise.all([
+  lab.goto(LAB_URL,{waitUntil:'domcontentloaded'}),
+  main.goto('http://127.0.0.1:'+server.address().port+'/qa-main-reference.html',{waitUntil:'domcontentloaded'})
+ ]);
+ await lab.locator('#icmxLabToggle').click();
+ await lab.locator('[data-lab-action="pack"]').click();
+ await lab.locator('#pack.on').waitFor({state:'visible'});
+ const cases=[
+  ['oneplayer','b'],['continuara','b'],['booit','b'],['hipstermario','b'],
+  ['carton','b'],['carton','e'],['guardianes','b'],['versus','r'],
+  ['sonic','b'],['evilexes','b'],['karma','e']
+ ];
+ async function render(page,design,variant){
+  await page.evaluate(([id,v])=>{
+   const card=CB[id+'_'+v];
+   if(!card)throw Error('No existe '+id+'/'+v);
+   document.querySelectorAll('.crt > .screen.on').forEach(el=>el.classList.remove('on'));
+   document.getElementById('pack').classList.add('on');
    hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
    idx=0;showCard();
-  },[id,variant]);
-  await screen.waitForFunction(([design])=>{
-   const D=document.getElementById('disc');
-   return D.dataset.artId===design&&D.dataset.artBackgroundMode==='solid'
-     &&D.classList.contains('art-edge-extended');
-  },[id,variant],{timeout:12000});
-  const state=await screen.evaluate(()=>{
-   const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
-   return {expected:solidArtworkBackground(im),actual:D.style.getPropertyValue('--bg'),
-    scene:D.getBoundingClientRect().toJSON(),
-    art:getComputedStyle(D.querySelector('.dx-art')).backgroundColor,
-    backdrop:getComputedStyle(D).backgroundColor};
-  });
-  assert(state.expected&&state.actual===state.expected,
-   id+'/'+variant+' escritorio: fondo debe coincidir con el color real');
-  assert.equal(state.art,'rgba(0, 0, 0, 0)','escritorio: sin panel opaco tras arte');
-  assert(state.scene.width>500,'el CRT de escritorio debe estar abierto');
-  await screen.screenshot({path:'qa/screenshots/ui-lab-edge-desktop-'+id+'-'+variant+'.png'});
- }
-
-
- // REGRESIÓN VISUAL REAL: la prueba anterior sólo inspeccionaba CSS.
- // Muestreamos píxeles de la captura que realmente ve el jugador,
- // sin excepciones de lógica en el renderizador.
- for(const [id,variant] of [['guardianes','b'],['booit','b'],['hipstermario','b'],['carton','e'],['versus','r']]){
-  await screen.evaluate(([design,v])=>{
-   const c=CB[design+'_'+v];if(!c)throw Error('Falta '+design+v);
-   hand=[{...c,_new:false,_dnew:false,_comp:false,_doneB:true}];
-   idx=0;showCard();
-  },[id,variant]);
-  await screen.waitForFunction(([design])=>{
+  },[design,variant]);
+  await page.waitForFunction(id=>{
    const D=document.getElementById('disc'),im=D?.querySelector('.dx-art img');
-   return D.dataset.artId===design&&im?.complete&&im.naturalWidth>0
-     &&D.classList.contains('art-edge-extended');
-  },[id,variant],{timeout:12000});
-  await screen.waitForTimeout(850); // capturar estado estable, con animaciones habilitadas
-  const capture=await screen.screenshot({type:'png',
-    path:'qa/screenshots/ui-lab-visual-'+id+'-'+variant+'-desktop.png'});
-  const pixelCheck=await screen.evaluate(async encoded=>{
-   const D=document.getElementById('disc'),art=D.querySelector('.dx-art'),im=art.querySelector('img');
-   const sample=solidArtworkBackground(im);
-   const expected=sample?.match(/[0-9a-f]{2}/gi)?.map(x=>parseInt(x,16));
-   if(!expected)throw Error('El original no tiene color de fondo medible');
-   const snap=new Image();snap.src='data:image/png;base64,'+encoded;await snap.decode();
-   const canvas=document.createElement('canvas');canvas.width=snap.naturalWidth;canvas.height=snap.naturalHeight;
-   const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(snap,0,0);
-   const bounds=D.getBoundingClientRect(),left=Math.round(bounds.left),top=Math.round(bounds.top),
-     width=bounds.width,height=bounds.height;
-   const rgb=(x,y)=>Array.from(ctx.getImageData(Math.round(x),Math.round(y),1,1).data).slice(0,3);
-   const diff=(a,b)=>Math.max(...a.map((n,i)=>Math.abs(n-b[i])));
-   const outside=[rgb(left+12,top+150),rgb(left+width-12,top+150)];
-   // La estampa debe ser visible, no solamente estar cargada o tener opacity 1.
-   let marks=0,total=0;
-   for(let y=top+height*.19;y<top+height*.59;y+=4){
-    for(let x=left+width*.25;x<left+width*.75;x+=4){
-     total++;
-     if(diff(rgb(x,y),expected)>40)marks++;
-    }
-   }
-   return {mode:D.dataset.artBackgroundMode,color:sample,
-    artOpacity:getComputedStyle(art).opacity,
-    sideDifferences:outside.map(color=>diff(color,expected)),
-    activePixels:marks,total,activeRatio:marks/total};
-  },capture.toString('base64'));
-  assert.equal(pixelCheck.mode,'solid',id+'/'+variant+': debe detectar el fondo original');
-  assert.equal(pixelCheck.artOpacity,'1',id+'/'+variant+': el arte debe estar visible');
-  const maxSideDifference=variant==='b'?12:45;
-  assert(pixelCheck.sideDifferences.every(d=>d<=maxSideDifference),
-   id+'/'+variant+': recuadro todavía visible en captura: '+JSON.stringify(pixelCheck));
-  assert(pixelCheck.activeRatio>0.025,
-   id+'/'+variant+': la ilustración no aparece en los píxeles: '+JSON.stringify(pixelCheck));
-  console.log('✓ Arte visible y fondo continuo '+id+'/'+variant+' '+JSON.stringify(pixelCheck));
+   if(!D||D.dataset.artId!==id||!im?.naturalWidth)return false;
+   const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+   const expected=bgFromArtwork(im),actual=D.style.getPropertyValue('--bg');
+   return expected&&actual&&Math.max(...rgb(expected).map((v,i)=>Math.abs(v-rgb(actual)[i])))<=3;
+  },design,{timeout:10000});
+  await page.waitForTimeout(750);
+  return await page.evaluate(()=>{
+   const D=document.getElementById('disc'),im=D.querySelector('.dx-art img'),art=D.querySelector('.dx-art');
+   return {measured:bgFromArtwork(im),actual:D.style.getPropertyValue('--bg'),
+    background:getComputedStyle(D).backgroundColor,artOpacity:getComputedStyle(art).opacity,
+    imageSize:[im.naturalWidth,im.naturalHeight],
+    viewport:[D.getBoundingClientRect().width,D.getBoundingClientRect().height]};
+  });
  }
- assert.deepEqual(desktopErrors,[],'sin errores del navegador en escritorio');
- console.log('✓ LAB escritorio 1280px: continuidad de fondo por muestreo para cinco cartas/variantes');
+ for(const [id,v] of cases){
+  const fromMain=await render(main,id,v);
+  const fromLab=await render(lab,id,v);
+  assert.equal(fromLab.background,fromMain.background,
+    id+'/'+v+': color visible de LAB distinto de main');
+  assert.equal(fromLab.measured,fromMain.measured,
+    id+'/'+v+': fondo fuente distinto de main');
+  assert.equal(fromLab.artOpacity,'1',id+'/'+v+': ilustración no visible en LAB');
+  await main.screenshot({path:'qa/screenshots/ui-lab-compare-main-'+id+'-'+v+'.png'});
+  await lab.screenshot({path:'qa/screenshots/ui-lab-compare-lab-'+id+'-'+v+'.png'});
+  console.log('✓ MAIN = LAB '+id+'/'+v,JSON.stringify({main:fromMain.background,lab:fromLab.background}));
+ }
+ // Verificación de COBERTURA: no se aprueba el motor si quedan diseños fuera.
+ const entireCatalog=await lab.evaluate(()=>{
+  const supported=new Set([...Object.keys(RBG),...Object.keys(ICOL),...AUTO_BG_IDS]);
+  return {count:DESIGNS.length,missing:DESIGNS.map(d=>d.id).filter(id=>!supported.has(id))};
+ });
+ assert.deepEqual(entireCatalog.missing,[],'Todo diseño de main debe tener un fondo respaldado');
+ console.log('✓ Cobertura heredada de main: '+entireCatalog.count+' diseños');
+ assert.deepEqual(desktopErrors,[],'sin errores de navegador LAB');
  await desktop.close();
 }finally{
  await browser.close();
