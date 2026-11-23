@@ -75,6 +75,9 @@
   }
   // Un solo vector reutilizable. La estrella de habilidad es de 4 puntas;
   // la jerarquía de rareza usa 5 puntas. No usamos caracteres de fuente.
+  function layerAbilityIcon(layers,cx,cy) {
+    layers.push({type:'ability-icon',cx,cy});
+  }
   function layerStar(layers, cx, cy, radius, points=5, color='#ffd21f') {
     layers.push({type:'star',cx,cy,radius,points,color});
   }
@@ -127,7 +130,7 @@
       const [r1,r2]=splitRef(card),offset=r2?28:0;
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',186,884,{tint:ink,width:264,height:26});
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_goty.png',790,900+offset,{tint:ink,width:102,height:78});
-      layerImage(layers,rootPath+'cartas/plantillas/icono.png',125.5,929.5+offset,{anchor:'center'});
+      layerAbilityIcon(layers,125.5,929.5+offset);
       layerText(layers,r1,193,926,49.2,ink,{maxWidth:590});
       if (r2) layerText(layers,r2,193,982,49.2,ink,{maxWidth:590});
       const habilidad=wrapLine(card.linea,r2?75:49);
@@ -167,7 +170,13 @@
     const svg=el('svg',{viewBox:'0 0 960 1340',class:'icmx-data',
       preserveAspectRatio:'xMidYMid meet','aria-hidden':'true'});
     for (const lay of layers) {
-      if (lay.type==='star') {
+      if (lay.type==='ability-icon') {
+        // Misma silueta circular de habilidad, ahora 100 % SVG y nítida en móviles.
+        svg.appendChild(el('circle',{cx:lay.cx,cy:lay.cy,r:44,fill:'#f8f2eb',
+          stroke:'#20191d','stroke-width':5}));
+        svg.appendChild(el('path',{d:starPath({cx:lay.cx,cy:lay.cy,radius:20,points:4}),
+          fill:'#20191d','data-icmx-ability-icon':'true'}));
+      } else if (lay.type==='star') {
         svg.appendChild(el('path',{d:starPath(lay),fill:lay.color,'data-icmx-star':lay.points,
           'aria-hidden':'true'}));
       } else if (lay.type==='image') {
