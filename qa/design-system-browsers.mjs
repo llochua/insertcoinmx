@@ -116,6 +116,10 @@ try{
    lab:localStorage.getItem('icmx-ui-lab-progress-v1')
   }));
 
+  // La escena debe estar visible: el QA venía de Perfil (pack oculto).
+  await page.locator('#icmxLabToggle').click();
+  await page.locator('[data-lab-action="pack"]').click();
+  await page.locator('#pack.on').waitFor({state:'visible'});
   // Contrato visual UNIVERSAL: todos los diseños usan el perímetro real del
   // arte, sin IDs privilegiados. Verificamos variantes, colores y degradados.
   for(const [designId,variant] of [["sonic","b"],["sonic","r"],["carton","b"],["karma","e"],["evilexes","b"],["robogodin","b"]]){
