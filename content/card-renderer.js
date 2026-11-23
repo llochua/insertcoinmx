@@ -10,6 +10,7 @@
   const COLORS = Object.freeze({b:'#191200',e:'#131111',r:'#191203',f:'#ffffff'});
   const NAMES = Object.freeze({b:'Común',e:'Holo',r:'Dorada',f:'Arte Especial'});
   const CSS_ID = 'icmx-card-renderer-css';
+  let maskSequence = 0;
 
   function assertData(card, variant) {
     if (!card || !/^[a-z0-9]{1,40}$/.test(String(card.id || ''))) throw Error('ID de carta inválido');
@@ -108,8 +109,8 @@
       layerText(layers,'POP',594,160,23.4,ink,{maxWidth:95});
       layerText(layers,popOf(options),909,209,74,ink,{maxWidth:270,align:'end'});
       const [r1,r2]=splitRef(card),offset=r2?28:0;
-      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',186,884,{tint:ink});
-      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_goty.png',790,900+offset,{tint:ink});
+      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',186,884,{tint:ink,width:264,height:26});
+      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_goty.png',790,900+offset,{tint:ink,width:102,height:78});
       layerImage(layers,rootPath+'cartas/plantillas/icono.png',125.5,929.5+offset,{anchor:'center'});
       layerText(layers,r1,193,926,49.2,ink,{maxWidth:590});
       if (r2) layerText(layers,r2,193,982,49.2,ink,{maxWidth:590});
@@ -125,7 +126,7 @@
       layerText(layers,card.nombre,48,922,64,'#ffffff',{maxWidth:590});
       layerText(layers,'POP',910,892,21,'#ffffff',{align:'end',spacing:4});
       layerText(layers,popOf(options),909,1011,79,'#ffffff',{align:'end',maxWidth:250});
-      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',48,1006);
+      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',48,1006,{tint:'#ffffff',width:264,height:26});
       layerText(layers,'✦',62,1052,37,'#ffd21f',{maxWidth:60,align:'middle'});
       layerText(layers,(card.ref+' '+(card.ref2||'')).trim(),84,1050,38,'#ffd21f',{maxWidth:560});
       layerText(layers,'— GOTY',910,1050,38,'#ffd21f',{align:'end',maxWidth:210});
@@ -150,19 +151,31 @@
       preserveAspectRatio:'xMidYMid meet','aria-hidden':'true'});
     for (const lay of layers) {
       if (lay.type==='image') {
-        const im=el('image',{href:lay.url,x:lay.x,y:lay.y,width:lay.width||1,height:lay.height||1});
-        if(lay.tint)im.style.filter='brightness(0)'; // piloto: revisar igualación exacta de tinta antes de publicar
-        svg.appendChild(im);
-        const probe=new Image();
-        probe.onload=()=>{
-          const w=lay.width||probe.naturalWidth,h=lay.height||probe.naturalHeight;
-          if (lay.anchor==='center') {
-            im.setAttribute('x',lay.x-w/2);
-            im.setAttribute('y',lay.y-h/2);
-          }
-          im.setAttribute('width',w);im.setAttribute('height',h);
-        };
-        probe.src=lay.url;
+        if(lay.tint) {
+          // Archivos etiqueta_*.png son máscaras de luminancia (gris), NO PNG transparentes.
+          // Rasterizar directamente el archivo añadiría un bloque negro al marco.
+          const id='icmx-card-mask-'+(++maskSequence),w=lay.width,h=lay.height;
+          const mask=el('mask',{id,x:lay.x,y:lay.y,width:w,height:h,
+            maskUnits:'userSpaceOnUse',maskContentUnits:'userSpaceOnUse','mask-type':'luminance'});
+          mask.style.maskType='luminance';
+          mask.appendChild(el('image',{href:lay.url,x:lay.x,y:lay.y,width:w,height:h}));
+          const rect=el('rect',{x:lay.x,y:lay.y,width:w,height:h,fill:lay.tint,
+            mask:'url(#'+id+')'});
+          svg.appendChild(mask);svg.appendChild(rect);
+        } else {
+          const im=el('image',{href:lay.url,x:lay.x,y:lay.y,width:lay.width||1,height:lay.height||1});
+          svg.appendChild(im);
+          const probe=new Image();
+          probe.onload=()=>{
+            const w=lay.width||probe.naturalWidth,h=lay.height||probe.naturalHeight;
+            if(lay.anchor==='center') {
+              im.setAttribute('x',lay.x-w/2);
+              im.setAttribute('y',lay.y-h/2);
+            }
+            im.setAttribute('width',w);im.setAttribute('height',h);
+          };
+          probe.src=lay.url;
+        }
       } else {
         const tx=el('text',{x:lay.x,y:lay.y,'font-size':lay.size,'font-family':lay.family,
           'font-weight':lay.weight,'dominant-baseline':'hanging',
