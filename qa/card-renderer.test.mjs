@@ -80,6 +80,17 @@ test('POP respeta su caja con posición controlada Base y Full',()=>{
     assert(pop.clipBox && pop.clipBox.y<=pop.y);
   }
 });
+test('pie completo: un fondo SVG continuo, no máscaras debajo de número/valor',()=>{
+  for(const v of ['b','e','r']){
+    const layers=api.makeLayers(sample,v,{points:50,pop:7});
+    const plate=layers.filter(x=>x.type==='footer-plate');
+    assert.equal(plate.length,1,v);
+    assert.equal(plate[0].variant,v);
+    assert(layers.indexOf(plate[0])<layers.findIndex(x=>x.field==='collection-number'),
+      'la placa se dibuja antes que los datos');
+  }
+  assert.equal(api.makeLayers(sample,'f',{fullTotal:74}).filter(x=>x.type==='footer-plate').length,0);
+});
 test('número dinámico solo dibuja texto: sin parche ni máscara en el pie',()=>{
   const layers=api.makeLayers({...sample,numero:'089/???'},'b',{});
   assert.equal(layers.find(x=>x.field==='collection-number').text,'089/???');
