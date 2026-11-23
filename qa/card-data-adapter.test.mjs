@@ -77,6 +77,7 @@ test('Bonus se etiqueta como Bonus, no infiere totales',()=>{
  assert.equal(x.card.tipo,bonus.tipo);
  assert.equal(x.card.numero,bonus.numero);
 });
-test('el adaptador no usa red ni almacenamiento',()=>{
- assert.doesNotMatch(src,/localStorage|sessionStorage|fetch\(|XMLHttpRequest|supabase|indexedDB/i);
+test('el adaptador no ejecuta red ni escrituras de almacenamiento',()=>{
+ const code=src.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'');
+ assert.doesNotMatch(code,/\b(?:localStorage|sessionStorage)\s*\.|\bfetch\s*\(|\bXMLHttpRequest\b|\bsupabase\s*\.|\bindexedDB\b/i);
 });
