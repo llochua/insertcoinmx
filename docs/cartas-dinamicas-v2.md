@@ -13,8 +13,8 @@ cuando cambian número/total del álbum, valor PTS, POP, nombre, categoría, hab
    IDs seleccionados. Deja las cartas existentes en `c/` y `c2/` intactas.
 2. `content/card-renderer.js` ofrece `window.ICMX_CARD_RENDERER.create(card, rareza, opciones)`
    y combina cada base sin textos con capas SVG basadas en datos.
-3. `qa/cards-dynamic-preview.html` muestra dos versiones lado a lado para pruebas manuales.
-4. `qa/card-renderer.test.mjs` valida la numeración, versiones, aliases, bonus y valores.
+3. El **LAB ya existente** de sobres ilimitados se usa para comparar cartas desde el PR #137, sin crear otro laboratorio.
+4. `qa/card-renderer.test.mjs` valida numeración, versiones, aliases, Bonus y valores.
 5. El workflow de validación **incluye** este test y `py_compile`.
 
 Este PR **no cambia index.html ni el juego principal**; no publica ni cambia
@@ -30,15 +30,12 @@ node --test qa/card-renderer.test.mjs
 python -m http.server 8000
 ```
 
-Abrir `http://localhost:8000/qa/cards-dynamic-preview.html`.
+Para comparación visual, abrir el **LAB original** del PR #137 (rama `feature/cartas-dinamicas-en-lab`),
+menú `LAB · ∞ SOBRES` → `Comparar cartas dinámicas`. Ahí están las 22 bases de muestra.
+No se crea una segunda pantalla de prueba independiente. Los WebP antiguos no se modifican.
 
-Comparar Base, Holo, Dorada, Full (Sonic/Abuket); nombre largo, habilidad de dos líneas,
-PTS de prueba, POP ausente/presente y número cambiante. Cambiar solo campos del formulario:
-los WebP bajo `cs/` y `cs2/` NO deben cambiar.
-
-**Las bases binarias de prueba NO se incluyeron en el PR:** deben generarse localmente.
-El laboratorio reporta el archivo faltante; no superpone datos sobre los WebP antiguos,
-porque estos contienen números y textos ya impresos.
+**Las bases binarias de muestra se mantienen únicamente en el PR del LAB (#137)**;
+este PR técnico contiene el generador y el motor, sin archivos WebP nuevos.
 
 ## Propiedad de cada capa
 
