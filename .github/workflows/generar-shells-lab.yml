@@ -59,5 +59,9 @@ jobs:
           git add cs cs2
           if ! git diff --cached --quiet; then
             git commit -m "test(lab): publicar 22 bases dinámicas para comparación visual"
-            git push
+            # El renderizador puede recibir commits mientras se generan las bases.
+            # Rebasea únicamente sobre la rama de prueba (nunca force-push).
+            git fetch origin "$GITHUB_REF_NAME"
+            git rebase "origin/$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
           fi
