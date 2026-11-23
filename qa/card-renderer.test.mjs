@@ -61,13 +61,29 @@ test('el icono de habilidad estándar es vectorial, sin imagen PNG',()=>{
   assert.equal(layers.filter(x=>x.type==='ability-icon').length,1);
   assert(!layers.some(x=>x.type==='image'&&/icono\\.png/.test(x.url)));
 });
-test('jerarquía vectorial Full: 1 símbolo de habilidad y 3 estrellas de rareza',()=>{
-  const layers=api.makeLayers(sample,'f',{fullTotal:74});
-  const symbols=layers.filter(x=>x.type==='star');
-  assert.equal(symbols.length,4);
-  assert.equal(symbols.filter(x=>x.points===4).length,1);
-  assert.equal(symbols.filter(x=>x.points===5).length,3);
-  assert(!layers.some(x=>x.type==='text'&&/[✦★]/.test(x.text)),'no estrellas tipográficas');
+test('rareza usa estrellas SVG 0/1/2/3 y habilidad usa ícono diferente',()=>{
+  const counts={b:0,e:1,r:2,f:3};
+  for(const [variant,expected] of Object.entries(counts)){
+    const layers=api.makeLayers(sample,variant,{fullTotal:74});
+    assert.equal(layers.filter(x=>x.type==='star'&&x.points===5).length,expected,variant);
+    assert(!layers.some(x=>x.type==='text'&&/[✦★]/.test(x.text)),'sin estrellas de fuente');
+    if(variant==='b')assert.equal(layers.filter(x=>x.type==='ability-icon').length,1);
+  }
+});
+test('POP respeta su caja con posición controlada Base y Full',()=>{
+  for(const [variant,y] of [['b',135],['f',924]]){
+    const layers=api.makeLayers(sample,variant,{pop:143,fullTotal:74});
+    const pop=layers.find(x=>x.field==='pop');
+    assert.equal(pop.text,'143');
+    assert.equal(pop.y,y);
+    assert.equal(pop.align,'end');
+    assert(pop.clipBox && pop.clipBox.y<=pop.y);
+  }
+});
+test('número dinámico solo dibuja texto: sin parche ni máscara en el pie',()=>{
+  const layers=api.makeLayers({...sample,numero:'089/???'},'b',{});
+  assert.equal(layers.find(x=>x.field==='collection-number').text,'089/???');
+  assert(!layers.some(x=>x.type==='rect' && x.y>1200));
 });
 test('la Full conserva numeración independiente',()=>{
   const layers=api.makeLayers(sample,'f',{fullTotal:74,points:125,pop:90,assetRoot:'../'});
