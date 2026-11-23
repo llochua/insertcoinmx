@@ -76,8 +76,9 @@
   }
   // Las estrellas de rareza son un sistema independiente del símbolo de habilidad.
   // El ícono de habilidad representa energía/acción (rayo); nunca una estrella.
-  function layerAbilityIcon(layers,cx,cy) {
-    layers.push({type:'ability-icon',cx,cy});
+  function layerAbilityIcon(layers,cx,cy,opts={}) {
+    layers.push({type:'ability-icon',cx,cy,radius:opts.radius||44,
+      badge:opts.badge!==false,color:opts.color||'#20191d'});
   }
   function layerStar(layers, cx, cy, radius, points=5, color='#ffd21f') {
     layers.push({type:'star',cx,cy,radius,points,color});
@@ -92,6 +93,12 @@
       path+=(k?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)+' ';
     }
     return path+'Z';
+  }
+  function layerFooterRule(layers,x,color) {
+    layers.push({type:'footer-rule',x,color});
+  }
+  function layerFooterDot(layers,cx,cy,color) {
+    layers.push({type:'footer-dot',cx,cy,color});
   }
   function layerImage(layers, url, x, y, options={}) {
     layers.push({type:'image',url,x,y,anchor:options.anchor||'start',
@@ -141,12 +148,24 @@
         {maxWidth:800,family:'"Carlito", Arial, sans-serif',weight:400}));
       layerText(layers,card.frase,75,1132,29.7,ink,
         {maxWidth:620,family:'"Carlito", Arial, sans-serif',weight:400,italic:true});
-      if(variant==='e')layerStar(layers,405,1271,12,5,ink);
-      if(variant==='r')[393,423].forEach(cx=>layerStar(layers,cx,1271,12,5,ink));
-      // Numeración exclusivamente en texto SVG sin fondo, máscara ni parche.
+      // Interior inferior recreado como UN solo fondo de plantilla, sin parches.
+      // Todos sus rótulos y divisores son dinámicos y comparten el mismo sistema.
+      layerText(layers,'Carta',75,1250,23.4,ink,{maxWidth:63,field:'collection-label'});
       layerText(layers,numLabel(card,variant,options),148,1250,23.4,ink,
         {maxWidth:206,field:'collection-number'});
-      layerText(layers,'Valor '+pointsOf(variant,options),651,1250,23.4,ink,{maxWidth:194});
+      layerFooterRule(layers,336,ink);
+      if(variant==='b'){
+        layerFooterDot(layers,370,1261,ink);
+        layerText(layers,'Común',398,1250,23.4,ink,{maxWidth:165});
+      } else if(variant==='e'){
+        layerStar(layers,375,1261,12,5,ink);
+        layerText(layers,'Holo',408,1250,23.4,ink,{maxWidth:172});
+      } else {
+        [374,408].forEach(cx=>layerStar(layers,cx,1261,12,5,ink));
+        layerText(layers,'Dorada',472,1250,23.4,ink,{maxWidth:145});
+      }
+      layerFooterRule(layers,622,ink);
+      layerText(layers,'Valor '+pointsOf(variant,options),647,1250,23.4,ink,{maxWidth:204});
     } else {
       layerImage(layers,pill,32,30);
       layerText(layers,card.nombre,48,922,64,'#ffffff',{maxWidth:590});
@@ -155,7 +174,7 @@
       layerText(layers,popOf(options),909,924,79,'#ffffff',
         {align:'end',maxWidth:230,field:'pop',clipBox:{x:665,y:922,width:249,height:100}});
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',48,1006,{tint:'#ffffff',width:264,height:26});
-      layerStar(layers,62,1064,15,4);
+      layerAbilityIcon(layers,62,1064,{radius:22,badge:false,color:'#ffd21f'});
       layerText(layers,(card.ref+' '+(card.ref2||'')).trim(),84,1050,38,'#ffd21f',{maxWidth:560});
       layerText(layers,'— GOTY',910,1050,38,'#ffd21f',{align:'end',maxWidth:210});
       layerText(layers,card.frase,78,1145,30,'#191200',
@@ -179,14 +198,20 @@
     const svg=el('svg',{viewBox:'0 0 960 1340',class:'icmx-data',
       preserveAspectRatio:'xMidYMid meet','aria-hidden':'true'});
     for (const lay of layers) {
-      if (lay.type==='ability-icon') {
-        // Un rayo comunica HABILIDAD (acción); las estrellas se reservan para rareza.
-        svg.appendChild(el('circle',{cx:lay.cx,cy:lay.cy,r:44,fill:'#f8f2eb',
-          stroke:'#20191d','stroke-width':5}));
+      if (lay.type==='footer-rule'){
+        svg.appendChild(el('line',{x1:lay.x,x2:lay.x,y1:1245,y2:1280,
+          stroke:lay.color,'stroke-width':3,'data-icmx-footer-rule':'true'}));
+      } else if(lay.type==='footer-dot'){
+        svg.appendChild(el('circle',{cx:lay.cx,cy:lay.cy,r:5,fill:lay.color,
+          'data-icmx-footer-dot':'true'}));
+      } else if (lay.type==='ability-icon') {
+        // Un rayo coherente en todas las rarezas, separado de las estrellas.
+        if(lay.badge)svg.appendChild(el('circle',{cx:lay.cx,cy:lay.cy,r:lay.radius,
+          fill:'#f8f2eb',stroke:'#20191d','stroke-width':5}));
         svg.appendChild(el('path',{
           d:'M -2 -27 L -19 2 H -4 L -12 27 L 22 -8 H 5 L 14 -27 Z',
-          fill:'#20191d',stroke:'#20191d','stroke-linejoin':'round',
-          transform:'translate('+lay.cx+' '+lay.cy+')',
+          fill:lay.color,stroke:lay.color,'stroke-linejoin':'round',
+          transform:'translate('+lay.cx+' '+lay.cy+') scale('+(lay.radius/44)+')',
           'data-icmx-ability-icon':'zap'
         }));
       } else if (lay.type==='star') {
