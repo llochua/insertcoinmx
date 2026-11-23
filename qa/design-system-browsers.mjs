@@ -218,7 +218,11 @@ try{
    return expected&&actual&&Math.max(...rgb(expected).map((v,i)=>Math.abs(v-rgb(actual)[i])))<=3;
   },design,{timeout:10000});
   await page.locator('#disc').waitFor({state:'visible'});
-  await page.waitForTimeout(750);
+  // El motor original anima la entrada; inspeccionar sólo tras su finalización.
+  await page.waitForFunction(()=>{
+   const art=document.querySelector('#disc .dx-art');
+   return art&&Number(getComputedStyle(art).opacity)>.99;
+  },null,{timeout:5000});
   return await page.evaluate(()=>{
    const D=document.getElementById('disc'),im=D.querySelector('.dx-art img'),art=D.querySelector('.dx-art');
    return {measured:bgFromArtwork(im),actual:D.style.getPropertyValue('--bg'),
