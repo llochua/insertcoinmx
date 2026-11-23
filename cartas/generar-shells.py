@@ -20,32 +20,52 @@ BASE = ROOT / "cartas/full"
 VERSIONES = ("comun", "holo", "dorada")
 
 
-def quitar_estrellas_impresas(marco, rareza):
-    """Quita SOLO la tinta de estrellas del marco original Holo/Dorada.
+def limpiar_pie_completo(marco, rareza):
+    """Una sola superficie limpia para TODOS los datos del pie.
 
-    Nunca pone rectángulos, gradientes nuevos ni parches en navegador.
-    La restauración afecta exclusivamente los trazos oscuros dentro de la
-    zona de insignia; el resto de la textura y todos los divisores quedan intactos.
-    Las estrellas nuevas se generan como vectores independientes en el renderer.
+    Las tres plantillas antiguas ya contenían un parche detrás del número,
+    texto de categoría y estrellas impresas. No se borran por zonas: se
+    recompone EL INTERIOR COMPLETO de la placa inferior, sin tocar su borde.
+    Cada columna mantiene su gradiente original. El renderer SVG añade
+    'Carta', numeración, rareza, estrellas/divisores y PTS.
+    Solo se ejecuta al generar bases de este LAB, nunca sobre c/ ni c2/.
     """
-    if rareza not in ("holo", "dorada"):
-        return marco
-    img = np.clip(marco, 0, 255).astype(np.uint8)
-    x0, y0, x1, y1 = 367, 1240, 492, 1297
-    zona = img[y0:y1, x0:x1].copy()
-    gris = cv2.cvtColor(zona, cv2.COLOR_RGB2GRAY)
-    # Tinta casi negra sobre fondos luminosos; conservar granos y tonos originales.
-    tinta = np.uint8(gris < 105) * 255
-    tinta = cv2.dilate(tinta, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
-    if cv2.countNonZero(tinta) < 35:
-        raise ValueError("No se reconocieron los símbolos de rareza impresos: " + rareza)
-    img[y0:y1, x0:x1] = cv2.inpaint(zona, tinta, 4, cv2.INPAINT_TELEA)
-    return img.astype(np.float32)
+    original = np.asarray(marco, dtype=np.float32)
+    if original.shape != (1340, 960, 3):
+        raise ValueError('Plantilla inesperada: ' + str(original.shape))
+    out = original.copy()
+    x0,x1,y0,y1 = 52,908,1238,1288
+    # Filas sin tipografía en el interior de la placa aprobada.
+    top = np.mean(original[1238:1244], axis=0)
+    bot = np.mean(original[1283:1288], axis=0)
+    # Suavizar únicamente artefactos de texto/foil en las referencias, no
+    # el encuadre ni ninguna otra región del marco.
+    top = cv2.GaussianBlur(top[np.newaxis,:,:], (27,1), 6)[0]
+    bot = cv2.GaussianBlur(bot[np.newaxis,:,:], (27,1), 6)[0]
+    ys=np.arange(y0,y1,dtype=np.float32)
+    t=np.clip((ys-y0)/float(y1-y0-1),0,1)[:,None,None]
+    surface=top[None,x0:x1,:]*(1-t)+bot[None,x0:x1,:]*t
+
+    # Grano mínimo determinista: evita una banda plana artificial.
+    # Dorada conserva su textura con tono uniforme; Holo conserva su gama.
+    rng=np.random.default_rng({'comun':31,'holo':37,'dorada':41}[rareza])
+    grain=rng.normal(0,0.65,size=(y1-y0,x1-x0,1)).astype(np.float32)
+    surface=np.clip(surface+grain,0,255)
+
+    # Bordes suaves: el interior se integra dentro del filete ORIGINAL.
+    xx=np.arange(x0,x1,dtype=np.float32)
+    ay=np.minimum(np.clip((ys-y0)/6,0,1),
+                  np.clip((y1-1-ys)/5,0,1))
+    ax=np.minimum(np.clip((xx-x0)/7,0,1),
+                  np.clip((x1-1-xx)/7,0,1))
+    alpha=(ay[:,None]*ax[None,:])[:,:,None]
+    out[y0:y1,x0:x1]=original[y0:y1,x0:x1]*(1-alpha)+surface*alpha
+    return out
 
 
 def imagen_base(d, rareza, plantillas):
     """Marco aprobado + arte original. SIN categoría, título, texto, POP, PTS ni número."""
-    salida = quitar_estrellas_impresas(plantillas["marco_" + rareza], rareza)
+    salida = limpiar_pie_completo(plantillas["marco_" + rareza], rareza)
     arte = g.leer_arte(d["id"])
     x0, y0, x1, y1 = g.VENTANA
     dibujo = g.acomodar_arte(arte, x1-x0, y1-y0, g.MARGEN_ARTE)
