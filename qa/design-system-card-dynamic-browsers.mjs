@@ -45,6 +45,11 @@ try{
     return images.every(x=>x?.complete&&x.naturalWidth>0);
   });
   assert.equal(await page.locator('#dynNew .icmx-data mask').count(),2,'mask luminance en etiquetas');
+  const pop=page.locator('#dynNew text[data-icmx-field="pop"]');
+  assert.equal(await pop.count(),1,'POP dinámico único');
+  assert.match(await pop.getAttribute('clip-path'),/url\(#icmx-pop-clip-/);
+  assert.equal(await page.locator('#dynNew .icmx-data path[data-icmx-ability-icon="zap"]').count(),1,
+    'habilidad usa rayo vectorial, no estrellas');
   assert.equal(await page.locator('#icmxDynamicLab .dyn-note[data-error="true"]').count(),0);
   let before=await page.locator('#dynNew .icmx-shell').getAttribute('src');
   await page.locator('#dynNumber').fill('001/250');
@@ -59,6 +64,11 @@ try{
   await page.screenshot({path:'qa/screenshots/ui-lab-dynamic-base-'+width+'.png',fullPage:true});
   await page.locator('#dynDesign').selectOption('sonic');
   await page.locator('#dynVariant').selectOption('e');
+  assert.equal(await page.locator('#dynNew .icmx-data path[data-icmx-star="5"]').count(),1,'Holo = 1 estrella SVG');
+  await page.locator('#dynVariant').selectOption('r');
+  assert.equal(await page.locator('#dynNew .icmx-data path[data-icmx-star="5"]').count(),2,'Dorada = 2 estrellas SVG');
+  await page.screenshot({path:'qa/screenshots/ui-lab-dynamic-gold-'+width+'.png',fullPage:true});
+  await page.locator('#dynVariant').selectOption('e');
   await page.waitForFunction(()=>document.querySelector('#dynNew .icmx-shell')?.complete &&
     document.querySelector('#dynNew .icmx-shell')?.naturalWidth>0);
   await page.screenshot({path:'qa/screenshots/ui-lab-dynamic-holo-'+width+'.png',fullPage:true});
@@ -69,6 +79,9 @@ try{
   await page.screenshot({path:'qa/screenshots/ui-lab-dynamic-full-'+width+'.png',fullPage:true});
   const svgStarCount=await page.locator('#dynNew .icmx-data path[data-icmx-star]').count();
   assert.equal(svgStarCount,4,'Full tiene 1 estrella vectorial de habilidad + 3 de rareza');
+  const popFull=page.locator('#dynNew text[data-icmx-field="pop"]');
+  assert.match(await popFull.getAttribute('clip-path'),/url\(#icmx-pop-clip-/);
+  assert.equal(await popFull.getAttribute('y'),'924','Full POP arriba de GOTY');
   assert.equal(await page.locator('#dynNew .icmx-data text').filter({hasText:'★★'}).count(),0,
     'ninguna estrella Full se dibuja como carácter tipográfico');
   assert.deepEqual(errors,[],'sin errores del navegador');
