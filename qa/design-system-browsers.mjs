@@ -143,6 +143,41 @@ try{
    await page.screenshot({path:'qa/screenshots/ui-lab-solid-background-'+designId+'-'+width+'.png'});
   }
   await page.evaluate(()=>document.getElementById('disc').classList.remove('on'));
+
+  // Regresión DS-ART-02: Evil Exes tiene degradado azul vertical, no fondo sólido.
+  // Base, Holo y Dorada deben prolongar sus orillas sin crear un rectángulo.
+  for(const variant of ['b','e','r']){
+   await page.evaluate(v=>{
+    const card=CB['evilexes_'+v];
+    if(!card?.img)throw Error('Falta Evil Exes '+v+' para QA');
+    hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
+    idx=0;showCard();
+   },variant);
+   await page.waitForFunction(()=>{
+    const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
+    return D.dataset.artId==='evilexes'&&!!im?.naturalWidth
+      &&D.classList.contains('art-edge-extended')
+      &&D.style.backgroundImage.includes('data:image/png');
+   });
+   const continuity=await page.evaluate(async()=>{
+    const D=document.getElementById('disc');
+    const url=D.style.backgroundImage.match(/data:image\/png;base64,[A-Za-z0-9+/=]+/)?.[0];
+    if(!url)return null;
+    const gradient=new Image();gradient.src=url;await gradient.decode();
+    const cv=document.createElement('canvas');cv.width=1;cv.height=256;
+    const ctx=cv.getContext('2d');ctx.drawImage(gradient,0,0);
+    const sample=y=>Array.from(ctx.getImageData(0,y,1,1).data).slice(0,3);
+    return {artBackground:getComputedStyle(D.querySelector('.dx-art')).backgroundColor,
+      top:sample(14),bottom:sample(240)};
+   });
+   assert(continuity,'se genera el fondo a partir de la orilla original');
+   assert.equal(continuity.artBackground,'rgba(0, 0, 0, 0)',
+      'la ilustración no tiene un panel opaco rectangular');
+   assert(Math.max(...continuity.top.map((x,i)=>Math.abs(x-continuity.bottom[i])))>30,
+      'el fondo conserva el degradado vertical real de Evil Exes');
+   await page.screenshot({path:'qa/screenshots/ui-lab-evilexes-'+variant+'-'+width+'.png'});
+  }
+
   assert.equal(storage.live,sentinel,'real save is unchanged');
   assert.equal(storage.liveHandle,'real_guest','real handle untouched');
   assert.equal(storage.liveRanking,'SENTINEL_REAL_RANKING','real ranking untouched');
