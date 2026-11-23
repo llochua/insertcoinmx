@@ -5,10 +5,14 @@ on:
       - feature/cartas-dinamicas-en-lab
     paths:
       - cartas/generar-shells.py
-      - content/card-renderer.js
-      - qa/design-system/card-dynamic-lab.js
-      - qa/design-system/index.html
+      - 'cartas/plantillas/**'
+      - 'cartas/arte/1up.png'
+      - 'cartas/arte/sonic.png'
+      - 'cartas/arte/abuket.png'
+      - 'cartas/full/sonic.jpg'
+      - 'cartas/full/abuket.jpg'
       - .github/workflows/generar-shells-lab.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
