@@ -20,9 +20,32 @@ BASE = ROOT / "cartas/full"
 VERSIONES = ("comun", "holo", "dorada")
 
 
+def quitar_estrellas_impresas(marco, rareza):
+    """Quita SOLO la tinta de estrellas del marco original Holo/Dorada.
+
+    Nunca pone rectángulos, gradientes nuevos ni parches en navegador.
+    La restauración afecta exclusivamente los trazos oscuros dentro de la
+    zona de insignia; el resto de la textura y todos los divisores quedan intactos.
+    Las estrellas nuevas se generan como vectores independientes en el renderer.
+    """
+    if rareza not in ("holo", "dorada"):
+        return marco
+    img = np.clip(marco, 0, 255).astype(np.uint8)
+    x0, y0, x1, y1 = 367, 1240, 492, 1297
+    zona = img[y0:y1, x0:x1].copy()
+    gris = cv2.cvtColor(zona, cv2.COLOR_RGB2GRAY)
+    # Tinta casi negra sobre fondos luminosos; conservar granos y tonos originales.
+    tinta = np.uint8(gris < 105) * 255
+    tinta = cv2.dilate(tinta, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+    if cv2.countNonZero(tinta) < 35:
+        raise ValueError("No se reconocieron los símbolos de rareza impresos: " + rareza)
+    img[y0:y1, x0:x1] = cv2.inpaint(zona, tinta, 4, cv2.INPAINT_TELEA)
+    return img.astype(np.float32)
+
+
 def imagen_base(d, rareza, plantillas):
     """Marco aprobado + arte original. SIN categoría, título, texto, POP, PTS ni número."""
-    salida = plantillas["marco_" + rareza].copy()
+    salida = quitar_estrellas_impresas(plantillas["marco_" + rareza], rareza)
     arte = g.leer_arte(d["id"])
     x0, y0, x1, y1 = g.VENTANA
     dibujo = g.acomodar_arte(arte, x1-x0, y1-y0, g.MARGEN_ARTE)
@@ -64,7 +87,9 @@ def nombre_version(d, rareza):
 def escribir_si_cambia(path, imagen):
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp.webp")
-    Image.fromarray(imagen).save(tmp, quality=90, method=6)
+    # Lossless: evita artefactos de compresión/halos en tipografía y franja del número.
+    # Solo archivos de este LAB, nunca modifica el WebP publicado.
+    Image.fromarray(imagen).save(tmp, lossless=True, method=6)
     data = tmp.read_bytes()
     tmp.unlink()
     if path.is_file() and path.read_bytes() == data:
