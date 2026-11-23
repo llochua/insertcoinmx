@@ -26,7 +26,8 @@
     return VARIANTS[variant] === original ? card.id : card.id+'_'+variant;
   }
   function cleanRoot(rootPath) {
-    return String(rootPath || '').replace(/\/?$/, '/');
+    const value=String(rootPath||'');
+    return !value?'':(value.endsWith('/')?value:value+'/');
   }
   function numLabel(card, variant, opts) {
     if (card.tipo !== 'Álbum') return 'BONUS';
