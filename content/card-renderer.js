@@ -94,6 +94,11 @@
     }
     return path+'Z';
   }
+  function layerFooterPlate(layers,variant) {
+    // Una SOLA placa vectorial continua: elimina los parches heredados de la plantilla
+    // detrás del número y valor. No repinta regiones sueltas ni regenera ilustraciones.
+    layers.push({type:'footer-plate',variant});
+  }
   function layerFooterRule(layers,x,color) {
     layers.push({type:'footer-rule',x,color});
   }
@@ -148,8 +153,9 @@
         {maxWidth:800,family:'"Carlito", Arial, sans-serif',weight:400}));
       layerText(layers,card.frase,75,1132,29.7,ink,
         {maxWidth:620,family:'"Carlito", Arial, sans-serif',weight:400,italic:true});
-      // Interior inferior recreado como UN solo fondo de plantilla, sin parches.
-      // Todos sus rótulos y divisores son dinámicos y comparten el mismo sistema.
+      // La placa completa (fondo + contorno) se crea una sola vez en SVG.
+      // Debe preceder TODOS los datos y símbolos: ninguna máscara bajo cifras.
+      layerFooterPlate(layers,variant);
       layerText(layers,'Carta',75,1250,23.4,ink,{maxWidth:63,field:'collection-label'});
       layerText(layers,numLabel(card,variant,options),148,1250,23.4,ink,
         {maxWidth:206,field:'collection-number'});
@@ -198,7 +204,23 @@
     const svg=el('svg',{viewBox:'0 0 960 1340',class:'icmx-data',
       preserveAspectRatio:'xMidYMid meet','aria-hidden':'true'});
     for (const lay of layers) {
-      if (lay.type==='footer-rule'){
+      if(lay.type==='footer-plate'){
+        // Fondo homogéneo creado desde cero, no a partir de pixeles con parches
+        // de la antigua tipografía. El trazo cierra el perímetro completo.
+        const stops={
+          b:[['0%','#EABB1E'],['60%','#E9B91D'],['100%','#E7B51E']],
+          e:[['0%','#FFD6D4'],['24%','#E7D9FA'],['48%','#FFE0DA'],['76%','#C8ECDD'],['100%','#E5F8AD']],
+          r:[['0%','#F5DF9D'],['38%','#EBD087'],['70%','#D6AB4D'],['100%','#EDCF7D']]
+        }[lay.variant];
+        const id='icmx-footer-gradient-'+(++maskSequence);
+        const defs=el('defs');
+        const grad=el('linearGradient',{id,x1:'0%',y1:'0%',x2:'100%',y2:'0%'});
+        stops.forEach(([offset,color])=>grad.appendChild(el('stop',{offset,'stop-color':color})));
+        defs.appendChild(grad);svg.appendChild(defs);
+        svg.appendChild(el('rect',{x:49,y:1233,width:862,height:59,rx:13,
+          fill:'url(#'+id+')',stroke:'#22180F','stroke-width':4,
+          'data-icmx-footer-plate':'true'}));
+      } else if (lay.type==='footer-rule'){
         svg.appendChild(el('line',{x1:lay.x,x2:lay.x,y1:1245,y2:1280,
           stroke:lay.color,'stroke-width':3,'data-icmx-footer-rule':'true'}));
       } else if(lay.type==='footer-dot'){
