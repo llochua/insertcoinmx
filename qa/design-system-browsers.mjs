@@ -233,7 +233,10 @@ try{
   assert.equal(state.status,'sampled',key+': muestreo no aplicado');
   assert(state.computedDiff<=2,key+': CSS del fondo no coincide con la imagen');
   assert(state.sceneWidth>500&&state.sceneHeight>500,key+': visor oculto');
-  assert.equal(state.artColor,state.bg,key+': capa de arte y escenario tienen fondos distintos');
+  // Holo/Dorada conservan .dx-flat-art transparente!important: ahí el fondo
+  // uniforme lo proporciona el escenario, no una caja rectangular opaca.
+  assert(state.artColor===state.bg||state.artColor==='rgba(0, 0, 0, 0)',
+   key+': capa de arte introduce un color distinto al del escenario');
   tested.push(key);variants[v]++;
   if(samples.has(key)){
    await screen.waitForTimeout(800);
