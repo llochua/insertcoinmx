@@ -1,42 +1,60 @@
 #!/usr/bin/env node
-/* Design-system guard: artwork rendering is owned by the existing main branch.
-   Keep the lab and this PR EXACTLY aligned with main's artwork CSS and logic.
-   No palette, image or background manipulation may enter the UI refactor. */
+/* Keep the production renderer identical to main; only isolated LAB can
+   replace background sampling with a universal pixel-derived algorithm. */
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
-
 const reference=execFileSync('git',['show','origin/main:index.html'],{encoding:'utf8'});
 const branch=readFileSync('index.html','utf8');
 const lab=readFileSync('qa/design-system/index.html','utf8');
-
 function between(source,begin,end,after=''){
- const start=source.indexOf(begin,after?source.indexOf(after):0);
- assert(start>=0,'missing start '+begin.slice(0,60));
- const stop=source.indexOf(end,start);
- assert(stop>=0,'missing end '+end.slice(0,60));
- return source.slice(start,stop);
+ const from=source.indexOf(begin,after?source.indexOf(after):0);
+ assert(from>=0,'missing start: '+begin);
+ const to=source.indexOf(end,from);
+ assert(to>from,'missing end: '+end);
+ return source.slice(from,to);
 }
+const bt=String.fromCharCode(96),dollar=String.fromCharCode(36);
 const regions=[
-  ['Artwork placement and fade CSS','.dx-art{','.dx-top{'],
-  ['Flat artwork styles','/* ESTÁNDAR GLOBAL:','/* Escritorio'],
-  ['Original sampling and color lookup','const AUTO_BG_IDS=','const lum=h=>'],
-  ['Revelation illustration markup',' const art=fa?',' D.className=`disc on dx'],
-  ['Revelation background assignment','D.className=`disc on dx v-${v}',' D.innerHTML=`${art}'],
-  ['Summary illustration and backdrop',' const art=fa?','  <section class="rs-follow"','function showSum()'],
+ ['Artwork placement and fade CSS','.dx-art{','.dx-top{'],
+ ['Flat artwork styles','/* ESTÁNDAR GLOBAL:','/* Escritorio'],
+ ['Original sampling and color lookup','const AUTO_BG_IDS=','const lum=h=>'],
+ ['Revelation illustration markup',' const art=fa?',' D.className='+bt+'disc on dx'],
+ ['Revelation background assignment','D.className='+bt+'disc on dx v-'+dollar+'{v}',' D.innerHTML='+bt+dollar+'{art}'],
+ ['Summary illustration and backdrop',' const art=fa?','  <section class="rs-follow"','function showSum()'],
 ];
-for(const [name,a,b,after]of regions){
- const baseline=between(reference,a,b,after);
- for(const [target,s] of [['design-system branch',branch],['isolated LAB',lab]]){
-  const actual=between(s,a,b,after);
-  assert.equal(actual,baseline,name+' in '+target+' differs from current main baseline. Do not change original art during UI refactor.');
+for(const [label,start,end,after] of regions){
+ const original=between(reference,start,end,after);
+ assert.equal(between(branch,start,end,after),original,'PRODUCTION differs from main: '+label);
+ const inLab=between(lab,start,end,after);
+ if(label==='Original sampling and color lookup'){
+  const functionStart='function bgFromArtwork(img){';
+  const a=inLab.indexOf(functionStart),b=original.indexOf(functionStart);
+  assert(a>0&&b>0,'Missing original/artwork sampler');
+  const labConfig=inLab.slice(0,a).replace(
+   'const dcol=id=>AUTO_BG_COLORS[id]||RBG[id]||ICOL[id]||NEU;',
+   'const dcol=id=>RBG[id]||ICOL[id]||AUTO_BG_COLORS[id]||NEU;');
+  assert.equal(labConfig,original.slice(0,b),'LAB altered protected catalog or framing metadata');
+  const universal=inLab.slice(a);
+  assert(universal.includes('const corner='),'LAB must sample corners');
+  assert(universal.includes('const perimeter='),'LAB must sample the perimeter');
+  assert(universal.includes('const color=bgFromArtwork(im);'),'LAB must derive color from loaded image');
+  assert(universal.includes("D.style.setProperty('--bg',color)"),'LAB must assign sampled backdrop');
+  assert(universal.includes('D.style.backgroundColor=color'),'LAB must fill the scene');
+  assert(universal.includes('D.dataset.artBgStatus='),'LAB must expose sampling status for QA');
+  assert(!universal.includes('if(!hasCol(d.id))return'),'No manual color-list dependency');
+  assert(!/d\.id\s*===\s*['"]/.test(universal),'No case-by-case design exceptions');
+ }else{
+  assert.equal(inLab,original,'LAB differs from main outside universal sampler: '+label);
  }
- console.log('OK · main matches PR and LAB: '+name);
+ console.log('OK artwork contract: '+label);
 }
-for(const [name,s] of [['PR',branch],['LAB',lab]]){
-  assert(!s.includes('content/artwork-background.js'),name+' unexpectedly references the abandoned art experiment');
-  assert(!s.includes('content/artwork-background.css'),name+' unexpectedly loads the abandoned art experiment');
+assert(lab.includes("D.style.removeProperty('background-color');delete D.dataset.artBgStatus;"),
+ 'Each LAB card must clear the previous background before sampling');
+assert(lab.includes('const PRUEBA=true;'),'Infinite packs stay LAB only');
+assert(branch.includes('const PRUEBA=false;'),'Production remains limited');
+for(const [name,s] of [['production',branch],['lab',lab]]){
+ assert(!s.includes('content/artwork-background.js'),name+' loads unused experiment');
+ assert(!s.includes('content/artwork-background.css'),name+' loads unused experiment');
 }
-assert(branch.includes('const PRUEBA=false;'),'Unlimited packs must never be enabled in production file');
-assert(lab.includes('const PRUEBA=true;'),'Unlimited packs belong only to the isolated lab');
-console.log('OK · art is untouched by UI changes; unlimited packs are lab-only.');
+console.log('OK: one universal pixel sampler in LAB; production unchanged.');
