@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Generated fallback colors from design image pixels; never maintain per design."""
-import argparse,json
+import argparse,json,re
 from pathlib import Path
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'qa/design-system/artwork-backgrounds.generated.json'
+LAB=ROOT/'qa/design-system/index.html'
 
 def sample(path):
  with Image.open(path) as raw:
@@ -40,9 +41,15 @@ def main():
   if value:colors[path.stem]=value
  result=json.dumps(colors,sort_keys=True,separators=(',',':'))
  if args.show:print('ICMX_ART_BG_JSON='+result)
+ source=LAB.read_text(encoding='utf-8')
+ matcher=re.search(r'const ART_BG_GENERATED=(\{[^\n]*\});',source)
+ if not matcher:raise SystemExit('LAB missing generated background map marker')
+ embedded=json.loads(matcher.group(1))
  if args.check:
-  if not OUT.exists() or json.loads(OUT.read_text())!=colors:
-   raise SystemExit('Generated manifest is stale: run scripts/generate-artwork-backgrounds.py')
- else:OUT.write_text(result+'\n')
+  if not OUT.exists() or json.loads(OUT.read_text(encoding='utf-8'))!=colors or embedded!=colors:
+   raise SystemExit('Generated color map is stale: run scripts/generate-artwork-backgrounds.py')
+ else:
+  OUT.write_text(result+'\n',encoding='utf-8')
+  LAB.write_text(source[:matcher.start(1)]+result+source[matcher.end(1):],encoding='utf-8')
  print(f'Artwork backgrounds: {len(colors)}',flush=True)
 if __name__=='__main__':main()
