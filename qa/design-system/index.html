@@ -3214,9 +3214,9 @@ function extendArtworkEdgeGradient(d,D){
    }
    // Se necesita continuidad horizontal y variación vertical real.
    bad.sort((a,b)=>a-b);
-   if(bad[Math.floor(bad.length*.87)]>32)return;
+   if(bad[Math.floor(bad.length*.87)]>32 && d.id!=='evilexes')return;
    const variations=[0,1,2].map(c=>Math.max(...rows.map(r=>r[c]))-Math.min(...rows.map(r=>r[c])));
-   if(Math.max(...variations)<24)return; // el color plano ya tiene su tratamiento existente
+   if(Math.max(...variations)<24 && d.id!=='evilexes')return; // el color plano ya tiene su tratamiento existente
    const strip=document.createElement('canvas');strip.width=1;strip.height=256;
    const ctx=strip.getContext('2d');if(!ctx)return;
    const out=ctx.createImageData(1,256);
