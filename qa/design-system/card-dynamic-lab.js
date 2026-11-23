@@ -84,7 +84,8 @@ const fieldNames=['dynNumber','dynName','dynRef','dynSkill','dynPhrase'];
 const inputValue=(key,fallback)=>qs(key).value||fallback;
 function restoreDefaults(){
  const d=byId[qs('dynDesign').value];if(!d)return;
- const map={dynNumber:d.numero||'BONUS',dynName:d.nombre||'',dynRef:d.ref||'',dynSkill:d.linea||'',dynPhrase:d.frase||''};
+ const visibleNumber=d.tipo==='Álbum'?(d.numero||'').replace(/\/\d+$/,'/???'):'BONUS';
+ const map={dynNumber:visibleNumber,dynName:d.nombre||'',dynRef:d.ref||'',dynSkill:d.linea||'',dynPhrase:d.frase||''};
  for(const [key,val] of Object.entries(map))qs(key).value=val;
 }
 function legacyName(d,v){
@@ -103,11 +104,16 @@ function render(){
   stat.dataset.error='true';stat.textContent='Este diseño no tiene Full. Elige otra variante.';return;
  }
  const value=qs('dynPoints').value,pop=qs('dynPop').value;
- const card={...d,numero:inputValue('dynNumber',d.numero),nombre:inputValue('dynName',d.nombre),
-  ref:inputValue('dynRef',d.ref),linea:inputValue('dynSkill',d.linea),
-  frase:inputValue('dynPhrase',d.frase),fullKey:legacyName(d,'f')};
- const opts={points:value===''?undefined:Number(value),pop:pop===''?null:Number(pop),fullTotal};
- const newer=window.ICMX_CARD_RENDERER.create(card,v,opts);
+ const resolved=window.ICMX_CARD_DATA.resolve({d:d.id,v},{
+  catalog:Object.values(byId),unknownAlbumTotal:true,
+  editorialOverrides:{numero:inputValue('dynNumber',d.numero),nombre:inputValue('dynName',d.nombre),
+    ref:inputValue('dynRef',d.ref),linea:inputValue('dynSkill',d.linea),
+    frase:inputValue('dynPhrase',d.frase)},
+  fullAliases:{[d.id]:legacyName(d,'f')},
+  points:value===''?undefined:Number(value),pop:pop===''?null:Number(pop),fullTotal
+ });
+ const card=resolved.card;
+ const newer=window.ICMX_CARD_RENDERER.create(card,v,resolved.options);
  qs('dynOld').src='c2/'+legacyName(d,v)+'.webp';
  qs('dynNew').replaceChildren(newer);
  stat.dataset.error='false';
