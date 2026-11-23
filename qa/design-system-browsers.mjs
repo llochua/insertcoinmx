@@ -114,6 +114,35 @@ try{
    liveAvatar:localStorage.getItem('icmx-avatar-guest-v1'),
    lab:localStorage.getItem('icmx-ui-lab-progress-v1')
   }));
+  // Regression: artwork with a solid background fills the whole discovery
+  // canvas; no rectangular white image on a dark field (Robogodín).
+  for(const [designId,expectedRGB] of [['robogodin','rgb(255, 255, 255)'],['1up',null]]){
+   const pre=await page.evaluate(id=>{
+    const card=CB[id+'_b'];
+    if(!card)throw Error('No test card for '+id);
+    hand=[{...card,_new:false,_dnew:false,_comp:false,_doneB:true}];
+    idx=0;showCard();
+    const d=document.getElementById('disc');
+    return {background:d.style.getPropertyValue('--bg'),image:d.querySelector('.dx-art img')?.getAttribute('src')};
+   },designId);
+   if(expectedRGB)assert.equal(pre.background,'#ffffff','Robogodín opens with white canvas before image load');
+   await page.waitForFunction(id=>{
+    const D=document.getElementById('disc'),im=D.querySelector('.dx-art img');
+    if(!im?.complete||!im.naturalWidth)return false;
+    const color=bgFromArtwork(im);
+    return D.dataset.artId===id && !!color &&
+      D.style.getPropertyValue('--bg').toLowerCase()===color;
+   },designId);
+   const final=await page.evaluate(()=>{
+    const D=document.getElementById('disc'),A=D.querySelector('.dx-art'),im=A.querySelector('img');
+    return {canvas:getComputedStyle(D).backgroundColor,
+      art:getComputedStyle(A).backgroundColor,image:im.src};
+   });
+   assert.equal(final.canvas,final.art,'full scene and artwork have identical solid background');
+   if(expectedRGB)assert.equal(final.canvas,expectedRGB,'Robogodín uses continuous white canvas');
+   await page.screenshot({path:'qa/screenshots/ui-lab-solid-background-'+designId+'-'+width+'.png'});
+  }
+  await page.evaluate(()=>document.getElementById('disc').classList.remove('on'));
   assert.equal(storage.live,sentinel,'real save is unchanged');
   assert.equal(storage.liveHandle,'real_guest','real handle untouched');
   assert.equal(storage.liveRanking,'SENTINEL_REAL_RANKING','real ranking untouched');
