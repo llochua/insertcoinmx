@@ -7,11 +7,8 @@ on:
       - "content/ui-system.css"
       - "content/design-tokens.css"
       - "content/ui-components.css"
-      - "content/artwork-background.css"
-      - "content/artwork-background.js"
       - "scripts/check-ui-icons.mjs"
       - "scripts/check-ui-components.mjs"
-      - "scripts/check-artwork-background.mjs"
       - "docs/design-system/**"
   push:
     branches: [main]
@@ -20,11 +17,8 @@ on:
       - "content/ui-system.css"
       - "content/design-tokens.css"
       - "content/ui-components.css"
-      - "content/artwork-background.css"
-      - "content/artwork-background.js"
       - "scripts/check-ui-icons.mjs"
       - "scripts/check-ui-components.mjs"
-      - "scripts/check-artwork-background.mjs"
 
 permissions:
   contents: read
@@ -41,16 +35,10 @@ jobs:
             content/ui-system.css
             content/design-tokens.css
             content/ui-components.css
-            content/artwork-background.css
-            content/artwork-background.js
             scripts/check-ui-icons.mjs
             scripts/check-ui-components.mjs
-            scripts/check-artwork-background.mjs
           sparse-checkout-cone-mode: false
       - name: Verify icon registry and inline scripts
         run: node scripts/check-ui-icons.mjs
       - name: Verify shared component contracts
         run: node scripts/check-ui-components.mjs
-
-      - name: Verify solid illustration background contract DS-ART-01
-        run: node scripts/check-artwork-background.mjs
