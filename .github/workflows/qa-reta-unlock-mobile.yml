@@ -1,13 +1,9 @@
 name: QA · Reta bloqueada en móvil
 
 on:
+  # Siempre ejecutado en PR para poder exigir este check en la protección de main.
   pull_request:
-    paths:
-      - 'index.html'
-      - 'reta-diaria.js'
-      - 'reta-diaria.html'
-      - 'qa/reta-unlock-browsers.mjs'
-      - '.github/workflows/qa-reta-unlock-mobile.yml'
+    branches: [main]
   push:
     branches: [main]
     paths:
