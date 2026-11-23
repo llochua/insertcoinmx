@@ -194,7 +194,7 @@ try{
 
  // Escritorio: comprobación visual independiente del flujo móvil. Reproduce el
  // escenario de las capturas reportadas (CRT centrado) con fondos sin recuadros.
- const desktop=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'reduce'});
+ const desktop=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'no-preference'});
  const screen=await desktop.newPage(),desktopErrors=[];
  screen.on('pageerror',error=>desktopErrors.push(error.message));
  await screen.goto(LAB_URL,{waitUntil:'domcontentloaded'});
