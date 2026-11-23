@@ -49,6 +49,8 @@ jobs:
           fi
       - name: Validar sobres, Reta, avatar e independencia de cuentas
         run: node qa/design-system-browsers.mjs
+      - name: Comparar cartas dinámicas dentro del LAB
+        run: node qa/design-system-card-dynamic-browsers.mjs
       - name: Conservar capturas del LAB
         if: always()
         uses: actions/upload-artifact@v4
