@@ -59,7 +59,7 @@ jobs:
           node --check qa/check-profile-gameplay-invariants.mjs
           node --check qa/live-auth-two-browsers.mjs
           node --check qa/live-experience-browsers.mjs
-          python -m py_compile cartas/generar.py cartas/actualizar.py cartas/qa.py
+          python -m py_compile cartas/generar.py cartas/actualizar.py cartas/qa.py cartas/generar-shells.py
 
       - name: Probar sincronización segura
         run: |
@@ -71,6 +71,7 @@ jobs:
           node --test qa/community-value.test.mjs
           node --test qa/community-ranking.test.mjs
           node --test qa/value-screens.test.mjs
+          node --test qa/card-renderer.test.mjs
           node --test qa/summary-story-cues.test.mjs
           node - <<'NODE'
           const fs = require('node:fs');
