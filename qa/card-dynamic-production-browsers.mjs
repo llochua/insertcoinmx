@@ -1,3 +1,4 @@
+// Revalidación final con bases WebP optimizadas.
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
