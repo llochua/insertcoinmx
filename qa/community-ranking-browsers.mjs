@@ -17,7 +17,7 @@ const server=createServer(async(req,res)=>{
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const origin='http://127.0.0.1:'+server.address().port;
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch(process.env.ICMX_CHROME==='true'?{headless:true,channel:'chrome'}:{headless:true});
 const votes=new Map(),errors=[],contexts=[];
 const ids=['abuket','arcade','1up'];
 const aggregates=()=>ids.map(id=>{
