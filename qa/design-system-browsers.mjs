@@ -162,6 +162,9 @@ try{
     await page.waitForFunction(()=>{const im=document.getElementById('profileAvatarImage');return im.complete&&im.naturalWidth>0&&getComputedStyle(im).visibility==='visible'});
     assert.equal(await page.locator('.profile-scoreboard #profileAllCards').count(),1);
     assert.equal(await page.locator('.profile-summary-board #profileDial').count(),1);
+    assert.equal(await page.locator('.profile-player-sheet #profileDial').count(),1);
+    const portrait=await page.locator('#profileAvatarButton').boundingBox(),meter=await page.locator('#profileDial').boundingBox();
+    assert(portrait.width<meter.width*.65,'Portrait must not compete with the circular progress meter');
     assert.equal(await page.locator('.profile-scoreboard #profileValuePoints').count(),1);
 
     assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuemax'),'100');
@@ -193,6 +196,10 @@ try{
   await page.waitForFunction(()=>document.getElementById('env').style.display==='none');
   await page.evaluate(()=>{document.getElementById('disc').classList.remove('on');showSum()});
   await page.locator('#p1LevelUp[open]').waitFor({state:'visible'});
+  const victory=await page.locator('#p1LevelUp').boundingBox();
+  assert(victory.width>=width-2,'Victory screen must fill viewport');
+  assert.equal(await page.locator('.p1-up-meter i').count(),25);
+  await page.waitForTimeout(2700);
   await page.screenshot({path:'qa/screenshots/ui-lab-levelup-'+width+'.png'});
   await page.locator('#p1UpExplore').click();
   assert.equal(await page.locator('#p1LevelUp[open]').count(),0);
