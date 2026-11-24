@@ -56,6 +56,24 @@
         "cartas/arte/piccolovolution.png": "68fe3542f879557d433fe5c5a4fb51884bffd617e6ec1ba28db8dab897f6d7db"
       }
     },
+    "thankyou": {
+      "outputs": {
+        "c/F_thankyou.webp": "62972a42e3ba27a76a070bbf38a22e8748381280d1dd0449d67a49619877edab",
+        "c/thankyou.webp": "0b8bd38198fd6bc0dcbf335dc56604ce789c0a07303f9d90d742521d67fd7155",
+        "c/thankyou_e.webp": "4ea16a7edb566d3321358798b43e596133f39aa3481f0b141693b339bd6bb331",
+        "c/thankyou_r.webp": "e2a4b8807f172188d9c5067bf63957313d97c84e2c445cd0f2b6fdef4440fed7",
+        "c2/F_thankyou.webp": "91526fd68c967ece2c34a09bfb7c26d5273af970d310d49ffa48e7f81a38b372",
+        "c2/thankyou.webp": "39f75d7569aea5e9a5d0b52787d027eb24425103b71879782d2c19ae6ae0e141",
+        "c2/thankyou_e.webp": "ad052c2a9291654365628a44f7bf85b5c537f02fa3e68cec6318a7807cb23226",
+        "c2/thankyou_r.webp": "5ba642a946ed5c75a6e7f77a9cd98594202e5c2bc2d3d8dd7f7ab6deea22ec30",
+        "d/thankyou.webp": "305f34929ac28f034654e4137c2072afd273b7ad4fd9307c23354a3466fd4517",
+        "fa/thankyou.webp": "fbb576bd26067152fa6497952842c243cffaabfedabb81ccee51d5f18020da8b"
+      },
+      "sources": {
+        "cartas/arte/thankyou.png": "648468193e5986188d15bbb78cc3ffdda110ed2b9ccc8eca39e34364f89de77b",
+        "cartas/full/thankyou.jpg": "1d1ebca70c8325c45f6ef3d6f1ca32e0facc8a8c9705eabd46bd68aa5c6b2cf7"
+      }
+    },
     "thelostgame": {
       "outputs": {
         "c/thelostgame.webp": "5590137fec253805350c989823aa5de6aa4181114714b9f72638c908bedcaf8e",
@@ -68,6 +86,24 @@
       },
       "sources": {
         "cartas/arte/thelostgame.png": "32770ce722d0e0e09734d067323c13ec9b5d74195489c69610e336314c827b01"
+      }
+    },
+    "triforce": {
+      "outputs": {
+        "c/F_triforce.webp": "215dede4a10fb9027b4811a24e28d5f28b8ffe67f5aedcdbdc1a96204078c5e0",
+        "c/triforce.webp": "fb8d6b8749c2493b606d6f9e6d7ca45febc607d6491a31f40900e97791658837",
+        "c/triforce_b.webp": "db4364ec5ed54b0722ebe871d604e5de5357e2bed94db32104e4044f59d84210",
+        "c/triforce_e.webp": "761452dcd6b658d6f6df797348022a5a4b2d1ec722da90c912db4f72c8f78b38",
+        "c2/F_triforce.webp": "424b42520319569bec53d59b751c1c986198d990dcd6addc7a314a230f987ae7",
+        "c2/triforce.webp": "bc511fe22410ac9a7e39de42116952b1666d9ab303520b4e2da26969575dceaf",
+        "c2/triforce_b.webp": "be547ebe5ee55b8122ad531fc1a363a52d52687de525b6709439fa78bed59fab",
+        "c2/triforce_e.webp": "326d6012eccd6c7837b1c2a762a9c901d7a2a3fcb28f706d0824be09c372f9db",
+        "d/triforce.webp": "15072eb315dbee08501ae9183c666689b4ba1358dbece65a3d4edb2ff5768b0e",
+        "fa/triforce.webp": "b5d6c4c6165a01f7a80e7cf23a6b176620b454af5fc0e06d20f7570d88a063cd"
+      },
+      "sources": {
+        "cartas/arte/triforce.png": "8ef045706379cc2bcd85169a2b9823866b2b926577e5ebdf969ec35872481425",
+        "cartas/full/triforce.jpg": "f09de7d55cd8d1b47966014723f552b77d38348f7bdb46313ce2cc3ada4094b0"
       }
     },
     "vegetavolution": {

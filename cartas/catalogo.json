@@ -122,7 +122,7 @@
   "linea": "Aparece justo cuando buscas tu nombre.",
   "frase": "¿Una que diga Bart? Solo hay Bort.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F80",
   "arte": "diseños/bort.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1130,7 +1130,7 @@
   "linea": "Saca del escenario al primero que se confíe.",
   "frase": "Sin objetos. Destino Final.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F85",
   "arte": "diseños/versus.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1226,7 +1226,7 @@
   "linea": "Regresa de la tumba con una vida extra.",
   "frase": "Vida extra… aunque venga medio podrida.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F75",
   "arte": "diseños/1up.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1258,7 +1258,7 @@
   "linea": "Flota detrás de ti cuando no lo ves.",
   "frase": "Aquí abajo todos flotamos.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F79",
   "arte": "diseños/booit.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1274,7 +1274,7 @@
   "linea": "Sella cualquier carta que ande suelta.",
   "frase": "Regresa a la forma humilde que mereces.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F81",
   "arte": "diseños/captor.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1306,7 +1306,7 @@
   "linea": "Recicla las caricaturas que ya nadie ve.",
   "frase": "…y fierro viejo que vendan.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F82",
   "arte": "diseños/carton.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1562,7 +1562,7 @@
   "linea": "Te protege aunque rompas todas las cajas.",
   "frase": "Ooga booga con licencia de Sony.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F76",
   "arte": "diseños/aku.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1658,7 +1658,7 @@
   "linea": "Te vuelve invencible por un ratito.",
   "frase": "No, no la sueltes.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F84",
   "arte": "diseños/universe.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1674,7 +1674,7 @@
   "linea": "Nace del pecho de la tripulación. A la hora de la cena.",
   "frase": "Un bebé hecho de galaxia… y dientes.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F77",
   "arte": "diseños/babyonboard.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1690,7 +1690,7 @@
   "linea": "Parte la cuadra en dos bandos. Ninguno se rinde.",
   "frase": "Tres botones contra cuatro.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F78",
   "arte": "diseños/bitwars.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1706,7 +1706,7 @@
   "linea": "Encuentra el último Twinkie del apocalipsis. Solo uno.",
   "frase": "El apocalipsis también tiene colores pastel.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F83",
   "arte": "diseños/enjoy.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
@@ -1738,7 +1738,7 @@
   "linea": "Te mete dentro del juego. El dolor de cabeza va aparte.",
   "frase": "El futuro llegó en 1995. Y era rojo.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F86",
   "arte": "diseños/virtual.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
