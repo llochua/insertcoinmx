@@ -1,0 +1,34 @@
+/* Run from repository root: node tests/player1-levels.cjs */
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const api = require('../content/player1-levels.js');
+const source = fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
+const catalog = source.slice(source.indexOf('const DESIGNS=['),source.indexOf('/* Copia de despliegue'));
+const cards = [...catalog.matchAll(/\{id:'([^']+)'[^\n]*?\}/g)].flatMap(m=>{
+  const line=m[0],id=m[1],r=/r:'([^']+)'/.exec(line)?.[1],ex=/ex:'([^']+)'/.exec(line)?.[1]||'';
+  const original={comun:'b',holo:'e',dorada:'r'}[r];
+  const full=/\bf:\d+/.test(line);
+  return api.variants.map(v=>({k:id+'_'+v,bx:/\bbx:1/.test(line),img:v==='f'?(full?'F_'+id:null):v===original?id:ex.includes(v)?id+'_'+v:null}));
+});
+const [l1,l2]=api.levels;
+assert.deepEqual(api.validateCatalog(cards),[]);
+assert.equal(new Set([...l1.designs,...l2.designs]).size,50);
+const have24=Object.fromEntries(l1.designs.slice(0,24).map(id=>[id+'_f',1]));
+const have25={...have24,[l1.designs[24]+'_e']:1};
+assert.equal(api.eligibleDesigns({}).length,25);
+assert.equal(api.progress({})[1].unlocked,false);
+assert.equal(api.progress({...have24,[l1.designs[0]+'_b']:99})[1].unlocked,false);
+assert.equal(api.progress(have25)[1].unlocked,true);
+assert.equal(api.eligibleDesigns(have25).length,50);
+assert.equal(api.eligibleDesigns(have25,l2.id).length,25);
+assert.equal(api.progress(have25)[0].collected,25);
+assert.equal(api.progress(have25)[0].allVariants,false);
+const future=l2.designs[0]+'_f';
+assert.equal(api.visibleDesigns({[future]:1,navidadgamer_b:1}).includes('navidadgamer'),true);
+assert.equal(api.visibleDesigns({[future]:1}).includes(l2.designs[0]),true);
+assert.equal(api.eligibleDesigns({[future]:1}).includes(l2.designs[0]),false);
+assert.equal(api.progress({...have25,[future]:1})[1].discovered,1);
+assert.equal(api.levelOf('navidadgamer'),null);
+assert.equal(api.levelOf('sailourss'),null);
+console.log('PLAYER 1: progression and catalog checks passed');
