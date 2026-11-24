@@ -22,8 +22,14 @@ function catalog(){
 function prepared(card,values,rows,quality){
  const aliases={};
  if(card.v==='f'&&/^F_[a-z0-9]+$/.test(card.img||''))aliases[card.d]=card.img;
- return A().resolve(card,{catalog:rows,fullAliases:aliases,
+ const no=root.ICMX_PLAYER1_LEVELS?.numberOf(card.d);
+ // Release number is presentation only: preserve the original asset and inventory keys.
+ const a=A().resolve(card,{catalog:rows,fullAliases:aliases,
   points:values?.points,pop:values?.pop,quality,unknownAlbumTotal:true});
+ if(a.card.tipo!=='Álbum'||!root.ICMX_PLAYER1_LEVELS)return a;
+ const serial=no?String(no).padStart(3,'0')+'/???':'ARCHIVO';
+ return {...a,card:{...a.card,numero:serial,releaseFullLabel:no?'F'+String(no).padStart(2,'0')+'/???':'ARCHIVO'}};
+
 }
 function cardImage(fx){
  return [...fx.children].find(e=>e.tagName==='IMG')||fx.querySelector('img');
