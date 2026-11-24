@@ -56,8 +56,8 @@ try{
  await page.evaluate(()=>openCard('abuket_b'));
  await page.locator('#zoom[open]').waitFor();
  await page.locator('#zFx svg.icmx-data [data-icmx-field="pop"]').waitFor();
- assert.ok((await page.locator('#zFx svg.icmx-data').innerText()).includes('Valor 10'));
- assert.equal(await page.locator('#zFx svg.icmx-data [data-icmx-field="pop"]').innerText(),'—');
+ assert.ok((await page.locator('#zFx svg.icmx-data').textContent()).includes('Valor 10'));
+ assert.equal(await page.locator('#zFx svg.icmx-data [data-icmx-field="pop"]').textContent(),'—');
  await page.locator('#zVoting').waitFor({state:'visible'});
  assert.deepEqual(await page.locator('#zRate button[data-r]').evaluateAll(buttons=>buttons.map(b=>b.getAttribute('aria-label'))),
   ['GOTY','GENIAL','OK','MMM'],'Solo cuatro reacciones compactas');
