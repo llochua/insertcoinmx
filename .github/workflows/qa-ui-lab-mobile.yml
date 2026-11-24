@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'qa/design-system/**'
+      - 'content/card-runtime.js'
+      - 'content/card-renderer.js'
       - 'qa/design-system-browsers.mjs'
       - 'scripts/generate-artwork-backgrounds.py'
       - 'content/design-tokens.css'

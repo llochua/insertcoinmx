@@ -61,3 +61,20 @@ test('Seguridad: SQL deriva PTS de pack_issues y nunca toma un score del cliente
  assert.doesNotMatch(sql,/INSERT INTO|UPDATE public\.player_snapshots/);
  assert.doesNotMatch(sql,/p_score|p_points|p_cards/);
 });
+
+test('INC-01: ranking global excluye Auth anónimo aunque el invitado esté verificado',()=>{
+ const sql=readFileSync('supabase/sql/player_global_leaderboards_STAGED.sql','utf8');
+ const match=sql.match(/WITH identities AS \(([\s\S]*?)\),\s*eligible AS \(/);
+ assert.ok(match,'El CTE identities debe existir');
+ const identities=match[1];
+ assert.match(identities,/JOIN auth\.users u ON u\.id=s\.user_id/);
+ assert.match(identities,/JOIN public\.player_profiles p ON p\.user_id=s\.user_id/);
+ assert.match(identities,/AND u\.is_anonymous IS FALSE/);
+ assert.match(identities,/AND u\.email_confirmed_at IS NOT NULL/);
+ assert.match(identities,/AND p\.is_public IS TRUE/);
+ assert.doesNotMatch(identities,/guest_public_identities|g\.handle|WHEN u\.is_anonymous IS TRUE/);
+ // La elegibilidad se aplica ANTES de calcular las cinco métricas, no en la UI.
+ assert.ok(sql.indexOf('AND u.is_anonymous IS FALSE')<sql.indexOf('cards AS ('));
+ assert.match(sql,/ARRAY\['pts','cards','designs','duplicates','ratings'\]/);
+ assert.match(sql,/GRANT EXECUTE ON FUNCTION public\.icmx_player_leaderboards\(\) TO anon,authenticated/);
+});

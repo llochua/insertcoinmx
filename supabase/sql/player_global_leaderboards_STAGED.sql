@@ -3,6 +3,8 @@
 -- Ningún usuario ni navegador puede enviar puntuaciones al RPC.
 -- El inventario y las calificaciones proceden del snapshot con economía protegida.
 -- PTS procede exclusivamente de sobres emitidos en servidor (historial de variantes).
+-- IC-AUTH-03 / IC-RANK-01: sin Auth anónimo, incluso con verified_guest activado.
+-- CAMBIO PROPUESTO: no aplicar al Supabase en producción sin autorización.
 BEGIN;
 CREATE OR REPLACE FUNCTION public.icmx_player_leaderboards()
 RETURNS jsonb
@@ -21,25 +23,21 @@ BEGIN
  LOOP
   WITH identities AS (
    SELECT s.user_id,s.state,
-    CASE WHEN u.is_anonymous IS TRUE THEN g.ini
-         WHEN s.state->'data'->>'ini' ~ '^[A-Z0-9!?*+.@#$%-]{3}$'
+    CASE WHEN s.state->'data'->>'ini' ~ '^[A-Z0-9!?*+.@#$%-]{3}$'
          THEN s.state->'data'->>'ini'
          ELSE u.raw_user_meta_data->>'icmx_initials' END AS ini,
-    CASE
-     WHEN u.is_anonymous IS FALSE AND p.is_public IS TRUE
-      AND u.email_confirmed_at IS NOT NULL THEN pg_catalog.lower(p.public_handle)
-     WHEN u.is_anonymous IS TRUE
-      AND EXISTS(SELECT 1 FROM private_sync.beta_access_gate
-                 WHERE key='verified_guest' AND enabled)
-      THEN g.handle
-     ELSE NULL END AS handle
+    pg_catalog.lower(p.public_handle) AS handle
    FROM public.player_snapshots s
    JOIN auth.users u ON u.id=s.user_id
-   LEFT JOIN public.player_profiles p ON p.user_id=s.user_id
-   LEFT JOIN private_sync.guest_public_identities g ON g.user_id=s.user_id
+   JOIN public.player_profiles p ON p.user_id=s.user_id
    WHERE s.game_format=2
      AND s.state->>'app'='insertcoinmx-album'
      AND s.state->>'format'='2'
+     -- Solo cuentas permanentes con correo confirmado y perfil público.
+     -- Invitados verificados pueden opinar, pero no ocupar rankings.
+     AND u.is_anonymous IS FALSE
+     AND u.email_confirmed_at IS NOT NULL
+     AND p.is_public IS TRUE
   ),
   eligible AS (
    SELECT * FROM identities

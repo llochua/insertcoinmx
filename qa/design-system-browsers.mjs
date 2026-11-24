@@ -172,6 +172,23 @@ try{
    assert.equal(state.visible,'rgb('+[1,3,5].map(i=>parseInt(state.color.slice(i,i+2),16)).join(', ')+')');
    await page.screenshot({path:'qa/screenshots/ui-lab-main-render-'+id+'-'+width+'.png'});
   }
+  // Exercise production Zoom in the isolated LAB.
+  const requests=[];page.on('request',r=>requests.push(new URL(r.url()).pathname));
+  for(const key of ['booit_e','arcade_b','1up_e','1up_r','sonic_f']){
+   const offset=requests.length;
+   await page.evaluate(key=>openCard(key),key);
+   await page.waitForFunction(()=>{
+    const fx=document.getElementById('zFx'),img=document.getElementById('zImg');
+    return fx.classList.contains('idle')&&img.dataset.icmxDynamic==='true'&&img.complete&&
+      img.naturalWidth>0&&fx.querySelectorAll('svg.icmx-data').length===1&&
+      getComputedStyle(img).opacity==='1';
+   });
+   assert.match(await page.locator('#zImg').getAttribute('src'),/\/cs2\//);
+   assert.equal(requests.slice(offset).filter(p=>p.startsWith('/c2/')).length,0);
+   await page.locator('#zFx').click();
+   await page.waitForFunction(()=>!document.getElementById('zoom').open);
+  }
+  console.log('OK: production Zoom in LAB '+width+'px; no legacy downloads');
   assert.equal(storage.live,sentinel,'real save is unchanged');
   assert.equal(storage.liveHandle,'real_guest','real handle untouched');
   assert.equal(storage.liveRanking,'SENTINEL_REAL_RANKING','real ranking untouched');

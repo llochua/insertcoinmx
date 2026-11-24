@@ -1,28 +1,9 @@
 name: QA · Sincronización en dos navegadores
 
 on:
+  # Siempre ejecutado en PR para poder exigir sincronización y UX antes de fusionar.
   pull_request:
     branches: [main]
-    paths:
-      - 'content/cloud-sync.mjs'
-      - 'content/auth-account.js'
-      - 'content/avatar-profile.js'
-      - 'assets/avatars/**'
-      - 'qa/profile-browsers.mjs'
-      - 'qa/perfil-main-browsers.mjs'
-      - 'qa/profile-auth-unit.test.mjs'
-      - 'index.html'
-      - 'content/community-value-ui.css'
-      - 'qa/value-screen-browsers.mjs'
-      - 'qa/perfil/index.html'
-      - 'qa/perfil-preview-browsers.mjs'
-      - 'qa/live-experience-browsers.mjs'
-      - 'qa/sync-two-browsers.mjs'
-      - 'qa/supabase-live-anon.mjs'
-      - 'qa/auth-public-settings.mjs'
-      - 'qa/live-auth-two-browsers.mjs'
-      - 'qa/registro/index.html'
-      - '.github/workflows/qa-sync-browsers.yml'
   workflow_dispatch:
 
 permissions:

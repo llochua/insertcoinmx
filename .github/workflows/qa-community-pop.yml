@@ -8,7 +8,7 @@ permissions:
 jobs:
   ranking:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:17
@@ -35,8 +35,13 @@ jobs:
         run: psql -h localhost -U postgres -d ranking_test -v ON_ERROR_STOP=1 -f qa/community-pop-isolated.sql
       - name: Instalar Chromium para las dos sesiones de prueba
         run: |
-          npm install --no-save playwright@1.56.1
-          npx playwright install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@1.56.1
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo 'ICMX_CHROME=true' >> "$GITHUB_ENV"
+            google-chrome --version
+          else
+            npx playwright install --with-deps chromium
+          fi
       - name: Ranking y POP en navegadores aislados
         run: node qa/community-ranking-browsers.mjs
       - name: Capturas móvil y escritorio

@@ -1,0 +1,116 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import {fileURLToPath} from 'node:url';
+
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const source=fs.readFileSync(path.join(root,'content/card-renderer.js'),'utf8');
+const context={};
+vm.runInNewContext(source,context,{filename:'content/card-renderer.js'});
+const api=context.ICMX_CARD_RENDERER;
+const sample={
+  id:'sonic',nombre:'Sonic',categoria:'GAMER',ref:'Sonic the Hedgehog',ref2:'',
+  linea:'Corre tan rápido que los anillos ni lo alcanzan.',frase:'Gotta go fast.',
+  numero:'092/109',tipo:'Álbum',full:'F32',version_original:'comun'
+};
+
+test('expone el nuevo renderizador sin tocar progreso ni catálogo',()=>{
+  assert.equal(typeof api.create,'function');
+  assert.equal(typeof api.makeLayers,'function');
+  assert.equal(typeof api.shellKey,'function');
+  assert.equal(typeof api.numLabel,'function');
+});
+test('reutiliza los IDs previos de archivo y aliases',()=>{
+  assert.equal(api.shellKey(sample,'b'),'sonic');
+  assert.equal(api.shellKey(sample,'e'),'sonic_e');
+  assert.equal(api.shellKey(sample,'r'),'sonic_r');
+  assert.equal(api.shellKey(sample,'f'),'F_sonic');
+  assert.equal(api.shellKey({...sample,fullKey:'F_zodiaco'},'f'),'F_zodiaco');
+});
+test('el número no forma parte de la imagen ni del ID',()=>{
+  const a=api.makeLayers(sample,'b',{assetRoot:'../'});
+  const b=api.makeLayers({...sample,numero:'092/250'},'b',{assetRoot:'../'});
+  assert.equal(api.shellKey(sample,'b'),api.shellKey({...sample,numero:'092/250'},'b'));
+  assert.ok(a.some(x=>x.text==='092/109'));
+  assert.ok(b.some(x=>x.text==='092/250'));
+});
+test('valor y POP cambian como datos, con valores iniciales por rareza',()=>{
+  const base=api.makeLayers(sample,'b',{assetRoot:'../'});
+  assert.ok(base.some(x=>x.text==='Valor 10'));
+  assert.ok(base.some(x=>x.text==='—'));
+  const special=api.makeLayers(sample,'r',{points:75,pop:43,assetRoot:'../'});
+  assert.ok(special.some(x=>x.text==='Valor 75'));
+  assert.ok(special.some(x=>x.text==='43'));
+  assert.equal(api.pointsOf('f',{}),100);
+});
+test('un cambio editorial no afecta los assets, solo las capas',()=>{
+  const edited={...sample,nombre:'Sonic Reloaded',linea:'Nueva habilidad revisada'};
+  assert.equal(api.shellKey(sample,'b'),api.shellKey(edited,'b'));
+  assert.ok(api.makeLayers(edited,'b',{assetRoot:'../'}).some(x=>x.text==='Sonic Reloaded'));
+});
+test('BONUS no tiene número ni total de álbum',()=>{
+  const bonus={...sample,tipo:'Bonus · nunca producida',numero:''};
+  assert.equal(api.numLabel(bonus,'b',{}),'BONUS');
+  const a=api.makeLayers(bonus,'b',{assetRoot:'../'});
+  assert.ok(a.some(x=>x.text==='BONUS'));
+});
+test('el icono de habilidad estándar es vectorial, sin imagen PNG',()=>{
+  const layers=api.makeLayers(sample,'b',{});
+  assert.equal(layers.filter(x=>x.type==='ability-icon').length,1);
+  assert(!layers.some(x=>x.type==='image'&&/icono\\.png/.test(x.url)));
+});
+test('rareza usa estrellas SVG 0/1/2/3 y habilidad usa ícono diferente',()=>{
+  const counts={b:0,e:1,r:2,f:3};
+  for(const [variant,expected] of Object.entries(counts)){
+    const layers=api.makeLayers(sample,variant,{fullTotal:74});
+    assert.equal(layers.filter(x=>x.type==='star'&&x.points===5).length,expected,variant);
+    assert(!layers.some(x=>x.type==='text'&&/[✦★]/.test(x.text)),'sin estrellas de fuente');
+    if(variant==='b')assert.equal(layers.filter(x=>x.type==='ability-icon').length,1);
+  }
+});
+test('POP respeta su caja con posición controlada Base y Full',()=>{
+  for(const [variant,y] of [['b',135],['f',924]]){
+    const layers=api.makeLayers(sample,variant,{pop:143,fullTotal:74});
+    const pop=layers.find(x=>x.field==='pop');
+    assert.equal(pop.text,'143');
+    assert.equal(pop.y,y);
+    assert.equal(pop.align,'end');
+    assert(pop.clipBox && pop.clipBox.y<=pop.y);
+  }
+});
+test('pie completo: un fondo SVG continuo, no máscaras debajo de número/valor',()=>{
+  for(const v of ['b','e','r']){
+    const layers=api.makeLayers(sample,v,{points:50,pop:7});
+    const plate=layers.filter(x=>x.type==='footer-plate');
+    assert.equal(plate.length,1,v);
+    assert.equal(plate[0].variant,v);
+    assert(layers.indexOf(plate[0])<layers.findIndex(x=>x.field==='collection-number'),
+      'la placa se dibuja antes que los datos');
+  }
+  assert.equal(api.makeLayers(sample,'f',{fullTotal:74}).filter(x=>x.type==='footer-plate').length,0);
+});
+test('número dinámico solo dibuja texto: sin parche ni máscara en el pie',()=>{
+  const layers=api.makeLayers({...sample,numero:'089/???'},'b',{});
+  assert.equal(layers.find(x=>x.field==='collection-number').text,'089/???');
+  assert(!layers.some(x=>x.type==='rect' && x.y>1200));
+});
+test('la Full conserva numeración independiente',()=>{
+  const layers=api.makeLayers(sample,'f',{fullTotal:74,points:125,pop:90,assetRoot:'../'});
+  assert.ok(layers.some(x=>x.text==='Carta F32/74'));
+  assert.ok(layers.some(x=>x.text==='Valor 125'));
+  assert.ok(layers.some(x=>x.text==='90'));
+});
+test('rechaza ID, rareza y categoría desconocidos',()=>{
+  assert.throws(()=>api.assertData({...sample,id:'../malicioso'},'b'),/ID/);
+  assert.throws(()=>api.assertData(sample,'z'),/Rareza/);
+  assert.throws(()=>api.assertData({...sample,categoria:'HTML'},'b'),/Categoría/);
+  assert.throws(()=>api.assertData({...sample,full:null},'f'),/Full/);
+});
+test('motor aislado: no toca archivos de juego ni crea un laboratorio duplicado',()=>{
+  const renderer=fs.readFileSync(path.join(root,'content/card-renderer.js'),'utf8');
+  assert.doesNotMatch(renderer,/localStorage\\.(setItem|removeItem|clear)/);
+  assert.doesNotMatch(renderer,/supabase\\.co/);
+  assert.equal(fs.existsSync(path.join(root,'qa/cards-dynamic-preview.html')),false);
+});

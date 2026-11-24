@@ -50,4 +50,4 @@ Workflow: `.github/workflows/qa-ui-lab-mobile.yml` con Chromium móvil 390px/320
 
 ## Mantenimiento
 
-Este es un **snapshot** del juego del PR #130; después de cambiar el código de producción, debe recrearse desde la rama (manteniendo los bloqueos de Auth/nube/analytics) o se quedará desfasado. No utilizar `qa/design-system/index.html` como base de producción.
+Este es un **snapshot** del juego de producción `71912062a13942a5d49e2534a83011c8f5e3bf22` (PR #143, motor optimizado). El LAB mantiene sus controles y claves aisladas. El comparador es auxiliar; Álbum, Ficha, Zoom y Sobres usan el mismo motor de producción. Las opciones experimentales del sistema de diseño permanecen en el historial del PR #130; no se superponen a esta versión estable. En adelante, después de cambiar el código de producción, debe recrearse desde la rama (manteniendo los bloqueos de Auth/nube/analytics) o se quedará desfasado. No utilizar `qa/design-system/index.html` como base de producción.

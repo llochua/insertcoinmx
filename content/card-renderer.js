@@ -171,7 +171,7 @@
         layerText(layers,'Dorada',472,1250,23.4,ink,{maxWidth:145});
       }
       layerFooterRule(layers,622,ink);
-      layerText(layers,'Valor '+pointsOf(variant,options),647,1250,23.4,ink,{maxWidth:204});
+      layerText(layers,'Valor '+pointsOf(variant,options),647,1250,23.4,ink,{maxWidth:204,field:'points'});
     } else {
       layerImage(layers,pill,32,30);
       layerText(layers,card.nombre,48,922,64,'#ffffff',{maxWidth:590});
@@ -189,7 +189,7 @@
       [374,396,418].forEach(cx=>layerStar(layers,cx,1274,11,5));
       layerText(layers,'Arte Especial',552,1262,23.4,'#ffffff',{align:'middle',maxWidth:205});
       layerText(layers,'Valor '+pointsOf(variant,options),912,1262,23.4,'#ffffff',
-        {align:'end',maxWidth:230});
+        {align:'end',maxWidth:230,field:'points'});
     }
     return layers;
   }
@@ -284,6 +284,21 @@
     }
     return svg;
   }
+  // Render data independently: loading a shell never creates a second IMG.
+  function renderData(card,variant,options={}) {
+    return renderSvg(makeLayers(card,variant,options));
+  }
+  function updateValues(svg,variant,options={}) {
+    const values={pop:popOf(options),points:'Valor '+pointsOf(variant,options)};
+    const layouts={pop:{size:variant==='f'?79:74,maxWidth:variant==='f'?230:205},
+      points:{size:23.4,maxWidth:variant==='f'?230:204}};
+    for(const [field,value] of Object.entries(values)){
+      const tx=svg.querySelector('[data-icmx-field="'+field+'"]');
+      if(!tx||tx.textContent===value)continue;
+      tx.textContent=value;tx.setAttribute('font-size',layouts[field].size);
+      Promise.resolve(document.fonts&&document.fonts.ready).then(()=>resizeText(tx,layouts[field]));
+    }
+  }
   function create(card,variant='b',options={}) {
     css();
     assertData(card,variant);
@@ -302,10 +317,10 @@
     image.src=rootPath+shellDir+'/'+shellKey(card,variant)+'.webp';
     image.onerror=()=>{node.dataset.error='missing-shell';};
     node.appendChild(image);
-    node.appendChild(renderSvg(makeLayers(card,variant,options)));
+    node.appendChild(renderData(card,variant,options));
     return node;
   }
   root.ICMX_CARD_RENDERER=Object.freeze({
-    create,makeLayers,assertData,shellKey,numLabel,pointsOf,VARIANTS
+    create,renderData,updateValues,makeLayers,assertData,shellKey,numLabel,pointsOf,VARIANTS
   });
 })(typeof window!=='undefined'?window:globalThis);

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Build de publicación: WebP optimizado, textos siempre vectoriales.
 """Genera SOLO la base gráfica sin datos. No modifica c/, c2/, d/, fa/ ni index.html.
 
 Uso: python cartas/generar-shells.py 1up sonic
@@ -113,9 +114,11 @@ def nombre_version(d, rareza):
 def escribir_si_cambia(path, imagen):
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp.webp")
-    # Lossless: evita artefactos de compresión/halos en tipografía y franja del número.
-    # Solo archivos de este LAB, nunca modifica el WebP publicado.
-    Image.fromarray(imagen).save(tmp, lossless=True, method=6)
+    # La base no contiene tipografía: WebP con calidad visual alta evita archivos
+    # lossless 3–5x mayores, sin introducir parches ni textos rasterizados.
+    # La composición SVG/Canvas conserva toda la tipografía nítida.
+    quality = 91 if path.parent.name == 'cs2' else 88
+    Image.fromarray(imagen).save(tmp, format='WEBP', quality=quality, method=6)
     data = tmp.read_bytes()
     tmp.unlink()
     if path.is_file() and path.read_bytes() == data:
