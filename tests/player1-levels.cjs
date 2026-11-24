@@ -62,3 +62,22 @@ for(const owned of [{},have24,have25,{...have24,navidadgamer_b:1,[future]:1}]){
  assert.equal(JSON.stringify(owned),snapshot);
 }
 console.log('Offline draws: 800 packs, scopes, rarity structure, preserved inventory');
+
+// Replacement slots preserve discovery credit, not duplicate credit or inventory.
+const removed=["invader","sensei","bustfiction","docecasas","gunsncontrols","keepcalm"];
+for(const id of removed)assert.equal(api.levelOf(id),null);
+const oldFirst=Object.fromEntries(l1.designs.map(id=>[({"ochentas":"invader","blooper":"sensei","fatman":"bustfiction","zodiac":"docecasas","triforce":"gunsncontrols","poketaco":"keepcalm"}[id]||id)+'_b',1]));
+assert.equal(api.progress(oldFirst)[0].discovered,25);
+assert.equal(api.progress(oldFirst)[1].unlocked,true);
+assert.equal(api.progress({...oldFirst,ochentas_b:1})[0].discovered,25);
+assert.ok(api.visibleDesigns(oldFirst).includes('invader'));
+assert.ok(!api.eligibleDesigns(oldFirst).includes('invader'));
+const oldBoth=Object.fromEntries([...l1.designs,...l2.designs].map(id=>[({"ochentas":"invader","blooper":"sensei","fatman":"bustfiction","zodiac":"docecasas","triforce":"gunsncontrols","poketaco":"keepcalm"}[id]||id)+'_b',1]));
+assert.equal(api.collectionProgress(oldBoth).discovered,50);
+const sql=fs.readFileSync(path.join(__dirname,'../supabase/sql/player1_pack_progression_STAGED.sql'),'utf8');
+for(const [i,level] of api.levels.entries()){
+ const match=sql.match(new RegExp('v_level'+(i+1)+' constant text\\[\\] := ARRAY\\[([^\\]]+)\\]'));
+ assert.ok(match);
+ assert.deepEqual(match[1].match(/'[^']+'/g).map(x=>x.slice(1,-1)).sort(),[...level.designs].sort());
+}
+console.log('Replacement progress and server/client pool parity passed');

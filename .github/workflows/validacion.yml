@@ -96,6 +96,7 @@ jobs:
       - name: Validar catálogo, narrativas y seguridad beta
         run: |
           node content/validate.mjs
+          node tests/player1-levels.cjs
           node qa/check-server-pack-pool.mjs
           node qa/check-beta-gate.mjs
 

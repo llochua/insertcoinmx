@@ -23,4 +23,13 @@ for(const id of ids){
 }
 assert.ok(html.indexOf('src="content/card-texts.js?')!==-1,'No se carga el archivo editorial');
 assert.ok(html.indexOf('src="content/card-texts.js?')<html.indexOf('<script>/* ===== CATÁLOGO'),'El archivo editorial debe cargar antes del juego');
-console.log('OK: '+ids.length+' cartas, textos completos y catálogo sincronizado');
+
+// Narrativas obligatorias para cualquier diseño incluido en una colección jugable.
+const levelContext={window:{}};
+vm.runInNewContext(fs.readFileSync('content/player1-levels.js','utf8'),levelContext,{timeout:2000});
+const levels=levelContext.window.ICMX_PLAYER1_LEVELS || levelContext.ICMX_PLAYER1_LEVELS;
+assert.ok(levels?.levels?.length,'No se encontró la configuración de colecciones');
+const missing=levels.levels.flatMap(level=>level.designs.flatMap(id=>
+ ['holo','dorada'].filter(key=>typeof texts[id]?.[key]!=='string'||!texts[id][key].trim()).map(key=>id+':'+key)));
+assert.equal(missing.length,0,'Colecciones jugables incompletas: '+missing.join(', '));
+console.log('OK: '+ids.length+' diseños; 50 diseños jugables con narrativas completas.');
