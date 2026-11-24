@@ -2013,6 +2013,31 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile.account-focus .profile-scoreboard{display:none!important}
 @media(max-width:380px){#profile .profile-passport{padding:14px 12px}#profile .profile-head{gap:10px}#profile .profile-identity .profile-kicker{font-size:7px}#profile .profile-summary-board .profile-collection{padding:13px 10px;gap:10px}#profile .profile-summary-board .profile-dial{width:91px;height:91px;flex-basis:91px;padding:7px}#profile .profile-summary-board .profile-dial strong{font-size:23px}#profile .profile-summary-board .profile-progress strong{font-size:17px}#profile .profile-summary-board .profile-progress-note{font-size:11px}#profile .profile-scoreboard{padding:12px 8px}#profile .profile-scoreboard .profile-metrics-spaced span:last-child{font-size:9px}}
 </style>
+<style>
+#p1LevelUp{box-sizing:border-box;width:min(94vw,460px);max-height:92dvh;margin:auto;padding:0;overflow:auto;border:1px solid #ffd400;border-radius:14px;color:#fff;background:#100d26;box-shadow:0 0 70px #ffd40030;text-align:center}
+#p1LevelUp::backdrop{background:#080619e8}
+.p1-up-scene{position:relative;isolation:isolate;overflow:hidden;padding:29px 20px 22px;background:radial-gradient(ellipse at 50% 25%,#554118 0,#201630 38%,#100d26 75%)}
+.p1-up-scene:before{content:"";position:absolute;inset:-45%;z-index:-1;background:repeating-conic-gradient(from 0deg,#ffd40013 0deg 10deg,transparent 10deg 30deg);animation:p1UpRays 18s linear infinite}
+.p1-up-scene:after{content:"";position:absolute;inset:0;z-index:-1;background:repeating-linear-gradient(0deg,#100d2630 0 1px,transparent 1px 4px)}
+.p1-up-kicker{font:9px/1.6 PX,monospace;letter-spacing:.05em;color:#ffd400}
+.p1-up-emblem{width:100px;height:100px;display:grid;place-items:center;margin:17px auto 14px;border:3px solid #ffd400;border-radius:50%;background:#151026;box-shadow:0 0 0 8px #ffd40013,0 0 35px #ffd40044;animation:p1UpCoin .6s cubic-bezier(.17,.89,.32,1.4) both}
+.p1-up-emblem img{width:72%;height:72%;object-fit:contain}
+#p1LevelUp h2{font:800 clamp(40px,11vw,62px)/.95 AVK,AV,sans-serif;letter-spacing:-.04em;margin:0;color:#ffd400;text-shadow:0 4px 0 #795a0a;animation:p1UpPop .5s .18s both}
+.p1-up-complete{font:700 12px AV,sans-serif;color:#e9dbf9;margin:12px 0 18px}
+.p1-up-route{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 auto 14px}
+.p1-up-stage{flex:1;min-width:0;padding:10px 4px;border:1px solid #6f638a;background:#221a37;border-radius:7px;display:grid;gap:6px}
+.p1-up-stage b{font:800 21px/1 AVK,AV,sans-serif}.p1-up-stage small{font:700 9px/1.3 AV,sans-serif;color:#bfb2da}
+.p1-up-stage.next{background:#ffd400;color:#161022;border-color:#ffd400;animation:p1UpPop .5s .45s both}.p1-up-stage.next small{color:#392b13}
+.p1-up-arrow{font:13px PX,monospace;color:#ffd400}
+#p1LevelUp p{font:600 14px/1.4 AV,sans-serif;color:#eee5fa;margin:0 0 15px}
+.p1-up-actions{display:grid;gap:8px;margin-top:20px}
+.p1-up-actions button{min-height:46px;border-radius:7px;font:800 12px AV,sans-serif;letter-spacing:.05em}
+#p1UpExplore{background:#ffd400;border:0;color:#151024;box-shadow:0 4px 0 #9b7900}
+#p1UpContinue{background:#ffffff08;border:1px solid #665781;color:#eee7fa}
+.p1-up-actions button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@keyframes p1UpRays{to{transform:rotate(360deg)}}@keyframes p1UpCoin{from{opacity:0;transform:scale(.35) rotate(-70deg)}to{opacity:1;transform:scale(1) rotate(0)}}@keyframes p1UpPop{from{opacity:0;transform:translateY(12px) scale(.92)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#p1LevelUp *,#p1LevelUp *:before{animation:none!important}}
+</style>
 </head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -2059,6 +2084,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <div class="sum" id="sum" tabindex="-1" aria-label="Resumen del sobre"></div>
  </div>
 </section>
+<dialog id="p1LevelUp" aria-labelledby="p1UpTitle"><div class="p1-up-scene"><div class="p1-up-kicker">STAGE CLEAR</div><div class="p1-up-emblem" aria-hidden="true"><img src="coin.png" alt=""></div><h2 id="p1UpTitle">LEVEL UP!</h2><div class="p1-up-complete">25 / 25 diseños descubiertos</div><div class="p1-up-route" aria-label="Level 01 completado, Level 02 desbloqueado"><div class="p1-up-stage"><b>01 ✓</b><small>PRESS START</small></div><span class="p1-up-arrow" aria-hidden="true">▶</span><div class="p1-up-stage next"><b>02</b><small>NEXT LEVEL</small></div></div><p>¡Desbloqueaste 25 diseños nuevos!<br>La partida continúa.</p><div class="p1-up-actions"><button type="button" id="p1UpExplore">EXPLORAR LEVEL 02</button><button type="button" id="p1UpContinue">VER RESUMEN DEL SOBRE</button></div></div></dialog>
 <section class="view" id="album">
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Álbum</h1><span class="sp"></span><span id="aCount"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="wrap p1-scroll">
@@ -3083,6 +3109,23 @@ const firstPack=()=>!S.fg&&!veteran();
 function makeHand(first){return [pickBase(),pickBase(),pickBase(),Math.random()<SURP?pickSpecial():pickBase(),first&&POOL.full.length?pickFrom('full'):pickSpecial()]}
 const GLOW={holo:'#9ff3ff',dorada:'#FFD400',full:'#ff6fd0'};
 let hand=[],idx=0,hintT,lastOpenedPack=null;
+let pendingLevelUp=false;
+function recordLevelUp(before,after){
+ const was=player1.progress(before)[0].complete,now=player1.progress(after)[0].complete;
+ pendingLevelUp=!was&&now;
+}
+function showLevelUpIfPending(){
+ if(!pendingLevelUp)return;
+ pendingLevelUp=false;
+ if(!player1.progress(S.have)[1].unlocked||cur!=='pack')return;
+ const dlg=$('p1LevelUp');if(dlg.open)return;
+ dlg.showModal();$('p1UpExplore').focus({preventScroll:true});
+ [523,659,784,1047,1319,1568].forEach((note,i)=>setTimeout(()=>{if(dlg.open)beep(note,.13)},i*105));
+}
+$('p1UpExplore').onclick=()=>{$('p1LevelUp').close();player1Page='player1-02';page=0;go('album');$('grid').parentNode.scrollTop=0};
+$('p1UpContinue').onclick=()=>{$('p1LevelUp').close();$('sum').focus({preventScroll:true})};
+$('p1LevelUp').addEventListener('cancel',e=>{e.preventDefault();$('p1UpContinue').click()});
+
 const VORD={f:0,r:1,e:2,b:3}; // de mejor a peor
 /* al rasgar, la luz que sale del sobre es la de su mejor carta: blanca (Base), arcoíris (Especial), oro (Rara), rosa (Full) */
 function leak(v){const L=$('leak');L.className='leak';void L.offsetWidth;L.className='leak on v-'+v;
@@ -3100,7 +3143,7 @@ function setPackPresentation(kind='standard'){
  img.alt=PACK_PRESENTATIONS[active].label;
  return active;
 }
-function resetPack(){setPackPresentation('standard');$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.webp?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
+function resetPack(){pendingLevelUp=false;setPackPresentation('standard');$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.webp?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
  $('stack').classList.remove('on');$('sum').classList.remove('on');$('stHint').style.display='none';$('openBtn').style.visibility='visible'}
 let tx=null;
 $('tearZone').addEventListener('pointerdown',e=>{tx=e.clientX;$('hand').style.display='none';try{$('tearZone').setPointerCapture(e.pointerId)}catch(_){}});
@@ -3150,6 +3193,7 @@ function openServerPack(){
   ga('abrir_sobre',{tipo:result.kind,servidor:1});
   hand.forEach(c=>ga('carta_obtenida',{diseno:c.d,rareza:VC[c.v],nueva:c._new?1:0}));
   const afterUnique=uniq();
+  recordLevelUp(beforeHave,S.have);
   GOALS.forEach(g=>{if(beforeUnique<g[0]&&afterUnique>=g[0])ga('hito',{hito:g[1],cartas:afterUnique})});
   // Los logros son metadatos del álbum; las cantidades siguen siendo del servidor.
   if(markLogros())save();
@@ -3184,7 +3228,7 @@ function openPack(){
   const doneB=new Set(DESIGNS.filter(d=>dState(d).done).map(d=>d.id));
   hand.forEach(c=>{c._new=!S.have[c.k]&&!seen[c.k];seen[c.k]=1;p.have[c.k]=(p.have[c.k]||0)+1;
    c._prev=VL.filter(v=>S.have[c.d+'_'+v]);c._dnew=c._new&&!c._prev.length&&!seenD[c.d];seenD[c.d]=1;c._doneB=doneB.has(c.d)});
-  const u0=uniq();applyPack(p);
+  const u0=uniq(),beforeLevelHave={...S.have};applyPack(p);recordLevelUp(beforeLevelHave,S.have);
    // Se guarda el lugar de ESTE sobre, antes de agotar la cuota o cruzar medianoche.
    lastOpenedPack=p.welcome?{kind:'welcome',number:5-S.welcomeLeft}
     :p.daily?{kind:'daily',number:S.freeUsed}
@@ -3609,7 +3653,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
  </div>`;
  for(const c of hand)mountFaceValueLazy(s.querySelector('.rc[data-k="'+c.k+'"] .fx'),c);
  mountFaceValueLazy(s.querySelector('.rh .dx-card .fx'),H);
- if(entering){s.scrollTop=0;ga('resumen_sobre_visto',{tipo:lastOpenedPack?.kind||'extra',paso:lastOpenedPack?.number||0})}
+ if(entering){s.scrollTop=0;ga('resumen_sobre_visto',{tipo:lastOpenedPack?.kind||'extra',paso:lastOpenedPack?.number||0});showLevelUpIfPending()}
  refreshSummaryActions();
  s.querySelectorAll('[data-k]').forEach(b=>b.onclick=e=>openCard(b.dataset.k,{storyFirst:!!e.target.closest('.rc-story-cta,.rh-story-cta')}));
  if($('sTrade'))$('sTrade').onclick=()=>trade(()=>{showSum();$('sOtro').focus({preventScroll:false})});
