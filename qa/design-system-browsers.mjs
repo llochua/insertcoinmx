@@ -123,6 +123,31 @@ try{
   await page.waitForFunction(()=>Object.values(S.have).reduce((a,n)=>a+n,0)>=13);
   assert.equal(await page.evaluate(()=>packReady()),true,'packs remain infinite after opening');
   await page.screenshot({path:'qa/screenshots/ui-lab-pack-'+width+'.png'});
+  // Quota trial: the real opening pipeline decrements the integrated counter.
+  await page.locator('#icmxLabToggle').click();
+  await page.locator('[data-lab-action="pack-quota"]').click();
+  await page.waitForFunction(()=>!opening&&freePacksLeft()===2&&!PRUEBA&&!S.test);
+  const beforeQuota=await page.evaluate(()=>Object.values(S.have).reduce((a,n)=>a+n,0));
+  for(const left of [1,0]){
+   if(left===0)await page.locator('#sOtro').click();
+   await page.locator('#openBtn').click();
+   await page.waitForFunction(n=>freePacksLeft()===n&&!opening&&document.getElementById('env').style.display==='none',left);
+   await page.evaluate(()=>{document.getElementById('disc').classList.remove('on');showSum()});
+   await page.locator('#sum.on').waitFor({state:'visible'});
+   assert.equal(await page.locator('#sOtroCount').isVisible(),left>0);
+   assert.equal(await page.locator('#sWait').isVisible(),left===0);
+   assert.equal(await page.locator('#sOtroLabel').textContent(),left?'ABRIR OTRO SOBRE':'VER MI ÁLBUM');
+   if(left)assert.equal(await page.locator('#sOtroCount').textContent(),'×1');
+   else assert.match(await page.locator('#sNextTime').textContent(),/^\d{2}:\d{2}:\d{2}$/);
+   await page.screenshot({path:'qa/screenshots/ui-lab-summary-'+left+'-'+width+'.png'});
+  }
+  assert.equal(await page.evaluate(()=>Object.values(S.have).reduce((a,n)=>a+n,0)),beforeQuota+10);
+  await page.locator('#sOtro').click();
+  await page.locator('#album.on').waitFor({state:'visible'});
+  await page.locator('#icmxLabToggle').click();
+  await page.locator('[data-lab-action="pack"]').click();
+  assert.equal(await page.evaluate(()=>PRUEBA&&S.test===1&&packReady()),true);
+
 
   await page.locator('#icmxLabToggle').click();
   await page.locator('[data-lab-action="profile"]').click();
