@@ -24,6 +24,23 @@ try{
  const page=await browser.newPage({viewport:{width:390,height:844}});
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!!window.ICMX_CARD_RUNTIME&&!!window.ICMX_CARD_RENDERER,{timeout:20000});
+ // Exercise the actual published Album zoom, not a synthetic card node.
+ for(const key of ['booit_e','arcade_b','1up_e','1up_b','1up_r','sonic_f','booit_e']){
+  await page.evaluate(key=>openCard(key),key);
+  await page.waitForFunction(()=>{
+   const fx=document.getElementById('zFx'),img=document.getElementById('zImg');
+   return fx.classList.contains('idle')&&!fx.classList.contains('is-error')&&
+    img.dataset.icmxDynamic==='true'&&img.complete&&img.naturalWidth>0&&
+    fx.querySelectorAll(':scope > svg.icmx-data').length===1&&
+    getComputedStyle(img).visibility==='visible'&&getComputedStyle(img).opacity==='1'&&
+    document.getElementById('zLoad').textContent==='';
+  },null,{timeout:20000});
+  const actual=await page.locator('#zImg').getAttribute('src');
+  assert.match(actual,/\/cs2\//,key+' '+actual);
+  await page.locator('#zFx').click();
+  await page.waitForFunction(()=>!document.getElementById('zoom').open);
+ }
+ console.log('OK: actual Album zoom, repeated open and close, Base/Holo/Dorada/Full');
  const results=await page.evaluate(async()=>{
   const list=[['1up','b','1up'],['1up','e','1up_e'],['1up','r','1up_r'],['sonic','f','F_sonic']];
   const out=[];
