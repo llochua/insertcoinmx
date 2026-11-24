@@ -2065,12 +2065,12 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   </section>
   <section class="profile-summary-board" aria-label="Avance de mi colección">
    <div class="profile-collection">
-    <div class="profile-dial" id="profileDial" aria-hidden="true"><div><strong id="profileCards">0</strong><span>CARTAS</span></div></div>
+    <div class="profile-dial" id="profileDial" aria-hidden="true"><div><strong id="profileCards">0</strong><span id="profileDialLabel">DE 25</span></div></div>
     <div class="profile-progress">
-     <span class="profile-progress-label">MI COLECCIÓN</span>
-     <strong><span id="profileTotal">100</span> variantes del nivel activo</strong>
-     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Cartas distintas obtenidas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="profileProgressFill"></i></div>
-     <p class="profile-progress-note" id="profilePercent">0% de la colección</p>
+     <span class="profile-progress-label">MI PROGRESO</span>
+     <strong id="profileTotal">LEVEL 01 · PRESS START</strong>
+     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Diseños descubiertos en el nivel actual" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"><i id="profileProgressFill"></i></div>
+     <p class="profile-progress-note" id="profilePercent">0 de 100 variantes</p>
     </div>
    </div>
   </section>
@@ -4247,16 +4247,18 @@ async function shareTier(){toast('PREPARANDO IMAGEN...');await document.fonts.re
 /* Perfil: solo lee el progreso local, sin modificar ni enviar cartas a Supabase. */
 function renderProfile(){
  syncIn();
- const cards=uniq(),activeLevel=player1.progress(S.have).filter(l=>l.unlocked).at(-1),total=activeLevel.variantTotal,levelCards=activeLevel.collected,progress=$('profileProgress');
+ const activeLevel=player1.progress(S.have).filter(l=>l.unlocked).at(-1),total=activeLevel.designTotal,discovered=activeLevel.discovered,progress=$('profileProgress');
  const pts=collectionPointsLocal();
  $('profileValuePoints').textContent=pts===null?'— PTS':pts.toLocaleString('es-MX')+' PTS';
- $('profileCards').textContent=cards;
- $('profileTotal').textContent=total;
- $('profileDial').style.setProperty('--profile-fill',(total?Math.min(100,cards/total*100):0)+'%');
- $('profilePercent').textContent='LEVEL 0'+activeLevel.number+' · '+levelCards+'/'+total+' variantes';
+ $('profileCards').textContent=discovered;
+ $('profileDialLabel').textContent='DE '+total+' DISEÑOS';
+ $('profileTotal').textContent='LEVEL 0'+activeLevel.number+' · '+activeLevel.name;
+ const fill=(total?Math.min(100,discovered/total*100):0)+'%';
+ $('profileDial').style.setProperty('--profile-fill',fill);
+ $('profilePercent').textContent=activeLevel.collected+' / '+activeLevel.variantTotal+' variantes · '+uniq()+' cartas totales obtenidas';
  progress.setAttribute('aria-valuemax',String(total));
- progress.setAttribute('aria-valuenow',String(levelCards));
- $('profileProgressFill').style.width=(total?Math.min(100,levelCards/total*100):0)+'%';
+ progress.setAttribute('aria-valuenow',String(discovered));
+ $('profileProgressFill').style.width=fill;
  $('profileDesigns').textContent=DESIGNS.filter(d=>!d.bx&&dState(d).own).length;
  $('profileDuplicates').textContent=dups();
  $('profileRatings').textContent=Object.keys(S.rate||{}).length;
