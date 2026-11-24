@@ -2170,8 +2170,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 window.ICMX_VERIFIED_GUEST_PLAY=/^(?:www\.)?insertcoinmx\.com$/i.test(location.hostname);</script>
 <script src="content/card-texts.js?v=20261123a"></script>
 <script src="content/card-data-adapter.js?v=20261123"></script>
-<script src="content/card-renderer.js?v=20261123"></script>
-<script src="content/card-runtime.js?v=20261123"></script>
+<script src="content/card-renderer.js?v=20261123-perf1"></script>
+<script src="content/card-runtime.js?v=20261123-perf1"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
    b Base · e Especial · r Rara · f Full. La clave de una carta es diseño+'_'+letra (ej. fatality_r, x_f).
@@ -2484,7 +2484,9 @@ function updateCardValueUI(card){
 }
 function mountFaceValue(fx,card){
  if(!fx||!card)return;
- window.ICMX_CARD_RUNTIME?.mount(fx,card,updateCardValueUI(card));
+ const task=window.ICMX_CARD_RUNTIME?.mount(fx,card,updateCardValueUI(card));
+ if(!task){const img=fx.querySelector('img');if(img&&!img.getAttribute('src')&&img.dataset.icmxOriginal)img.src=img.dataset.icmxOriginal;}
+ return task;
 }
 let faceCardObserver=null;
 const pendingFaceCards=new WeakMap();
@@ -3516,7 +3518,7 @@ function renderAlbum(){
  $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=DN.reduce((n,x)=>n+x.st.got,0)+'/'+DN.reduce((n,x)=>n+x.st.tot,0);
  const dn=LN.filter(x=>x.st.all).length;
  $('aSub').innerHTML=`<b>${dn}</b> de ${LN.length} diseños completos · ${t} cartas en sobres`+(SOON_N>0?`<span>+ ${SOON_N} ilustraciones en camino · todavía no salen en sobres</span>`:'');
- $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv${st.own?` fx idle r-${st.cover.r}`:''}">${st.own?`<img src="${imgOf(st.cover,'c')}" loading="lazy" alt=""><i class="foil"></i><i class="glare"></i>`:`<span class="lk"><img src="coin.png" alt="">${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
+ $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv${st.own?` fx idle r-${st.cover.r}`:''}">${st.own?`<img ${st.cover.img?'data-icmx-original':'src'}="${imgOf(st.cover,'c')}" alt=""><i class="foil"></i><i class="glare"></i>`:`<span class="lk"><img src="coin.png" alt="">${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
  for(const {d,st} of L)if(st.own)mountFaceValueLazy($('grid').querySelector('.dt[data-d="'+d.id+'"] .fx'),st.cover);
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
@@ -3529,11 +3531,13 @@ function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(
  const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
  const col=st.vs.filter(x=>x.st==='have'||x.st==='av');$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
-  return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv fx idle r-${x.c.img?x.c.r:'comun'}"><img src="${imgOf(x.c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span>${lb}</button>`
+  return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv fx idle r-${x.c.img?x.c.r:'comun'}"><img ${x.c.img?'data-icmx-original':'src'}="${imgOf(x.c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span>${lb}</button>`
    :`<div class="vc av"><span class="cv"><img src="coin.png" alt=""><span>EN SOBRES</span></span>${lb}</div>`}).join('');
  for(const x of col)if(x.st==='have')mountFaceValueLazy($('fVers').querySelector('.vc[data-k="'+x.c.k+'"] .fx'),x.c);
  const soon=st.vs.filter(x=>x.st==='soon');$('fSoon').innerHTML=soon.length?'Ilustración en camino:'+soon.map(x=>`<span>${VN[x.v]}</span>`).join(''):''}
 $('fVers').onclick=e=>{const b=e.target.closest('.vc.have');if(b)openCard(b.dataset.k)};
+function preloadFichaCard(e){const b=e.target.closest('.vc.have');if(b)window.ICMX_CARD_RUNTIME?.preload(CB[b.dataset.k]);}
+for(const type of ['pointerover','pointerdown','focusin'])$('fVers').addEventListener(type,preloadFichaCard);
 $('fClose').onclick=closeFicha;
 $('ficha').onclick=e=>{if(e.target.id==='ficha')closeFicha()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('zoom').open&&fd)closeFicha()});
@@ -3554,33 +3558,35 @@ function openCard(k,options={}){
  fx.className='fx is-loading r-'+(cc.img?cc.r:'comun');
  status.textContent='CARGANDO CARTA';
  img.alt=cc.n+' · '+VN[cc.v];
+ img.onload=null;img.onerror=null;
+ window.ICMX_CARD_RUNTIME?.reset(fx);
  img.removeAttribute('src');
  delete img.dataset.icmxDynamic;
  fx.querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
  delete fx.dataset.icmxDynamic;
+ img.dataset.icmxOriginal=imgOf(cc,'c2');
  const valid=()=>token===zLoadToken&&zoom.open;
  const failed=()=>{
   if(!valid())return;
-  fx.classList.replace('is-loading','is-error');
+  fx.classList.remove('is-loading','idle');fx.classList.add('is-error');
   status.textContent='NO SE PUDO CARGAR LA CARTA';
  };
  const ready=()=>{
   if(!valid())return;
   if(!img.naturalWidth){failed();return}
-  fx.classList.remove('is-loading');
+  fx.classList.remove('is-loading','is-error');
   fx.classList.add('idle');
   status.textContent='';
  };
- // La imagen heredada termina de cargar antes de que el motor dinámico
- // cambie su src. Evitamos el AbortError de decode() entre ambas cargas.
- img.onload=()=>{
-  if(!valid())return;
-  ready();
-  if(img.dataset.icmxDynamic!=='true')mountFaceValue(fx,cc);
- };
- img.onerror=failed;
  setVoting(true);
  if(!zoom.open)zoom.showModal();
+ // Un solo montaje controla imagen, SVG y fallback; no hay decode competidor.
+ if(cc.img&&window.ICMX_CARD_RUNTIME){
+  mountFaceValue(fx,cc).then(ok=>{if(valid())ok?ready():failed()},failed);
+ }else{
+  img.onload=ready;img.onerror=failed;img.src=img.dataset.icmxOriginal;
+  if(img.complete&&img.naturalWidth)ready();
+ }
  if(communityRanking&&communityRanking.state.status!=='loading')communityRanking.refresh();
  zoom.scrollTop=0;
  // Un toque en «Así se diseñó» o «Leer la anécdota» lleva al relato directamente.
@@ -3590,9 +3596,7 @@ function openCard(k,options={}){
   narrative.scrollIntoView({block:'start',behavior:'auto'});
   narrative.focus({preventScroll:true});
  });
- img.src=imgOf(cc,'c2');
- // onload valida la imagen sin competir con el cambio de src del motor dinámico.
- if(img.complete&&img.naturalWidth)img.onload();
+ // La carga de la carta se inicia antes de solicitar el ranking.
 }
 function setVoting(on){
  $('zVoting').hidden=!on;
@@ -3626,7 +3630,8 @@ $('zFx').addEventListener('keydown',e=>{
 $('zoom').addEventListener('close',()=>{
  if($('zoom').open)return; // un cierre anterior no debe limpiar la carta que acaba de reabrirse
  ++zLoadToken; // invalida cargas previas, también si se cierra con Escape
- const img=$('zImg');img.onload=null;img.onerror=null;img.removeAttribute('src');
+ const img=$('zImg');img.onload=null;img.onerror=null;
+ window.ICMX_CARD_RUNTIME?.reset($('zFx'));img.removeAttribute('src');delete img.dataset.icmxOriginal;
  $('zFx').querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
  delete img.dataset.icmxDynamic;
  $('zFx').className='fx';$('zLoad').textContent='';
