@@ -68,7 +68,7 @@ function mount(fx,card,values){
    R().updateValues(previous.svg,card.v,values);
    return Promise.resolve(true);
   }
-  if(previous.status==='pending')return previous.promise;
+  if(previous.status==='pending'||previous.status==='fallback')return previous.promise;
  }
  const current=img.getAttribute('src')||'';
  const original=img.dataset.icmxOriginal||(/^(?:c|c2)\//.test(current)?current:'')||
@@ -83,6 +83,7 @@ function mount(fx,card,values){
    // Start the network and catalogue concurrently; the DOM IMG is the sole
    // shell loader on the direct path. Legacy assets are only a fallback.
    const hasLegacy=current&&/^(?:c|c2)\//.test(current);
+   if(!hasLegacy)img.style.opacity='0';
    const imageReady=hasLegacy?loadImage(shell):decodeTarget(img,shell);
    const [rows]=await Promise.all([catalog(),imageReady]);
    if(!active())return false;
