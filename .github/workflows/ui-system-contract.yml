@@ -1,0 +1,54 @@
+name: UI system contract
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "content/ui-system.css"
+      - "content/design-tokens.css"
+      - "content/ui-components.css"
+      - "scripts/check-ui-icons.mjs"
+      - "scripts/check-ui-components.mjs"
+      - "scripts/check-lab-art-parity.mjs"
+      - "qa/design-system/index.html"
+      - "docs/design-system/**"
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "content/ui-system.css"
+      - "content/design-tokens.css"
+      - "content/ui-components.css"
+      - "scripts/check-ui-icons.mjs"
+      - "scripts/check-ui-components.mjs"
+      - "scripts/check-lab-art-parity.mjs"
+      - "qa/design-system/index.html"
+
+permissions:
+  contents: read
+
+jobs:
+  ui-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout UI system and main baseline without large assets
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            index.html
+            content/ui-system.css
+            content/design-tokens.css
+            content/ui-components.css
+            scripts/check-ui-icons.mjs
+            scripts/check-ui-components.mjs
+            scripts/check-lab-art-parity.mjs
+            qa/design-system/index.html
+            qa/design-system/artwork-backgrounds.generated.json
+          sparse-checkout-cone-mode: false
+      - name: Verify icon registry and inline scripts
+        run: node scripts/check-ui-icons.mjs
+      - name: Verify shared component contracts
+        run: node scripts/check-ui-components.mjs
+      - name: Prevent LAB illustration rendering regressions against main
+        run: node scripts/check-lab-art-parity.mjs
