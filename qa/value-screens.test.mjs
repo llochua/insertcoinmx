@@ -11,19 +11,19 @@ const runtime=readFileSync('content/card-runtime.js','utf8');
 const shellGen=readFileSync('cartas/generar-shells.py','utf8');
 const key=pat=>assert.ok(html.includes(pat),'Falta en index.html: '+pat);
 
-test('Conservar High Scores arcade con cinco categorías reales',()=>{
- for(const id of ['recordDesigns','recordDuplicates','recordRatings','scoreRankColumn','scoreDataScope','arcadeBonusTitle','scoreTopTitle'])
+test('Conservar High Scores arcade con Coleccionistas y POP',()=>{
+ for(const id of ['scoreCardCount','scorePopPanel','scoreRankColumn','scoreDataScope','scoreTopTitle'])
   key('id="'+id+'"');
- for(const metric of ['cards','pts','designs','duplicates','ratings'])key('data-score-metric="'+metric+'"');
+ for(const view of ['pts','pop'])key('data-record-view="'+view+'"');
  assert.match(html,/<section class="view" id="scores">[\s\S]*?HIGH SCORES[\s\S]*?TOP 10/);
  assert.match(html,/rank-empty/);
  const section=html.slice(html.indexOf('<section class="view" id="scores">'),html.indexOf('<section class="view" id="profile"'));
- assert.doesNotMatch(section,/id="bkExp"|id="bkImp"|RESPALDO DE TU PROGRESO/);
+ assert.doesNotMatch(section,/id="bkExp"|id="bkImp"|RESPALDO DE TU PROGRESO|BONUS STATS|data-score-metric/);
 });
 test('Valor y POP sobre la imagen, con reacciones antes de la narrativa y sin fórmula duplicada',()=>{
  key('id="profileValuePoints"');
  key('id="fDesignValue"');
- key('id="icmxGlobalTitle"');
+ key('id="communityRankRows"');
  for(const id of ['zVoting','zRate','zGoty','zLikeStatus','zNarrative'])key('id="'+id+'"');
  key('content/card-runtime.js?v=');
  key('content/card-renderer.js?v=');
@@ -62,6 +62,8 @@ test('El historial actual de PTS se calcula mediante el motor existente',()=>{
  vm.runInContext(section+'\nglobalThis.testAPI={setEngine:(v)=>communityValueEngine=v,points:collectionPointsLocal,update:updateCardValueUI};',ctx);
  ctx.testAPI.setEngine({collectionPoints,VARIANT_POINTS});
  assert.equal(ctx.testAPI.points(),35);
+ ctx.S.have.abuket_b=1;ctx.S.have.abuket_e=1;
+ assert.equal(ctx.testAPI.points(),35,'Canjear copias conserva los puntos');
  assert.equal(ctx.testAPI.update({k:'abuket_b',v:'b',bx:false}).points,10);
  assert.equal(ctx.testAPI.update({k:'abuket_e',v:'e',bx:false}).points,25);
  assert.equal(ctx.testAPI.update({k:'arcade_f',v:'f',bx:false}).points,100);
