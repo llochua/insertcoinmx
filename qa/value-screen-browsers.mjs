@@ -55,9 +55,9 @@ try{
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-records-mobile.png'),fullPage:true});
  await page.evaluate(()=>openCard('abuket_b'));
  await page.locator('#zoom[open]').waitFor();
- await page.locator('#zFx svg.icmx-live-pop[data-ready="true"]').waitFor();
- assert.equal(await page.locator('#zFx svg.icmx-live-pop').getAttribute('data-points'),'10');
- assert.equal(await page.locator('#zFx svg.icmx-live-pop').getAttribute('data-pop'),'—');
+ await page.locator('#zFx svg.icmx-data [data-icmx-field="pop"]').waitFor();
+ assert.ok((await page.locator('#zFx svg.icmx-data').innerText()).includes('Valor 10'));
+ assert.equal(await page.locator('#zFx svg.icmx-data [data-icmx-field="pop"]').innerText(),'—');
  await page.locator('#zVoting').waitFor({state:'visible'});
  assert.deepEqual(await page.locator('#zRate button[data-r]').evaluateAll(buttons=>buttons.map(b=>b.getAttribute('aria-label'))),
   ['GOTY','GENIAL','OK','MMM'],'Solo cuatro reacciones compactas');
@@ -75,19 +75,19 @@ try{
  await page.locator('#zoom[open]').waitFor({state:'hidden'});
  await page.waitForFunction(()=>!document.getElementById('zImg').getAttribute('src'));
  await page.evaluate(()=>openCard('abuket_e'));
- await page.locator('#zFx svg.icmx-live-pop[data-ready="true"][data-points="25"]').waitFor();
+ await page.waitForFunction(()=>document.querySelector('#zFx svg.icmx-data')?.textContent.includes('Valor 25'));
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-holo-mobile.png'),fullPage:true});
  await page.locator('#zClose').click();
  await page.locator('#zoom[open]').waitFor({state:'hidden'});
  await page.waitForFunction(()=>!document.getElementById('zImg').getAttribute('src'));
  await page.evaluate(()=>openCard('abuket_r'));
- await page.locator('#zFx svg.icmx-live-pop[data-ready="true"][data-points="50"]').waitFor();
+ await page.waitForFunction(()=>document.querySelector('#zFx svg.icmx-data')?.textContent.includes('Valor 50'));
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-gold-mobile.png'),fullPage:true});
  await page.locator('#zClose').click();
  await page.locator('#zoom[open]').waitFor({state:'hidden'});
  await page.waitForFunction(()=>!document.getElementById('zImg').getAttribute('src'));
  await page.evaluate(()=>openCard('arcade_f'));
- await page.locator('#zFx svg.icmx-live-pop[data-ready="true"][data-points="100"]').waitFor();
+ await page.waitForFunction(()=>document.querySelector('#zFx svg.icmx-data')?.textContent.includes('Valor 100'));
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-card-full-mobile.png'),fullPage:true});
  assert.deepEqual(errors,[],'sin errores JavaScript al navegar');
  console.log('✓ Pantallas reales: Récords arcade, PTS incrustados de Base/Holo/Full y POP sin datos ficticios');
