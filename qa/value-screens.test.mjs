@@ -37,7 +37,7 @@ test('Valor y POP sobre la imagen, con reacciones antes de la narrativa y sin f√
  assert.match(html,/previous===r\?null:r/,'Segundo toque retira la reacci√≥n');
  assert.doesNotMatch(html,/id="zVariantPoints"|id="zDesignPopularity"|class="icmx-card-value"/);
  assert.match(renderer,/field:'pop'/);
- assert.match(runtime,/\.mount\(fx,card,updateCardValueUI\(card\)\)/);
+ assert.match(html,/ICMX_CARD_RUNTIME\?\.mount\(fx,card,updateCardValueUI\(card\)\)/);
  assert.match(css,/#zoom \.icmx-card-value-note/);
  assert.doesNotMatch(html,/738 POP|480 PTS/);
 });
