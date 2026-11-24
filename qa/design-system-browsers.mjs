@@ -124,6 +124,7 @@ try{
   assert.equal(await page.evaluate(()=>packReady()),true,'packs remain infinite after opening');
   await page.screenshot({path:'qa/screenshots/ui-lab-pack-'+width+'.png'});
   // Quota trial: the real opening pipeline decrements the integrated counter.
+  await page.waitForFunction(()=>!opening&&document.getElementById('disc').classList.contains('on'));
   await page.locator('#icmxLabToggle').click();
   await page.locator('[data-lab-action="pack-quota"]').click();
   await page.waitForFunction(()=>!opening&&freePacksLeft()===2&&!PRUEBA&&!S.test);
@@ -132,7 +133,16 @@ try{
    if(left===0)await page.locator('#sOtro').click();
    await page.locator('#openBtn').click();
    await page.waitForFunction(n=>freePacksLeft()===n&&!opening&&document.getElementById('env').style.display==='none',left);
-   await page.evaluate(()=>{document.getElementById('disc').classList.remove('on');showSum()});
+   // Let the opening animation finish, then navigate all five cards using the real controls.
+   await page.locator('#disc.on').waitFor({state:'visible'});
+   for(let card=0;card<5;card++){
+    await page.waitForFunction(n=>idx===n&&document.getElementById('disc').classList.contains('on'),card);
+    if(await page.locator('#dcReveal').count()){
+     await page.locator('#dcReveal').click();
+    }
+    await page.locator('#dcNext').click();
+   }
+   assert.equal(await page.locator('#disc.on').count(),0,'Discovery must not cover summary');
    await page.locator('#sum.on').waitFor({state:'visible'});
    assert.equal(await page.locator('#sOtroCount').isVisible(),left>0);
    assert.equal(await page.locator('#sWait').isVisible(),left===0);
