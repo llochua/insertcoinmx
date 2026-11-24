@@ -1,6 +1,6 @@
 # Revisión de artes
 
-Diseños procesados: triforce, thankyou
+Diseños procesados: aku, universe
 
 Se han regenerado las rarezas, encuadres, color de fondo y caché.
 
