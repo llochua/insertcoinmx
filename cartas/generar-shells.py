@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Build de publicación: WebP optimizado, textos siempre vectoriales.
 """Genera SOLO la base gráfica sin datos. No modifica c/, c2/, d/, fa/ ni index.html.
 
 Uso: python cartas/generar-shells.py 1up sonic
