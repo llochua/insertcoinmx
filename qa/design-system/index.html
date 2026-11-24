@@ -2223,7 +2223,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-account:not([hidden]){margin-top:20px}
 @media(max-width:360px){#profile .profile-scroll{padding-inline:12px}#profile .pc-ticket,#profile .pc-collection{padding-inline:13px}#profile .pc-avatar{width:55px;height:55px;flex-basis:55px}#profile .pc-identity{gap:11px}#profile .pc-player-name h2{font-size:18px}#profile .pc-score-number #profileValuePoints{font-size:43px}#profile .pc-stats span{font-size:9px}#profile .pc-stats{padding-inline:6px}#profile .pc-collection-title{font-size:16px}}
 </style>
-<style>#scores #communityRankRows button{width:100%;cursor:pointer}#scores #communityRankRows .pop-design-name{display:flex;align-items:center;gap:8px;text-align:left;font:700 14px AV,system-ui!important}#scores .pop-design-name img{width:28px;height:36px;object-fit:contain}#scores [hidden]{display:none!important}</style></head><body>
+<style>#scores #communityRankRows button{width:100%;cursor:pointer}#scores #communityRankRows .pop-design-name{display:flex;align-items:center;gap:8px;text-align:left;font:700 14px AV,system-ui!important}#scores .pop-design-name img{width:28px;height:36px;object-fit:contain}#scores [hidden]{display:none!important}#scores #tbl .rank-card-count{display:block;margin-top:2px;color:#bbb5d3;font:600 10px/1.35 AV,system-ui,sans-serif;letter-spacing:normal}</style></head><body>
 <aside id="icmxLabTools" aria-label="Controles del laboratorio">
  <button type="button" id="icmxLabToggle" aria-expanded="false" aria-controls="icmxLabPanel">LAB · ∞ SOBRES <span aria-hidden="true">⌄</span></button>
  <section id="icmxLabPanel" hidden>
@@ -4254,7 +4254,7 @@ function scoreBoard(metric="pts"){
  // Los invitados sin sesión conservan su récord local provisional.
  const own=arcadeIdentity(),count=currentRecordScores()[metric];
  if(!own.registered&&validArcadeIni(own.ini)&&safeRankValue(count)!==null&&count>0)
-  return {rows:[{ini:own.ini,handle:own.handle||'',score:count}],origin:'session'};
+  return {rows:[{ini:own.ini,handle:own.handle||'',score:count,cards:currentRecordScores().cards}],origin:'session'};
  return {rows:[],origin:ranking?.status==='loading'?'loading':'empty'};
 }
 function renderScores(){
@@ -4286,7 +4286,9 @@ function renderScores(){
   const name=r?esc(String(r.ini).slice(0,3)):'---';
   const count=r?String(r.score).padStart(3,'0'):'---';
   const handle=r&&validArcadeHandle(r.handle)?'<small class="rank-handle">@'+esc(r.handle)+'</small>':'';
-  return `<div class="${cl}"${r?' data-score-entry="true"':''}><span>${String(i+1).padStart(2,'0')}</span><span>${name}${handle}</span><span>${count}</span></div>`
+  const cards=r?safeRankValue(r.cards):null;
+  const cardLabel=cards===null?'':'<small class="rank-card-count">'+cards+(cards===1?' carta':' cartas')+'</small>';
+  return `<div class="${cl}"${r?' data-score-entry="true"':''}><span>${String(i+1).padStart(2,'0')}</span><span>${name}${handle}${cardLabel}</span><span>${count}</span></div>`
  }).join('');
 }
 $('scores').addEventListener('click',e=>{
