@@ -35,7 +35,7 @@ const missing=levels.levels.flatMap(level=>level.designs.flatMap(id=>
  ['holo','dorada'].filter(key=>typeof texts[id]?.[key]!=='string'||!texts[id][key].trim()).map(key=>id+':'+key)));
 const knownDebt=new Set(["invader:holo","invader:dorada","sensei:holo","sensei:dorada","bustfiction:holo","bustfiction:dorada","docecasas:holo","docecasas:dorada","gunsncontrols:holo","gunsncontrols:dorada","keepcalm:holo","keepcalm:dorada"]);
 const unexpected=missing.filter(key=>!knownDebt.has(key));
-assert.deepEqual(unexpected,[],'Narrativas faltantes nuevas: '+unexpected.join(', '));
+assert.equal(unexpected.length,0,'Narrativas faltantes nuevas: '+unexpected.join(', '));
 if(missing.length){
  console.error('DEUDA EDITORIAL NO RESUELTA ('+missing.length+'): '+missing.join(', '));
  if(process.argv.includes('--strict-release'))throw Error('Colección no apta para liberación: '+missing.join(', '));
