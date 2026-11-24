@@ -2110,6 +2110,24 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .p1-up-next-name{font-size:clamp(21px,6vw,36px)}
 @media(max-height:700px){.p1-up-stage-number span{font-size:105px}}
 </style>
+<style>
+/* Final profile: coin identity + one continuous collection progress bar. */
+#profile .profile-player-sheet .profile-avatar{border-radius:50%;padding:2px}
+#profile .profile-player-sheet .profile-avatar img{border-radius:50%}
+#profile .profile-player-sheet .profile-collection{display:block;padding:10px 0 20px}
+#profile .profile-player-sheet .profile-progress{width:100%;display:block}
+#profile .profile-player-sheet .profile-progress-label{display:none}
+#profile .profile-player-sheet .profile-progress strong{font:800 19px/1.2 AVK,AV,sans-serif;margin:0 0 14px;color:#fff}
+#profile .profile-design-count{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 8px}
+#profile .profile-design-count #profileCards{font:800 30px/1 AVK,AV,sans-serif;letter-spacing:-.035em;color:#fff;font-variant-numeric:tabular-nums}
+#profile .profile-design-count #profileDialLabel{font:600 12px/1.3 AV,sans-serif;color:#c6bbdf;text-align:right}
+#profile .profile-player-sheet .profile-progress-track{height:9px;border-radius:8px;background:#352c4e;overflow:hidden}
+#profile .profile-player-sheet .profile-progress-track i{display:block;height:100%;border-radius:8px;background:#ffd400;box-shadow:none;transition:width .3s ease}
+#profile .profile-player-sheet .profile-progress-note{font:600 12px/1.4 AV,sans-serif;margin:8px 0 15px;color:#c9bfdf}
+#profile .profile-player-sheet .p1-profile-variants{border-top:1px solid #ffffff16;padding-top:12px;margin:0;font:600 12px/1.3 AV,sans-serif}
+#profile .profile-player-sheet .p1-profile-variants b{font:800 15px/1 AV,sans-serif;color:#fff}
+@media(prefers-reduced-motion:reduce){#profile .profile-player-sheet .profile-progress-track i{transition:none}}
+</style>
 </head><body>
 <aside id="icmxLabTools" aria-label="Controles del laboratorio">
  <button type="button" id="icmxLabToggle" aria-expanded="false" aria-controls="icmxLabPanel">LAB · ∞ SOBRES <span aria-hidden="true">⌄</span></button>
@@ -2263,13 +2281,13 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <section class="profile-summary-board" aria-label="Avance de mi colección">
    <div class="profile-level-banner"><span>MI PROGRESO</span><span>PLAYER 1</span></div>
    <div class="profile-collection">
-    <div class="profile-dial" id="profileDial" aria-hidden="true"><div><strong id="profileCards">0/25</strong><span id="profileDialLabel">DISEÑOS</span></div></div>
     <div class="profile-progress">
      <span class="profile-progress-label" id="profileLevelLabel">MI COLECCIÓN</span>
      <strong id="profileTotal">COLECCIÓN ORIGINAL</strong>
+     <div class="profile-design-count"><b id="profileCards">0/25</b><span id="profileDialLabel">Diseños descubiertos</span></div>
+     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Diseños descubiertos de la colección original" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"><i id="profileProgressFill"></i></div>
      <p class="profile-progress-note" id="profilePercent">Descubre todos para expandir tu álbum.</p>
-     <div class="p1-profile-variants"><span>Variantes</span><b id="profileVariantCount">0/100</b></div>
-     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Variantes obtenidas del nivel actual" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="profileProgressFill"></i></div>
+     <div class="p1-profile-variants"><span>Variantes obtenidas</span><b id="profileVariantCount">0/100</b></div>
     </div>
    </div>
   </section>
@@ -4486,16 +4504,16 @@ function renderProfile(){
  const pts=collectionPointsLocal();
  $('profileValuePoints').textContent=pts===null?'— PTS':pts.toLocaleString('es-MX')+' PTS';
  $('profileCards').textContent=discovered+'/'+total;
- $('profileDialLabel').textContent='DISEÑOS';
+ $('profileDialLabel').textContent='Diseños descubiertos';
  $('profileLevelLabel').textContent='MI COLECCIÓN';
  $('profileTotal').textContent='COLECCIÓN ORIGINAL';
- $('profileDial').style.setProperty('--profile-fill',(discovered/total*100)+'%');
+
  $('profileVariantCount').textContent=activeLevel.collected+'/'+activeLevel.variantTotal;
  $('profilePercent').textContent=discovered===total?'¡Todos los diseños disponibles descubiertos!':activeLevel.hasExpansion?'Faltan '+(total-discovered)+' diseños para expandir tu álbum.':'Faltan '+(total-discovered)+' diseños por descubrir.';
  $('profileAllCards').textContent=uniq();
- progress.setAttribute('aria-valuemax',String(activeLevel.variantTotal));
- progress.setAttribute('aria-valuenow',String(activeLevel.collected));
- $('profileProgressFill').style.width=(activeLevel.collected/activeLevel.variantTotal*100)+'%';
+ progress.setAttribute('aria-valuemax',String(total));
+ progress.setAttribute('aria-valuenow',String(discovered));
+ $('profileProgressFill').style.width=(total?discovered/total*100:0)+'%';
  $('profileDesigns').textContent=DESIGNS.filter(d=>!d.bx&&dState(d).own).length;
  $('profileDuplicates').textContent=dups();
  $('profileRatings').textContent=Object.keys(S.rate||{}).length;
