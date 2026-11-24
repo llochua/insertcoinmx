@@ -12,7 +12,7 @@ export function normalizePlayerBoards(data){
   result[metric]=data[metric].filter(row=>{
    if(!validRow(row)||seen.has(row.handle))return false;
    seen.add(row.handle);return true;
-  }).map(row=>({ini:row.ini,handle:row.handle,score:row.score,mine:row.mine===true}))
+  }).map(row=>({ini:row.ini,handle:row.handle,score:row.score,mine:row.mine===true,...(metric==='pts'&&Number.isSafeInteger(row.cards)&&row.cards>=0&&row.cards<=999999?{cards:row.cards}:{})}))
    .sort((a,b)=>b.score-a.score||a.handle.localeCompare(b.handle)).slice(0,10);
  }
  return result;
