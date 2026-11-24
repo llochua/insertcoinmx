@@ -1321,7 +1321,11 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 .rs-follow .rs-main,.rs-follow .rs-sec2{box-sizing:border-box;min-height:50px;height:auto;padding:10px 8px;line-height:1.25;text-wrap:balance;touch-action:manipulation;font-size:clamp(12px,2.8vw,14px)}
 .rs-follow .rs-main{box-shadow:0 4px 0 #ad8f00,0 10px 22px rgba(255,212,0,.12)}
 .rs-wait{margin-bottom:12px;padding:14px 16px;border:1px solid rgba(255,212,0,.27);border-radius:12px;background:rgba(255,212,0,.08);text-align:center}
-.rs-wait[hidden]{display:none!important}
+.rs-wait[hidden],.rs-pack-count[hidden]{display:none!important}
+.rs-follow .rs-main{position:relative;gap:12px}
+.rs-pack-count{flex:none;min-width:32px;min-height:26px;display:inline-flex;align-items:center;justify-content:center;padding:3px 7px;border-radius:6px;background:#120f1a;color:#ffd400;font:700 13px/1 AV,system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.rs-follow .rs-wait{background:transparent;border:0;padding:7px 0 12px}
+.rs-follow .rs-wait strong{font-size:32px;line-height:1.15}
 .rs-wait>span{display:block;font:9px/1.3 PX,monospace;letter-spacing:.075em;color:#FFD400;margin-bottom:7px}
 .rs-wait strong{display:block;font:700 20px/1.25 AV,system-ui,sans-serif;color:#fff}
 .rs-wait time{font-variant-numeric:tabular-nums;color:#FFD400}
@@ -2232,6 +2236,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <div class="lab-grid">
    <button type="button" data-lab-action="home">Inicio</button>
    <button type="button" data-lab-action="pack">Abrir un sobre</button>
+   <button type="button" data-lab-action="pack-quota">Probar 2 sobres · contador</button>
    <button type="button" data-lab-seed="5">Reta · 5 diseños</button>
    <button type="button" data-lab-seed="7">Reta · 7 diseños</button>
    <button type="button" data-lab-seed="8">Reta · 8 diseños</button>
@@ -2848,7 +2853,7 @@ function mountFaceValueLazy(fx,card){
  pendingFaceCards.set(fx,card);
  faceCardObserver.observe(fx);
 }
-const PRUEBA=true; // quitar al lanzar: sobres ilimitados para revisar
+let PRUEBA=true; // LAB: ilimitados salvo en la prueba explícita de cuota
 /* Regla pactada: 5 sobres de bienvenida, luego 2 cada 6 horas.
    La bienvenida se conserva hasta gastarla; los ciclos de 6 horas
    se calculan por reloj. Los canjes extra van aparte. */
@@ -3782,19 +3787,18 @@ function summaryStatus(){
  if(p.kind==='daily')return {kicker:'SOBRES DE HOY',step:p.number+' DE 2',title:p.number===2?'¡Abriste tus 2 sobres de hoy!':'¡Sobre 1 de 2 completado!'};
  return {kicker:p.kind==='test'?'MODO PRUEBA':'SOBRE EXTRA',step:'COMPLETADO',title:'¡Sobre completado!'};
 }
-function nextSummaryPackLabel(){
- if(PRUEBA||S.test)return 'ABRIR OTRO SOBRE';
- if(S.welcomeLeft>0)return 'ABRIR SOBRE '+(6-S.welcomeLeft)+' DE 5';
- const free=freePacksLeft();
- if(free>0)return 'ABRIR SOBRE '+(3-free)+' DE 2';
- if(S.extra>0)return S.extra===1?'ABRIR SOBRE EXTRA':'ABRIR SOBRE EXTRA · '+S.extra+' DISPONIBLES';
- return '';
+function summaryPacksRemaining(){
+ if(PRUEBA||S.test)return null;
+ return Math.max(0,freePacksLeft())+Math.max(0,Number(S.extra)||0);
 }
 function refreshSummaryActions(){
- const primary=$('sOtro'),secondary=$('sAlb'),wait=$('sWait'),timer=$('sNextTime');
- if(!primary||!secondary)return;
- const available=!!packReady();
- primary.textContent=available?nextSummaryPackLabel():'VER MI ÁLBUM';
+ const primary=$('sOtro'),label=$('sOtroLabel'),count=$('sOtroCount'),secondary=$('sAlb'),wait=$('sWait'),timer=$('sNextTime');
+ if(!primary||!label||!count||!secondary)return;
+ const available=!!packReady(),remaining=summaryPacksRemaining();
+ label.textContent=available?'ABRIR OTRO SOBRE':'VER MI ÁLBUM';
+ count.hidden=!available||remaining===null;
+ count.textContent=remaining===null?'':'×'+remaining;
+ primary.setAttribute('aria-label',available&&remaining!==null?'Abrir otro sobre, '+remaining+(remaining===1?' disponible':' disponibles'):label.textContent);
  secondary.textContent=available?'VER MI ÁLBUM':'VOLVER AL MENÚ';
  if(wait)wait.hidden=available;
  if(!available&&timer)timer.textContent=nextPackCountdown();
@@ -3835,11 +3839,10 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
    <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${H._comp?`<div class="rh-vs">${vchips}</div>`:tag(H)}${summaryStoryCta(H)?`<button type="button" class="rh-story-cta" data-k="${H.k}" aria-label="${summaryStoryCta(H)} de ${esc(d.n)}">${summaryStoryCta(H)} <span aria-hidden="true">→</span></button>`:''}</div></div>
   <section class="rs-follow" aria-label="Qué sigue después de este sobre">
    <div class="rs-wait" id="sWait" ${packReady()?'hidden':''}>
-    <span>PRÓXIMOS 2 SOBRES</span><strong>En <time id="sNextTime">${nextPackCountdown()}</time></strong>
-    <p>Recibirás 2 sobres nuevos en el siguiente ciclo de 6 horas.</p>
+    <span>PRÓXIMOS 2 SOBRES EN</span><strong><time id="sNextTime">${nextPackCountdown()}</time></strong>
    </div>
    <div class="rs-act2">
-    <button type="button" class="rs-main" id="sOtro">ABRIR OTRO SOBRE</button>
+    <button type="button" class="rs-main" id="sOtro"><span id="sOtroLabel">ABRIR OTRO SOBRE</span><span id="sOtroCount" class="rs-pack-count" aria-hidden="true" hidden></span></button>
     <button type="button" class="rs-sec2" id="sAlb">VER MI ÁLBUM</button>
     <button type="button" class="rs-share" id="sShare"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.1m-6.6 6.7 6.6 4.1"/></svg><span>COMPARTIR SOBRE</span></button>
    </div>
@@ -4699,7 +4702,9 @@ if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
   if([5,7,8].includes(n)){seed(n);return}
   const action=b.dataset.labAction;
   if(action==='levelup'){syncIn();MINE.length=0;S.have=Object.fromEntries(player1.levels[0].designs.slice(0,24).map(id=>[id+'_b',1]));S.rate={};S.logro={};S.test=1;S.fg=1;save();closeMenu();go('pack');labForceLevelUp=true;return}
-  if(['home','pack','album','profile'].includes(action)){closeMenu();go(action);return}
+  if(action==='pack-quota'){syncIn();PRUEBA=false;S.test=0;S.welcomeLeft=0;S.freeCycle=packCycle();S.freeUsed=0;S.extra=0;save();closeMenu();go('pack');return}
+  if(action==='pack'){syncIn();PRUEBA=true;S.test=1;save();closeMenu();go('pack');return}
+  if(['home','album','profile'].includes(action)){closeMenu();go(action);return}
   if(action==='reset'){
    if(!confirm('¿Reiniciar solamente la colección LAB? La cuenta real no se toca.'))return;
    for(const key of [KEY,KEY_EXT,KEY_BAK,KEY_BAD,KEY_PRE,GUEST_HANDLE_KEY,LOCAL_RANKING_KEY,'icmx-ui-lab-sound-v1','icmx-lab-design-avatar-v1'])
