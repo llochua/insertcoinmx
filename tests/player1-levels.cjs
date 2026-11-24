@@ -37,3 +37,12 @@ assert.equal(api.numberOf('x'),25);
 assert.equal(api.numberOf(l2.designs[0]),26);
 assert.equal(api.numberOf(l2.designs[24]),50);
 assert.equal(api.numberOf('navidadgamer'),null);
+
+assert.equal(api.collectionProgress(have24).designTotal,25);
+assert.equal(api.collectionProgress(have24).discovered,24);
+assert.equal(api.collectionProgress(have25).designTotal,50);
+assert.equal(api.collectionProgress(have25).discovered,25);
+assert.equal(api.collectionProgress(have25).variantTotal,200);
+assert.equal(api.collectionProgress({...have25,[future]:1}).discovered,26);
+assert.equal(api.collectionProgress({[future]:1}).designTotal,25);
+assert.equal(api.collectionProgress({[future]:1}).discovered,0);
