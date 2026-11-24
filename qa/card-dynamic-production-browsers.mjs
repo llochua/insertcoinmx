@@ -7,7 +7,7 @@ const root=process.cwd();
 const mime={'.html':'text/html','.js':'text/javascript','.json':'application/json','.webp':'image/webp','.jpg':'image/jpeg','.png':'image/png','.css':'text/css','.woff2':'font/woff2'};
 const server=createServer(async(req,res)=>{
  try{
-  const requestPath=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+  const requestPath=decodeURIComponent(new URL(req.url,'http://localhost').pathname)==='/'?'/index.html':decodeURIComponent(new URL(req.url,'http://localhost').pathname);
   const name=path.resolve(root,'.'+requestPath);
   if(!name.startsWith(root+path.sep))throw Error('path');
   const item=await stat(name);
