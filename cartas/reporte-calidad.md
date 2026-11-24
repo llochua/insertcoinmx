@@ -1,6 +1,6 @@
 # Revisión de artes
 
-Diseños procesados: babyonboard, bitwars, enjoy, piccolovolution, thelostgame, vegetavolution, virtual
+Diseños procesados: 1up, aku, babyonboard, bitwars, booit, bort, captor, carton, enjoy, thankyou, triforce, universe, versus, virtual
 
 Se han regenerado las rarezas, encuadres, color de fondo y caché.
 
