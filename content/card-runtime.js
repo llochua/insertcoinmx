@@ -35,7 +35,8 @@ async function mount(fx,card,values){
  const stamp=card.k+'|'+quality+'|'+String(values?.pop??'—')+'|'+String(values?.points??'—');
  if(mounted.get(fx)===stamp&&fx.querySelector(':scope > svg.icmx-data'))return;
  mounted.set(fx,stamp);
- const original=img.dataset.icmxOriginal||img.getAttribute('src')||'';
+ const current=img.getAttribute('src')||'';
+ const original=/^(?:c|c2)\//.test(current)?current:(img.dataset.icmxOriginal||current);
  img.dataset.icmxOriginal=original;
  img.style.opacity='0';
  try{
@@ -67,14 +68,15 @@ async function mount(fx,card,values){
  }
 }
 function loadImage(src){
- if(images.has(src))return images.get(src);
+ if(images.has(src)){const hit=images.get(src);images.delete(src);images.set(src,hit);return hit}
  const p=new Promise((resolve,reject)=>{
   const img=new Image();img.decoding='async';
   img.onload=()=>resolve(img);
   img.onerror=()=>reject(Error('Falta shell: '+src));
   img.src=src;
  });
- images.set(src,p);p.catch(()=>images.delete(src));
+ images.set(src,p);if(images.size>48)images.delete(images.keys().next().value);
+ p.catch(()=>{if(images.get(src)===p)images.delete(src)});
  return p;
 }
 function rect(ctx,x,y,w,h,r){
