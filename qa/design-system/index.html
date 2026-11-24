@@ -2177,6 +2177,53 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-backup-content{padding:0 0 14px}
 @media(max-width:380px){#profile .profile-scroll{gap:20px}#profile .profile-player-sheet .profile-avatar{width:54px;height:54px;min-height:54px;flex-basis:54px}#profile .profile-player-sheet .profile-head h2.arcade-initials{font-size:20px}#profile .profile-player-sheet .profile-progress strong{font-size:19px}#profile .profile-player-sheet .profile-design-count #profileCards{font-size:23px}#profile .profile-extra-stats .profile-metrics-spaced{gap:5px 10px}}
 </style>
+<style>
+.pc-player-card{border:1px solid #6e5a99;overflow:hidden;border-radius:11px;background:#1a1530;box-shadow:0 6px 24px #05041055}
+.pc-ticket{position:relative;isolation:isolate;overflow:hidden;padding:16px 16px 19px;background:linear-gradient(135deg,#26204a,#130f29 70%)}
+
+.pc-ticket:after{content:"";position:absolute;inset:0;z-index:-1;background:repeating-linear-gradient(0deg,transparent 0 4px,#ffffff08 4px 5px);pointer-events:none}
+.pc-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font:8px/1.5 PX,monospace;letter-spacing:.02em;color:#ffd400}
+.pc-card-head span:last-child{color:#c9bce9;font:700 10px AV,sans-serif;letter-spacing:.11em}
+.pc-identity{display:flex;align-items:center;gap:13px;margin-top:19px}
+.pc-avatar{width:62px;height:62px;flex:0 0 62px;position:relative;border:2px solid #ffdc58;border-radius:50%;padding:2px;background:#151027;box-shadow:0 3px 0 #0006;overflow:visible}
+.pc-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.pc-avatar .pc-fallback{display:none;border-radius:50%;height:100%;background:#ffd400;color:#705300;font:800 27px AVK,sans-serif;place-items:center}
+.pc-avatar .pc-edit{position:absolute;bottom:-2px;right:-4px;width:20px;height:20px;background:#ffd400;border:2px solid #1b1531;border-radius:50%;color:#211932;display:grid;place-items:center}.pc-edit svg{width:10px;height:10px}
+.pc-player-name{flex:1;min-width:0}.pc-player-name h2{font:21px/1.25 PX,monospace;letter-spacing:.045em;margin:0;color:#fff;text-shadow:0 3px 0 #080614}.pc-player-name p{font:600 12px/1.4 AV,sans-serif;color:#c2b6de;margin:5px 0 0;overflow:hidden;text-overflow:ellipsis}
+.pc-identity-status{font:700 9px AV,sans-serif;color:#c4b7e1;letter-spacing:.045em}
+.pc-score{margin:21px 0 0;display:flex;flex-direction:column;gap:4px}.pc-score-label{font:8px/1.5 PX,monospace;color:#e4d9fa;letter-spacing:.05em}.pc-score-number{display:flex;align-items:baseline;gap:9px;white-space:nowrap;color:#ffd400}.pc-score-number strong{font:clamp(43px,13vw,62px)/.98 AVK,AV,sans-serif;letter-spacing:-.055em;text-shadow:0 3px 0 #715715}.pc-score-number small{font:700 14px AV,sans-serif;letter-spacing:.08em}.pc-score-sub{color:#b8acd5;font-size:10px}
+.pc-collection{position:relative;padding:19px 16px 18px;border-top:1px solid #75619d;background:linear-gradient(180deg,#211931,#171329)}
+.pc-collection-title{margin:0 0 16px;color:#fff;font:700 17px/1.2 AV,sans-serif}
+.pc-progress-label{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.pc-progress-label span{font-size:12px;color:#b5aacc}.pc-progress-label b{font:27px/1 AVK,sans-serif;letter-spacing:-.03em}.pc-progress-label b small{font:600 17px AV,sans-serif;color:#b8accf;letter-spacing:0}
+.pc-track{height:9px;background:#3c3254;border-radius:10px;overflow:hidden;margin-top:9px}.pc-fill{height:100%;width:96%;background:#ffd400;border-radius:10px}
+.pc-next{font-size:11px;color:#c6badf;margin:8px 0 17px}.pc-variants{display:flex;justify-content:space-between;align-items:center;font:600 12px AV,sans-serif;color:#c2b5db}.pc-variants b{font:700 14px AV,sans-serif;color:#fff}
+.pc-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:16px 10px 15px;background:#151127;border-top:1px solid #ffffff15;text-align:center;gap:0}.pc-stats div{min-width:0}.pc-stats div+div{border-left:1px solid #ffffff15}.pc-stats b{display:block;font:21px/1 AVK,AV,sans-serif;font-variant-numeric:tabular-nums;color:#fff}.pc-stats span{display:block;font:600 10px/1.25 AV,sans-serif;color:#b5aacc;margin-top:6px;white-space:nowrap}
+.pc-account{padding:22px 3px 0}.pc-account-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.pc-account h3{font:700 15px AV,sans-serif;margin:0}.pc-account-state{font-size:10px;color:#bdb1d5;display:flex;align-items:center;gap:5px}.pc-account-state:before{content:"";width:6px;height:6px;border-radius:50%;background:#bdb1d5}.pc-account p{margin:6px 0 13px;color:#b5aacc;font-size:12px}.pc-account-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pc-account-actions button{min-height:43px;border:1px solid #6c5a88;border-radius:6px;color:#eee9fa;background:transparent;font:700 12px AV,sans-serif}.pc-account-actions .pc-primary{background:#ffd400;border-color:#ffd400;color:#151026}.pc-backup{margin-top:12px;border-top:1px solid #ffffff19}.pc-backup summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;min-height:41px;color:#c7bbdf;font-size:11px}.pc-backup summary::-webkit-details-marker{display:none}.pc-backup summary:after{content:"›";font-size:22px}.pc-backup[open] summary:after{transform:rotate(90deg)}.pc-backup p{font-size:11px}.pc-concept-note{font-size:9px;letter-spacing:.08em;text-align:center;color:#8e82ae;margin:12px 0 0}
+
+#profile .profile-scroll{width:min(100%,480px);padding:0 16px 22px;gap:0;align-self:center}
+#profile .pc-player-card{flex:none;margin:0}
+#profile .pc-ticket{background:linear-gradient(135deg,#26204a,#130f29 70%)}
+#profile .pc-player-name h2:not(.arcade-initials){font:700 19px/1.2 AV,sans-serif;letter-spacing:0}
+#profile .pc-player-name p[hidden],#profile .pc-avatar[hidden],#profile .pc-edit-name[hidden],#profile .pc-account[hidden]{display:none!important}
+#profile .pc-avatar img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover}
+#profile .pc-edit-name{width:34px;height:34px;background:none;border:0;color:#fff;display:grid;place-items:center;padding:0}
+#profile .pc-edit-name svg{width:18px;height:18px}
+#profile .pc-score-number #profileValuePoints{font:clamp(43px,13vw,62px)/.98 AVK,AV,sans-serif;letter-spacing:-.055em;text-shadow:0 3px 0 #715715;color:#ffd400}
+#profile .pc-score-number small{font:700 14px AV,sans-serif;letter-spacing:.08em}
+#profile .pc-status{margin:4px 0 0;color:#b8acd5;font:600 10px/1.3 AV,sans-serif}
+#profile .pc-account{padding:22px 3px 0;flex:none}
+#profile .pc-account-actions .profile-action{min-height:43px;padding:10px 6px;border-radius:6px;font:700 12px AV,sans-serif;letter-spacing:0}
+#profile .pc-account-actions .secondary{background:transparent;border:1px solid #6c5a88;color:#eee9fa}
+#profile .profile-backup{margin:12px 3px 0;border-top:1px solid #ffffff19;border-radius:0;background:none;flex:none}
+#profile .profile-backup summary{padding:5px 0}
+#profile .profile-backup-symbol,#profile .profile-backup summary small{display:none}
+#profile .profile-backup summary strong{font:600 11px AV,sans-serif;color:#c7bbdf}
+#profile .profile-backup-content{padding:0 0 12px}
+#profile.account-focus .pc-player-card,#profile.account-focus .pc-account{display:none!important}
+#profile.account-focus .profile-scroll{padding-top:18px}
+#profile .profile-account:not([hidden]){margin-top:20px}
+@media(max-width:360px){#profile .profile-scroll{padding-inline:12px}#profile .pc-ticket,#profile .pc-collection{padding-inline:13px}#profile .pc-avatar{width:55px;height:55px;flex-basis:55px}#profile .pc-identity{gap:11px}#profile .pc-player-name h2{font-size:18px}#profile .pc-score-number #profileValuePoints{font-size:43px}#profile .pc-stats span{font-size:9px}#profile .pc-stats{padding-inline:6px}#profile .pc-collection-title{font-size:16px}}
+</style>
 </head><body>
 <aside id="icmxLabTools" aria-label="Controles del laboratorio">
  <button type="button" id="icmxLabToggle" aria-expanded="false" aria-controls="icmxLabPanel">LAB · ∞ SOBRES <span aria-hidden="true">⌄</span></button>
@@ -2313,54 +2360,30 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <section class="view" id="profile" aria-label="Mi perfil de jugador">
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Mi perfil</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="profile-scroll">
-  <div class="profile-player-sheet" aria-label="Ficha del jugador">
-  <section class="profile-passport" aria-label="Identidad del jugador">
-   <div class="profile-head">
-    <button type="button" id="profileAvatarButton" class="profile-avatar" aria-label="Cambiar mi avatar" title="Cambiar avatar"><img id="profileAvatarImage" style="visibility:hidden" src="assets/avatars/moneda-128.webp" alt="" width="82" height="82"><span class="avatar-pencil" aria-hidden="true">✎</span></button>
-    <div class="profile-identity">
-     <p class="profile-kicker">MI IDENTIDAD ARCADE</p>
-     <h2 id="profilePlayerName">Jugador invitado</h2>
-     <p class="profile-initials" id="profileInitials" hidden></p>
-     <p class="profile-status" id="profilePlayerState">Progreso en este navegador</p>
+  <article class="pc-player-card" aria-label="Ficha del jugador">
+   <div class="pc-ticket">
+    <div class="pc-card-head"><span>PLAYER CARD</span><span>PLAYER 1</span></div>
+    <div class="pc-identity">
+     <button type="button" id="profileAvatarButton" class="pc-avatar" aria-label="Cambiar mi avatar" title="Cambiar avatar"><img id="profileAvatarImage" style="visibility:hidden" src="assets/avatars/moneda-128.webp" alt="" width="82" height="82"><span class="pc-edit" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m15 5 4 4M4 20l4-1 12-12-4-4L4 15z"/></svg></span></button>
+     <div class="pc-player-name"><h2 id="profilePlayerName">Jugador invitado</h2><p id="profileInitials" hidden></p><p class="pc-status" id="profilePlayerState">Invitado</p></div>
+     <button type="button" class="pc-edit-name" id="profileEditIdentity" aria-label="Editar identidad" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m15 5 4 4M4 20l4-1 12-12-4-4L4 15z"/></svg></button>
     </div>
-    <button type="button" class="guest-edit-identity" id="profileEditIdentity" hidden>EDITAR</button>
+    <button type="button" id="profileAvatarChange" hidden>CAMBIAR AVATAR</button>
+    <div class="pc-score"><div class="pc-score-label">COLLECTION SCORE</div><div class="pc-score-number"><strong id="profileValuePoints" aria-live="polite">—</strong><small>PTS</small></div><div class="pc-score-sub">Puntos de colección</div></div>
    </div>
-   <button type="button" id="profileAvatarChange" hidden>CAMBIAR AVATAR</button>
-   <section class="profile-scoreboard" aria-label="Puntos de colección"><section class="icmx-player-points profile-points-standalone" aria-label="Puntos acumulados de colección"><div><span>Puntos de colección</span><strong id="profileValuePoints" aria-live="polite">— PTS</strong></div></section></section>
-  </section>
-  <section class="profile-summary-board" aria-label="Avance de mi colección">
-   <div class="profile-level-banner"><span>MI PROGRESO</span><span>PLAYER 1</span></div>
-   <div class="profile-collection">
-    <div class="profile-progress">
-     <span class="profile-progress-label" id="profileLevelLabel">MI COLECCIÓN</span>
-     <strong id="profileTotal">COLECCIÓN ORIGINAL</strong>
-     <div class="profile-design-count"><span id="profileDialLabel">Diseños descubiertos</span><b id="profileCards">0/25</b></div>
-     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Diseños descubiertos de la colección original" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"><i id="profileProgressFill"></i></div>
-     <p class="profile-progress-note" id="profilePercent">Descubre todos para expandir tu álbum.</p>
-     <div class="p1-profile-variants"><span>Variantes obtenidas</span><b id="profileVariantCount">0/100</b></div>
-    </div>
-   </div>
-  </section>
-  <details class="profile-extra-stats"><summary>Estadísticas de jugador</summary>
-  <div class="profile-metrics profile-metrics-spaced" aria-label="Resumen de mi colección">
-   <div><span class="profile-metric-icon" aria-hidden="true">▣</span><strong id="profileAllCards">0</strong><span>Cartas únicas</span></div>
-   <div><span class="profile-metric-icon" aria-hidden="true">✦</span><strong id="profileDesigns">0</strong><span>Diseños totales</span></div>
-   <div><span class="profile-metric-icon" aria-hidden="true">▣</span><strong id="profileDuplicates">0</strong><span>Repetidas</span></div>
-   <div><span class="profile-metric-icon" aria-hidden="true">★</span><strong id="profileRatings">0</strong><span>Calificados</span></div>
-  </div>
-   <p class="profile-points-help">Los puntos se obtienen al descubrir variantes nuevas. Las repetidas no suman.</p>
-  </details>
-  </div>
-  <section class="profile-spotlight" id="profileWelcome" aria-labelledby="profileSpotlightTitle">
-   <span class="profile-account-label">MI CUENTA</span>
-   <div class="profile-spotlight-heading">
-    <span class="profile-spotlight-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6Z"/><path d="m8.5 12 2.3 2.3 4.7-4.7"/></svg></span>
-    <div><h3 id="profileSpotlightTitle">Protege tu colección</h3><p>Respalda tus cartas y juega desde otros dispositivos.</p></div>
-   </div>
-   <div class="profile-spotlight-actions">
-    <button type="button" class="profile-action primary" id="profileQuickSignup">CREAR CUENTA</button>
-    <button type="button" class="profile-action secondary" id="profileQuickLogin">INICIAR SESIÓN</button>
-   </div>
+   <section class="pc-collection" aria-label="Progreso del álbum">
+    <span id="profileLevelLabel" hidden>MI COLECCIÓN</span><h3 class="pc-collection-title" id="profileTotal">Colección original</h3>
+    <div class="pc-progress-label"><span id="profileDialLabel">Diseños descubiertos</span><b id="profileCards">0/25</b></div>
+    <div class="pc-track" id="profileProgress" role="progressbar" aria-label="Diseños descubiertos de la colección original" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"><div class="pc-fill" id="profileProgressFill"></div></div>
+    <p class="pc-next" id="profilePercent">Descubre todos para expandir tu álbum.</p>
+    <div class="pc-variants"><span>Variantes obtenidas</span><b id="profileVariantCount">0/100</b></div>
+   </section>
+   <div class="pc-stats" aria-label="Estadísticas de jugador"><div><b id="profileAllCards">0</b><span>Cartas únicas</span></div><div><b id="profileDesigns">0</b><span>Diseños</span></div><div><b id="profileDuplicates">0</b><span>Repetidas</span></div><div><b id="profileRatings">0</b><span>Calificadas</span></div></div>
+  </article>
+  <section class="pc-account" id="profileWelcome" aria-labelledby="profileSpotlightTitle">
+   <div class="pc-account-head"><h3 id="profileSpotlightTitle">Mi cuenta</h3><span class="pc-account-state">Invitado</span></div>
+   <p>Respalda tu colección y juega desde otros dispositivos.</p>
+   <div class="pc-account-actions"><button type="button" class="profile-action primary" id="profileQuickSignup">CREAR CUENTA</button><button type="button" class="profile-action secondary" id="profileQuickLogin">INICIAR SESIÓN</button></div>
   </section>
   <section class="profile-panel profile-account" id="profileAccountPanel" aria-labelledby="profileAccountTitle" tabindex="-1" hidden>
    <button type="button" id="profileAccountBack" class="profile-account-return">← VOLVER AL PERFIL</button>
@@ -4549,11 +4572,11 @@ function renderProfile(){
  syncIn();
  const activeLevel=player1.collectionProgress(S.have),total=activeLevel.designTotal,discovered=activeLevel.discovered,progress=$('profileProgress');
  const pts=collectionPointsLocal();
- $('profileValuePoints').textContent=pts===null?'— PTS':pts.toLocaleString('es-MX')+' PTS';
- $('profileCards').textContent=discovered+'/'+total;
+ $('profileValuePoints').textContent=pts===null?'—':pts.toLocaleString('es-MX');
+ $('profileCards').innerHTML=discovered+'<small>/'+total+'</small>';
  $('profileDialLabel').textContent='Diseños descubiertos';
  $('profileLevelLabel').textContent='MI COLECCIÓN';
- $('profileTotal').textContent='COLECCIÓN ORIGINAL';
+ $('profileTotal').textContent='Colección original';
 
  $('profileVariantCount').textContent=activeLevel.collected+'/'+activeLevel.variantTotal;
  $('profilePercent').textContent=discovered===total?'¡Todos los diseños disponibles descubiertos!':activeLevel.hasExpansion?'Faltan '+(total-discovered)+' diseños para expandir tu álbum.':'Faltan '+(total-discovered)+' diseños por descubrir.';
@@ -4567,7 +4590,7 @@ function renderProfile(){
  const identity=arcadeIdentity();
  $('profilePlayerName').textContent=validArcadeIni(identity.ini)?identity.ini:(identity.registered?'Jugador registrado':'Jugador invitado');
  $('profilePlayerName').classList.toggle('arcade-initials',validArcadeIni(identity.ini));
- $('profilePlayerState').textContent=identity.registered?'Cuenta conectada · revisa tu respaldo':'Invitado · progreso en este dispositivo';
+ $('profilePlayerState').textContent=identity.registered?'Cuenta conectada':'Invitado';
  const initials=$('profileInitials');
  initials.hidden=!identity.handle;
  initials.textContent=identity.handle?'@'+identity.handle+(identity.registered?'':' · provisional'):'';
