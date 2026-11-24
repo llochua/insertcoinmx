@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'qa/design-system/**'
+      - 'content/player1-levels.js'
+      - 'tests/player1-levels.cjs'
       - 'content/card-runtime.js'
       - 'content/card-renderer.js'
       - 'qa/design-system-browsers.mjs'
@@ -35,6 +37,8 @@ jobs:
         run: |
           node --check qa/design-system/avatar-lab.js
           node --check qa/design-system-browsers.mjs
+      - name: Verificar lógica PLAYER 1
+        run: node tests/player1-levels.cjs
       - name: Generar colores de fondo desde todos los archivos originales
         run: |
           python3 -m pip install --quiet pillow
