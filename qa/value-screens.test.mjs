@@ -6,7 +6,9 @@ import {collectionPoints,VARIANT_POINTS} from '../content/community-value.mjs';
 
 const html=readFileSync('index.html','utf8');
 const css=readFileSync('content/community-value-ui.css','utf8');
-const face=readFileSync('content/card-value-overlay.js','utf8');
+const renderer=readFileSync('content/card-renderer.js','utf8');
+const runtime=readFileSync('content/card-runtime.js','utf8');
+const shellGen=readFileSync('cartas/generar-shells.py','utf8');
 const key=pat=>assert.ok(html.includes(pat),'Falta en index.html: '+pat);
 
 test('Conservar High Scores arcade con cinco categorías reales',()=>{
@@ -23,7 +25,9 @@ test('Valor y POP sobre la imagen, con reacciones antes de la narrativa y sin f�
  key('id="fDesignValue"');
  key('id="icmxGlobalTitle"');
  for(const id of ['zVoting','zRate','zGoty','zLikeStatus','zNarrative'])key('id="'+id+'"');
- key('content/card-value-overlay.js?v=');
+ key('content/card-runtime.js?v=');
+ key('content/card-renderer.js?v=');
+ key('content/card-data-adapter.js?v=');
  const zoomStart=html.indexOf('<dialog class="zoom" id="zoom"');
  const zoom=html.slice(zoomStart,html.indexOf('</dialog>',zoomStart));
  assert.ok(zoomStart>=0&&zoom.includes('id="zRate"')&&zoom.includes('id="zNarrative"'));
@@ -32,7 +36,8 @@ test('Valor y POP sobre la imagen, con reacciones antes de la narrativa y sin f�
  assert.match(html,/const TN=\['GOTY','GENIAL','OK','MMM'\]/);
  assert.match(html,/previous===r\?null:r/,'Segundo toque retira la reacción');
  assert.doesNotMatch(html,/id="zVariantPoints"|id="zDesignPopularity"|class="icmx-card-value"/);
- assert.match(css,/\.fx>svg\.icmx-live-pop/);
+ assert.match(renderer,/field:'pop'/);
+ assert.match(runtime,/\.mount\(fx,card,updateCardValueUI\(card\)\)/);
  assert.match(css,/#zoom \.icmx-card-value-note/);
  assert.doesNotMatch(html,/738 POP|480 PTS/);
 });
@@ -65,15 +70,18 @@ test('El historial actual de PTS se calcula mediante el motor existente',()=>{
  ctx.S.have={arcade_f:1};assert.equal(ctx.testAPI.points(),100);
  ctx.S.have={};assert.equal(ctx.testAPI.points(),0);
 });
-test('Las cartas no usan rectángulos de reparación: la tipografía se compone en el generador',()=>{
- const generator=readFileSync('cartas/generar.py','utf8');
- assert.match(generator,/def limpiar_rotulos_valor\(marco\):/);
- assert.match(generator,/cv2\.inpaint\(roi, tinta, 3, cv2\.INPAINT_TELEA\)/);
- assert.match(generator,/texto\(out, 'pop_label', 'pop_label', 'POP', tinta\)/);
- assert.match(generator,/texto\(out, 'valor_pie', 'valor_pie', f"Valor \{PUNTOS_VARIANTE\[rareza\]\}", tinta\)/);
- assert.match(generator,/escribir\(out, 'pie', f"Valor \{PUNTOS_VARIANTE\['full'\]\}"/);
- assert.match(face,/document\.createElementNS\(NS,'svg'\)/);
- assert.match(face,/isPop\(pop\)\?String\(pop\):'—'/);
- assert.doesNotMatch(face,/fillRect|putImageData|createImageData|drawImage|canvas|restoreBand|inpaint/i);
+test('El nuevo renderer elimina los parches: un solo pie SVG sobre shell sin tinta',()=>{
+ assert.match(shellGen,/def vaciar_pie_inferior\(marco\):/);
+ assert.match(shellGen,/x0, x1 = 39, 921/);
+ assert.match(shellGen,/y0, y1 = 1226, 1299/);
+ assert.match(shellGen,/quality = 91 if path.parent.name == 'cs2' else 88/);
+ assert.match(renderer,/type:'footer-plate'/);
+ assert.match(renderer,/data-icmx-footer-plate/);
+ assert.match(renderer,/field:'collection-number'/);
+ assert.match(renderer,/field:'pop'/);
+ assert.match(runtime,/drawInto/);
+ assert.match(runtime,/svg\.icmx-data/);
+ assert.doesNotMatch(html,/content\/card-value-overlay\.js\?v=/);
+ assert.doesNotMatch(html,/ICMX_CARD_VALUE\.mount\(/);
  assert.doesNotMatch(css,/\.fx>canvas\.icmx-card-face-values/);
 });
