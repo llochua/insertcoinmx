@@ -32,3 +32,8 @@ assert.equal(api.progress({...have25,[future]:1})[1].discovered,1);
 assert.equal(api.levelOf('navidadgamer'),null);
 assert.equal(api.levelOf('sailourss'),null);
 console.log('PLAYER 1: progression and catalog checks passed');
+
+assert.equal(api.numberOf('x'),25);
+assert.equal(api.numberOf(l2.designs[0]),26);
+assert.equal(api.numberOf(l2.designs[24]),50);
+assert.equal(api.numberOf('navidadgamer'),null);

@@ -3,11 +3,13 @@
   'use strict';
   const api=(function createPlayer1Levels(){
   const levels=Object.freeze([
-    Object.freeze({id:"player1-01",number:1,name:"PRESS START",designs:Object.freeze(["arcade","abuket","asteroids","invader","controls","collector","gamepop","mainstream","mapa","n64","snes","sonic","samus","hyrule","x","sv001","humangamer","continue","gameover","kame","nerv","gatosamurai","guardianes","sensei","caritele"])}),
-    Object.freeze({id:"player1-02",number:2,name:"NEXT LEVEL",designs:Object.freeze(["blowme","challenger","neo","polystation","nowloading","levelup","oneplayer","linkfloyd","wirimask","zero","thankyou","gunsncontrols","omkami","hipstermario","pikaball","keepcalm","tokyo3","docecasas","futbolito","gojira","mrkarate","robogodin","chocarreros","pizzcipher","bustfiction"])})
+    Object.freeze({id:"player1-01",number:1,name:"PRESS START",designs:Object.freeze(["abuket","arcade","asteroids","caritele","collector","continue","controls","gameover","gamepop","gatosamurai","guardianes","humangamer","hyrule","invader","kame","mainstream","mapa","n64","nerv","samus","sensei","snes","sonic","sv001","x"])}),
+    Object.freeze({id:"player1-02",number:2,name:"NEXT LEVEL",designs:Object.freeze(["blowme","bustfiction","challenger","chocarreros","docecasas","futbolito","gojira","gunsncontrols","hipstermario","keepcalm","levelup","linkfloyd","mrkarate","neo","nowloading","omkami","oneplayer","pikaball","pizzcipher","polystation","robogodin","thankyou","tokyo3","wirimask","zero"])})
   ]);
   const variants=Object.freeze(["b","e","r","f"]);
   const membership=new Map(levels.flatMap(l=>l.designs.map(id=>[id,l.id])));
+  const releaseNumbers=new Map(levels.flatMap(l=>l.designs).map((id,i)=>[id,i+1]));
+  const numberOf=id=>releaseNumbers.get(id)||null;
   const has=(owned,key)=>Number(owned?.[key])>0;
   function progress(owned){
     let unlocked=true;
@@ -47,7 +49,7 @@
     }
     return errors;
   }
-  return Object.freeze({levels,variants,progress,eligibleDesigns,visibleDesigns,validateCatalog,levelOf:id=>membership.get(id)||null});
+  return Object.freeze({levels,variants,progress,eligibleDesigns,visibleDesigns,validateCatalog,numberOf,levelOf:id=>membership.get(id)||null});
 })();
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.ICMX_PLAYER1_LEVELS=api;

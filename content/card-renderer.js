@@ -22,6 +22,7 @@
     if (!/^(GAMER|ANIME|PELÍCULAS|CARICATURAS|OTROS)$/.test(card.categoria)) throw Error('Categoría inválida');
   }
   function shellKey(card, variant) {
+    if (variant === 'f' && card.releaseFullLabel) return card.releaseFullLabel;
     if (variant === 'f') return card.fullKey || 'F_'+card.id;
     const original = card.version_original || 'comun';
     return VARIANTS[variant] === original ? card.id : card.id+'_'+variant;

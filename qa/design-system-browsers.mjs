@@ -142,6 +142,22 @@ try{
    assert.equal(await page.locator('#grid .dt').count(),25);
    assert.equal(await page.locator('#grid .dt.lock .p1-lock-icon').count(),25-count);
    assert.equal(await page.locator('#grid .dt.lock .p1-lock-name').count(),25-count);
+   assert.equal(await page.locator('#grid .dt.lock:disabled').count(),25-count);
+   assert.equal(await page.locator('#grid .dt.lock[data-d]').count(),0);
+   assert.equal(await page.locator('#grid .dt.lock .pp').count(),0);
+   if(count===0){
+    assert.equal(await page.locator('#grid .dt.lock .p1-lock-name').first().innerText(),'???');
+    assert.equal(await page.locator('#grid .dt.lock small').last().innerText(),'#025');
+    await page.evaluate(()=>openFicha('x'));
+    assert.equal(await page.locator('#ficha.on').count(),0);
+   }
+   if(count===24){
+    await page.evaluate(()=>{go('profile')});
+    assert.equal(await page.locator('#profileCards').innerText(),'24');
+    assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuenow'),'24');
+    assert.match(await page.locator('#profileTotal').innerText(),/LEVEL 01/);
+    await page.evaluate(()=>go('album'));
+   }
    assert.equal(await page.locator('[data-level="player1-02"]').isDisabled(),count!==25);
    const allowed=await page.evaluate(()=>{const ids=new Set(player1.eligibleDesigns(S.have));return Array.from({length:40},()=>makeHand(false)).flat().every(c=>ids.has(c.d))});
    assert.equal(allowed,true,'No cards outside unlocked pool');
@@ -149,7 +165,7 @@ try{
   }
   await page.locator('[data-level="player1-02"]').click();
   assert.equal(await page.locator('#grid .dt').count(),25);
-  assert.match(await page.locator('.p1-head').innerText(),/NEXT LEVEL/);
+  assert.match(await page.locator('.p1-hero h2').innerText(),/NEXT LEVEL/);
   await page.evaluate(()=>{S.have.navidadgamer_b=1;renderAlbum()});
   await page.locator('[data-level="legacy"]').click();
   assert.equal(await page.locator('#grid [data-d="navidadgamer"]').count(),1);
