@@ -46,3 +46,19 @@ assert.equal(api.collectionProgress(have25).variantTotal,200);
 assert.equal(api.collectionProgress({...have25,[future]:1}).discovered,26);
 assert.equal(api.collectionProgress({[future]:1}).designTotal,25);
 assert.equal(api.collectionProgress({[future]:1}).discovered,0);
+
+/* Exercise the actual offline draw implementation without loading the browser. */
+const drawStart=source.indexOf('const SP={holo:17,dorada:6.6,full:2.4}');
+const drawEnd=source.indexOf('const GLOW=',drawStart);
+assert.ok(drawStart>=0 && drawEnd>drawStart);
+const POOL={comun:[],holo:[],dorada:[],full:[]};
+const names={b:'comun',e:'holo',r:'dorada',f:'full'};
+for(const c of cards.filter(c=>c.img&&!c.bx)){const v=c.k.slice(-1);POOL[names[v]].push({k:c.k,d:c.k.slice(0,-2),v});}
+const S={have:{}};
+const makeHand=new Function('POOL','S','window',source.slice(drawStart,drawEnd)+';return makeHand;')(POOL,S,{ICMX_PLAYER1_LEVELS:api});
+for(const owned of [{},have24,have25,{...have24,navidadgamer_b:1,[future]:1}]){
+ S.have=owned;const allowed=new Set(api.eligibleDesigns(owned));const snapshot=JSON.stringify(owned);
+ for(let i=0;i<200;i++){const hand=makeHand(i===0);assert.equal(hand.length,5);assert.ok(hand.every(c=>allowed.has(c.d)));assert.ok(hand.slice(0,3).every(c=>c.v==='b'));if(i===0)assert.equal(hand[4].v,'f');}
+ assert.equal(JSON.stringify(owned),snapshot);
+}
+console.log('Offline draws: 800 packs, scopes, rarity structure, preserved inventory');
