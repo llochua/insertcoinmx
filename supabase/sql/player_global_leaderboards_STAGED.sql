@@ -105,10 +105,10 @@ BEGIN
    pg_catalog.jsonb_build_object(
     'ini',t.ini,'handle',t.handle,'score',t.score,
     'mine',t.user_id=auth.uid()
-   ) ORDER BY t.score DESC,t.handle,t.user_id
+   ) || CASE WHEN v_metric='pts' THEN pg_catalog.jsonb_build_object('cards',t.cards) ELSE '{}'::jsonb END ORDER BY t.score DESC,t.handle,t.user_id
   ),'[]'::jsonb) INTO v_rows
   FROM (
-   SELECT m.user_id,m.ini,m.handle,
+   SELECT m.user_id,m.ini,m.handle,m.cards,
     CASE v_metric WHEN 'pts' THEN m.pts
      WHEN 'cards' THEN m.cards WHEN 'designs' THEN m.designs
      WHEN 'duplicates' THEN m.duplicates WHEN 'ratings' THEN m.ratings END AS score
