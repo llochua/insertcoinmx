@@ -159,6 +159,11 @@ try{
     assert.equal(await page.locator('#profileTotal').innerText(),'PRESS START');
     assert.equal(await page.locator('#profileVariantCount').innerText(),'24/100');
     assert.equal(await page.locator('#profileAllCards').innerText(),'24');
+    await page.waitForFunction(()=>{const im=document.getElementById('profileAvatarImage');return im.complete&&im.naturalWidth>0&&getComputedStyle(im).visibility==='visible'});
+    assert.equal(await page.locator('.profile-scoreboard #profileAllCards').count(),1);
+    assert.equal(await page.locator('.profile-summary-board #profileDial').count(),1);
+    assert.equal(await page.locator('.profile-scoreboard #profileValuePoints').count(),1);
+
     assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuemax'),'100');
     await page.screenshot({path:'qa/screenshots/ui-lab-profile-level-'+width+'.png'});
     await page.evaluate(()=>go('album'));

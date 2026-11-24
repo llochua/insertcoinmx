@@ -34,6 +34,8 @@ function paintAvatarImages(){
   el.srcset=srcAvatar(currentAvatar,128)+' 128w, '+srcAvatar(currentAvatar,320)+' 320w';
   el.sizes=id==='profileAvatarImage'?'54px':'48px';
   el.onerror=()=>{el.onerror=null;el.removeAttribute('srcset');el.src='coin.png'};
+  // The isolated LAB has no production Auth gate to reveal these images.
+  el.style.visibility='visible';
  }
 }
 function paintAvatarChoice(){
