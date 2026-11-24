@@ -1,0 +1,36 @@
+/* Insert Coin MX — design tokens v0.2.
+   Tokens are additive aliases: never change the art, CSS animations or gameplay. */
+:root{
+  /* Brand / semantic colors */
+  --ic-color-accent:var(--y,#FFD400);
+  --ic-color-on-accent:#120F1A;
+  --ic-color-text:var(--ink,#F3F1FF);
+  --ic-color-muted:var(--dim,#8B88B8);
+  --ic-color-surface:#15112E;
+  --ic-color-field:#120E29;
+  --ic-color-field-border:rgba(255,255,255,.27);
+  --ic-color-neutral-fill:rgba(255,255,255,.08);
+  --ic-color-neutral-border:rgba(255,255,255,.27);
+  --ic-color-success:#B8F7CB;
+  --ic-color-error:#FFB6B6;
+  /* Typography: legacy display font stays decorative. */
+  --ic-font-ui:AV,system-ui,sans-serif;
+  --ic-font-display:PX,monospace;
+  --ic-font-body-size:15px;
+  --ic-font-control-size:12px;
+  /* Geometry / layout */
+  --ic-space-1:4px;
+  --ic-space-2:8px;
+  --ic-space-3:12px;
+  --ic-space-4:16px;
+  --ic-space-6:24px;
+  --ic-space-8:32px;
+  --ic-radius-sm:8px;
+  --ic-radius-md:10px;
+  --ic-radius-lg:16px;
+  --ic-radius-pill:999px;
+  --ic-control-height:44px;
+  --ic-input-height:46px;
+  --ic-focus-color:var(--ic-color-accent);
+  --ic-focus-ring:2px solid var(--ic-focus-color);
+}

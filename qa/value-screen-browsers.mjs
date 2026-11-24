@@ -37,9 +37,10 @@ try{
  await page.locator('#title').click();
  await page.locator('#home .home-player-card').click();
  await page.locator('#profile.on').waitFor();
- await page.waitForFunction(()=>/^\d[\d.,]* PTS$/.test(document.getElementById('profileValuePoints')?.textContent||''),null,{timeout:10000});
+ await page.waitForFunction(()=>/^\d[\d.,]*$/.test(document.getElementById('profileValuePoints')?.textContent||''),null,{timeout:10000});
  const pts=await page.locator('#profileValuePoints').innerText();
- assert.match(pts,/^\d[\d.,]* PTS$/);
+ assert.match(pts,/^\d[\d.,]*$/);
+ assert.equal(await page.locator('.pc-score-number small').innerText(),'PTS');
  assert.ok(Number(pts.replace(/[^\d]/g,''))>=35,'Ya tiene Base + Holo únicas');
  await mkdir(resolve(ROOT,'qa/screenshots'),{recursive:true});
  await page.screenshot({path:resolve(ROOT,'qa/screenshots/value-profile-mobile.png'),fullPage:true});

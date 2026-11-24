@@ -1,0 +1,57 @@
+/* Insert Coin MX · Design System v0.1 — iconography and shared controls.
+   Conservative first migration: no card art, game logic or page layout redesign. */
+:root{
+  --ic-accent:var(--y,#FFD400);
+  --ic-ink:var(--ink,#F3F1FF);
+  --ic-muted:var(--dim,#8B88B8);
+  --ic-focus:2px solid var(--ic-accent);
+  --ic-target:44px;
+  --ic-icon-size:20px;
+}
+.ic-icon-defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+.ic-ui-icon{
+  display:inline-block;width:var(--ic-icon-size);height:var(--ic-icon-size);
+  flex:none;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;pointer-events:none;
+}
+:where(.vback,.sound-toggle,.ic-close,.dx-leave){
+  box-sizing:border-box;min-width:var(--ic-target);min-height:var(--ic-target);
+  display:inline-flex;align-items:center;justify-content:center;
+  touch-action:manipulation;
+}
+:where(.vback,.sound-toggle,.ic-close,.dx-leave):focus-visible{
+  outline:var(--ic-focus);outline-offset:3px;
+}
+.view>.top .vback,.view>.top .sound-toggle{
+  box-sizing:border-box;width:var(--ic-target);height:var(--ic-target);
+  min-width:var(--ic-target);min-height:var(--ic-target);flex:0 0 var(--ic-target);
+}
+.view>.top .vback .ic-ui-icon{width:20px;height:20px}
+.view>.top .sound-toggle .ic-ui-icon,.sound-toggle .ic-ui-icon{width:20px;height:20px}
+#title .sound-toggle{width:var(--ic-target);height:var(--ic-target)}
+#torneo .reta-reroll{min-height:var(--ic-target);height:var(--ic-target)}
+#torneo>.top .vback,#torneo>.top .sound-toggle{
+  width:var(--ic-target);height:var(--ic-target);min-width:var(--ic-target);
+  min-height:var(--ic-target);flex:0 0 var(--ic-target);
+}
+@media(max-width:700px){
+  /* Keep Reta's compact header while making its 44px controls actually fit. */
+  #torneo>.top{height:44px;min-height:44px;flex:0 0 44px;padding-block:0!important}
+}
+.dx-top .sound-toggle{
+  box-sizing:border-box;width:var(--ic-target);height:var(--ic-target);
+  min-width:var(--ic-target);min-height:var(--ic-target);flex:0 0 var(--ic-target);
+}
+#profile .profile-metric-icon .ic-ui-icon{width:18px;height:18px}
+#profile .profile-avatar .avatar-pencil .ic-ui-icon{width:13px;height:13px}
+#profile .profile-backup-symbol .ic-ui-icon{width:20px;height:20px}
+#profile .profile-backup-chevron .ic-ui-icon{width:19px;height:19px}
+#profile .profile-account-return{display:inline-flex;align-items:center;gap:5px;min-height:44px}
+#profile .profile-account-return .ic-ui-icon{width:17px;height:17px}
+#entryAccountBack .ic-ui-icon{width:17px;height:17px}
+#onBack .ic-ui-icon{width:16px;height:16px}
+#onBack{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px}
+#avatarSelect .vback .ic-ui-icon{width:20px;height:20px}
+@media(prefers-reduced-motion:reduce){
+  :where(.vback,.sound-toggle,.ic-close,.dx-leave){transition:none}
+}

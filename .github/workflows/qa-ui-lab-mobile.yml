@@ -1,0 +1,66 @@
+name: QA · Laboratorio visual de diseño
+
+on:
+  pull_request:
+    paths:
+      - 'qa/design-system/**'
+      - 'content/player1-levels.js'
+      - 'tests/player1-levels.cjs'
+      - 'content/card-runtime.js'
+      - 'content/card-renderer.js'
+      - 'qa/design-system-browsers.mjs'
+      - 'scripts/generate-artwork-backgrounds.py'
+      - 'content/design-tokens.css'
+      - 'content/ui-components.css'
+      - 'content/ui-system.css'
+      - '.github/workflows/qa-ui-lab-mobile.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  laboratorio:
+    name: Chromium · LAB aislado en 320px y 390px
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Comprobar sintaxis del laboratorio
+        run: |
+          node --check qa/design-system/avatar-lab.js
+          node --check qa/design-system-browsers.mjs
+      - name: Verificar lógica PLAYER 1
+        run: node tests/player1-levels.cjs
+      - name: Generar colores de fondo desde todos los archivos originales
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 scripts/generate-artwork-backgrounds.py --print
+      - name: Instalar Playwright
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Chrome del runner, o Chromium si no está disponible
+        run: |
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo 'ICMX_CHROME=true' >> "$GITHUB_ENV"
+            google-chrome --version
+          else
+            npx playwright install --with-deps chromium
+          fi
+      - name: Validar sobres, Reta, avatar e independencia de cuentas
+        run: node qa/design-system-browsers.mjs
+      - name: Comparar cartas dinámicas dentro del LAB
+        run: node qa/design-system-card-dynamic-browsers.mjs
+      - name: Conservar capturas del LAB
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-lab-mobile
+          path: qa/screenshots/ui-lab-*.png
+          if-no-files-found: ignore

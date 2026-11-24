@@ -22,8 +22,14 @@ function catalog(){
 function prepared(card,values,rows,quality){
  const aliases={};
  if(card.v==='f'&&/^F_[a-z0-9]+$/.test(card.img||''))aliases[card.d]=card.img;
- return A().resolve(card,{catalog:rows,fullAliases:aliases,
-  points:values?.points,pop:values?.pop,quality,fullTotal:rows.filter(d=>!!d.full).length});
+ const no=root.ICMX_PLAYER1_LEVELS?.numberOf(card.d);
+ // Release number is presentation only: preserve the original asset and inventory keys.
+ const a=A().resolve(card,{catalog:rows,fullAliases:aliases,
+  points:values?.points,pop:values?.pop,quality,unknownAlbumTotal:true});
+ if(a.card.tipo!=='Álbum'||!root.ICMX_PLAYER1_LEVELS)return a;
+ const serial=no?String(no).padStart(3,'0')+'/???':'ARCHIVO';
+ return {...a,card:{...a.card,numero:serial,releaseFullLabel:no?'F'+String(no).padStart(2,'0')+'/???':'ARCHIVO'}};
+
 }
 function cardImage(fx){
  return [...fx.children].find(e=>e.tagName==='IMG')||fx.querySelector('img');
@@ -83,7 +89,7 @@ function mount(fx,card,values){
    // Start the network and catalogue concurrently; the DOM IMG is the sole
    // shell loader on the direct path. Legacy assets are only a fallback.
    const hasLegacy=current&&/^(?:c|c2)\//.test(current);
-   if(!hasLegacy)img.style.opacity='0';
+   img.style.opacity='0'; // legacy art contains the unreleased catalog total
    const imageReady=hasLegacy?loadImage(shell):decodeTarget(img,shell);
    const [rows]=await Promise.all([catalog(),imageReady]);
    if(!active())return false;
@@ -108,9 +114,9 @@ function mount(fx,card,values){
    fx.dataset.icmxError=String(err?.message||err);
    fx.querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
    delete img.dataset.icmxDynamic;delete fx.dataset.icmxDynamic;
-   img.style.opacity='1';
    console.warn('Carta dinámica no disponible:',card.k,err);
-   try{await decodeTarget(img,original);return !!active()}catch{return false}
+   // A pre-rendered legacy face would expose the hidden total. Use the clean shell, or the coin placeholder.
+   try{await decodeTarget(img,shellURL(card.img,quality));if(!active())return false;img.style.opacity='1';return true}catch{if(active()){img.src='coin.png';img.style.opacity='1'}return false}
   }
  })();
  return rec.promise;
