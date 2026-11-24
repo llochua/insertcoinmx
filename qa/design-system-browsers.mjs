@@ -156,19 +156,20 @@ try{
     await page.evaluate(()=>{go('profile')});
     assert.equal(await page.locator('#profileCards').innerText(),'24/25');
     assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuenow'),'24');
-    assert.equal(await page.locator('#profileLevelLabel').innerText(),'MI COLECCIÓN');
+    assert.equal(await page.locator('#profileLevelLabel').textContent(),'MI COLECCIÓN');
     assert.equal(await page.locator('#profileTotal').innerText(),'COLECCIÓN ORIGINAL');
     assert.equal(await page.locator('#profileVariantCount').innerText(),'24/100');
     assert.equal(await page.locator('#profileAllCards').innerText(),'24');
     await page.waitForFunction(()=>{const im=document.getElementById('profileAvatarImage');return im.complete&&im.naturalWidth>0&&getComputedStyle(im).visibility==='visible'});
     assert.equal(await page.locator('.profile-scoreboard #profileAllCards').count(),1);
-    assert.equal(await page.locator('.profile-summary-board #profileDial').count(),1);
-    assert.equal(await page.locator('.profile-player-sheet #profileDial').count(),1);
-    const portrait=await page.locator('#profileAvatarButton').boundingBox(),meter=await page.locator('#profileDial').boundingBox();
-    assert(portrait.width<meter.width*.65,'Portrait must not compete with the circular progress meter');
+    assert.equal(await page.locator('#profileDial').count(),0);
+    assert.equal(await page.locator('#profile .profile-progress-track').count(),1);
+    assert.equal(await page.locator('#profileAvatarButton').evaluate(el=>getComputedStyle(el).borderRadius),'50%');
+    const portrait=await page.locator('#profileAvatarButton').boundingBox(),meter=await page.locator('#profileProgress').boundingBox();
+    assert(meter.width>portrait.width*2,'One wide horizontal progress bar');
     assert.equal(await page.locator('.profile-scoreboard #profileValuePoints').count(),1);
 
-    assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuemax'),'100');
+    assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuemax'),'25');
     await page.screenshot({path:'qa/screenshots/ui-lab-profile-level-'+width+'.png'});
     await page.evaluate(()=>go('album'));
    }
@@ -186,6 +187,8 @@ try{
   assert.match(await page.locator('.p1-hero h2').innerText(),/COLECCIÓN ORIGINAL/);
   await page.evaluate(()=>go('profile'));
   assert.equal(await page.locator('#profileCards').innerText(),'25/50');
+  assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuemax'),'50');
+  assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuenow'),'25');
   assert.equal(await page.locator('#profileVariantCount').innerText(),'25/200');
   await page.evaluate(()=>go('album'));
   await page.screenshot({path:'qa/screenshots/ui-lab-player1-level2-'+width+'.png'});
