@@ -393,7 +393,22 @@ INSERT INTO private_sync.pack_pool(card_key,variant) VALUES
 ('zodiac_b','b'),
 ('zodiac_e','e'),
 ('zodiac_r','r'),
-('zodiac_f','f')
+('zodiac_f','f'),
+('babyonboard_b','b'),
+('babyonboard_e','e'),
+('babyonboard_r','r'),
+('bitwars_b','b'),
+('bitwars_e','e'),
+('bitwars_r','r'),
+('enjoy_b','b'),
+('enjoy_e','e'),
+('enjoy_r','r'),
+('piccolovolution_b','b'),
+('piccolovolution_e','e'),
+('piccolovolution_r','r'),
+('virtual_b','b'),
+('virtual_e','e'),
+('virtual_r','r')
 ON CONFLICT (card_key) DO UPDATE SET variant=EXCLUDED.variant;
 -- Evitar eliminar o cambiar filas al actualizar el catálogo: el proceso de
 -- baja de diseños necesita una migración revisada expresamente.
