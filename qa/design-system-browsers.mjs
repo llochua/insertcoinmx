@@ -140,6 +140,8 @@ try{
    await page.locator('[data-lab-level-seed="'+count+'"]').click();
    await page.locator('#album.on').waitFor({state:'visible'});
    assert.equal(await page.locator('#grid .dt').count(),25);
+   assert.equal(await page.locator('#grid .dt.lock .p1-lock-icon').count(),25-count);
+   assert.equal(await page.locator('#grid .dt.lock .p1-lock-name').count(),25-count);
    assert.equal(await page.locator('[data-level="player1-02"]').isDisabled(),count!==25);
    const allowed=await page.evaluate(()=>{const ids=new Set(player1.eligibleDesigns(S.have));return Array.from({length:40},()=>makeHand(false)).flat().every(c=>ids.has(c.d))});
    assert.equal(allowed,true,'No cards outside unlocked pool');

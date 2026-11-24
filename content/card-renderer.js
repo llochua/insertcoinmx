@@ -33,7 +33,7 @@
   function numLabel(card, variant, opts) {
     if (card.tipo !== 'Álbum') return 'BONUS';
     if (variant === 'f') return card.full
-      ? String(card.full).replace(/^F/,'F').padStart(3,'0')+'/'+String(opts.fullTotal || 0).padStart(2,'0')
+      ? String(card.full).replace(/^F/,'F').padStart(3,'0')+'/'+(opts.unknownAlbumTotal?'???':String(opts.fullTotal || 0).padStart(2,'0'))
       : 'BONUS';
     // El número es dato editorial; no integra las claves de progreso.
     return String(card.numero || '').trim() || '—';

@@ -114,3 +114,8 @@ test('motor aislado: no toca archivos de juego ni crea un laboratorio duplicado'
   assert.doesNotMatch(renderer,/supabase\\.co/);
   assert.equal(fs.existsSync(path.join(root,'qa/cards-dynamic-preview.html')),false);
 });
+
+test('Full oculta el total futuro cuando se solicita numeración abierta',()=>{
+ assert.equal(api.numLabel(sample,'f',{fullTotal:74,unknownAlbumTotal:true}),'F32/???');
+ assert.ok(api.makeLayers(sample,'f',{unknownAlbumTotal:true}).some(x=>x.text==='Carta F32/???'));
+});

@@ -38,6 +38,8 @@ try{
     getComputedStyle(img).visibility==='visible'&&getComputedStyle(img).opacity==='1'&&
     document.getElementById('zLoad').textContent==='';
   },null,{timeout:20000});
+  const number=await page.locator('#zFx svg.icmx-data').textContent();
+  assert.match(number,/\/?\?\?\?/,'Unreleased catalog denominator hidden');
   const actual=await page.locator('#zImg').getAttribute('src');
   assert.match(actual,/\/cs2\//,key+' '+actual);
   assert.equal(requests.slice(offset).filter(x=>x.startsWith('/c2/')).length,0,'No legacy download: '+key);
@@ -56,13 +58,13 @@ try{
   await page.waitForFunction(()=>!document.getElementById('zoom').open);
  }
  console.log('OK: actual Album zoom, repeated open and close, Base/Holo/Dorada/Full');
- // A failed shell must be replaced by the correct legacy card, never stale SVG.
+ // A failed shell must not expose a pre-rendered catalog denominator or stale SVG.
  await page.route('**/cs2/booit_e.webp',r=>r.abort());
  await page.evaluate(()=>openCard('booit_e'));
  await page.waitForFunction(()=>{
   const fx=document.getElementById('zFx'),img=document.getElementById('zImg');
-  return fx.classList.contains('idle')&&img.complete&&img.naturalWidth>0&&
-   !fx.querySelector('svg.icmx-data')&&new URL(img.src).pathname==='/c2/booit_e.webp';
+  return fx.classList.contains('is-error')&&
+   !fx.querySelector('svg.icmx-data')&&new URL(img.src).pathname==='/coin.png';
  });
  assert.ok(await page.locator('#zFx').getAttribute('data-icmx-error'));
  await page.unroute('**/cs2/booit_e.webp');
@@ -82,7 +84,7 @@ try{
  await page.unroute('**/cs2/1up_e.webp');
  await page.locator('#zFx').click();
  await page.waitForFunction(()=>!document.getElementById('zoom').open);
- console.log('OK: legacy only on failure; rapid card switching does not restore old art');
+ console.log('OK: no legacy denominator on failure; rapid card switching does not restore old art');
 
  const results=await page.evaluate(async()=>{
   const list=[['1up','b','1up'],['1up','e','1up_e'],['1up','r','1up_r'],['sonic','f','F_sonic']];

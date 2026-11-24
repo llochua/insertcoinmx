@@ -81,3 +81,9 @@ test('el adaptador no ejecuta red ni escrituras de almacenamiento',()=>{
  const code=src.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'');
  assert.doesNotMatch(code,/\b(?:localStorage|sessionStorage)\s*\.|\bfetch\s*\(|\bXMLHttpRequest\b|\bsupabase\s*\.|\bindexedDB\b/i);
 });
+
+test('el adaptador transmite la política de total oculto a las Full',()=>{
+ const r=api.resolve({d:'sonic',v:'f'},{catalog:cards,unknownAlbumTotal:true});
+ assert.equal(r.options.unknownAlbumTotal,true);
+ assert.equal(r.card.full,cards.find(x=>x.id==='sonic').full);
+});
