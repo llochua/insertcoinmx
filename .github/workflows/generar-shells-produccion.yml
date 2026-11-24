@@ -1,7 +1,7 @@
 name: Migración · bases dinámicas catálogo completo
 on:
   push:
-    branches: [feature/cartas-dinamicas-produccion-20261123]
+    branches: [feature/cartas-dinamicas-produccion-20261123, release/cartas-dinamicas-mainline-20261123]
     paths:
       - '.github/workflows/generar-shells-produccion.yml'
       - 'cartas/generar-shells.py'
