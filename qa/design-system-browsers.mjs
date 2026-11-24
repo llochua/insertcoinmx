@@ -16,6 +16,11 @@ const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 /* Comparación con la versión REAL de main, no con una copia de sus colores. */
 const MAIN_HTML=execFileSync('git',['show','origin/main:index.html'],{cwd:ROOT,encoding:'utf8'});
 const LAB_HTML=await readFile(resolve(ROOT,'qa/design-system/index.html'),'utf8');
+const PROD_HTML=await readFile(resolve(ROOT,'index.html'),'utf8');
+const summaryLogic=html=>html.slice(html.indexOf('function summaryPacksRemaining(){'),html.indexOf('/* Si cambia el día',html.indexOf('function summaryPacksRemaining(){')));
+assert(summaryLogic(PROD_HTML).startsWith('function summaryPacksRemaining(){'));
+assert.equal(summaryLogic(PROD_HTML),summaryLogic(LAB_HTML),'Production and LAB must use identical summary logic');
+
 const region=(html,begin,end)=>{
  const a=html.indexOf(begin),b=html.indexOf(end,a+begin.length);
  assert(a>=0&&b>a,'No se encontró región compartida '+begin);
@@ -128,6 +133,20 @@ try{
   await page.locator('#icmxLabToggle').click();
   await page.locator('[data-lab-action="pack-quota"]').click();
   await page.waitForFunction(()=>!opening&&freePacksLeft()===2&&!PRUEBA&&!S.test);
+
+  // The counter includes welcome, current-cycle daily packs and earned extras.
+  const balances=await page.evaluate(()=>{
+   const saved={welcomeLeft:S.welcomeLeft,freeUsed:S.freeUsed,freeCycle:S.freeCycle,extra:S.extra};
+   try{
+    S.freeCycle=packCycle();S.welcomeLeft=4;S.freeUsed=0;S.extra=2;
+    const welcome=summaryPacksRemaining();
+    S.welcomeLeft=0;S.freeUsed=1;S.extra=2;
+    const extras=summaryPacksRemaining();
+    S.freeUsed=2;S.extra=0;
+    return [welcome,extras,summaryPacksRemaining()];
+   }finally{Object.assign(S,saved)}
+  });
+  assert.deepEqual(balances,[8,3,0]);
   const beforeQuota=await page.evaluate(()=>Object.values(S.have).reduce((a,n)=>a+n,0));
   for(const left of [1,0]){
    if(left===0)await page.locator('#sOtro').click();
