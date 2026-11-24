@@ -139,10 +139,11 @@ try{
    await page.locator('#icmxLabToggle').click();
    await page.locator('[data-lab-level-seed="'+count+'"]').click();
    await page.locator('#album.on').waitFor({state:'visible'});
-   assert.equal(await page.locator('#grid .dt').count(),25);
-   assert.equal(await page.locator('#grid .dt.lock .p1-lock-icon').count(),25-count);
-   assert.equal(await page.locator('#grid .dt.lock .p1-lock-name').count(),25-count);
-   assert.equal(await page.locator('#grid .dt.lock:disabled').count(),25-count);
+   const total=count===25?50:25;
+   assert.equal(await page.locator('#grid .dt').count(),total);
+   assert.equal(await page.locator('#grid .dt.lock .p1-lock-icon').count(),total-count);
+   assert.equal(await page.locator('#grid .dt.lock .p1-lock-name').count(),total-count);
+   assert.equal(await page.locator('#grid .dt.lock:disabled').count(),total-count);
    assert.equal(await page.locator('#grid .dt.lock[data-d]').count(),0);
    assert.equal(await page.locator('#grid .dt.lock .pp').count(),0);
    if(count===0){
@@ -155,8 +156,8 @@ try{
     await page.evaluate(()=>{go('profile')});
     assert.equal(await page.locator('#profileCards').innerText(),'24/25');
     assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuenow'),'24');
-    assert.equal(await page.locator('#profileLevelLabel').innerText(),'LEVEL 01');
-    assert.equal(await page.locator('#profileTotal').innerText(),'PRESS START');
+    assert.equal(await page.locator('#profileLevelLabel').innerText(),'MI COLECCIÓN');
+    assert.equal(await page.locator('#profileTotal').innerText(),'COLECCIÓN ORIGINAL');
     assert.equal(await page.locator('#profileVariantCount').innerText(),'24/100');
     assert.equal(await page.locator('#profileAllCards').innerText(),'24');
     await page.waitForFunction(()=>{const im=document.getElementById('profileAvatarImage');return im.complete&&im.naturalWidth>0&&getComputedStyle(im).visibility==='visible'});
@@ -171,15 +172,22 @@ try{
     await page.screenshot({path:'qa/screenshots/ui-lab-profile-level-'+width+'.png'});
     await page.evaluate(()=>go('album'));
    }
-   assert.equal(await page.locator('[data-level="player1-02"]').isDisabled(),count!==25);
+   assert.equal(await page.locator('[data-level="player1-02"]').count(),0);
+   assert.equal(await page.locator('.p1-growing-meter').getAttribute('aria-valuemax'),String(total));
+   assert.equal(await page.locator('.p1-growing-meter').getAttribute('aria-valuenow'),String(count));
    const allowed=await page.evaluate(()=>{const ids=new Set(player1.eligibleDesigns(S.have));return Array.from({length:40},()=>makeHand(false)).flat().every(c=>ids.has(c.d))});
    assert.equal(allowed,true,'No cards outside unlocked pool');
    await page.screenshot({path:'qa/screenshots/ui-lab-player1-'+count+'-'+width+'.png'});
   }
-  await page.locator('[data-level="player1-02"]').click();
-  assert.equal(await page.locator('#grid .dt').count(),25);
-  assert.match(await page.locator('.p1-hero h2').innerText(),/NEXT LEVEL/);
-  assert.equal(await page.locator('.p1-hero').getAttribute('data-stage'),'2');
+  assert.equal(await page.locator('#grid .dt').count(),50);
+  assert.equal(await page.locator('#grid .dt.own').count(),25);
+  assert.equal(await page.locator('#grid .dt[data-release="26"]').isDisabled(),true);
+  assert.equal(await page.locator('#grid .dt[data-release="50"]').count(),1);
+  assert.match(await page.locator('.p1-hero h2').innerText(),/COLECCIÓN ORIGINAL/);
+  await page.evaluate(()=>go('profile'));
+  assert.equal(await page.locator('#profileCards').innerText(),'25/50');
+  assert.equal(await page.locator('#profileVariantCount').innerText(),'25/200');
+  await page.evaluate(()=>go('album'));
   await page.screenshot({path:'qa/screenshots/ui-lab-player1-level2-'+width+'.png'});
   await page.evaluate(()=>{S.have.navidadgamer_b=1;renderAlbum()});
   await page.locator('[data-level="legacy"]').click();
@@ -203,7 +211,9 @@ try{
   await page.screenshot({path:'qa/screenshots/ui-lab-levelup-'+width+'.png'});
   await page.locator('#p1UpExplore').click();
   assert.equal(await page.locator('#p1LevelUp[open]').count(),0);
-  assert.equal(await page.locator('[data-level="player1-02"]').getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('#grid .dt').count(),50);
+  assert.equal(await page.locator('#grid [data-release="26"].p1-expansion-highlight').count(),1);
+  assert.equal(await page.locator('#grid .dt[data-release="1"].own').count(),1);
   assert.equal(await page.evaluate(()=>{recordLevelUp(S.have,S.have);return pendingLevelUp}),false,'No celebration for repeat packs');
   const storage=await page.evaluate(()=>({
    live:localStorage.getItem('icmx-album2'),

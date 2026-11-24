@@ -25,6 +25,13 @@
     const allowed=progress(owned).filter(l=>l.unlocked&&(!levelId||levelId===l.id));
     return allowed.flatMap(l=>l.designs);
   }
+  // One growing original collection. Internal milestones only control eligibility.
+  function collectionProgress(owned){
+    const stages=progress(owned),active=stages.filter(l=>l.unlocked);
+    const sum=k=>active.reduce((n,l)=>n+l[k],0);
+    const designs=active.flatMap(l=>l.designs);
+    return {designs,discovered:sum('discovered'),designTotal:designs.length,collected:sum('collected'),variantTotal:sum('variantTotal'),hasExpansion:active.length<stages.length};
+  }
   function visibleDesigns(owned){
     const visible=new Set(eligibleDesigns(owned));
     // Never remove legacy cards; callers supply canonical card keys from the existing album.
@@ -49,7 +56,7 @@
     }
     return errors;
   }
-  return Object.freeze({levels,variants,progress,eligibleDesigns,visibleDesigns,validateCatalog,numberOf,levelOf:id=>membership.get(id)||null});
+  return Object.freeze({levels,variants,progress,collectionProgress,eligibleDesigns,visibleDesigns,validateCatalog,numberOf,levelOf:id=>membership.get(id)||null});
 })();
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.ICMX_PLAYER1_LEVELS=api;
