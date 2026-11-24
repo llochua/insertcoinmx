@@ -44,6 +44,7 @@ jobs:
             scripts/check-ui-components.mjs
             scripts/check-lab-art-parity.mjs
             qa/design-system/index.html
+            qa/design-system/artwork-backgrounds.generated.json
           sparse-checkout-cone-mode: false
       - name: Verify icon registry and inline scripts
         run: node scripts/check-ui-icons.mjs
