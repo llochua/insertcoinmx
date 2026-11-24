@@ -30,7 +30,8 @@ for(const [begin,end] of [
  assert.equal(region(LAB_HTML,begin,end),region(MAIN_HTML,begin,end),
   'La colocación del arte de LAB debe seguir main: '+begin);
 }
-assert(LAB_HTML.includes('const color=bgFromArtwork(im);'),'Falta muestreo universal');
+assert(LAB_HTML.includes('const sampled=bgFromArtwork(im);'),'Falta muestreo universal');
+assert(LAB_HTML.includes('ART_BG_GENERATED[d.id]'),'Falta respaldo automático para imágenes externas');
 assert(LAB_HTML.includes('D.style.backgroundColor=color'),'El fondo no ocupa toda la escena');
 assert(!LAB_HTML.includes('extendArtworkEdges('),'Eliminar extensiones experimentales');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript','.mjs':'text/javascript',
@@ -213,7 +214,8 @@ try{
    if(!im.naturalWidth)return {skip:'missing-file'};
    // El listener del motor se registró ANTES de esta espera.
    await Promise.resolve();
-   const expected=bgFromArtwork(im);
+   const sampled=bgFromArtwork(im);
+   const expected=sampled||ART_BG_GENERATED[design];
    const actual=D.style.getPropertyValue('--bg');
    const bg=getComputedStyle(D).backgroundColor;
    const artColor=getComputedStyle(D.querySelector('.dx-art')).backgroundColor;
@@ -230,7 +232,7 @@ try{
   const key=id+'/'+v;
   assert(state.expected&&state.actual===state.expected,
    key+': el fondo no coincide con los píxeles originales '+JSON.stringify(state));
-  assert.equal(state.status,'sampled',key+': muestreo no aplicado');
+  assert(['sampled','generated-fallback'].includes(state.status),key+': muestreo o respaldo no aplicado');
   assert(state.computedDiff<=2,key+': CSS del fondo no coincide con la imagen');
   assert(state.sceneWidth>500&&state.sceneHeight>500,key+': visor oculto');
   // Holo/Dorada conservan .dx-flat-art transparente!important: ahí el fondo
