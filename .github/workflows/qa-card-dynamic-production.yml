@@ -36,6 +36,11 @@ jobs:
       - name: Instalar navegador
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1
-          npx playwright install --with-deps chromium
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo 'ICMX_CHROME=true' >> "$GITHUB_ENV"
+            google-chrome --version
+          else
+            npx playwright install --with-deps chromium
+          fi
       - name: Verificar Base, Holo, Dorada, Full y exportación
         run: node qa/card-dynamic-production-browsers.mjs
