@@ -2463,7 +2463,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <script>/* El acceso verificable empieza únicamente con la edición reiniciada. */
 window.ICMX_VERIFIED_GUEST_PLAY=/^(?:www\.)?insertcoinmx\.com$/i.test(location.hostname);</script>
 <script src="content/player1-levels.js?v=4"></script>
-<script src="content/card-texts.js?v=20261124-editorial2"></script>
+<script src="content/card-texts.js?v=20261124-editorial3"></script>
 <script src="content/card-data-adapter.js?v=20261124-hidden"></script>
 <script src="content/card-renderer.js?v=20261124-serial"></script>
 <script src="content/card-runtime.js?v=20261124-serial"></script>
@@ -2487,10 +2487,10 @@ window.ICMX_VERIFIED_GUEST_PLAY=/^(?:www\.)?insertcoinmx\.com$/i.test(location.h
    Las claves guardadas en el progreso (id_v) nunca se renombran; los nombres viejos se quedan en `al`.
    El progreso del modelo anterior (id / F_id) se convierte solo al abrir: Común→Base, Holo→Especial, Dorada→Rara, F_→Full. */
 const DESIGNS=[
-{id:'1up',ex:'er',n:"1UP",cat:'GAMER',r:'comun',no:1},
+{id:'1up',ex:'er',n:"1UP",cat:'GAMER',r:'comun',no:1,f:75},
 {id:'9000',bx:1,ex:'er',n:"It's Over 9000",cat:'ANIME',r:'comun',no:0},
 {id:'abuket',ex:'er',n:"Abuket",cat:'GAMER',r:'comun',no:2,f:1},
-{id:'aku',ex:'er',n:"Aku",cat:'GAMER',r:'comun',no:3},
+{id:'aku',ex:'er',n:"Aku",cat:'GAMER',r:'comun',no:3,f:76},
 {id:'alienonboard',bx:1,ex:'er',n:"Alien on Board",cat:'PELÍCULAS',r:'comun',no:0},
 {id:'androidsdays',bx:1,ex:'er',n:"Androids Days",cat:'ANIME',r:'comun',no:0},
 {id:'animehero',bx:1,ex:'er',n:"Anime Héroe",cat:'ANIME',r:'comun',no:0},
@@ -2498,16 +2498,16 @@ const DESIGNS=[
 {id:'arcade2',ex:'er',n:"Arcade 2",cat:'GAMER',r:'comun',no:5,f:50},
 {id:'artemis',ex:'er',n:"Artemis",cat:'ANIME',r:'comun',no:6,f:51},
 {id:'asteroids',ex:'er',n:"Asteroids",cat:'GAMER',r:'comun',no:7,f:3},
-{id:'babyonboard',ex:'er',n:"Baby on Board",cat:'PELÍCULAS',r:'comun',no:8},
-{id:'bitwars',ex:'er',n:"Guerra de los 16 Bits",cat:'GAMER',r:'comun',no:9},
+{id:'babyonboard',ex:'er',n:"Baby on Board",cat:'PELÍCULAS',r:'comun',no:8,f:77},
+{id:'bitwars',ex:'er',n:"Guerra de los 16 Bits",cat:'GAMER',r:'comun',no:9,f:78},
 {id:'blooper',ex:'er',n:"Blooper Maki",cat:'GAMER',r:'comun',no:10,f:4},
 {id:'blowme',ex:'er',n:"Blow Me",cat:'GAMER',r:'comun',no:11,f:63},
-{id:'booit',ex:'er',n:"Boo It",cat:'GAMER',r:'comun',no:12},
-{id:'bort',ex:'er',n:"Bort",cat:'CARICATURAS',r:'comun',no:13},
+{id:'booit',ex:'er',n:"Boo It",cat:'GAMER',r:'comun',no:12,f:79},
+{id:'bort',ex:'er',n:"Bort",cat:'CARICATURAS',r:'comun',no:13,f:80},
 {id:'bustfiction',ex:'er',n:"Bust Fiction",cat:'PELÍCULAS',r:'comun',no:14,f:5},
-{id:'captor',ex:'er',n:"Captor",cat:'ANIME',r:'comun',no:15},
+{id:'captor',ex:'er',n:"Captor",cat:'ANIME',r:'comun',no:15,f:81},
 {id:'caritele',ex:'er',n:"Caritele",cat:'CARICATURAS',r:'comun',no:16,f:64},
-{id:'carton',ex:'er',n:"Recojo Cartón",cat:'CARICATURAS',r:'comun',no:17},
+{id:'carton',ex:'er',n:"Recojo Cartón",cat:'CARICATURAS',r:'comun',no:17,f:82},
 {id:'challenger',ex:'er',n:"Challenger",cat:'GAMER',r:'comun',no:18,f:6},
 {id:'chocarreros',ex:'er',n:"Chocarreros",cat:'PELÍCULAS',r:'comun',no:19,f:52},
 {id:'choochoo',ex:'er',n:"Choo Choo",cat:'CARICATURAS',r:'comun',no:20},
@@ -2519,7 +2519,7 @@ const DESIGNS=[
 {id:'controls',ex:'er',n:"Controls",cat:'GAMER',r:'comun',no:25,f:8},
 {id:'deathlove',ex:'er',n:"Death Love",cat:'ANIME',r:'comun',no:26},
 {id:'docecasas',ex:'er',n:"Las Doce Casas",cat:'ANIME',r:'comun',no:27,f:9},
-{id:'enjoy',ex:'er',n:"Enjoy the Little Things",cat:'PELÍCULAS',r:'comun',no:28},
+{id:'enjoy',ex:'er',n:"Enjoy the Little Things",cat:'PELÍCULAS',r:'comun',no:28,f:83},
 {id:'evilexes',ex:'er',n:"Evil Exes",cat:'PELÍCULAS',r:'comun',no:29,f:44},
 {id:'family',bx:1,ex:'er',n:"Family",cat:'GAMER',r:'comun',no:0},
 {id:'fatality',ex:'be',n:"Fatality",cat:'GAMER',r:'dorada',no:30,f:45},
@@ -2607,12 +2607,12 @@ const DESIGNS=[
 {id:'tokyo3',ex:'er',n:"Tokyo-3",cat:'ANIME',r:'comun',no:98,f:74},
 {id:'toto',ex:'er',n:"Totoro",cat:'ANIME',r:'comun',no:99},
 {id:'triforce',ex:'be',n:"Triforce",cat:'GAMER',r:'dorada',no:100,f:35},
-{id:'universe',ex:'er',n:"Universe",cat:'GAMER',r:'comun',no:101},
+{id:'universe',ex:'er',n:"Universe",cat:'GAMER',r:'comun',no:101,f:84},
 {id:'vamonospest',bx:1,ex:'er',n:"Vámonos Pest",cat:'CARICATURAS',r:'comun',no:0},
 {id:'vegetavolution',bx:1,ex:'er',n:"Vegetavolution",cat:'ANIME',r:'comun',no:0},
-{id:'versus',ex:'er',n:"Versus",cat:'GAMER',r:'comun',no:102},
+{id:'versus',ex:'er',n:"Versus",cat:'GAMER',r:'comun',no:102,f:85},
 {id:'vidaextra',ex:'br',n:"Una Vida Extra",cat:'GAMER',r:'holo',no:103,f:36},
-{id:'virtual',ex:'er',n:"Virtual",cat:'GAMER',r:'comun',no:104},
+{id:'virtual',ex:'er',n:"Virtual",cat:'GAMER',r:'comun',no:104,f:86},
 {id:'wirimask',ex:'er',n:"Wirimask",cat:'GAMER',r:'comun',no:105,f:37},
 {id:'x',ex:'er',n:"X",cat:'GAMER',r:'comun',no:106,f:39},
 {id:'yinyang',ex:'br',n:"Yin Yang",cat:'GAMER',r:'holo',no:107,f:40},
@@ -2642,7 +2642,7 @@ const baseHtml=c=>{
 };
 
 
-const IMGV='a4e785b1e43a3'; // versión de imágenes de cartas: súbela cuando se reemplace un arte (Arte Especial, diseño) para que los navegadores bajen la nueva
+const IMGV='a20261124ae86'; // versión de imágenes de cartas: súbela cuando se reemplace un arte (Arte Especial, diseño) para que los navegadores bajen la nueva
 const VL=['b','e','r','f'],VN={b:'Base',e:'Holo',r:'Dorada',f:'Arte Especial'},VSHORT={b:'Base',e:'Holo',r:'Dorada',f:'Especial'},VC={b:'comun',e:'holo',r:'dorada',f:'full'},OLDV={comun:'b',holo:'e',dorada:'r'};
 const CARDS=[],DB={},ALIAS={},CB={};
 for(const d of DESIGNS){d.fk=d.f?(d.fk||'F_'+d.id):null;DB[d.id]=d;for(const a of d.al||[])ALIAS[a]=d.id;
