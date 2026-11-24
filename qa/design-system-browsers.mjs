@@ -157,22 +157,19 @@ try{
     assert.equal(await page.locator('#profileCards').innerText(),'24/25');
     assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuenow'),'24');
     assert.equal(await page.locator('#profileLevelLabel').textContent(),'MI COLECCIÓN');
-    assert.equal(await page.locator('#profileTotal').innerText(),'COLECCIÓN ORIGINAL');
+    assert.equal(await page.locator('#profileTotal').innerText(),'Colección original');
     assert.equal(await page.locator('#profileVariantCount').innerText(),'24/100');
     assert.equal(await page.locator('#profileAllCards').textContent(),'24');
     await page.waitForFunction(()=>{const im=document.getElementById('profileAvatarImage');return im.complete&&im.naturalWidth>0&&getComputedStyle(im).visibility==='visible'});
-    assert.equal(await page.locator('.profile-extra-stats #profileAllCards').count(),1);
-    assert.equal(await page.locator('.profile-extra-stats').getAttribute('open'),null);
-    await page.locator('.profile-extra-stats summary').click();
-    await page.locator('#profileAllCards').waitFor({state:'visible'});
-    assert.equal(await page.locator('#profileAllCards').innerText(),'24');
-    await page.locator('.profile-extra-stats summary').click();
+    assert.equal(await page.locator('.pc-player-card .pc-stats #profileAllCards').count(),1);
+    assert.equal(await page.locator('.pc-stats #profileAllCards').innerText(),'24');
+    assert.equal(await page.locator('.pc-ticket').evaluate(el=>getComputedStyle(el).backgroundImage.includes('url(')),false);
     assert.equal(await page.locator('#profileDial').count(),0);
-    assert.equal(await page.locator('#profile .profile-progress-track').count(),1);
+    assert.equal(await page.locator('#profile .pc-track').count(),1);
     assert.equal(await page.locator('#profileAvatarButton').evaluate(el=>getComputedStyle(el).borderRadius),'50%');
     const portrait=await page.locator('#profileAvatarButton').boundingBox(),meter=await page.locator('#profileProgress').boundingBox();
     assert(meter.width>portrait.width*2,'One wide horizontal progress bar');
-    assert.equal(await page.locator('.profile-passport #profileValuePoints').count(),1);
+    assert.equal(await page.locator('.pc-ticket #profileValuePoints').count(),1);
 
     assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuemax'),'25');
     await page.screenshot({path:'qa/screenshots/ui-lab-profile-level-'+width+'.png'});
