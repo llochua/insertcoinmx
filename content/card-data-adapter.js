@@ -44,7 +44,7 @@
     return Object.freeze({
       card:Object.freeze(data),variant,
       options:Object.freeze({points,pop,assetRoot:options.assetRoot||'',
-        fullTotal:options.fullTotal||0,quality:options.quality||'full'}),
+        fullTotal:options.fullTotal||0,unknownAlbumTotal:options.unknownAlbumTotal===true,quality:options.quality||'full'}),
       fileKey,
       legacySrc:(options.assetRoot||'')+(options.quality==='thumb'?'c':'c2')+'/'+fileKey+'.webp'
     });
