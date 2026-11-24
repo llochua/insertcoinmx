@@ -3,10 +3,12 @@
   'use strict';
   const api=(function createPlayer1Levels(){
   const levels=Object.freeze([
-    Object.freeze({id:"player1-01",number:1,name:"PRESS START",designs:Object.freeze(["abuket","arcade","asteroids","caritele","collector","continue","controls","gameover","gamepop","gatosamurai","guardianes","humangamer","hyrule","invader","kame","mainstream","mapa","n64","nerv","samus","sensei","snes","sonic","sv001","x"])}),
-    Object.freeze({id:"player1-02",number:2,name:"NEXT LEVEL",designs:Object.freeze(["blowme","bustfiction","challenger","chocarreros","docecasas","futbolito","gojira","gunsncontrols","hipstermario","keepcalm","levelup","linkfloyd","mrkarate","neo","nowloading","omkami","oneplayer","pikaball","pizzcipher","polystation","robogodin","thankyou","tokyo3","wirimask","zero"])})
+    Object.freeze({id:"player1-01",number:1,name:"PRESS START",designs:Object.freeze(["abuket","arcade","asteroids","caritele","collector","continue","controls","gameover","gamepop","gatosamurai","guardianes","humangamer","hyrule","ochentas","kame","mainstream","mapa","n64","nerv","samus","blooper","snes","sonic","sv001","x"])}),
+    Object.freeze({id:"player1-02",number:2,name:"NEXT LEVEL",designs:Object.freeze(["blowme","fatman","challenger","chocarreros","zodiac","futbolito","gojira","triforce","hipstermario","poketaco","levelup","linkfloyd","mrkarate","neo","nowloading","omkami","oneplayer","pikaball","pizzcipher","polystation","robogodin","thankyou","tokyo3","wirimask","zero"])})
   ]);
   const variants=Object.freeze(["b","e","r","f"]);
+  // Existing owners retain discovery credit for the replaced slot; no inventory mutation.
+  const legacySlot=Object.freeze({"ochentas":"invader","blooper":"sensei","fatman":"bustfiction","zodiac":"docecasas","triforce":"gunsncontrols","poketaco":"keepcalm"});
   const membership=new Map(levels.flatMap(l=>l.designs.map(id=>[id,l.id])));
   const releaseNumbers=new Map(levels.flatMap(l=>l.designs).map((id,i)=>[id,i+1]));
   const numberOf=id=>releaseNumbers.get(id)||null;
@@ -14,7 +16,7 @@
   function progress(owned){
     let unlocked=true;
     return levels.map(level=>{
-      const discovered=level.designs.filter(id=>variants.some(v=>has(owned,id+"_"+v))).length;
+      const discovered=level.designs.filter(id=>variants.some(v=>has(owned,id+"_"+v)||(legacySlot[id]&&has(owned,legacySlot[id]+"_"+v)))).length;
       const collected=level.designs.reduce((sum,id)=>sum+variants.filter(v=>has(owned,id+"_"+v)).length,0);
       const unlockedNow=unlocked;
       unlocked=unlockedNow&&discovered===level.designs.length;
