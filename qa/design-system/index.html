@@ -4288,7 +4288,7 @@ function renderScores(){
   const handle=r&&validArcadeHandle(r.handle)?'<small class="rank-handle">@'+esc(r.handle)+'</small>':'';
   const cards=r?safeRankValue(r.cards):null;
   const cardLabel=cards===null?'':'<small class="rank-card-count">'+cards+(cards===1?' carta':' cartas')+'</small>';
-  return `<div class="${cl}"${r?' data-score-entry="true"':''}><span>${String(i+1).padStart(2,'0')}</span><span>${name}${handle}${cardLabel}</span><span>${count}</span></div>`
+  return `<div class="${cl}"${r?' data-score-entry="true"':''}><span>${String(i+1).padStart(2,'0')}</span><span>${name}${handle}</span><span>${count}${cardLabel}</span></div>`
  }).join('');
 }
 $('scores').addEventListener('click',e=>{
