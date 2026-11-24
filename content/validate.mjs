@@ -23,4 +23,22 @@ for(const id of ids){
 }
 assert.ok(html.indexOf('src="content/card-texts.js?')!==-1,'No se carga el archivo editorial');
 assert.ok(html.indexOf('src="content/card-texts.js?')<html.indexOf('<script>/* ===== CATÁLOGO'),'El archivo editorial debe cargar antes del juego');
-console.log('OK: '+ids.length+' cartas, textos completos y catálogo sincronizado');
+
+// Narrativas obligatorias para cualquier diseño incluido en una colección jugable.
+// Deuda preexistente identificada el 24/11: nunca se considera contenido completo.
+// El modo estricto no admite excepciones y debe pasar antes de ampliar colecciones.
+const levelContext={window:{}};
+vm.runInNewContext(fs.readFileSync('content/player1-levels.js','utf8'),levelContext,{timeout:2000});
+const levels=levelContext.window.ICMX_PLAYER1_LEVELS || levelContext.ICMX_PLAYER1_LEVELS;
+assert.ok(levels?.levels?.length,'No se encontró la configuración de colecciones');
+const missing=levels.levels.flatMap(level=>level.designs.flatMap(id=>
+ ['holo','dorada'].filter(key=>typeof texts[id]?.[key]!=='string'||!texts[id][key].trim()).map(key=>id+':'+key)));
+const knownDebt=new Set(["invader:holo","invader:dorada","sensei:holo","sensei:dorada","bustfiction:holo","bustfiction:dorada","docecasas:holo","docecasas:dorada","gunsncontrols:holo","gunsncontrols:dorada","keepcalm:holo","keepcalm:dorada"]);
+const unexpected=missing.filter(key=>!knownDebt.has(key));
+assert.deepEqual(unexpected,[],'Narrativas faltantes nuevas: '+unexpected.join(', '));
+if(missing.length){
+ console.error('DEUDA EDITORIAL NO RESUELTA ('+missing.length+'): '+missing.join(', '));
+ if(process.argv.includes('--strict-release'))throw Error('Colección no apta para liberación: '+missing.join(', '));
+}
+
+console.log('OK: '+ids.length+' cartas; catálogo sincronizado, '+missing.length+' narrativas de deuda explícita.');

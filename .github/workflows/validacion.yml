@@ -96,6 +96,9 @@ jobs:
       - name: Validar catálogo, narrativas y seguridad beta
         run: |
           node content/validate.mjs
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && ! git diff --quiet origin/main...HEAD -- content/player1-levels.js; then
+            node content/validate.mjs --strict-release
+          fi
           node qa/check-server-pack-pool.mjs
           node qa/check-beta-gate.mjs
 
