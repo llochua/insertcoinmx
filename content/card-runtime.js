@@ -10,62 +10,109 @@ let catalogPromise=null;
 const mounted=new WeakMap();
 const images=new Map();
 function catalog(){
- if(!catalogPromise)catalogPromise=fetch('cartas/catalogo.json',{cache:'force-cache'})
+ if(!catalogPromise){
+  const pending=fetch('cartas/catalogo.json',{cache:'force-cache'})
    .then(r=>{if(!r.ok)throw Error('Catálogo HTTP '+r.status);return r.json()})
    .then(rows=>{if(!Array.isArray(rows))throw Error('Catálogo inválido');return rows});
+  catalogPromise=pending;
+  pending.catch(()=>{if(catalogPromise===pending)catalogPromise=null});
+ }
  return catalogPromise;
 }
 function prepared(card,values,rows,quality){
  const aliases={};
  if(card.v==='f'&&/^F_[a-z0-9]+$/.test(card.img||''))aliases[card.d]=card.img;
- const adapted=A().resolve(card,{catalog:rows,fullAliases:aliases,
+ return A().resolve(card,{catalog:rows,fullAliases:aliases,
   points:values?.points,pop:values?.pop,quality,fullTotal:rows.filter(d=>!!d.full).length});
- return adapted;
 }
 function cardImage(fx){
  return [...fx.children].find(e=>e.tagName==='IMG')||fx.querySelector('img');
 }
-function makeNode(adapted){
- return R().create(adapted.card,adapted.variant,adapted.options);
+function shellURL(key,quality){
+ return new URL((quality==='full'?'cs2/':'cs/')+key+'.webp',document.baseURI).href;
 }
-async function mount(fx,card,values){
- if(!fx||!card||!card.img||!card.d||!card.v)return;
- const img=cardImage(fx);if(!img)return;
+function reset(fx){
+ mounted.delete(fx);
+ fx.querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
+ delete fx.dataset.icmxDynamic;delete fx.dataset.icmxError;
+ const img=cardImage(fx);
+ if(img){delete img.dataset.icmxDynamic;img.style.opacity='';}
+}
+function decodeTarget(img,src){
+ const url=new URL(src,document.baseURI).href;
+ if(img.src!==url)img.src=url;
+ if(img.complete&&img.naturalWidth)return Promise.resolve();
+ if(typeof img.decode==='function')return img.decode();
+ return new Promise((resolve,reject)=>{
+  const done=()=>{cleanup();resolve()};
+  const bad=()=>{cleanup();reject(Error('Imagen no disponible: '+url))};
+  const cleanup=()=>{img.removeEventListener('load',done);img.removeEventListener('error',bad)};
+  img.addEventListener('load',done);img.addEventListener('error',bad);
+ });
+}
+// Precarga acotada por intención; no descarga todas las Full del álbum.
+function preload(card){
+ if(!card?.img||! /^(?:F_)?[a-z0-9_]+$/.test(card.img))return;
+ catalog().catch(()=>{});
+ loadImage(shellURL(card.img,'full')).catch(()=>{});
+}
+function mount(fx,card,values){
+ if(!fx||!card?.img||!card.d||!card.v)return Promise.resolve(false);
+ const img=cardImage(fx);if(!img)return Promise.resolve(false);
  const quality=fx.id==='zFx'?'full':'thumb';
- const stamp=card.k+'|'+quality+'|'+String(values?.pop??'—')+'|'+String(values?.points??'—');
- if(mounted.get(fx)===stamp&&fx.querySelector(':scope > svg.icmx-data')&&/\/(?:cs|cs2)\//.test(img.src))return;
- mounted.set(fx,stamp);
- const current=img.getAttribute('src')||'';
- const original=/^(?:c|c2)\//.test(current)?current:(img.dataset.icmxOriginal||current);
- img.dataset.icmxOriginal=original;
- img.style.opacity='0';
- try{
-  const rows=await catalog();
-  if(!fx.isConnected||mounted.get(fx)!==stamp)return;
-  const component=makeNode(prepared(card,values,rows,quality));
-  const image=component.querySelector('img.icmx-shell'),svg=component.querySelector('svg.icmx-data');
-  const shell=image.src;
-  await loadImage(shell);
-  if(!fx.isConnected||mounted.get(fx)!==stamp||(fx.id==='zFx'&&!document.getElementById('zoom')?.open))return;
-  fx.querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
-  img.src=shell;
-  img.style.opacity='1';
-  img.style.display='block';
-  img.decoding='async';
-  img.dataset.icmxDynamic='true';
-  svg.style.position='absolute';svg.style.inset='0';svg.style.width='100%';svg.style.height='100%';
-  svg.style.pointerEvents='none';
-  svg.style.zIndex='1';
-  const overlay=[...fx.children].find(el=>el.tagName==='I');
-  fx.insertBefore(svg,overlay||null);
-  fx.dataset.icmxDynamic='true';
-  delete fx.dataset.icmxError;
- }catch(err){
-  if(mounted.get(fx)!==stamp)return;
-  fx.dataset.icmxError=String(err?.message||err);
-  img.src=original;img.style.opacity='1';
-  console.warn('Carta dinámica no disponible:',card.k,err);
+ const key=card.k+'|'+quality;
+ const previous=mounted.get(fx);
+ if(previous?.key===key&&previous.img===img){
+  previous.values=values;
+  if(previous.status==='ready'){
+   R().updateValues(previous.svg,card.v,values);
+   return Promise.resolve(true);
+  }
+  if(previous.status==='pending')return previous.promise;
  }
+ const current=img.getAttribute('src')||'';
+ const original=img.dataset.icmxOriginal||(/^(?:c|c2)\//.test(current)?current:'')||
+  (quality==='full'?'c2/':'c/')+card.img+'.webp';
+ const rec={key,img,values,status:'pending',promise:null,svg:null};
+ mounted.set(fx,rec);
+ const active=()=>mounted.get(fx)===rec&&fx.isConnected&&
+  (fx.id!=='zFx'||document.getElementById('zoom')?.open);
+ rec.promise=(async()=>{
+  try{
+   const shell=shellURL(card.img,quality);
+   // Start the network and catalogue concurrently; the DOM IMG is the sole
+   // shell loader on the direct path. Legacy assets are only a fallback.
+   const hasLegacy=current&&/^(?:c|c2)\//.test(current);
+   const imageReady=hasLegacy?loadImage(shell):decodeTarget(img,shell);
+   const [rows]=await Promise.all([catalog(),imageReady]);
+   if(!active())return false;
+   const a=prepared(card,rec.values,rows,quality);
+   if(shellURL(a.fileKey,quality)!==shell)throw Error('Clave editorial no coincide: '+card.k);
+   const svg=R().renderData(a.card,a.variant,a.options);
+   if(hasLegacy){await decodeTarget(img,shell);if(!active())return false;}
+   fx.querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
+   svg.style.position='absolute';svg.style.inset='0';svg.style.width='100%';svg.style.height='100%';
+   svg.style.pointerEvents='none';svg.style.zIndex='1';
+   const overlay=[...fx.children].find(el=>el.tagName==='I');
+   fx.insertBefore(svg,overlay||null);
+   img.style.opacity='1';img.style.display='block';
+   img.dataset.icmxDynamic='true';fx.dataset.icmxDynamic='true';
+   delete fx.dataset.icmxError;
+   rec.svg=svg;rec.status='ready';
+   R().updateValues(svg,card.v,rec.values);
+   return true;
+  }catch(err){
+   if(!active())return false;
+   rec.status='fallback';
+   fx.dataset.icmxError=String(err?.message||err);
+   fx.querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
+   delete img.dataset.icmxDynamic;delete fx.dataset.icmxDynamic;
+   img.style.opacity='1';
+   console.warn('Carta dinámica no disponible:',card.k,err);
+   try{await decodeTarget(img,original);return !!active()}catch{return false}
+  }
+ })();
+ return rec.promise;
 }
 function loadImage(src){
  if(images.has(src)){const hit=images.get(src);images.delete(src);images.set(src,hit);return hit}
@@ -156,7 +203,7 @@ async function layerCanvas(ctx,lay){
 }
 async function drawInto(ctx,card,values,x,y,width,height){
  const rows=await catalog(),a=prepared(card,values,rows,'full');
- const shell=makeNode(a).querySelector('img.icmx-shell').src;
+ const shell=shellURL(a.fileKey,'full');
  const im=await loadImage(shell);
  const cv=document.createElement('canvas');cv.width=960;cv.height=1340;
  const out=cv.getContext('2d');out.drawImage(im,0,0,960,1340);
@@ -165,5 +212,5 @@ async function drawInto(ctx,card,values,x,y,width,height){
  for(const lay of layers)await layerCanvas(out,lay);
  ctx.drawImage(cv,x,y,width,height);
 }
-root.ICMX_CARD_RUNTIME=Object.freeze({mount,drawInto,catalog});
+root.ICMX_CARD_RUNTIME=Object.freeze({mount,reset,preload,drawInto,catalog});
 })(window);
