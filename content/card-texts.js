@@ -5,6 +5,12 @@
  * Solo se publican las narrativas ya incorporadas y aprobadas; el contenido de Drive no se modifica.
  */
 window.ICMX_CARD_TEXTS=Object.freeze({
+  "babyonboard": {"habilidad":"Nace del pecho de la tripulación. A la hora de la cena.","frase":"Un bebé hecho de galaxia… y dientes."},
+  "bitwars": {"habilidad":"Parte la cuadra en dos bandos. Ninguno se rinde.","frase":"Tres botones contra cuatro."},
+  "enjoy": {"habilidad":"Encuentra el último Twinkie del apocalipsis. Solo uno.","frase":"El apocalipsis también tiene colores pastel."},
+  "piccolovolution": {"habilidad":"Le vuelve a crecer cualquier brazo. Tarda un capítulo.","frase":"Del huevo a la capa con hombreras."},
+  "virtual": {"habilidad":"Te mete dentro del juego. El dolor de cabeza va aparte.","frase":"El futuro llegó en 1995. Y era rojo."},
+  "vegetavolution": {"habilidad":"Rompe su propio límite. El de Kakaroto, nunca.","frase":"Orgullo saiyajin en seis tallas."},
   "9000": {"habilidad":"La lectura del scouter de Vegeta.","frase":"¡Es de más de ocho mil!"},
   "fck": {"habilidad":"Va directo al primer lugar. Siempre.","frase":"Ibas primero. Ibas.","holo":"El caparazón azul de Mario Kart aparece de frente, con sus alas extendidas y un gesto bastante claro. Abajo, una sola palabra: «#Fuck». No necesitaba más para recuperar el instante en que sabes que vas a perder el primer lugar.","dorada":"Ese caparazón azul tenía una sola misión: arruinarte el primer lugar cuando ya veías la meta. La expresión que lo acompaña es prácticamente lo último que dices al mirar por el retrovisor, justo antes de enemistarte de por vida con quien lo lanzó. Aguas con las proyectadas."},
   "abuket": {"habilidad":"Lanza el poder aunque no sepas cómo se dice.","frase":"Abajo, adelante, puño… ¡y abuket!","holo":"Una silueta, el comando del movimiento y una palabra escrita como la escuchábamos: «Abuket». La composición reduce el ataque de Street Fighter II a tres elementos reconocibles y convierte una pronunciación muy nuestra en el verdadero protagonista.","dorada":"Cuando Street Fighter II llegó a México, los ataques se aprendían más de oído que de memoria. «Hadouken» podía convertirse en «Abuket» y cada quien tenía su versión. Esta fue de las primeras playeras que mandamos a imprimir en un taller, antes de producirlas nosotros. Incluso hicimos stickers de vinil recortado con el diseño, algo que casi nunca repetimos."},
