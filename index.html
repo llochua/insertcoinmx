@@ -3251,13 +3251,19 @@ let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;
    Solo cuentan las versiones con imagen; si una clase no tiene cartas, su parte se reparte entre las que sí
    (Base se queda en 74%). Primer sobre de un jugador nuevo: la carta segura es una Full (una sola vez). */
 const SP={holo:17,dorada:6.6,full:2.4},SURP=.3;
-const pickFrom=r=>{const pool=POOL[r];return Object.assign({},pool[Math.random()*pool.length|0])};
-function pickSpecial(){const ks=Object.keys(SP).filter(k=>POOL[k].length);if(!ks.length)return pickFrom('comun');
+let scopedPackPool=null;
+const currentPool=()=>scopedPackPool||POOL;
+const pickFrom=r=>{const pool=currentPool()[r];return Object.assign({},pool[Math.random()*pool.length|0])};
+function pickSpecial(){const ks=Object.keys(SP).filter(k=>currentPool()[k].length);if(!ks.length)return pickFrom('comun');
  let t=Math.random()*ks.reduce((a,k)=>a+SP[k],0);for(const k of ks)if((t-=SP[k])<0)return pickFrom(k);return pickFrom(ks[ks.length-1])}
-const pickBase=()=>POOL.comun.length?pickFrom('comun'):pickSpecial();
+const pickBase=()=>currentPool().comun.length?pickFrom('comun'):pickSpecial();
 const veteran=()=>Object.keys(S.have).length>0||!!S.last||(Array.isArray(S.pk)&&S.pk.length>0); // ya jugaba antes de la Etapa 4
 const firstPack=()=>!S.fg&&!veteran();
-function makeHand(first){return [pickBase(),pickBase(),pickBase(),Math.random()<SURP?pickSpecial():pickBase(),first&&POOL.full.length?pickFrom('full'):pickSpecial()]}
+function makeHand(first){
+ const allowed=new Set(window.ICMX_PLAYER1_LEVELS.eligibleDesigns(S.have));
+ scopedPackPool=Object.fromEntries(Object.entries(POOL).map(([r,cs])=>[r,cs.filter(c=>allowed.has(c.d))]));
+ try{return [pickBase(),pickBase(),pickBase(),Math.random()<SURP?pickSpecial():pickBase(),first&&currentPool().full.length?pickFrom('full'):pickSpecial()]}finally{scopedPackPool=null}
+}
 const GLOW={holo:'#9ff3ff',dorada:'#FFD400',full:'#ff6fd0'};
 let hand=[],idx=0,hintT,lastOpenedPack=null;
 let pendingLevelUp=false,expandedFrom=0;
