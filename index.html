@@ -2058,6 +2058,34 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-height:700px){.p1-up-hud{margin-bottom:12px}.p1-up-stage-number{height:100px}.p1-up-stage-number span{font-size:112px}.p1-up-achieve{margin-bottom:15px}.p1-up-actions{margin-top:17px}.p1-up-next-name{font-size:25px}}
 @media(prefers-reduced-motion:reduce){#p1LevelUp *,#p1LevelUp *:before,#p1LevelUp *:after{animation:none!important}#p1LevelUp .old{display:none}}
 </style>
+<style>
+/* Player identity and collection form one continuous screen. */
+#profile .profile-scroll{gap:22px}
+#profile .profile-player-sheet{display:flex;flex-direction:column;gap:0;min-width:0;padding:0 1px}
+#profile .profile-player-sheet .profile-passport{background:none;border:0;border-radius:0;box-shadow:none;min-height:0;padding:5px 0 18px;overflow:visible}
+#profile .profile-player-sheet .profile-passport:before,#profile .profile-player-sheet .profile-passport:after{display:none}
+#profile .profile-player-sheet .profile-head{align-items:center;gap:12px}
+#profile .profile-player-sheet .profile-avatar{flex:0 0 56px;width:56px;height:56px;min-height:56px;padding:2px;border:1px solid #74658f!important;border-radius:9px;background:#17122c!important;box-shadow:none}
+#profile .profile-player-sheet .profile-avatar img{border-radius:6px;object-fit:cover}
+#profile .profile-player-sheet .profile-avatar .avatar-pencil{width:17px;height:17px;font-size:10px;right:-4px;bottom:-4px}
+#profile .profile-player-sheet .profile-head h2.arcade-initials{font-size:22px;letter-spacing:.04em}
+#profile .profile-player-sheet .profile-identity .profile-kicker{font-size:7px;color:#ada0c9}
+#profile .profile-player-sheet .profile-summary-board{border:0;border-top:1px solid #ffffff20;border-radius:0;background:none;box-shadow:none;overflow:visible}
+#profile .profile-player-sheet .profile-level-banner{background:none;border:0;padding:16px 0 4px}
+#profile .profile-player-sheet .profile-collection{padding:9px 0 19px;gap:18px}
+#profile .profile-player-sheet .profile-dial{width:112px;height:112px;flex:0 0 112px;box-shadow:none}
+#profile .profile-player-sheet .profile-progress strong{font-size:21px}
+#profile .profile-player-sheet .profile-scoreboard{background:none;border-top:1px solid #ffffff20;border-bottom:1px solid #ffffff20;padding:18px 0 16px;gap:17px}
+#profile .profile-player-sheet .profile-score-label{display:none}
+#profile .profile-player-sheet .profile-points-standalone{padding:0}
+#profile .profile-player-sheet .profile-points-standalone>small{font-size:10px}
+#profile .profile-player-sheet .profile-metrics-spaced div{border-color:#ffffff18}
+#profile .profile-player-sheet .profile-metrics-spaced .profile-metric-icon{display:none}
+#profile .profile-spotlight{background:none;border:0;border-radius:0;padding:0;gap:12px}
+#profile .profile-spotlight .profile-spotlight-icon{background:#ffd40015;color:#ffd400}
+#profile.account-focus .profile-player-sheet{display:none!important}
+@media(max-width:380px){#profile .profile-scroll{gap:18px}#profile .profile-player-sheet .profile-avatar{width:50px;height:50px;min-height:50px;flex-basis:50px}#profile .profile-player-sheet .profile-head{gap:10px}#profile .profile-player-sheet .profile-head h2.arcade-initials{font-size:19px}#profile .profile-player-sheet .profile-collection{gap:12px}#profile .profile-player-sheet .profile-dial{width:94px;height:94px;flex-basis:94px}#profile .profile-player-sheet .profile-progress strong{font-size:17px}}
+</style>
 </head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
@@ -2171,6 +2199,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <section class="view" id="profile" aria-label="Mi perfil de jugador">
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Mi perfil</h1><span class="sp"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="profile-scroll">
+  <div class="profile-player-sheet" aria-label="Ficha del jugador">
   <section class="profile-passport" aria-label="Identidad del jugador">
    <div class="profile-head">
     <button type="button" id="profileAvatarButton" class="profile-avatar" aria-label="Cambiar mi avatar" title="Cambiar avatar"><img id="profileAvatarImage" style="visibility:hidden" src="assets/avatars/moneda-128.webp" alt="" width="82" height="82"><span class="avatar-pencil" aria-hidden="true">✎</span></button>
@@ -2210,6 +2239,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <div><span class="profile-metric-icon" aria-hidden="true">★</span><strong id="profileRatings">0</strong><span>Calificados</span></div>
   </div>
   </section>
+  </div>
   <section class="profile-spotlight" id="profileWelcome" aria-labelledby="profileSpotlightTitle">
    <div class="profile-spotlight-heading">
     <span class="profile-spotlight-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6Z"/><path d="m8.5 12 2.3 2.3 4.7-4.7"/></svg></span>
