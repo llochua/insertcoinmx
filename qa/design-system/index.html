@@ -1909,47 +1909,76 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #icmxLabTools button:focus-visible{outline:2px solid #ffd400;outline-offset:2px}
 @media(max-width:370px){#icmxLabTools{top:4px;left:4px}#icmxLabToggle{font-size:10px;padding:7px 9px}}
 </style><style>
-/* PLAYER 1 · arcade stage select */
-.p1-panel{flex:none;margin:0 14px 9px;position:relative;display:grid;gap:7px;min-width:0}.p1-panel[hidden]{display:none}
-.p1-kicker{display:flex;align-items:center;gap:6px;color:var(--y);font:8px/1.35 PX,monospace}.p1-kicker img{width:17px;height:17px;object-fit:contain}.p1-kicker:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#ffd40070,transparent)}
-.p1-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;min-width:0}
-.p1-tabs button{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:62px;padding:10px 8px 9px;display:flex;align-items:center;gap:7px;text-align:left;border:1px solid #625696;border-radius:6px;background:linear-gradient(135deg,#32235e,#16112f 65%);box-shadow:0 3px 0 #09071a}
-.p1-tabs button:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.16;background:repeating-linear-gradient(135deg,transparent 0 8px,#a895ef 8px 9px,transparent 9px 16px)}
-.p1-tabs button[aria-pressed=true]{border-color:#ffd400;background:linear-gradient(135deg,#4b3711,#231b2f 76%);box-shadow:0 3px 0 #795c13,0 0 15px #ffd40020}
-.p1-tabs button[aria-pressed=true]:before{opacity:.28;background:repeating-linear-gradient(135deg,transparent 0 8px,#ffd400 8px 9px,transparent 9px 16px)}
-.p1-tabs button:disabled{border-color:#393359;background:#111027;color:#a19aba;cursor:default;box-shadow:0 3px 0 #09071a}
-.p1-tabs button:focus-visible{outline:2px solid var(--y);outline-offset:2px}
-.p1-stage-no{flex:none;font:700 25px/.85 AVK,AV,sans-serif;letter-spacing:-.05em;color:#c9baff;text-shadow:2px 2px 0 #0b071d}.p1-tabs button[aria-pressed=true] .p1-stage-no{color:var(--y)}.p1-tabs button:disabled .p1-stage-no{color:#514969}
-.p1-stage-copy{display:grid;gap:5px;min-width:0}.p1-stage-copy small{font:7px/1.3 PX,monospace;color:#bcb3db}.p1-stage-copy b{font:700 13px/1.05 AVK,AV,sans-serif;color:#fff;letter-spacing:.015em;overflow-wrap:anywhere}
-.p1-tabs button[aria-pressed=true] .p1-stage-copy small{color:#ffe681}.p1-tabs button:disabled .p1-stage-copy b{color:#9e97b9}
-.p1-stage-lock{width:14px;height:14px;flex:none;color:#a49cbf;margin-left:auto}.p1-stage-select{position:absolute;right:0;top:0;background:var(--y);color:#171021;padding:3px 5px;font:6px/1.1 PX,monospace}
-.p1-archive{grid-column:1/-1;min-height:31px!important;padding:6px 10px!important;justify-content:space-between;font:700 11px AV,system-ui,sans-serif}.p1-archive b{color:#fff}
-.p1-status{display:grid;gap:5px;padding:5px 1px 2px}.p1-head,.p1-counts{display:flex;justify-content:space-between;align-items:center;gap:8px}.p1-head b{font:8px/1.5 PX,monospace;color:var(--y)}.p1-head small{font:700 15px/1 AV,system-ui,sans-serif;color:#fff;font-variant-numeric:tabular-nums}
-.p1-counts,.p1-help{font:600 11px/1.3 AV,system-ui,sans-serif;color:#bdb6d7}.p1-counts b{color:#fff}
-.p1-meter{display:grid;grid-template-columns:repeat(25,minmax(0,1fr));gap:2px;height:8px}.p1-meter i{display:block;background:#423759;border-radius:1px}.p1-meter i.on{background:#ffd400;box-shadow:0 0 5px #ffd40035}
-.p1-empty{grid-column:1/-1;text-align:center;color:#c8c4de;padding:22px;font:600 13px AV,system-ui,sans-serif}
-#album #pTabs{padding-bottom:7px!important}#album #pTabs .btn{font:700 10px AV,system-ui,sans-serif!important;border-radius:5px!important;padding:7px 9px!important}#album #pTabs .btn.on{background:#ffd400!important;color:#181127!important}#album .prog{display:none}#album .aSub{padding-bottom:8px}
-#album .dt.lock .cv{background:repeating-linear-gradient(135deg,#1b1536 0 9px,#211a40 9px 10px)!important;box-shadow:inset 0 0 0 1px #64578b,inset 0 0 0 5px #100d25}
-#album .dt .lk{gap:5px;padding:7px}#album .dt .lk small{font:7px PX,monospace;color:#a89bc9}#album .dt .lk .p1-lock-icon{color:#d4b54b;width:28px;filter:drop-shadow(0 2px 0 #09071b)}#album .dt .lk .p1-lock-name{font:700 12px/1.15 AV,system-ui,sans-serif;color:#eee9ff}
-@media(max-width:380px){.p1-panel{margin-inline:10px;gap:5px}.p1-tabs button{min-height:55px;padding:8px 6px;gap:5px}.p1-stage-no{font-size:21px}.p1-stage-copy b{font-size:11px}.p1-stage-copy small{font-size:6px}.p1-stage-select{display:none}.p1-kicker{font-size:7px}#album .dt .lk .p1-lock-name{font-size:10px}}
-@media(min-width:700px){.p1-panel{width:min(640px,calc(100% - 32px));margin-inline:auto}.p1-tabs button{min-height:74px;padding:12px 16px}.p1-stage-no{font-size:36px}.p1-stage-copy b{font-size:17px}}
-
+/* COLLECTION SCREEN — Insert Coin MX original arcade UI. */
 #album .p1-scroll{min-height:0;overscroll-behavior:contain}
-#album .p1-panel{width:100%;max-width:720px;margin:0 auto 13px;gap:9px}
-.p1-hero{position:relative;min-height:122px;overflow:hidden;isolation:isolate;display:flex;align-items:center;padding:14px 16px;border:1px solid #89702e;background:radial-gradient(ellipse at 83% 48%,#62471c 0,#271c36 38%,#100d28 77%);border-radius:9px;box-shadow:0 4px 0 #09081c}
-.p1-hero:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.25;background:repeating-linear-gradient(0deg,transparent 0 3px,#0c081c 3px 4px)}
-.p1-hero:after{content:"";position:absolute;right:0;bottom:0;width:62px;height:6px;background:repeating-linear-gradient(90deg,#ffd400 0 6px,transparent 6px 12px)}
-.p1-hero[data-stage="2"]{border-color:#8a78df;background:radial-gradient(ellipse at 83% 48%,#514397,#231947 42%,#100d28 80%)}
-.p1-hero-copy{z-index:2;width:76%}.p1-hero .p1-kicker{font:7px/1.6 PX,monospace}.p1-hero .p1-kicker:after{display:none}
-.p1-hero-level{font:9px/1.3 PX,monospace;color:#ddd4f3;margin-top:10px}.p1-hero h2{font:700 clamp(21px,5.9vw,34px)/.98 AVK,AV,sans-serif;letter-spacing:-.02em;color:#ffd400;margin:5px 0;text-shadow:2px 3px 0 #0e0a1b}.p1-hero p{font:600 11px/1.3 AV,system-ui,sans-serif;color:#dfd7ef;margin:5px 0 0}
-.p1-hero-mark{position:absolute;right:8px;top:50%;transform:translateY(-50%) rotate(-10deg);width:30%;max-width:130px;aspect-ratio:1;display:grid;place-items:center;opacity:.8}.p1-hero-mark img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 12px #ffd40040)}
-#album .p1-tabs button{min-height:50px}#album #pTabs{padding:0 0 8px!important;max-width:1100px;margin-inline:auto}#album .aSub{padding:0 0 10px;max-width:1100px;margin-inline:auto}
-#album .dt.lock{cursor:default;pointer-events:none}
-#album .dt.lock .cv{background:radial-gradient(ellipse at 50% 36%,#342557,#110d28 77%)!important;box-shadow:inset 0 0 0 1px #655280,inset 0 0 0 5px #120e2a}
-#album .dt.lock .cv:before{content:"";position:absolute;inset:7px;border:1px dashed #62527f;opacity:.7;border-radius:5px}
-#album .dt.lock .lk{gap:8px}#album .dt.lock .lk .p1-lock-name{font:13px PX,monospace;color:#b9a8de}
-.p1-unseen{font:700 8px/1.4 AV,sans-serif;letter-spacing:.05em;color:#9c91be;text-align:center}
-@media(max-width:380px){.p1-hero{min-height:105px;padding:11px 12px}.p1-hero h2{font-size:23px}.p1-hero .p1-kicker{font-size:6px}.p1-unseen{font-size:7px}}
+#album .p1-panel{width:100%;max-width:1100px;margin:0 auto 19px;display:grid;gap:0}
+.p1-panel[hidden]{display:none!important}
+.p1-hero{position:relative;overflow:hidden;isolation:isolate;display:grid;align-content:end;min-height:164px;padding:18px 15px 14px;border:1px solid #5a4a79;border-radius:12px 12px 0 0;background:#100d25}
+.p1-hero:before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,#100d25 0%,#100d25eb 28%,#100d2590 60%,#100d2510 100%),linear-gradient(0deg,#100d25 0%,transparent 65%),url(menu/final/album.webp) right 42%/auto 175% no-repeat}
+.p1-hero:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:repeating-linear-gradient(0deg,#100d251a 0 1px,transparent 1px 4px)}
+.p1-hero[data-stage="2"]:before{background:linear-gradient(90deg,#15102a 0%,#15102aeb 28%,#15102a90 60%,#15102a10 100%),linear-gradient(0deg,#15102a 0%,transparent 65%),url(menu/final/reta.webp) right 45%/auto 175% no-repeat}
+.p1-hero[data-stage="0"]:before{opacity:.35}
+.p1-hero-top{position:absolute;top:13px;left:15px;right:15px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.p1-kicker{font:8px/1.4 PX,monospace;color:#ffd400;letter-spacing:.02em}
+.p1-hero-top span:last-child{font:700 10px AV,system-ui,sans-serif;color:#eee7fd;letter-spacing:.06em}
+.p1-hero-copy{max-width:86%;position:relative}
+.p1-hero-level{display:inline-flex;align-items:center;gap:6px;font:8px/1.3 PX,monospace;color:#ffd400}
+.p1-hero-level:before{content:"";width:6px;height:6px;background:#ffd400;box-shadow:0 0 9px #ffd40077}
+.p1-hero h2{font:700 clamp(30px,8vw,51px)/.89 AVK,AV,sans-serif;letter-spacing:-.045em;color:#fff;margin:8px 0 7px;text-shadow:0 3px 0 #0b0916,0 8px 28px #080615}
+.p1-hero p{font:600 12px/1.35 AV,system-ui,sans-serif;color:#d9d2eb;max-width:240px;margin:0}
+.p1-status{padding:12px 14px 11px;border:1px solid #5a4a79;border-top:0;background:linear-gradient(180deg,#211931,#171329);border-radius:0 0 12px 12px;display:grid;gap:7px}
+.p1-head,.p1-counts{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.p1-head b{font:8px/1.45 PX,monospace;color:#ffd400}.p1-head small{font:700 17px/1 AV,system-ui,sans-serif;color:#fff;font-variant-numeric:tabular-nums}
+.p1-meter{display:grid;grid-template-columns:repeat(25,minmax(0,1fr));gap:3px;height:8px}
+.p1-meter i{display:block;background:#4a405d;border-radius:1px}.p1-meter i.on{background:#ffd400;box-shadow:0 0 6px #ffd40040}
+.p1-counts,.p1-help{font:600 11px/1.3 AV,system-ui,sans-serif;color:#c0b7d4}.p1-counts b{color:#fff;white-space:nowrap}
+.p1-tabs{display:flex;gap:6px;margin-bottom:10px;min-width:0;flex-wrap:wrap}
+.p1-tabs button{position:relative;min-width:0;flex:1;min-height:44px;border:1px solid #4a405e;border-radius:7px;background:#1c1730;color:#ddd5f0;padding:7px 10px;display:flex;align-items:center;justify-content:flex-start;gap:7px;text-align:left}
+.p1-tabs button[aria-pressed=true]{background:#ffd400;color:#120d21;border-color:#ffd400;box-shadow:0 3px 0 #9d7900}
+.p1-tabs button:disabled{color:#a9a0c3;background:#151127;border-color:#3b334f;cursor:default}
+.p1-tabs button:focus-visible{outline:2px solid #ffd400;outline-offset:3px}
+.p1-stage-no{font:800 23px/1 AVK,AV,sans-serif;letter-spacing:-.05em;flex:none}
+.p1-stage-copy{min-width:0;display:grid;gap:3px}
+.p1-stage-copy small{font:7px/1.4 PX,monospace}.p1-stage-copy b{font:700 11px/1.1 AV,system-ui,sans-serif;overflow-wrap:anywhere}
+.p1-stage-lock{width:14px;height:14px;flex:none;margin-left:auto}.p1-stage-select{font:7px PX,monospace;margin-left:auto}
+.p1-tabs .p1-archive{flex:1 0 100%;min-height:34px;justify-content:space-between;font:700 11px AV,system-ui,sans-serif}
+#album .prog{display:none}#album #pTabs{padding:0 0 8px!important;max-width:1100px;margin-inline:auto;gap:6px!important}
+#album #pTabs .btn{font:700 11px AV,system-ui,sans-serif!important;border-radius:5px!important;padding:7px 10px!important;letter-spacing:0}
+#album #pTabs .btn.on{background:#ffd400!important;color:#181127!important}
+#album .aSub{padding:0 0 12px;max-width:1100px;margin-inline:auto}
+#album .p1-section-label{font:8px/1.5 PX,monospace;letter-spacing:.02em;color:#fff;display:flex;align-items:center;gap:9px;max-width:1100px;margin:0 auto 10px}
+#album .p1-section-label:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,#a293c84d,transparent)}
+#album .dgrid{gap:16px 10px;align-items:start}
+#album .dt{min-width:0;gap:6px}
+#album .dt.lock{cursor:default;pointer-events:none;opacity:1}
+#album .dt.lock .cv{background:radial-gradient(ellipse at 50% 43%,#32254c,#17122e 74%)!important;border-radius:8px;box-shadow:inset 0 0 0 1px #655783,inset 0 0 0 5px #100d24}
+#album .dt.lock .cv:before{content:"";position:absolute;inset:8px;border:1px solid #54476e;border-radius:4px;opacity:.75;background:repeating-linear-gradient(135deg,transparent 0 10px,#c7b2ff09 10px 11px)}
+#album .dt.lock .lk{gap:7px;padding:7px}
+#album .dt.lock .lk .p1-lock-icon{width:26px;height:auto;color:#b6a7d9;filter:drop-shadow(0 2px 0 #100a23)}
+#album .dt.lock .lk .p1-lock-name{font:12px PX,monospace;color:#aca0c8}
+#album .dt.lock .lk small{position:absolute;top:13px;left:12px;font:7px PX,monospace;color:#9487b5}
+.p1-unseen{font:700 8px/1.4 AV,sans-serif;letter-spacing:.05em;color:#a69ac6;text-align:center}
+.p1-card-caption{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#ede7fc;font:700 11px/1.3 AV,sans-serif}
+.p1-empty{grid-column:1/-1;text-align:center;color:#c8c4de;padding:22px;font:600 13px AV,system-ui,sans-serif}
+@media(max-width:380px){.p1-hero{min-height:146px;padding:15px 12px 12px}.p1-hero h2{font-size:28px}.p1-hero-top{left:12px;right:12px}.p1-kicker{font-size:7px}.p1-stage-no{font-size:20px}.p1-stage-copy b{font-size:10px}.p1-stage-copy small{font-size:6px}.p1-tabs button{padding:7px}.p1-stage-select{display:none}.p1-unseen{font-size:7px}.p1-counts{font-size:10px}}
+@media(min-width:700px){.p1-hero{min-height:220px;padding:22px 26px}.p1-hero-top{left:26px;right:26px}.p1-hero:before,.p1-hero[data-stage="2"]:before{background-size:cover,cover,auto 210%}.p1-status{padding:15px 24px}.p1-tabs button{min-height:48px}.p1-tabs .p1-archive{flex:1 1 auto}}
+/* Profile: existing meter stays in its original place; the two measures are distinct. */
+#profile .profile-summary-board{padding:16px 14px;background:linear-gradient(145deg,#292149,#14102b 85%);border-color:#554576}
+#profile .profile-summary-board .profile-collection{gap:13px}
+#profile .profile-summary-board .profile-dial{flex:0 0 108px;width:108px;height:108px;padding:7px;background:conic-gradient(#ffd400 var(--profile-fill),#4a405d 0);box-shadow:0 0 0 1px #74613f}
+#profile .profile-summary-board .profile-dial>div{background:#18122d;gap:4px}
+#profile .profile-summary-board .profile-dial strong{font:800 26px/.95 AVK,AV,sans-serif;letter-spacing:-.045em;white-space:nowrap}
+#profile .profile-summary-board .profile-dial span{font:700 8px/1.15 AV,sans-serif;color:#d8cfe8;letter-spacing:.06em;margin:0}
+#profile .profile-summary-board .profile-progress-label{font:8px/1.4 PX,monospace;color:#ffd400;margin:0 0 6px}
+#profile .profile-summary-board .profile-progress strong{font:800 18px/1.05 AVK,AV,sans-serif;letter-spacing:-.015em;margin:0 0 13px;color:#fff}
+#profile .p1-profile-variants{display:flex;justify-content:space-between;align-items:baseline;gap:5px;font:700 11px/1.3 AV,sans-serif;color:#c9c0dc;margin-bottom:5px}
+#profile .p1-profile-variants b{font-variant-numeric:tabular-nums;color:#fff;white-space:nowrap}
+#profile .profile-summary-board .profile-progress-track{height:6px;border-radius:3px;background:#4a405d}
+#profile .profile-summary-board .profile-progress-track i{background:#b8a6ef;box-shadow:none}
+#profile .profile-summary-board .profile-progress-note{font:600 11px/1.4 AV,sans-serif;color:#bdb4d0;margin:7px 0 0}
+#profile .p1-profile-total{border-top:1px solid #ffffff19;padding-top:10px;margin:13px 0 0;display:flex;justify-content:space-between;align-items:center;gap:8px;font:600 11px AV,sans-serif;color:#bdb4d0}
+#profile .p1-profile-total b{font:800 15px AV,sans-serif;color:#fff}
+@media(max-width:380px){#profile .profile-summary-board{padding:13px 11px}#profile .profile-summary-board .profile-collection{gap:10px}#profile .profile-summary-board .profile-dial{flex-basis:91px;width:91px;height:91px;padding:6px}#profile .profile-summary-board .profile-dial strong{font-size:22px}#profile .profile-summary-board .profile-progress strong{font-size:15px}#profile .profile-summary-board .profile-progress-label{font-size:7px}#profile .p1-profile-variants{font-size:10px}#profile .profile-summary-board .profile-progress-note{font-size:10px}}
 </style></head><body>
 <aside id="icmxLabTools" aria-label="Controles del laboratorio">
  <button type="button" id="icmxLabToggle" aria-expanded="false" aria-controls="icmxLabPanel">LAB · ∞ SOBRES <span aria-hidden="true">⌄</span></button>
@@ -2022,6 +2051,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Álbum</h1><span class="sp"></span><span id="aCount"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
  <div class="wrap p1-scroll">
   <section id="player1Panel" class="p1-panel" aria-label="Colección original" hidden></section>
+  <div class="p1-section-label">MI COLECCIÓN</div>
   <div id="pTabs"></div>
   <div class="prog"><i id="aProg"></i></div>
   <div class="aSub" id="aSub"></div>
@@ -2098,14 +2128,16 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   </section>
   <section class="profile-summary-board" aria-label="Avance de mi colección">
    <div class="profile-collection">
-    <div class="profile-dial" id="profileDial" aria-hidden="true"><div><strong id="profileCards">0</strong><span id="profileDialLabel">DE 25</span></div></div>
+    <div class="profile-dial" id="profileDial" aria-hidden="true"><div><strong id="profileCards">0/25</strong><span id="profileDialLabel">DISEÑOS</span></div></div>
     <div class="profile-progress">
-     <span class="profile-progress-label">MI PROGRESO</span>
-     <strong id="profileTotal">LEVEL 01 · PRESS START</strong>
-     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Diseños descubiertos en el nivel actual" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"><i id="profileProgressFill"></i></div>
-     <p class="profile-progress-note" id="profilePercent">0 de 100 variantes</p>
+     <span class="profile-progress-label" id="profileLevelLabel">LEVEL 01</span>
+     <strong id="profileTotal">PRESS START</strong>
+     <div class="p1-profile-variants"><span>Variantes</span><b id="profileVariantCount">0/100</b></div>
+     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Variantes obtenidas del nivel actual" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="profileProgressFill"></i></div>
+     <p class="profile-progress-note" id="profilePercent">Descubre 25 diseños para avanzar.</p>
     </div>
    </div>
+   <div class="p1-profile-total"><span>Cartas distintas obtenidas</span><b id="profileAllCards">0</b></div>
   </section>
   <section class="icmx-player-points profile-points-standalone" aria-label="Puntos acumulados de colección">
    <div><span>PUNTOS DE COLECCIÓN</span><strong id="profileValuePoints" aria-live="polite">— PTS</strong></div>
@@ -3602,13 +3634,14 @@ function renderPlayer1Panel(view){
  const legacyOwned=legacy.reduce((n,id)=>n+VL.filter(v=>Number(S.have[id+'_'+v])>0).length,0);
  const panel=$('player1Panel');panel.hidden=false;
  const lock='<svg class="p1-stage-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg>';
- panel.innerHTML='<div class="p1-hero" data-stage="'+(l?l.number:0)+'"><div class="p1-hero-copy"><div class="p1-kicker">INSERT COIN MX / PLAYER 1</div><div class="p1-hero-level">'+(l?'LEVEL 0'+l.number:'PLAYER ARCHIVE')+'</div><h2>'+(l?l.name:'TU ARCHIVO')+'</h2><p>'+(l?(l.number===1?'Todo comienza con una ficha.':'La partida continúa.'):'Tus cartas anteriores siguen siendo tuyas.')+'</p></div><div class="p1-hero-mark" aria-hidden="true"><img src="coin.png" alt=""></div></div>'+
- '<div class="p1-tabs" role="group" aria-label="Niveles de la colección">'+levels.map(x=>'<button type="button" data-level="'+x.id+'" aria-pressed="'+(x.id===player1Page)+'" '+(x.unlocked?'':'disabled')+'><span class="p1-stage-no">0'+x.number+'</span><span class="p1-stage-copy"><small>LEVEL 0'+x.number+'</small><b>'+(x.unlocked?x.name:'LOCKED')+'</b></span>'+(!x.unlocked?lock:x.id===player1Page?'<span class="p1-stage-select">1P</span>':'')+'</button>').join('')+
- (legacy.length?'<button type="button" class="p1-archive" data-level="legacy" aria-pressed="'+(player1Page==='legacy')+'"><b>ARCHIVO</b><span>'+legacy.length+' diseños</span></button>':'')+'</div>'+
- (l?'<div class="p1-status"><div class="p1-head"><b>'+(l.complete?(l.number===1?'LEVEL UP!':'STAGE CLEAR!'):l.name)+'</b><small>'+l.discovered+' / '+l.designTotal+' diseños</small></div>'+
+ const tabs='<div class="p1-tabs" role="group" aria-label="Niveles de la colección">'+levels.map(x=>'<button type="button" data-level="'+x.id+'" aria-pressed="'+(x.id===player1Page)+'" '+(x.unlocked?'':'disabled')+'><span class="p1-stage-no">0'+x.number+'</span><span class="p1-stage-copy"><small>LEVEL 0'+x.number+'</small><b>'+(x.unlocked?x.name:'BLOQUEADO')+'</b></span>'+(!x.unlocked?lock:x.id===player1Page?'<span class="p1-stage-select">1P</span>':'')+'</button>').join('')+
+ (legacy.length?'<button type="button" class="p1-archive" data-level="legacy" aria-pressed="'+(player1Page==='legacy')+'"><b>ARCHIVO</b><span>'+legacy.length+' diseños</span></button>':'')+'</div>';
+ const cover='<div class="p1-hero" data-stage="'+(l?l.number:0)+'"><div class="p1-hero-top"><span class="p1-kicker">INSERT COIN MX</span><span>PLAYER 1</span></div><div class="p1-hero-copy"><div class="p1-hero-level">'+(l?'LEVEL 0'+l.number:'PLAYER ARCHIVE')+'</div><h2>'+(l?l.name:'TU ARCHIVO')+'</h2><p>'+(l?(l.number===1?'La partida comienza aquí.':'La partida continúa.'):'Tus cartas anteriores siguen siendo tuyas.')+'</p></div></div>';
+ const status=l?'<div class="p1-status"><div class="p1-head"><b>'+(l.complete?(l.number===1?'LEVEL UP!':'STAGE CLEAR!'):'DISEÑOS DESCUBIERTOS')+'</b><small>'+l.discovered+' / '+l.designTotal+'</small></div>'+
  '<div class="p1-meter" role="progressbar" aria-label="Diseños descubiertos" aria-valuemin="0" aria-valuemax="'+l.designTotal+'" aria-valuenow="'+l.discovered+'">'+Array.from({length:l.designTotal},(_,i)=>'<i class="'+(i<l.discovered?'on':'')+'"></i>').join('')+'</div>'+
- '<div class="p1-counts"><span>'+(l.complete?(l.number===1?'Level 02 desbloqueado':'Nivel descubierto'):(l.number===1?'Faltan '+(l.designTotal-l.discovered)+' para Level 02':'Completa los diseños'))+'</span><b>'+l.collected+'/'+l.variantTotal+' variantes</b></div></div>':
- '<div class="p1-status"><div class="p1-head"><b>TU ARCHIVO</b><small>'+legacyOwned+' cartas</small></div><div class="p1-help">Las cartas de tus partidas anteriores siguen siendo tuyas.</div></div>');
+ '<div class="p1-counts"><span>'+(l.complete?(l.number===1?'Level 02 desbloqueado':'Nivel descubierto'):(l.number===1?'Faltan '+(l.designTotal-l.discovered)+' para Level 02':'Descubre todos los diseños'))+'</span><b>'+l.collected+'/'+l.variantTotal+' variantes</b></div></div>':
+ '<div class="p1-status"><div class="p1-head"><b>TU ARCHIVO</b><small>'+legacyOwned+' cartas</small></div><div class="p1-help">Tu progreso anterior se conserva.</div></div>';
+ panel.innerHTML=tabs+cover+status;
  return l?new Set(l.designs):new Set(legacy);
 }
 $('player1Panel').onclick=e=>{const b=e.target.closest('[data-level]');if(!b||b.disabled)return;player1Page=b.dataset.level;page=0;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
@@ -3636,7 +3669,7 @@ function renderAlbum(){
  $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=DN.reduce((n,x)=>n+x.st.got,0)+' cartas';
  const dn=LN.filter(x=>x.st.all).length;
  $('aSub').innerHTML=player1Page==='legacy'?`<b>${L.reduce((n,x)=>n+x.st.got,0)}</b> cartas anteriores conservadas`:`<b>${LN.filter(x=>x.st.own).length}</b> de ${LN.length} diseños descubiertos · ${dn} completos`;
- $('grid').innerHTML=L.map(({d,st})=>!st.own?`<button type="button" class="dt lock" disabled aria-label="Diseño sin descubrir"><span class="cv"><span class="lk"><svg class="p1-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg><span class="p1-lock-name">???</span>${player1.numberOf(d.id)?`<small>#${String(player1.numberOf(d.id)).padStart(3,'0')}</small>`:''}</span></span><span class="p1-unseen">SIN DESCUBRIR</span></button>`:`<button class="dt own ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv fx idle r-${st.cover.r}"><img ${st.cover.img?'data-icmx-original':'src'}="${imgOf(st.cover,'c')}" alt=""><i class="foil"></i><i class="glare"></i>${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
+ $('grid').innerHTML=L.map(({d,st})=>!st.own?`<button type="button" class="dt lock" disabled aria-label="Diseño sin descubrir"><span class="cv"><span class="lk"><svg class="p1-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg><span class="p1-lock-name">???</span>${player1.numberOf(d.id)?`<small>#${String(player1.numberOf(d.id)).padStart(3,'0')}</small>`:''}</span></span><span class="p1-unseen">SIN DESCUBRIR</span></button>`:`<button class="dt own ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv fx idle r-${st.cover.r}"><img ${st.cover.img?'data-icmx-original':'src'}="${imgOf(st.cover,'c')}" alt=""><i class="foil"></i><i class="glare"></i>${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span><span class="p1-card-caption">${esc(d.n)}</span>${pips(st)}</button>`).join('');
  if(!L.length)$('grid').innerHTML='<p class="p1-empty">No hay diseños en este filtro.</p>';
  for(const {d,st} of L)if(st.own)mountFaceValueLazy($('grid').querySelector('.dt[data-d="'+d.id+'"] .fx'),st.cover);
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
@@ -4292,15 +4325,17 @@ function renderProfile(){
  const activeLevel=player1.progress(S.have).filter(l=>l.unlocked).at(-1),total=activeLevel.designTotal,discovered=activeLevel.discovered,progress=$('profileProgress');
  const pts=collectionPointsLocal();
  $('profileValuePoints').textContent=pts===null?'— PTS':pts.toLocaleString('es-MX')+' PTS';
- $('profileCards').textContent=discovered;
- $('profileDialLabel').textContent='DE '+total+' DISEÑOS';
- $('profileTotal').textContent='LEVEL 0'+activeLevel.number+' · '+activeLevel.name;
- const fill=(total?Math.min(100,discovered/total*100):0)+'%';
- $('profileDial').style.setProperty('--profile-fill',fill);
- $('profilePercent').textContent=activeLevel.collected+' / '+activeLevel.variantTotal+' variantes · '+uniq()+' cartas totales obtenidas';
- progress.setAttribute('aria-valuemax',String(total));
- progress.setAttribute('aria-valuenow',String(discovered));
- $('profileProgressFill').style.width=fill;
+ $('profileCards').textContent=discovered+'/'+total;
+ $('profileDialLabel').textContent='DISEÑOS';
+ $('profileLevelLabel').textContent='LEVEL 0'+activeLevel.number;
+ $('profileTotal').textContent=activeLevel.name;
+ $('profileDial').style.setProperty('--profile-fill',(discovered/total*100)+'%');
+ $('profileVariantCount').textContent=activeLevel.collected+'/'+activeLevel.variantTotal;
+ $('profilePercent').textContent=activeLevel.complete?'¡Nivel descubierto!':activeLevel.number===1?'Faltan '+(total-discovered)+' diseños para Level 02.':'Faltan '+(total-discovered)+' diseños.';
+ $('profileAllCards').textContent=uniq();
+ progress.setAttribute('aria-valuemax',String(activeLevel.variantTotal));
+ progress.setAttribute('aria-valuenow',String(activeLevel.collected));
+ $('profileProgressFill').style.width=(activeLevel.collected/activeLevel.variantTotal*100)+'%';
  $('profileDesigns').textContent=DESIGNS.filter(d=>!d.bx&&dState(d).own).length;
  $('profileDuplicates').textContent=dups();
  $('profileRatings').textContent=Object.keys(S.rate||{}).length;

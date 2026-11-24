@@ -30,7 +30,7 @@ for(const [begin,end] of [
  assert.equal(region(LAB_HTML,begin,end),region(MAIN_HTML,begin,end),
   'La colocación del arte de LAB debe seguir main: '+begin);
 }
-assert(LAB_HTML.includes('const color=bgFromArtwork(im);'),'Falta muestreo universal');
+assert(LAB_HTML.includes('const sampled=bgFromArtwork(im);')&&LAB_HTML.includes('sampled||ART_BG_GENERATED[d.id]'),'Falta muestreo universal y respaldo CORS');
 assert(LAB_HTML.includes('D.style.backgroundColor=color'),'El fondo no ocupa toda la escena');
 assert(!LAB_HTML.includes('extendArtworkEdges('),'Eliminar extensiones experimentales');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript','.mjs':'text/javascript',
@@ -153,9 +153,14 @@ try{
    }
    if(count===24){
     await page.evaluate(()=>{go('profile')});
-    assert.equal(await page.locator('#profileCards').innerText(),'24');
+    assert.equal(await page.locator('#profileCards').innerText(),'24/25');
     assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuenow'),'24');
-    assert.match(await page.locator('#profileTotal').innerText(),/LEVEL 01/);
+    assert.equal(await page.locator('#profileLevelLabel').innerText(),'LEVEL 01');
+    assert.equal(await page.locator('#profileTotal').innerText(),'PRESS START');
+    assert.equal(await page.locator('#profileVariantCount').innerText(),'24/100');
+    assert.equal(await page.locator('#profileAllCards').innerText(),'24');
+    assert.equal(await page.locator('#profileProgress').getAttribute('aria-valuemax'),'100');
+    await page.screenshot({path:'qa/screenshots/ui-lab-profile-level-'+width+'.png'});
     await page.evaluate(()=>go('album'));
    }
    assert.equal(await page.locator('[data-level="player1-02"]').isDisabled(),count!==25);
@@ -166,6 +171,8 @@ try{
   await page.locator('[data-level="player1-02"]').click();
   assert.equal(await page.locator('#grid .dt').count(),25);
   assert.match(await page.locator('.p1-hero h2').innerText(),/NEXT LEVEL/);
+  assert.equal(await page.locator('.p1-hero').getAttribute('data-stage'),'2');
+  await page.screenshot({path:'qa/screenshots/ui-lab-player1-level2-'+width+'.png'});
   await page.evaluate(()=>{S.have.navidadgamer_b=1;renderAlbum()});
   await page.locator('[data-level="legacy"]').click();
   assert.equal(await page.locator('#grid [data-d="navidadgamer"]').count(),1);

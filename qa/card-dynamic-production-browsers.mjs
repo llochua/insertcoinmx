@@ -39,7 +39,7 @@ try{
     document.getElementById('zLoad').textContent==='';
   },null,{timeout:20000});
   const number=await page.locator('#zFx svg.icmx-data').textContent();
-  assert.match(number,/\/?\?\?\?/,'Unreleased catalog denominator hidden');
+  assert.match(number,/(?:\/\?\?\?|ARCHIVO)/,'Unreleased catalog denominator hidden');
   const actual=await page.locator('#zImg').getAttribute('src');
   assert.match(actual,/\/cs2\//,key+' '+actual);
   assert.equal(requests.slice(offset).filter(x=>x.startsWith('/c2/')).length,0,'No legacy download: '+key);
