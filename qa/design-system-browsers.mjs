@@ -182,6 +182,22 @@ try{
   await page.locator('[data-level="legacy"]').click();
   assert.equal(await page.locator('#grid [data-d="navidadgamer"]').count(),1);
   await page.screenshot({path:'qa/screenshots/ui-lab-player1-archive-'+width+'.png'});
+  // Deterministic LAB-only draw through the real pack pipeline.
+  await page.locator('#icmxLabToggle').click();
+  await page.locator('[data-lab-action="levelup"]').click();
+  await page.locator('#pack.on').waitFor({state:'visible'});
+  assert.equal(await page.evaluate(()=>player1.progress(S.have)[0].discovered),24);
+  await page.locator('#openBtn').click();
+  await page.waitForFunction(()=>player1.progress(S.have)[1].unlocked);
+  assert.equal(await page.locator('#p1LevelUp[open]').count(),0,'No celebration before summary');
+  await page.waitForFunction(()=>document.getElementById('env').style.display==='none');
+  await page.evaluate(()=>{document.getElementById('disc').classList.remove('on');showSum()});
+  await page.locator('#p1LevelUp[open]').waitFor({state:'visible'});
+  await page.screenshot({path:'qa/screenshots/ui-lab-levelup-'+width+'.png'});
+  await page.locator('#p1UpExplore').click();
+  assert.equal(await page.locator('#p1LevelUp[open]').count(),0);
+  assert.equal(await page.locator('[data-level="player1-02"]').getAttribute('aria-pressed'),'true');
+  assert.equal(await page.evaluate(()=>{recordLevelUp(S.have,S.have);return pendingLevelUp}),false,'No celebration for repeat packs');
   const storage=await page.evaluate(()=>({
    live:localStorage.getItem('icmx-album2'),
    liveHandle:localStorage.getItem('icmx-guest-handle-v1'),
