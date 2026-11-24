@@ -657,7 +657,12 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .dt .lk img{width:38%!important;height:auto!important;opacity:.4;filter:grayscale(1)}
 .dt.lock .cv{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
 .dt .lk{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:16px PX;color:rgba(255,255,255,.55)}
-.dt .lk small{font:9px PX;color:rgba(255,255,255,.3)}
+.dt .lk small{font:9px PX;color:rgba(255,255,255,.65)}
+.dt .lk .p1-lock-icon{width:clamp(22px,28%,36px);height:auto;flex:none;color:#b4afd4}
+.dt .lk .p1-lock-name{max-width:90%;font:700 12px/1.25 AV,system-ui,sans-serif;text-align:center;color:#e5e0f5;overflow-wrap:anywhere}
+.dt .lk .p1-lock-label{font:600 9px AV,system-ui,sans-serif;color:#a6a1c3;letter-spacing:.02em}
+.vc.av .cv .p1-lock-icon{width:24%;height:auto;color:#b4afd4}
+@media(max-width:380px){.dt .lk .p1-lock-name{font-size:10px}.dt .lk{gap:5px}}
 .dt .cr{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:var(--y);color:#120F1A;font-size:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.5)}
 .dt .x{position:absolute;left:5px;top:5px;background:#e8323c;color:#fff;font:700 10px AV;border-radius:6px;padding:2px 6px}
 .pp{display:flex;align-items:center;gap:4px;padding:0 2px}
@@ -2029,8 +2034,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
     <div class="profile-dial" id="profileDial" aria-hidden="true"><div><strong id="profileCards">0</strong><span>CARTAS</span></div></div>
     <div class="profile-progress">
      <span class="profile-progress-label">MI COLECCIÓN</span>
-     <strong><span id="profileTotal">386</span> cartas disponibles</strong>
-     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Cartas distintas obtenidas" aria-valuemin="0" aria-valuemax="386" aria-valuenow="0"><i id="profileProgressFill"></i></div>
+     <strong><span id="profileTotal">100</span> variantes del nivel activo</strong>
+     <div class="profile-progress-track" id="profileProgress" role="progressbar" aria-label="Cartas distintas obtenidas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="profileProgressFill"></i></div>
      <p class="profile-progress-note" id="profilePercent">0% de la colección</p>
     </div>
    </div>
@@ -2181,9 +2186,9 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 window.ICMX_VERIFIED_GUEST_PLAY=/^(?:www\.)?insertcoinmx\.com$/i.test(location.hostname);</script>
 <script src="content/player1-levels.js?v=1"></script>
 <script src="content/card-texts.js?v=20261123a"></script>
-<script src="content/card-data-adapter.js?v=20261123"></script>
-<script src="content/card-renderer.js?v=20261123-perf1"></script>
-<script src="content/card-runtime.js?v=20261123-perf1"></script>
+<script src="content/card-data-adapter.js?v=20261124-hidden"></script>
+<script src="content/card-renderer.js?v=20261124-hidden"></script>
+<script src="content/card-runtime.js?v=20261124-hidden"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
    b Base · e Especial · r Rara · f Full. La clave de una carta es diseño+'_'+letra (ej. fatality_r, x_f).
@@ -2862,12 +2867,12 @@ function menuArtLoad(img,m,dir){
 const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(playerRanking?.state.boards?.cards||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
  {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
- {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' de '+N+' cartas',img:'F_hyrule',rr:'full',go:'VER'},
+ {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' cartas obtenidas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
  {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Tu identidad arcade y tus récords',img:'F_samus',rr:'full',go:'VER'}]};
 function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,imgDir=light?'c':'c2';
- $('hCount').textContent=u+' / '+N;
+ $('hCount').textContent=u;
  $('homePlayerCards').textContent=u;
  const identity=arcadeIdentity();
  $('homePlayerStatus').textContent=identity.handle?'@'+identity.handle+(identity.registered?'':' · invitado'):(u?'Tu colección está creciendo':'Comienza tu colección');
@@ -3365,7 +3370,7 @@ ST.addEventListener('touchcancel',()=>gEnd(true));
 function renderTitle(){$('tiOne').textContent=uniq();const docs=(playerRanking?.state.boards?.cards||[]).slice().sort((a,b)=>(b.score||0)-(a.score||0));
  const top=docs[0];$('tiHi').textContent=top?((top.ini||'???')+' '+top.score):'---';
  const list=docs.slice(0,5).map((d,i)=>`<i>${i+1}.</i> ${d.ini||'???'} ${d.score||0}`).join('   ·   ');
- $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'5 SOBRES DE BIENVENIDA · 2 DIARIOS   ·   JUNTA '+NAV+' CARTAS   ·   INSERTCOINMX.COM'}
+ $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'5 SOBRES DE BIENVENIDA · 2 DIARIOS   ·   COLECCIONA CARTAS   ·   INSERTCOINMX.COM'}
 renderTitle();
 $('title').addEventListener('click',e=>{
  if(e.target.closest('[data-sound-toggle]'))return;
@@ -3485,7 +3490,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
   </section>
   ${sec('Colección completa',G.comp)}${sec('Diseños nuevos',G.dnew)}${sec('Versiones nuevas',G.vnew)}${sec('Repetidas',G.rep)}
   <div class="rs-group rs-redeem">${tradeH}</div>
-  <div class="rs-pg">${disc} de ${PD.length} diseños · ${AV.filter(c=>S.have[c.k]).length} de ${NAV} cartas</div>
+  <div class="rs-pg">${disc} diseños descubiertos · ${AV.filter(c=>S.have[c.k]).length} cartas obtenidas</div>
  </div>`;
  for(const c of hand)mountFaceValueLazy(s.querySelector('.rc[data-k="'+c.k+'"] .fx'),c);
  mountFaceValueLazy(s.querySelector('.rh .dx-card .fx'),H);
@@ -3552,7 +3557,7 @@ function renderAlbum(){
  $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=DN.reduce((n,x)=>n+x.st.got,0)+'/'+DN.reduce((n,x)=>n+x.st.tot,0);
  const dn=LN.filter(x=>x.st.all).length;
  $('aSub').innerHTML=player1Page==='legacy'?`<b>${L.reduce((n,x)=>n+x.st.got,0)}</b> cartas anteriores conservadas`:`<b>${dn}</b> de ${LN.length} diseños completos · ${t} variantes en este filtro`;
- $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv${st.own?` fx idle r-${st.cover.r}`:''}">${st.own?`<img ${st.cover.img?'data-icmx-original':'src'}="${imgOf(st.cover,'c')}" alt=""><i class="foil"></i><i class="glare"></i>`:`<span class="lk"><img src="coin.png" alt="">${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
+ $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv${st.own?` fx idle r-${st.cover.r}`:''}">${st.own?`<img ${st.cover.img?'data-icmx-original':'src'}="${imgOf(st.cover,'c')}" alt=""><i class="foil"></i><i class="glare"></i>`:`<span class="lk"><svg class="p1-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg><span class="p1-lock-name">${esc(d.n)}</span>${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
  if(!L.length)$('grid').innerHTML='<p class="p1-empty">No hay diseños en este filtro.</p>';
  for(const {d,st} of L)if(st.own)mountFaceValueLazy($('grid').querySelector('.dt[data-d="'+d.id+'"] .fx'),st.cover);
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
@@ -3567,7 +3572,7 @@ function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(
  const inLevel=player1View(S.have).eligible.has(d.id);const col=st.vs.filter(x=>x.st==='have'||(inLevel&&x.st==='av'));$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
   return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv fx idle r-${x.c.img?x.c.r:'comun'}"><img ${x.c.img?'data-icmx-original':'src'}="${imgOf(x.c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span>${lb}</button>`
-   :`<div class="vc av"><span class="cv"><img src="coin.png" alt=""><span>EN SOBRES</span></span>${lb}</div>`}).join('');
+   :`<div class="vc av"><span class="cv"><svg class="p1-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg><span>EN SOBRES</span></span>${lb}</div>`}).join('');
  for(const x of col)if(x.st==='have')mountFaceValueLazy($('fVers').querySelector('.vc[data-k="'+x.c.k+'"] .fx'),x.c);
  const soon=st.vs.filter(x=>x.st==='soon');$('fSoon').innerHTML=!inLevel?'Diseño de tu archivo · conservas las variantes obtenidas.':soon.length?'Ilustración en camino:'+soon.map(x=>`<span>${VN[x.v]}</span>`).join(''):''}
 $('fVers').onclick=e=>{const b=e.target.closest('.vc.have');if(b)openCard(b.dataset.k)};
@@ -4205,16 +4210,16 @@ async function shareTier(){toast('PREPARANDO IMAGEN...');await document.fonts.re
 /* Perfil: solo lee el progreso local, sin modificar ni enviar cartas a Supabase. */
 function renderProfile(){
  syncIn();
- const cards=uniq(),total=NAV,progress=$('profileProgress');
+ const cards=uniq(),activeLevel=player1.progress(S.have).filter(l=>l.unlocked).at(-1),total=activeLevel.variantTotal,levelCards=activeLevel.collected,progress=$('profileProgress');
  const pts=collectionPointsLocal();
  $('profileValuePoints').textContent=pts===null?'— PTS':pts.toLocaleString('es-MX')+' PTS';
  $('profileCards').textContent=cards;
  $('profileTotal').textContent=total;
  $('profileDial').style.setProperty('--profile-fill',(total?Math.min(100,cards/total*100):0)+'%');
- $('profilePercent').textContent=(total?Math.round(cards/total*100):0)+'% de la colección';
+ $('profilePercent').textContent='LEVEL 0'+activeLevel.number+' · '+levelCards+'/'+total+' variantes';
  progress.setAttribute('aria-valuemax',String(total));
- progress.setAttribute('aria-valuenow',String(cards));
- $('profileProgressFill').style.width=(total?Math.min(100,cards/total*100):0)+'%';
+ progress.setAttribute('aria-valuenow',String(levelCards));
+ $('profileProgressFill').style.width=(total?Math.min(100,levelCards/total*100):0)+'%';
  $('profileDesigns').textContent=DESIGNS.filter(d=>!d.bx&&dState(d).own).length;
  $('profileDuplicates').textContent=dups();
  $('profileRatings').textContent=Object.keys(S.rate||{}).length;
