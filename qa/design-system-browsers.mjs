@@ -134,6 +134,24 @@ try{
   await page.locator('#profile.on').waitFor({state:'visible'});
   assert.equal(await page.evaluate(()=>localStorage.getItem('icmx-lab-design-avatar-v1')),'control');
 
+  // PLAYER 1: deterministic progression tests, isolated from real account.
+  for(const count of [0,24,25]){
+   await page.locator('#icmxLabToggle').click();
+   await page.locator('[data-lab-level-seed="'+count+'"]').click();
+   await page.locator('#album.on').waitFor({state:'visible'});
+   assert.equal(await page.locator('#grid .dt').count(),25);
+   assert.equal(await page.locator('[data-level="player1-02"]').isDisabled(),count!==25);
+   const allowed=await page.evaluate(()=>{const ids=new Set(player1.eligibleDesigns(S.have));return Array.from({length:40},()=>makeHand(false)).flat().every(c=>ids.has(c.d))});
+   assert.equal(allowed,true,'No cards outside unlocked pool');
+   await page.screenshot({path:'qa/screenshots/ui-lab-player1-'+count+'-'+width+'.png'});
+  }
+  await page.locator('[data-level="player1-02"]').click();
+  assert.equal(await page.locator('#grid .dt').count(),25);
+  assert.match(await page.locator('.p1-head').innerText(),/NEXT LEVEL/);
+  await page.evaluate(()=>{S.have.navidadgamer_b=1;renderAlbum()});
+  await page.locator('[data-level="legacy"]').click();
+  assert.equal(await page.locator('#grid [data-d="navidadgamer"]').count(),1);
+  await page.screenshot({path:'qa/screenshots/ui-lab-player1-archive-'+width+'.png'});
   const storage=await page.evaluate(()=>({
    live:localStorage.getItem('icmx-album2'),
    liveHandle:localStorage.getItem('icmx-guest-handle-v1'),
