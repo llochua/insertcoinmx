@@ -22,10 +22,13 @@ const url='http://127.0.0.1:'+server.address().port+'/';
 const browser=await chromium.launch(process.env.ICMX_CHROME==='true'?{headless:true,channel:'chrome'}:{headless:true});
 try{
  const page=await browser.newPage({viewport:{width:390,height:844}});
+ const requests=[];
+ page.on('request',r=>requests.push(new URL(r.url()).pathname));
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!!window.ICMX_CARD_RUNTIME&&!!window.ICMX_CARD_RENDERER,{timeout:20000});
  // Exercise the actual published Album zoom, not a synthetic card node.
  for(const key of ['booit_e','arcade_b','1up_e','1up_b','1up_r','sonic_f','booit_e']){
+  const offset=requests.length;
   await page.evaluate(key=>openCard(key),key);
   await page.waitForFunction(()=>{
    const fx=document.getElementById('zFx'),img=document.getElementById('zImg');
@@ -37,10 +40,50 @@ try{
   },null,{timeout:20000});
   const actual=await page.locator('#zImg').getAttribute('src');
   assert.match(actual,/\/cs2\//,key+' '+actual);
+  assert.equal(requests.slice(offset).filter(x=>x.startsWith('/c2/')).length,0,'No legacy download: '+key);
+  if(key==='1up_e'){
+   const values=await page.evaluate(async()=>{
+    const fx=document.getElementById('zFx'),img=document.getElementById('zImg');
+    const svg=fx.querySelector('svg.icmx-data'),src=img.src;
+    const ok=await window.ICMX_CARD_RUNTIME.mount(fx,CB['1up_e'],{points:25,pop:143});
+    return {ok,sameSvg:svg===fx.querySelector('svg.icmx-data'),sameImg:img===document.getElementById('zImg'),
+      sameSrc:src===img.src,pop:svg.querySelector('[data-icmx-field="pop"]').textContent,opacity:img.style.opacity};
+   });
+   assert.deepEqual(values,{ok:true,sameSvg:true,sameImg:true,sameSrc:true,pop:'143',opacity:'1'});
+   console.log('OK: POP updated without replacing or hiding image/SVG');
+  }
   await page.locator('#zFx').click();
   await page.waitForFunction(()=>!document.getElementById('zoom').open);
  }
  console.log('OK: actual Album zoom, repeated open and close, Base/Holo/Dorada/Full');
+ // A failed shell must be replaced by the correct legacy card, never stale SVG.
+ await page.route('**/cs2/booit_e.webp',r=>r.abort());
+ await page.evaluate(()=>openCard('booit_e'));
+ await page.waitForFunction(()=>{
+  const fx=document.getElementById('zFx'),img=document.getElementById('zImg');
+  return fx.classList.contains('idle')&&img.complete&&img.naturalWidth>0&&
+   !fx.querySelector('svg.icmx-data')&&new URL(img.src).pathname==='/c2/booit_e.webp';
+ });
+ assert.ok(await page.locator('#zFx').getAttribute('data-icmx-error'));
+ await page.unroute('**/cs2/booit_e.webp');
+ await page.locator('#zFx').click();
+ await page.waitForFunction(()=>!document.getElementById('zoom').open);
+ // Simulate rapid switching while the first shell request is delayed.
+ await page.route('**/cs2/1up_e.webp',async r=>{await new Promise(resolve=>setTimeout(resolve,350));await r.continue().catch(()=>{})});
+ await page.evaluate(()=>{openCard('1up_e');openCard('arcade_b')});
+ await page.waitForFunction(()=>{
+  const fx=document.getElementById('zFx'),img=document.getElementById('zImg');
+  return fx.classList.contains('idle')&&img.dataset.icmxDynamic==='true'&&
+   new URL(img.src).pathname==='/cs2/arcade.webp'&&fx.querySelectorAll('svg.icmx-data').length===1;
+ });
+ await page.waitForTimeout(450);
+ assert.equal(await page.locator('#zImg').evaluate(img=>new URL(img.src).pathname),'/cs2/arcade.webp');
+ assert.equal(await page.locator('#zFx svg.icmx-data').count(),1);
+ await page.unroute('**/cs2/1up_e.webp');
+ await page.locator('#zFx').click();
+ await page.waitForFunction(()=>!document.getElementById('zoom').open);
+ console.log('OK: legacy only on failure; rapid card switching does not restore old art');
+
  const results=await page.evaluate(async()=>{
   const list=[['1up','b','1up'],['1up','e','1up_e'],['1up','r','1up_r'],['sonic','f','F_sonic']];
   const out=[];
