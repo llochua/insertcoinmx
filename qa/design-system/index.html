@@ -3789,7 +3789,8 @@ function summaryStatus(){
 }
 function summaryPacksRemaining(){
  if(PRUEBA||S.test)return null;
- return Math.max(0,freePacksLeft())+Math.max(0,Number(S.extra)||0);
+ const daily=S.freeCycle===packCycle()?Math.max(0,2-(S.freeUsed||0)):2;
+ return Math.max(0,Number(S.welcomeLeft)||0)+daily+Math.max(0,Number(S.extra)||0);
 }
 function refreshSummaryActions(){
  const primary=$('sOtro'),label=$('sOtroLabel'),count=$('sOtroCount'),secondary=$('sAlb'),wait=$('sWait'),timer=$('sNextTime');
