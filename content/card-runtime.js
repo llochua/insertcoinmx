@@ -33,7 +33,7 @@ async function mount(fx,card,values){
  const img=cardImage(fx);if(!img)return;
  const quality=fx.id==='zFx'?'full':'thumb';
  const stamp=card.k+'|'+quality+'|'+String(values?.pop??'—')+'|'+String(values?.points??'—');
- if(mounted.get(fx)===stamp&&fx.querySelector(':scope > svg.icmx-data'))return;
+ if(mounted.get(fx)===stamp&&fx.querySelector(':scope > svg.icmx-data')&&/\/(?:cs|cs2)\//.test(img.src))return;
  mounted.set(fx,stamp);
  const current=img.getAttribute('src')||'';
  const original=/^(?:c|c2)\//.test(current)?current:(img.dataset.icmxOriginal||current);
@@ -46,7 +46,7 @@ async function mount(fx,card,values){
   const image=component.querySelector('img.icmx-shell'),svg=component.querySelector('svg.icmx-data');
   const shell=image.src;
   await loadImage(shell);
-  if(!fx.isConnected||mounted.get(fx)!==stamp)return;
+  if(!fx.isConnected||mounted.get(fx)!==stamp||(fx.id==='zFx'&&!document.getElementById('zoom')?.open))return;
   fx.querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
   img.src=shell;
   img.style.opacity='1';
