@@ -1892,7 +1892,17 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #home #mGo.pack-wait time{font:800 22px/1.15 AV,system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
 #home #mGo.pack-wait:active{transform:none}
 @media(max-height:650px){#entryAccount .entry-account-brand img{width:64px}#entryAccount .entry-account-brand{margin-bottom:10px}#entryAccount .entry-account-shell{padding-top:12px;padding-bottom:17px}}
-</style><link rel="stylesheet" href="content/community-value-ui.css?v=20261121-global"></head><body>
+</style><link rel="stylesheet" href="content/community-value-ui.css?v=20261121-global"><style>
+.p1-panel{flex:none;margin:0 16px 12px;padding:12px;border:1px solid #ffffff29;border-radius:14px;background:#0a0822b8;display:grid;gap:8px}
+.p1-head,.p1-counts{display:flex;justify-content:space-between;align-items:center;gap:10px}.p1-head b{font:700 15px AV,system-ui,sans-serif;color:var(--y)}
+.p1-head small,.p1-counts,.p1-help{font:600 12px AV,system-ui,sans-serif;color:#e0dcf4}
+.p1-kicker{font:700 10px PX,monospace;color:#a6a1c3}.p1-tabs{display:flex;gap:6px}
+.p1-tabs button{flex:1;min-width:0;display:grid;gap:5px;padding:10px 7px;border-radius:9px;border:1px solid #ffffff21;background:#ffffff0a;text-align:center;font:700 11px AV,system-ui,sans-serif}
+.p1-tabs button[aria-pressed=true]{background:var(--y);color:#151123;border-color:var(--y)}.p1-tabs button:disabled{opacity:.54;cursor:default}
+.p1-tabs small{font:600 10px AV,system-ui,sans-serif}.p1-meter{height:6px;background:#ffffff1f;border-radius:9px;overflow:hidden}.p1-meter i{display:block;height:100%;background:var(--y);border-radius:9px}
+.p1-help{line-height:1.35}.p1-preview{font:600 10px AV,system-ui,sans-serif;color:#aaa4c3}.p1-empty{grid-column:1/-1;text-align:center;color:#c8c4de;padding:22px;font:600 13px AV,system-ui,sans-serif}
+@media(max-width:380px){.p1-panel{margin-inline:12px;padding:9px;gap:6px}.p1-tabs button{padding:8px 4px}}
+</style></head><body>
 <noscript><h1>Insert Coin MX</h1><p>Insert Coin MX es una marca mexicana de playeras con diseños inspirados en videojuegos, anime y cultura pop. Las playeras que hemos hecho ahora tienen una carta. Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección. Activa JavaScript para jugar.</p><p><a href="https://www.instagram.com/insertcoinmx/">Instagram</a> · <a href="https://www.facebook.com/insertcoinmex">Facebook</a></p></noscript>
 <div class="crt">
 <section id="title" class="on">
@@ -1940,6 +1950,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 </section>
 <section class="view" id="album">
  <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Álbum</h1><span class="sp"></span><span id="aCount"></span><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div>
+ <section id="player1Panel" class="p1-panel" aria-label="Colección original" hidden></section>
  <div id="pTabs"></div>
  <div class="prog"><i id="aProg"></i></div>
  <div class="aSub" id="aSub"></div>
@@ -2168,6 +2179,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <script src="content/release-reset.js?v=20261121-sync-recovery" data-active="false" data-game-epoch="public-2026-launch-v2"></script>
 <script>/* El acceso verificable empieza únicamente con la edición reiniciada. */
 window.ICMX_VERIFIED_GUEST_PLAY=/^(?:www\.)?insertcoinmx\.com$/i.test(location.hostname);</script>
+<script src="content/player1-levels.js?v=1"></script>
 <script src="content/card-texts.js?v=20261123a"></script>
 <script src="content/card-data-adapter.js?v=20261123"></script>
 <script src="content/card-renderer.js?v=20261123-perf1"></script>
@@ -3496,7 +3508,28 @@ $('tearZone').addEventListener('pointercancel',()=>{tx=null;$('cutp').style.widt
 /* ---------- álbum (Etapa 5: por diseño) ----------
    Estado de cada versión: have = la tienes · av = existe en sobres y te falta · soon = aún sin ilustración (no sale en sobres).
    Una versión sin imagen que ya tengas cuenta como conseguida (nunca se esconde lo que es tuyo). */
-let page=0,fd=null;
+let page=0,fd=null,player1Page='player1-01';
+const player1=window.ICMX_PLAYER1_LEVELS;
+function player1View(owned){
+ const levels=player1.progress(owned),eligible=new Set(player1.eligibleDesigns(owned));
+ const legacy=player1.visibleDesigns(owned).filter(id=>!eligible.has(id)&&DB[id]);
+ return {levels,eligible,legacy};
+}
+function renderPlayer1Panel(view){
+ const {levels,legacy}=view;
+ if((player1Page==='legacy'&&!legacy.length)||(player1Page!=='legacy'&&!levels.some(l=>l.id===player1Page&&l.unlocked)))player1Page=levels[0].id;
+ const l=levels.find(l=>l.id===player1Page);
+ const legacyOwned=legacy.reduce((n,id)=>n+VL.filter(v=>Number(S.have[id+'_'+v])>0).length,0);
+ const panel=$('player1Panel');panel.hidden=false;
+ panel.innerHTML='<div class="p1-kicker">PLAYER 1 · COLECCIÓN ORIGINAL</div>'+
+ '<div class="p1-head"><b>'+(l?('LEVEL 0'+l.number+' · '+l.name):'TU ARCHIVO')+'</b><small>'+(l?(l.discovered+'/'+l.designTotal+' diseños'):(legacy.length+' diseños'))+'</small></div>'+
+ '<div class="p1-tabs" role="group" aria-label="Niveles de la colección">'+levels.map(x=>'<button type="button" data-level="'+x.id+'" aria-pressed="'+(x.id===player1Page)+'" '+(x.unlocked?'':'disabled')+'>LEVEL 0'+x.number+'<small>'+(x.unlocked?x.name:'🔒 Bloqueado')+'</small></button>').join('')+(legacy.length?'<button type="button" data-level="legacy" aria-pressed="'+(player1Page==='legacy')+'">ARCHIVO<small>'+legacy.length+' diseños</small></button>':'')+'</div>'+
+ (l?'<div class="p1-meter" role="progressbar" aria-label="Diseños descubiertos" aria-valuemin="0" aria-valuemax="'+l.designTotal+'" aria-valuenow="'+l.discovered+'"><i style="width:'+(l.discovered/l.designTotal*100)+'%"></i></div><div class="p1-counts"><span>Variantes obtenidas</span><b>'+l.collected+'/'+l.variantTotal+'</b></div><div class="p1-help">'+(l.complete?(l.number===1?'¡LEVEL 02 DESBLOQUEADO!':'¡STAGE CLEAR!'):(l.number===1?'Descubre '+(l.designTotal-l.discovered)+' diseños más para desbloquear el Level 02.':'Descubre todos los diseños en cualquier variante.'))+'</div>':'<div class="p1-help">Tus '+legacyOwned+' cartas anteriores siguen siendo tuyas.</div>')+
+ '<div class="p1-preview">LAB · Vista de progresión; sobres del servidor pendientes de integración.</div>';
+ return l?new Set(l.designs):new Set(legacy);
+}
+$('player1Panel').onclick=e=>{const b=e.target.closest('[data-level]');if(!b||b.disabled)return;player1Page=b.dataset.level;page=0;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
+
 const RANK=['f','r','e','b']; // mejor ilustración primero
 const APAGES=[['TODOS',()=>1],['GAMER',d=>d.cat==='GAMER'],['ANIME',d=>d.cat==='ANIME'],['CINE Y TV',d=>['PELÍCULAS','CARICATURAS','OTROS'].includes(d.cat)]];
 const DORD=[...DESIGNS].sort((a,b)=>(a.no||999)-(b.no||999)||a.n.localeCompare(b.n,'es'));
@@ -3512,13 +3545,15 @@ function markLogros(){let ch=0;for(const d of DESIGNS){if(S.logro&&S.logro[d.id]
 const fday=f=>{const [y,m,d]=f.split('-').map(Number);return d+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m-1]+(y!==new Date().getFullYear()?' '+y:'')};
 const pips=(st,n=1)=>`<span class="pp">${st.vs.map(x=>`<i class="p ${x.v} ${x.st}"></i>`).join('')}${n?`<b>${st.got}/${st.tot}</b>`:''}</span>`;
 function renderAlbum(){
- const D=DORD.map(d=>({d,st:dState(d)})).filter(x=>!x.d.bx||x.st.own); // bonus: solo si ya la tienes
+ const scope=renderPlayer1Panel(player1View(S.have));
+ const D=DORD.map(d=>({d,st:dState(d)})).filter(x=>scope.has(x.d.id)&&(!x.d.bx||x.st.own));
  $('pTabs').innerHTML=APAGES.map((p,i)=>{const L=D.filter(x=>!x.d.bx&&p[1](x.d));return `<button class="btn ${i===page?'on':''}" data-p="${i}">${p[0]} <small>${L.reduce((n,x)=>n+x.st.got,0)}/${L.reduce((n,x)=>n+x.st.tot,0)}</small></button>`}).join('');
  const L=D.filter(x=>APAGES[page][1](x.d)),LN=L.filter(x=>!x.d.bx),DN=D.filter(x=>!x.d.bx),g=LN.reduce((n,x)=>n+x.st.got,0),t=LN.reduce((n,x)=>n+x.st.tot,0); // bonus: se ven si las tienes, pero no suman
  $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=DN.reduce((n,x)=>n+x.st.got,0)+'/'+DN.reduce((n,x)=>n+x.st.tot,0);
  const dn=LN.filter(x=>x.st.all).length;
- $('aSub').innerHTML=`<b>${dn}</b> de ${LN.length} diseños completos · ${t} cartas en sobres`+(SOON_N>0?`<span>+ ${SOON_N} ilustraciones en camino · todavía no salen en sobres</span>`:'');
+ $('aSub').innerHTML=player1Page==='legacy'?`<b>${L.reduce((n,x)=>n+x.st.got,0)}</b> cartas anteriores conservadas`:`<b>${dn}</b> de ${LN.length} diseños completos · ${t} variantes en este filtro`;
  $('grid').innerHTML=L.map(({d,st})=>`<button class="dt ${st.own?'own':'lock'} ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv${st.own?` fx idle r-${st.cover.r}`:''}">${st.own?`<img ${st.cover.img?'data-icmx-original':'src'}="${imgOf(st.cover,'c')}" alt=""><i class="foil"></i><i class="glare"></i>`:`<span class="lk"><img src="coin.png" alt="">${d.no?`<small>#${String(d.no).padStart(3,'0')}</small>`:''}</span>`}${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span>${pips(st)}</button>`).join('');
+ if(!L.length)$('grid').innerHTML='<p class="p1-empty">No hay diseños en este filtro.</p>';
  for(const {d,st} of L)if(st.own)mountFaceValueLazy($('grid').querySelector('.dt[data-d="'+d.id+'"] .fx'),st.cover);
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
@@ -3529,12 +3564,12 @@ function renderFicha(){const d=DB[fd];if(!d)return closeFicha();const st=dState(
  $('fMeta').innerHTML=d.cat+(d.bx?' · BONUS':d.no?' · #'+String(d.no).padStart(3,'0'):'')+(st.done?'<span class="fdone">★ COMPLETO</span>':st.was?'<span class="fdone was">★ COMPLETADO '+fday(S.logro[d.id]).toUpperCase()+' · NUEVA VERSIÓN</span>':'');$('fName').textContent=d.n;
  const pop=getGlobalPop(d.id);$('fDesignValue').textContent=pop?.position!=null?'POPULARIDAD GLOBAL · '+pop.score+' POP · #'+pop.position:'POPULARIDAD GLOBAL · SIN CLASIFICAR';
  const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
- const col=st.vs.filter(x=>x.st==='have'||x.st==='av');$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
+ const inLevel=player1View(S.have).eligible.has(d.id);const col=st.vs.filter(x=>x.st==='have'||(inLevel&&x.st==='av'));$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
   return x.st==='have'?`<button class="vc have" data-k="${x.c.k}" aria-label="Ver ${VN[x.v]} en grande"><span class="cv fx idle r-${x.c.img?x.c.r:'comun'}"><img ${x.c.img?'data-icmx-original':'src'}="${imgOf(x.c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span>${lb}</button>`
    :`<div class="vc av"><span class="cv"><img src="coin.png" alt=""><span>EN SOBRES</span></span>${lb}</div>`}).join('');
  for(const x of col)if(x.st==='have')mountFaceValueLazy($('fVers').querySelector('.vc[data-k="'+x.c.k+'"] .fx'),x.c);
- const soon=st.vs.filter(x=>x.st==='soon');$('fSoon').innerHTML=soon.length?'Ilustración en camino:'+soon.map(x=>`<span>${VN[x.v]}</span>`).join(''):''}
+ const soon=st.vs.filter(x=>x.st==='soon');$('fSoon').innerHTML=!inLevel?'Diseño de tu archivo · conservas las variantes obtenidas.':soon.length?'Ilustración en camino:'+soon.map(x=>`<span>${VN[x.v]}</span>`).join(''):''}
 $('fVers').onclick=e=>{const b=e.target.closest('.vc.have');if(b)openCard(b.dataset.k)};
 function preloadFichaCard(e){const b=e.target.closest('.vc.have');if(b)window.ICMX_CARD_RUNTIME?.preload(CB[b.dataset.k]);}
 for(const type of ['pointerover','pointerdown','focusin'])$('fVers').addEventListener(type,preloadFichaCard);
