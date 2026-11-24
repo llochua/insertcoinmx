@@ -2169,7 +2169,9 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 <script>/* El acceso verificable empieza únicamente con la edición reiniciada. */
 window.ICMX_VERIFIED_GUEST_PLAY=/^(?:www\.)?insertcoinmx\.com$/i.test(location.hostname);</script>
 <script src="content/card-texts.js?v=20261123a"></script>
-<script src="content/card-value-overlay.js?v=20261121-template"></script>
+<script src="content/card-data-adapter.js?v=20261123"></script>
+<script src="content/card-renderer.js?v=20261123"></script>
+<script src="content/card-runtime.js?v=20261123"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
    b Base · e Especial · r Rara · f Full. La clave de una carta es diseño+'_'+letra (ej. fatality_r, x_f).
@@ -2481,8 +2483,8 @@ function updateCardValueUI(card){
  return {variant:card.v,points:pts,pop:card.bx?null:getGlobalPop(card.d)?.score??null};
 }
 function mountFaceValue(fx,card){
- if(!window.ICMX_CARD_VALUE)return;
- window.ICMX_CARD_VALUE.mount(fx,updateCardValueUI(card));
+ if(!fx||!card)return;
+ window.ICMX_CARD_RUNTIME?.mount(fx,card,updateCardValueUI(card));
 }
 let faceCardObserver=null;
 const pendingFaceCards=new WeakMap();
@@ -4143,7 +4145,7 @@ async function frame(x,W,H,title){x.fillStyle='#0c0b2a';x.fillRect(0,0,W,H);x.fi
  const lg=await li('logo.png');if(lg)x.drawImage(lg,W/2-60,H-120,120,120*lg.height/lg.width)}
 async function shareGrid(title,keys,name){toast('PREPARANDO IMAGEN...');await document.fonts.ready;const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');await frame(x,W,H,title);
  const n=keys.length,cols=n===1?1:3,cw=n===1?560:300,ch=cw*670/480,rows=Math.ceil(n/cols);let y0=(H-rows*ch-(rows-1)*24)/2;
- for(let i=0;i<n;i++){const im=await li(imgK(keys[i],'c'));const row=i/cols|0,inRow=Math.min(cols,n-row*cols),col=i%cols;const x0=(W-inRow*cw-(inRow-1)*24)/2+col*(cw+24);if(im)x.drawImage(im,x0,y0+row*(ch+24),cw,ch)}
+ for(let i=0;i<n;i++){const card=CB[cardKey(keys[i])||keys[i]];const row=i/cols|0,inRow=Math.min(cols,n-row*cols),col=i%cols;const x0=(W-inRow*cw-(inRow-1)*24)/2+col*(cw+24);if(card)await window.ICMX_CARD_RUNTIME.drawInto(x,card,updateCardValueUI(card),x0,y0+row*(ch+24),cw,ch)}
  deliver(cv,name)}
 async function shareTier(){toast('PREPARANDO IMAGEN...');await document.fonts.ready;const W=1080,cw=96,ch=120,per=9;const m=tierKeys();const rows=TN.map((_,i)=>m.filter(c=>S.rate[c.k]===i));
  const hs=rows.map(r=>Math.max(1,Math.ceil(r.length/per))*(ch+8)+12);const H=Math.max(1350,170+hs.reduce((a,b)=>a+b+12,0)+150);

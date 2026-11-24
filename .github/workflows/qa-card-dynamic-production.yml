@@ -1,0 +1,46 @@
+name: QA · Cartas dinámicas de producción
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'content/card-*.js'
+      - 'cartas/generar-shells.py'
+      - 'qa/card-*.mjs'
+      - '.github/workflows/qa-card-dynamic-production.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cards:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verificar scripts del motor
+        run: |
+          node --check content/card-renderer.js
+          node --check content/card-data-adapter.js
+          node --check content/card-runtime.js
+          node --check qa/card-dynamic-production-browsers.mjs
+          node --test qa/card-renderer.test.mjs qa/card-data-adapter.test.mjs
+      - name: Instalar generador y crear muestras limpias
+        run: |
+          python -m pip install pillow numpy opencv-python-headless
+          python cartas/generar-shells.py 1up sonic abuket
+      - name: Instalar navegador
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo 'ICMX_CHROME=true' >> "$GITHUB_ENV"
+            google-chrome --version
+          else
+            npx playwright install --with-deps chromium
+          fi
+      - name: Verificar Base, Holo, Dorada, Full y exportación
+        run: node qa/card-dynamic-production-browsers.mjs
