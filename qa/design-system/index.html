@@ -2098,7 +2098,6 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-width:380px){#profile .profile-scroll{gap:18px}#profile .profile-player-sheet .profile-avatar{width:50px;height:50px;min-height:50px;flex-basis:50px}#profile .profile-player-sheet .profile-head{gap:10px}#profile .profile-player-sheet .profile-head h2.arcade-initials{font-size:19px}#profile .profile-player-sheet .profile-collection{gap:12px}#profile .profile-player-sheet .profile-dial{width:94px;height:94px;flex-basis:94px}#profile .profile-player-sheet .profile-progress strong{font-size:17px}}
 </style>
 <style>
-.p1-archive-nav{display:flex;gap:8px;margin-bottom:10px}.p1-archive-nav button{flex:1;padding:10px 8px;min-height:40px;border:1px solid #57476e;background:#18132a;color:#cfc4e6;border-radius:6px;font:700 12px AV,sans-serif}.p1-archive-nav button[aria-pressed=true]{background:#ffd400;color:#161022;border-color:#ffd400}
 .p1-growing-meter{position:relative;height:9px;background:#493c5d;overflow:hidden;border-radius:2px}.p1-growing-meter i{display:block;height:100%;background:#ffd400;box-shadow:0 0 9px #ffd40070}.p1-growing-meter:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(4% - 2px),#1b152c calc(4% - 2px) 4%);pointer-events:none}
 #album .p1-hero h2{font-size:clamp(29px,7vw,51px);max-width:10em}
 #album .dt[data-release]{scroll-margin-top:18px}
@@ -3320,7 +3319,7 @@ function showLevelUpIfPending(){
  dlg.showModal();$('p1UpExplore').focus({preventScroll:true});
  [[0,523],[180,659],[360,784],[900,1047],[1190,1319],[1350,1568],[1570,2093]].forEach(([delay,note])=>setTimeout(()=>{if(dlg.open)beep(note,.15)},delay));
 }
-$('p1UpExplore').onclick=()=>{$('p1LevelUp').close();player1Page='original';page=0;go('album');const first=$('grid').querySelector('[data-release="'+(expandedFrom+1)+'"]');if(first){first.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});first.classList.add('p1-expansion-highlight')}};
+$('p1UpExplore').onclick=()=>{$('p1LevelUp').close();page=0;go('album');const first=$('grid').querySelector('[data-release="'+(expandedFrom+1)+'"]');if(first){first.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});first.classList.add('p1-expansion-highlight')}};
 $('p1UpContinue').onclick=()=>{$('p1LevelUp').close();$('sum').focus({preventScroll:true})};
 $('p1LevelUp').addEventListener('cancel',e=>{e.preventDefault();$('p1UpContinue').click()});
 
@@ -3870,30 +3869,20 @@ $('tearZone').addEventListener('pointercancel',()=>{tx=null;$('cutp').style.widt
 /* ---------- álbum (Etapa 5: por diseño) ----------
    Estado de cada versión: have = la tienes · av = existe en sobres y te falta · soon = aún sin ilustración (no sale en sobres).
    Una versión sin imagen que ya tengas cuenta como conseguida (nunca se esconde lo que es tuyo). */
-let page=0,fd=null,player1Page='original';
+let page=0,fd=null;
 const player1=window.ICMX_PLAYER1_LEVELS;
 function player1View(owned){
- const levels=player1.progress(owned),eligible=new Set(player1.eligibleDesigns(owned));
- const legacy=player1.visibleDesigns(owned).filter(id=>!eligible.has(id)&&DB[id]);
- return {levels,eligible,legacy};
+ return {eligible:new Set(player1.eligibleDesigns(owned))};
 }
-function renderPlayer1Panel(view){
- const c=player1.collectionProgress(S.have),legacy=view.legacy;
- if(player1Page==='legacy'&&!legacy.length)player1Page='original';
- const archive=player1Page==='legacy';
- const legacyOwned=legacy.reduce((n,id)=>n+VL.filter(v=>Number(S.have[id+'_'+v])>0).length,0);
- const panel=$('player1Panel');panel.hidden=false;
- const nav=legacy.length?'<div class="p1-archive-nav"><button type="button" data-level="original" aria-pressed="'+(!archive)+'">Colección original</button><button type="button" data-level="legacy" aria-pressed="'+archive+'">Archivo · '+legacy.length+'</button></div>':'';
- const cover='<div class="p1-hero" data-stage="'+(archive?0:1)+'"><div class="p1-hero-top"><span class="p1-kicker">INSERT COIN MX</span><span>PLAYER 1</span></div><div class="p1-hero-copy"><div class="p1-hero-level">'+(archive?'PLAYER ARCHIVE':'EL ÁLBUM')+'</div><h2>'+(archive?'TU ARCHIVO':'COLECCIÓN ORIGINAL')+'</h2><p>'+(archive?'Tus cartas anteriores siguen siendo tuyas.':'Cada diseño descubierto hace crecer tu partida.')+'</p></div></div>';
- const status=archive?'<div class="p1-status"><div class="p1-head"><b>TU ARCHIVO</b><small>'+legacyOwned+' cartas</small></div></div>':
- '<div class="p1-status"><div class="p1-head"><b>DISEÑOS DESCUBIERTOS</b><small>'+c.discovered+' / '+c.designTotal+'</small></div>'+
+function renderPlayer1Panel(){
+ const c=player1.collectionProgress(S.have),panel=$('player1Panel');panel.hidden=false;
+ const cover='<div class="p1-hero" data-stage="1"><div class="p1-hero-top"><span class="p1-kicker">INSERT COIN MX</span><span>PLAYER 1</span></div><div class="p1-hero-copy"><div class="p1-hero-level">EL ÁLBUM</div><h2>COLECCIÓN ORIGINAL</h2><p>Cada diseño descubierto hace crecer tu partida.</p></div></div>';
+ const status='<div class="p1-status"><div class="p1-head"><b>DISEÑOS DESCUBIERTOS</b><small>'+c.discovered+' / '+c.designTotal+'</small></div>'+
  '<div class="p1-growing-meter" role="progressbar" aria-label="Diseños descubiertos" aria-valuemin="0" aria-valuemax="'+c.designTotal+'" aria-valuenow="'+c.discovered+'"><i style="width:'+(c.designTotal?100*c.discovered/c.designTotal:0)+'%"></i></div>'+
  '<div class="p1-counts"><span>'+(c.discovered===c.designTotal?'¡Todos los diseños disponibles descubiertos!':c.hasExpansion?'Descubre todos para expandir tu álbum.':'Sigue descubriendo diseños.')+'</span><b>'+c.collected+'/'+c.variantTotal+' variantes</b></div></div>';
- panel.innerHTML=nav+cover+status;
- return archive?new Set(legacy):new Set(c.designs);
+ panel.innerHTML=cover+status;
+ return new Set(c.designs);
 }
-$('player1Panel').onclick=e=>{const b=e.target.closest('[data-level]');if(!b||b.disabled)return;player1Page=b.dataset.level;page=0;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
-
 
 const RANK=['f','r','e','b']; // mejor ilustración primero
 const APAGES=[['TODOS',()=>1],['GAMER',d=>d.cat==='GAMER'],['ANIME',d=>d.cat==='ANIME'],['CINE Y TV',d=>['PELÍCULAS','CARICATURAS','OTROS'].includes(d.cat)]];
@@ -3910,13 +3899,13 @@ function markLogros(){let ch=0;for(const d of DESIGNS){if(S.logro&&S.logro[d.id]
 const fday=f=>{const [y,m,d]=f.split('-').map(Number);return d+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m-1]+(y!==new Date().getFullYear()?' '+y:'')};
 const pips=(st,n=1)=>`<span class="pp">${st.vs.map(x=>`<i class="p ${x.v} ${x.st}"></i>`).join('')}${n?`<b>${st.got}/${st.tot}</b>`:''}</span>`;
 function renderAlbum(){
- const scope=renderPlayer1Panel(player1View(S.have));
+ const scope=renderPlayer1Panel();
  const D=[...scope].map(id=>DB[id]).filter(Boolean).map(d=>({d,st:dState(d)})).filter(x=>!x.d.bx||x.st.own);
  $('pTabs').innerHTML=APAGES.map((p,i)=>{const L=D.filter(x=>!x.d.bx&&p[1](x.d));return `<button class="btn ${i===page?'on':''}" data-p="${i}">${p[0]} <small>${L.reduce((n,x)=>n+x.st.got,0)}/${L.reduce((n,x)=>n+x.st.tot,0)}</small></button>`}).join('');
  const L=D.filter(x=>APAGES[page][1](x.d)),LN=L.filter(x=>!x.d.bx),DN=D.filter(x=>!x.d.bx),g=LN.reduce((n,x)=>n+x.st.got,0),t=LN.reduce((n,x)=>n+x.st.tot,0); // bonus: se ven si las tienes, pero no suman
  $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=DN.reduce((n,x)=>n+x.st.got,0)+' cartas';
  const dn=LN.filter(x=>x.st.all).length;
- $('aSub').innerHTML=player1Page==='legacy'?`<b>${L.reduce((n,x)=>n+x.st.got,0)}</b> cartas anteriores conservadas`:`<b>${LN.filter(x=>x.st.own).length}</b> de ${LN.length} diseños descubiertos · ${dn} completos`;
+ $('aSub').innerHTML=`<b>${LN.filter(x=>x.st.own).length}</b> de ${LN.length} diseños descubiertos · ${dn} completos`;
  $('grid').innerHTML=L.map(({d,st})=>!st.own?`<button type="button" class="dt lock" data-release="${player1.numberOf(d.id)||''}" disabled aria-label="Diseño sin descubrir"><span class="cv"><span class="lk"><svg class="p1-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg><span class="p1-lock-name">???</span>${player1.numberOf(d.id)?`<small>#${String(player1.numberOf(d.id)).padStart(3,'0')}</small>`:''}</span></span><span class="p1-unseen">SIN DESCUBRIR</span></button>`:`<button data-release="${player1.numberOf(d.id)||''}" class="dt own ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv fx idle r-${st.cover.r}"><img ${st.cover.img?'data-icmx-original':'src'}="${imgOf(st.cover,'c')}" alt=""><i class="foil"></i><i class="glare"></i>${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span><span class="p1-card-caption">${esc(d.n)}</span>${pips(st)}</button>`).join('');
  if(!L.length)$('grid').innerHTML='<p class="p1-empty">No hay diseños en este filtro.</p>';
  for(const {d,st} of L)if(st.own)mountFaceValueLazy($('grid').querySelector('.dt[data-d="'+d.id+'"] .fx'),st.cover);
@@ -4703,7 +4692,7 @@ if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
    const count=Number(b.dataset.labLevelSeed);
    if(![0,24,25].includes(count))return;
    syncIn();MINE.length=0;S.have=Object.fromEntries(player1.levels[0].designs.slice(0,count).map(id=>[id+'_b',1]));
-   S.rate={};S.logro={};S.test=1;S.fg=count?1:0;player1Page='original';page=0;
+   S.rate={};S.logro={};S.test=1;S.fg=count?1:0;page=0;
    save();closeMenu();go('album');return;
   }
   const n=Number(b.dataset.labSeed);

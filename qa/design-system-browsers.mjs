@@ -194,10 +194,20 @@ try{
   assert.equal(await page.locator('#profileVariantCount').innerText(),'25/200');
   await page.evaluate(()=>go('album'));
   await page.screenshot({path:'qa/screenshots/ui-lab-player1-level2-'+width+'.png'});
+  // Owned, unreleased cards remain in inventory but must not appear in the album.
   await page.evaluate(()=>{S.have.navidadgamer_b=1;renderAlbum()});
-  await page.locator('[data-level="legacy"]').click();
-  assert.equal(await page.locator('#grid [data-d="navidadgamer"]').count(),1);
-  await page.screenshot({path:'qa/screenshots/ui-lab-player1-archive-'+width+'.png'});
+  assert.equal(await page.locator('[data-level="legacy"]').count(),0);
+  assert.equal(await page.locator('#grid [data-d="navidadgamer"]').count(),0);
+  assert.equal(await page.evaluate(()=>S.have.navidadgamer_b),1);
+  assert.equal(await page.locator('#grid .dt').count(),50);
+  await page.evaluate(()=>{const l1=player1.levels[0].designs,l2=player1.levels[1].designs;S.have=Object.fromEntries(l1.slice(0,24).map(id=>[id+'_b',1]));S.have[l2[0]+'_b']=1;renderAlbum()});
+  assert.equal(await page.locator('#grid .dt').count(),25);
+  assert.equal(await page.locator('#grid .dt.own').count(),24);
+  await page.evaluate(()=>{S.have[player1.levels[0].designs[24]+'_b']=1;renderAlbum()});
+  assert.equal(await page.locator('#grid .dt').count(),50);
+  assert.equal(await page.locator('#grid .dt.own').count(),26);
+  assert.equal(await page.evaluate(()=>S.have[player1.levels[1].designs[0]+'_b']),1);
+  await page.screenshot({path:'qa/screenshots/ui-lab-player1-preserved-'+width+'.png'});
   // Deterministic LAB-only draw through the real pack pipeline.
   await page.locator('#icmxLabToggle').click();
   await page.locator('[data-lab-action="levelup"]').click();
