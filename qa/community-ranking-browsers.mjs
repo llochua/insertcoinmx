@@ -17,7 +17,7 @@ const server=createServer(async(req,res)=>{
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const origin='http://127.0.0.1:'+server.address().port;
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch(process.env.ICMX_CHROME==='true'?{headless:true,channel:'chrome'}:{headless:true});
 const votes=new Map(),errors=[],contexts=[];
 const ids=['abuket','arcade','1up'];
 const aggregates=()=>ids.map(id=>{
@@ -98,12 +98,12 @@ try{
   return x?.tiers.goty===1&&x?.tiers.ok===0&&x?.likes.total===2&&x?.likes.positive===2;
  });
  const expected=rankDesigns(aggregates()).find(x=>x.id==='abuket').score;
- assert.equal(await b.locator('#zFx svg.icmx-live-pop').getAttribute('data-pop'),String(expected));
+ await b.waitForFunction(v=>document.querySelector('#zFx svg.icmx-data [data-icmx-field="pop"]')?.textContent===String(v),expected);
  await a.locator('#zClose').click();await a.evaluate(()=>go('scores'));
  await a.waitForFunction(v=>document.querySelector('#communityRankRows strong')?.textContent===v+' POP',expected);
  for(const k of ['abuket_b','abuket_e','abuket_r']){
   await a.evaluate(k=>openCard(k),k);
-  await a.waitForFunction(v=>document.querySelector('#zFx svg.icmx-live-pop')?.dataset.pop===String(v),expected);
+  await a.waitForFunction(v=>document.querySelector('#zFx svg.icmx-data [data-icmx-field="pop"]')?.textContent===String(v),expected);
   await a.locator('#zClose').click();
  }
  const publishedBeforeGuest=JSON.stringify(aggregates());

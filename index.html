@@ -3555,6 +3555,9 @@ function openCard(k,options={}){
  status.textContent='CARGANDO CARTA';
  img.alt=cc.n+' · '+VN[cc.v];
  img.removeAttribute('src');
+ delete img.dataset.icmxDynamic;
+ fx.querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
+ delete fx.dataset.icmxDynamic;
  const valid=()=>token===zLoadToken&&zoom.open;
  const failed=()=>{
   if(!valid())return;
@@ -3568,7 +3571,13 @@ function openCard(k,options={}){
   fx.classList.add('idle');
   status.textContent='';
  };
- img.onload=()=>{if(typeof img.decode!=='function')ready()};
+ // La imagen heredada termina de cargar antes de que el motor dinámico
+ // cambie su src. Evitamos el AbortError de decode() entre ambas cargas.
+ img.onload=()=>{
+  if(!valid())return;
+  ready();
+  if(img.dataset.icmxDynamic!=='true')mountFaceValue(fx,cc);
+ };
  img.onerror=failed;
  setVoting(true);
  if(!zoom.open)zoom.showModal();
@@ -3582,10 +3591,8 @@ function openCard(k,options={}){
   narrative.focus({preventScroll:true});
  });
  img.src=imgOf(cc,'c2');
- mountFaceValue(fx,cc);
- // decode garantiza que el primer fotograma visible ya pertenece a la carta nueva.
- if(typeof img.decode==='function')img.decode().then(ready,failed);
- else if(img.complete)(img.naturalWidth?ready():failed());
+ // onload valida la imagen sin competir con el cambio de src del motor dinámico.
+ if(img.complete&&img.naturalWidth)img.onload();
 }
 function setVoting(on){
  $('zVoting').hidden=!on;
@@ -3620,6 +3627,8 @@ $('zoom').addEventListener('close',()=>{
  if($('zoom').open)return; // un cierre anterior no debe limpiar la carta que acaba de reabrirse
  ++zLoadToken; // invalida cargas previas, también si se cierra con Escape
  const img=$('zImg');img.onload=null;img.onerror=null;img.removeAttribute('src');
+ $('zFx').querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
+ delete img.dataset.icmxDynamic;
  $('zFx').className='fx';$('zLoad').textContent='';
  const back=zReturnFocus;zReturnFocus=null;
  if(back?.isConnected&&typeof back.focus==='function')back.focus({preventScroll:true});
