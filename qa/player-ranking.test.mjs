@@ -78,3 +78,29 @@ test('INC-01: ranking global excluye Auth anónimo aunque el invitado esté veri
  assert.match(sql,/ARRAY\['pts','cards','designs','duplicates','ratings'\]/);
  assert.match(sql,/GRANT EXECUTE ON FUNCTION public\.icmx_player_leaderboards\(\) TO anon,authenticated/);
 });
+
+test('PTS: conserva cartas únicas incluso fuera del top 10 de cartas, sin cambiar orden',()=>{
+ const data=empty();
+ data.pts=[
+  {ini:'AAA',handle:'high_pts',score:500,cards:4},
+  {ini:'BBB',handle:'more_cards',score:400,cards:25},
+  {ini:'CCC',handle:'zero_cards',score:300,cards:0},
+  {ini:'DDD',handle:'old_payload',score:200},
+  {ini:'EEE',handle:'bad_count',score:100,cards:-1}
+ ];
+ data.cards=[{ini:'BBB',handle:'more_cards',score:25}];
+ const rows=normalizePlayerBoards(data).pts;
+ assert.deepEqual(rows.map(r=>r.handle),['high_pts','more_cards','zero_cards','old_payload','bad_count']);
+ assert.deepEqual(rows.map(r=>r.cards),[4,25,0,undefined,undefined]);
+});
+test('Récords: contador secundario debajo del puntaje, sin cuarta columna',()=>{
+ const html=readFileSync('index.html','utf8');
+ const start=html.indexOf(" $('tbl').innerHTML=Array.from",html.indexOf('function renderScores()'));
+ const end=html.indexOf("\n}\n$('scores')",start);
+ const render=new Function('available','listing','safeRankValue','esc','validArcadeHandle',html.slice(start,end).replace(" $('tbl').innerHTML=",' return '));
+ const out=render([{ini:'AAA',handle:'pixel',score:500,cards:4},{ini:'BBB',handle:'mago',score:400,cards:1},{ini:'CCC',handle:'other',score:300}],{origin:'available'},n=>Number.isSafeInteger(n)&&n>=0&&n<=999999?n:null,String,Boolean);
+ assert.match(out,/@pixel<\/small><\/span><span>500<small class="rank-card-count">4 cartas<\/small><\/span>/);
+ assert.match(out,/400<small class="rank-card-count">1 carta<\/small>/);
+ assert.equal((out.match(/rank-card-count/g)||[]).length,2);
+ assert.equal((out.match(/rank-empty/g)||[]).length,7);
+});

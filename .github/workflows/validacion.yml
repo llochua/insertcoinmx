@@ -68,6 +68,7 @@ jobs:
           node --test qa/password-recovery.test.mjs
           node --test qa/release-reset.test.mjs
           node --test qa/records-edition.test.mjs
+          node --test qa/player-ranking.test.mjs
           node --test qa/community-value.test.mjs
           node --test qa/community-ranking.test.mjs
           node --test qa/value-screens.test.mjs

@@ -1860,6 +1860,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .guest-edit-identity[hidden]{display:none!important}
 #scores #scorePlayerIdentity[hidden]{display:none!important}
 #scores #scoreIdentityNote{font:600 11px/1.4 AV,system-ui,sans-serif;letter-spacing:0;color:#cfc9e1;overflow-wrap:anywhere}
+#scores #tbl .rank-card-count{display:block;margin-top:2px;color:#bbb5d3;font:600 10px/1.35 AV,system-ui,sans-serif;letter-spacing:normal}
 #scores .rank-handle{display:block;margin-top:5px;color:#bbb5d3;font:600 10px/1.45 AV,system-ui,sans-serif;letter-spacing:normal}
 #profile #profileAuthInitials,#profile #profileAuthHandle,#profile #profileSignedInitials,#profile #profileSignedHandle{display:block;width:100%;min-height:46px;border:1px solid rgba(255,255,255,.27);border-radius:10px;background:#120e29;color:#fff;font:600 15px AV,system-ui,sans-serif;padding:10px 12px}
 #profile #profileAuthInitials,#profile #profileSignedInitials{font:16px PX,monospace;letter-spacing:.2em;color:#ffd400;text-transform:uppercase}
@@ -4218,7 +4219,7 @@ function scoreBoard(metric='pts'){
  // Los invitados sin sesión conservan su récord local provisional.
  const own=arcadeIdentity(),count=currentRecordScores()[metric];
  if(!own.registered&&validArcadeIni(own.ini)&&safeRankValue(count)!==null&&count>0)
-  return {rows:[{ini:own.ini,handle:own.handle||'',score:count}],origin:'session'};
+  return {rows:[{ini:own.ini,handle:own.handle||'',score:count,cards:currentRecordScores().cards}],origin:'session'};
  return {rows:[],origin:ranking?.status==='loading'?'loading':'empty'};
 }
 function renderScores(){
@@ -4250,7 +4251,9 @@ function renderScores(){
   const name=r?esc(String(r.ini).slice(0,3)):'---';
   const count=r?String(r.score).padStart(3,'0'):'---';
   const handle=r&&validArcadeHandle(r.handle)?'<small class="rank-handle">@'+esc(r.handle)+'</small>':'';
-  return `<div class="${cl}"${r?' data-score-entry="true"':''}><span>${String(i+1).padStart(2,'0')}</span><span>${name}${handle}</span><span>${count}</span></div>`
+  const cards=r?safeRankValue(r.cards):null;
+  const cardLabel=cards===null?'':'<small class="rank-card-count">'+cards+(cards===1?' carta':' cartas')+'</small>';
+  return `<div class="${cl}"${r?' data-score-entry="true"':''}><span>${String(i+1).padStart(2,'0')}</span><span>${name}${handle}</span><span>${count}${cardLabel}</span></div>`
  }).join('');
 }
 $('scores').addEventListener('click',e=>{
@@ -4609,7 +4612,7 @@ $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
- Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261122chars')]).then(([mod,auth,players])=>{
+ Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261124cardcount')]).then(([mod,auth,players])=>{
   playerRanking=players.createPlayerRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{if(cur==='scores')renderScores();if(cur==='home'||cur==='title')refresh()}});
   playerRanking.refresh();
   communityRanking=mod.createCommunityRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{
