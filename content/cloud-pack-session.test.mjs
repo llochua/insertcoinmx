@@ -18,8 +18,8 @@ const backup=(have={})=>({app:'insertcoinmx-album',format:2,
  data:{have,rate:{},welcomeLeft:5,freeUsed:0,fg:0,pk:[],last:''}});
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 
-async function harness({uid='qa-user',local=backup(),remote=backup(),verifiedGuests=false,anonymous=false}={}){
- const store=new Map();
+async function harness({uid='qa-user',local=backup(),remote=backup(),verifiedGuests=false,anonymous=false,initialStorage={}}={}){
+ const store=new Map(Object.entries(initialStorage));
  const storage={
   get length(){return store.size},key:i=>[...store.keys()][i]??null,
   getItem:k=>store.has(k)?store.get(k):null,
@@ -249,4 +249,55 @@ test('Invitado verificado con cartas locales antiguas no las acuña en servidor'
   assert.equal(h.remote,null);
   assert.ok(h.controller.getConflict());
  }finally{h.stop()}
+});
+
+test('Invitado y registrado anteriores al reset recuperan su partida sin mezclar cartas',{concurrency:false},async()=>{
+ for(const anonymous of [true,false]){
+  const old=backup({gato_b:5});old.data.last='2026-11-20';old.data.fg=1;
+  const current=backup({perro_b:9});current.data.last='2026-11-24';current.data.fg=1;
+  const h=await harness({local:old,remote:current,verifiedGuests:true,anonymous});
+  try{
+   assert.deepEqual(h.local,current);
+   assert.deepEqual(h.remote,current);
+   assert.equal(h.controller.getConflict(),null);
+   assert.deepEqual(h.controller.listConflictArchives()[0].backup,old);
+   assert.equal(localStorage.getItem('icmx-game-epoch'),'public-2026-launch-v2');
+   assert.equal(h.issueCalls,0);
+   assert.equal((await h.controller.issuePack()).status,'issued');
+   assert.equal(h.issueCalls,1);
+  }finally{h.stop()}
+ }
+});
+test('Invitado histórico sin snapshot se inicializa sin restaurar cartas antiguas',{concurrency:false},async()=>{
+ const old=backup({gato_b:5});old.data.last='2026-11-20';old.data.fg=1;
+ const h=await harness({uid:null,local:old,remote:null,verifiedGuests:true});
+ try{
+  const result=await h.controller.issuePack();
+  assert.equal(result.status,'issued');
+  assert.equal(h.guestCreations,1);
+  assert.equal(h.issueCalls,1);
+  assert.deepEqual(h.controller.listConflictArchives()[0].backup,old);
+  assert.equal(Object.values(h.local.data.have).reduce((n,v)=>n+v,0),5);
+ }finally{h.stop()}
+});
+test('Progreso reciente, fecha ambigua, marcador actual y peticiones pendientes no se migran',{concurrency:false},async()=>{
+ for(const variant of ['recent','ambiguous','epoch','pending','baseline']){
+  const old=backup({gato_b:5});old.data.last=variant==='recent'?'2026-11-24':variant==='ambiguous'?'2026-11-21':'2026-11-20';old.data.fg=1;
+  const current=backup({perro_b:9});current.data.last='2026-11-24';
+  const initialStorage={};
+  if(variant==='epoch')initialStorage['icmx-game-epoch']='public-2026-launch-v2';
+  if(variant==='pending')initialStorage['icmx-cloud-pack-request-v1:qa-user']='pending-id';
+  if(variant==='baseline'){
+   const post=copy(old);post.exportedAt='2026-11-23T00:00:00Z';
+   initialStorage['icmx-cloud-baseline-v1:qa-user']=JSON.stringify({userId:'qa-user',revision:1,backup:post});
+  }
+  const h=await harness({local:old,remote:current,verifiedGuests:true,initialStorage});
+  try{
+   // El flujo normal puede descargar si el local coincide con una baseline válida.
+   if(variant!=='baseline')assert.deepEqual(h.local,old);
+   assert.equal(h.controller.listConflictArchives().length,0);
+   assert.deepEqual(h.remote,current);
+   assert.equal(h.issueCalls,0);
+  }finally{h.stop()}
+ }
 });
