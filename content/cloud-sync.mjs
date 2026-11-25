@@ -10,7 +10,7 @@ const BASE_PREFIX='icmx-cloud-baseline-v1:';
 const ACCOUNT_BINDING='icmx-cloud-active-account-v1';
 const AUTH_STORAGE='icmx-auth-qa-nov2026';
 const ARCHIVE_PREFIX='icmx-cloud-conflict-archive-v1:';
-const ECONOMY=['have','pk','fg','last','extra','welcomeLeft','freeDay','freeUsed','freeCycle','test'];
+const ECONOMY=['have','pk','fg','last','extra','welcomeLeft','welcomeTotal','freeDay','freeUsed','freeCycle','test'];
 const economySignature=b=>canonical({fields:Object.fromEntries(ECONOMY.map(k=>[k,b.data[k]??null])),ext:b.ext??null});
 const eq=(a,b)=>canonical(a)===canonical(b);
 // Solo se incorpora metadata local si la economía no divergió desde la base.
@@ -85,12 +85,12 @@ export function sameProgress(a,b){return progressSignature(a)===progressSignatur
 // reconciliación. Cualquier progreso anterior real conserva el flujo de revisión.
 export function isFreshGuest(backup){
  const b=assertBackup(backup),d=b.data;
- const allowed=new Set(['have','rate','ini','seen','last','extra','test','champ','sv','rev','mv','fg','welcomeLeft','freeDay','freeUsed','freeCycle','pk']);
+ const allowed=new Set(['have','rate','ini','seen','last','extra','test','champ','sv','rev','mv','fg','welcomeLeft','welcomeTotal','freeDay','freeUsed','freeCycle','pk']);
  return Object.keys(d).every(k=>allowed.has(k))&&
   !Object.keys(d.have).length&&!Object.keys(d.rate).length&&!b.ext&&
   (!d.pk||Array.isArray(d.pk)&&!d.pk.length)&&
   (d.fg===undefined||d.fg===0)&&!d.last&&!d.champ&&!d.extra&&!d.test&&
-  d.welcomeLeft===5&&!d.freeUsed&&!d.freeDay&&
+  d.welcomeLeft===(d.welcomeTotal===3?3:5)&&!d.freeUsed&&!d.freeDay&&
   (d.freeCycle===undefined||d.freeCycle===0)&&
   (!d.ini||/^[A-Z0-9!?*+.@#$%-]{3}$/.test(d.ini))&&
   (d.seen===undefined||d.seen===0||d.seen===1);
@@ -99,7 +99,7 @@ export function hasGameProgress(backup){
  const b=assertBackup(backup),d=b.data;
  if(Object.keys(d.have).length||Object.keys(d.rate).length||b.ext&&Object.keys(b.ext).length)return true;
  if(d.fg||d.last||d.champ||d.ini||d.extra||d.reta2||d.rdia||
-    d.welcomeLeft<5||d.freeUsed>0||Array.isArray(d.pk)&&d.pk.length)return true;
+    d.welcomeLeft<(d.welcomeTotal===3?3:5)||d.freeUsed>0||Array.isArray(d.pk)&&d.pk.length)return true;
  for(const k of ['duel','logro'])if(isObj(d[k])&&Object.keys(d[k]).length)return true;
  return false;
 }
