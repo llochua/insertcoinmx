@@ -64,15 +64,15 @@ for(const owned of [{},have24,have25,{...have24,navidadgamer_b:1,[future]:1}]){
 console.log('Offline draws: 800 packs, scopes, rarity structure, preserved inventory');
 
 // Replacement slots preserve discovery credit, not duplicate credit or inventory.
-const removed=["invader","sensei","bustfiction","docecasas","gunsncontrols","keepcalm"];
+const removed=["invader","sensei","bustfiction","docecasas","gunsncontrols","keepcalm","caritele","guardianes","gojira"];
 for(const id of removed)assert.equal(api.levelOf(id),null);
-const oldFirst=Object.fromEntries(l1.designs.map(id=>[({"ochentas":"invader","blooper":"sensei","fatman":"bustfiction","zodiac":"docecasas","triforce":"gunsncontrols","poketaco":"keepcalm"}[id]||id)+'_b',1]));
+const oldFirst=Object.fromEntries(l1.designs.map(id=>[({"ochentas":"invader","blooper":"sensei","fatman":"bustfiction","zodiac":"docecasas","triforce":"gunsncontrols","poketaco":"keepcalm","aku":"caritele","bitwars":"guardianes","virtual":"gojira"}[id]||id)+'_b',1]));
 assert.equal(api.progress(oldFirst)[0].discovered,25);
 assert.equal(api.progress(oldFirst)[1].unlocked,true);
 assert.equal(api.progress({...oldFirst,ochentas_b:1})[0].discovered,25);
 assert.ok(api.visibleDesigns(oldFirst).includes('invader'));
 assert.ok(!api.eligibleDesigns(oldFirst).includes('invader'));
-const oldBoth=Object.fromEntries([...l1.designs,...l2.designs].map(id=>[({"ochentas":"invader","blooper":"sensei","fatman":"bustfiction","zodiac":"docecasas","triforce":"gunsncontrols","poketaco":"keepcalm"}[id]||id)+'_b',1]));
+const oldBoth=Object.fromEntries([...l1.designs,...l2.designs].map(id=>[({"ochentas":"invader","blooper":"sensei","fatman":"bustfiction","zodiac":"docecasas","triforce":"gunsncontrols","poketaco":"keepcalm","aku":"caritele","bitwars":"guardianes","virtual":"gojira"}[id]||id)+'_b',1]));
 assert.equal(api.collectionProgress(oldBoth).discovered,50);
 const sql=fs.readFileSync(path.join(__dirname,'../supabase/sql/player1_pack_progression_STAGED.sql'),'utf8');
 for(const [i,level] of api.levels.entries()){
@@ -81,3 +81,13 @@ for(const [i,level] of api.levels.entries()){
  assert.deepEqual(match[1].match(/'[^']+'/g).map(x=>x.slice(1,-1)).sort(),[...level.designs].sort());
 }
 console.log('Replacement progress and server/client pool parity passed');
+
+// Editorial substitutions retain discovery credit and positions, without duplicate credit.
+assert.equal(api.numberOf('aku'),4);
+assert.equal(api.numberOf('bitwars'),11);
+assert.equal(api.numberOf('virtual'),32);
+assert.ok(api.levels.every(l=>l.name==='Colección Original'));
+assert.equal(api.progress({caritele_b:1,aku_b:1,guardianes_e:1,bitwars_b:1})[0].discovered,2);
+assert.equal(api.progress({...have25,gojira_b:1,virtual_f:1})[1].discovered,1);
+assert.ok(api.visibleDesigns({caritele_b:1,guardianes_b:1,gojira_b:1}).includes('gojira'));
+assert.ok(!api.eligibleDesigns(have25).includes('gojira'));

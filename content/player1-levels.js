@@ -3,12 +3,12 @@
   'use strict';
   const api=(function createPlayer1Levels(){
   const levels=Object.freeze([
-    Object.freeze({id:"player1-01",number:1,name:"PRESS START",designs:Object.freeze(["abuket","arcade","asteroids","caritele","collector","continue","controls","gameover","gamepop","gatosamurai","guardianes","humangamer","hyrule","ochentas","kame","mainstream","mapa","n64","nerv","samus","blooper","snes","sonic","sv001","x"])}),
-    Object.freeze({id:"player1-02",number:2,name:"NEXT LEVEL",designs:Object.freeze(["blowme","fatman","challenger","chocarreros","zodiac","futbolito","gojira","triforce","hipstermario","poketaco","levelup","linkfloyd","mrkarate","neo","nowloading","omkami","oneplayer","pikaball","pizzcipher","polystation","robogodin","thankyou","tokyo3","wirimask","zero"])})
+    Object.freeze({id:"player1-01",number:1,name:"Colección Original",designs:Object.freeze(["abuket","arcade","asteroids","aku","collector","continue","controls","gameover","gamepop","gatosamurai","bitwars","humangamer","hyrule","ochentas","kame","mainstream","mapa","n64","nerv","samus","blooper","snes","sonic","sv001","x"])}),
+    Object.freeze({id:"player1-02",number:2,name:"Colección Original",designs:Object.freeze(["blowme","fatman","challenger","chocarreros","zodiac","futbolito","virtual","triforce","hipstermario","poketaco","levelup","linkfloyd","mrkarate","neo","nowloading","omkami","oneplayer","pikaball","pizzcipher","polystation","robogodin","thankyou","tokyo3","wirimask","zero"])})
   ]);
   const variants=Object.freeze(["b","e","r","f"]);
   // Existing owners retain discovery credit for the replaced slot; no inventory mutation.
-  const legacySlot=Object.freeze({"ochentas":"invader","blooper":"sensei","fatman":"bustfiction","zodiac":"docecasas","triforce":"gunsncontrols","poketaco":"keepcalm"});
+  const legacySlot=Object.freeze({"ochentas":"invader","blooper":"sensei","fatman":"bustfiction","zodiac":"docecasas","triforce":"gunsncontrols","poketaco":"keepcalm","aku":"caritele","bitwars":"guardianes","virtual":"gojira"});
   const membership=new Map(levels.flatMap(l=>l.designs.map(id=>[id,l.id])));
   const releaseNumbers=new Map(levels.flatMap(l=>l.designs).map((id,i)=>[id,i+1]));
   const numberOf=id=>releaseNumbers.get(id)||null;

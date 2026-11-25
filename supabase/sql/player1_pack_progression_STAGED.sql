@@ -5,7 +5,7 @@ BEGIN;
 DO $check$
 DECLARE missing integer;
 BEGIN
-  SELECT count(*) INTO missing FROM pg_catalog.unnest(ARRAY['arcade','abuket','asteroids','ochentas','controls','collector','gamepop','mainstream','mapa','n64','snes','sonic','samus','hyrule','x','sv001','humangamer','continue','gameover','kame','nerv','gatosamurai','guardianes','blooper','caritele']::text[]||ARRAY['blowme','challenger','neo','polystation','nowloading','levelup','oneplayer','linkfloyd','wirimask','zero','thankyou','triforce','omkami','hipstermario','pikaball','poketaco','tokyo3','zodiac','futbolito','gojira','mrkarate','robogodin','chocarreros','pizzcipher','fatman']::text[]) AS d(id)
+  SELECT count(*) INTO missing FROM pg_catalog.unnest(ARRAY['arcade','abuket','asteroids','ochentas','controls','collector','gamepop','mainstream','mapa','n64','snes','sonic','samus','hyrule','x','sv001','humangamer','continue','gameover','kame','nerv','gatosamurai','bitwars','blooper','aku']::text[]||ARRAY['blowme','challenger','neo','polystation','nowloading','levelup','oneplayer','linkfloyd','wirimask','zero','thankyou','triforce','omkami','hipstermario','pikaball','poketaco','tokyo3','zodiac','futbolito','virtual','mrkarate','robogodin','chocarreros','pizzcipher','fatman']::text[]) AS d(id)
   CROSS JOIN pg_catalog.unnest(ARRAY['b','e','r','f']::text[]) AS v(variant)
   WHERE NOT EXISTS (SELECT 1 FROM private_sync.pack_pool p WHERE p.card_key=d.id||'_'||v.variant AND p.variant=v.variant);
   IF missing<>0 THEN RAISE EXCEPTION 'PLAYER 1: faltan % variantes del pool',missing; END IF;
@@ -39,8 +39,8 @@ DECLARE
   v_roll double precision;
   v_count integer;
   v_i integer;
-  v_level1 constant text[] := ARRAY['arcade','abuket','asteroids','ochentas','controls','collector','gamepop','mainstream','mapa','n64','snes','sonic','samus','hyrule','x','sv001','humangamer','continue','gameover','kame','nerv','gatosamurai','guardianes','blooper','caritele']::text[];
-  v_level2 constant text[] := ARRAY['blowme','challenger','neo','polystation','nowloading','levelup','oneplayer','linkfloyd','wirimask','zero','thankyou','triforce','omkami','hipstermario','pikaball','poketaco','tokyo3','zodiac','futbolito','gojira','mrkarate','robogodin','chocarreros','pizzcipher','fatman']::text[];
+  v_level1 constant text[] := ARRAY['arcade','abuket','asteroids','ochentas','controls','collector','gamepop','mainstream','mapa','n64','snes','sonic','samus','hyrule','x','sv001','humangamer','continue','gameover','kame','nerv','gatosamurai','bitwars','blooper','aku']::text[];
+  v_level2 constant text[] := ARRAY['blowme','challenger','neo','polystation','nowloading','levelup','oneplayer','linkfloyd','wirimask','zero','thankyou','triforce','omkami','hipstermario','pikaball','poketaco','tokyo3','zodiac','futbolito','virtual','mrkarate','robogodin','chocarreros','pizzcipher','fatman']::text[];
   v_allowed text[];
   v_discovered integer;
 BEGIN
@@ -125,7 +125,7 @@ BEGIN
   SELECT count(*) INTO v_discovered FROM pg_catalog.unnest(v_level1) AS d(id)
     WHERE EXISTS (SELECT 1 FROM pg_catalog.unnest(ARRAY['b','e','r','f']::text[]) AS v(variant)
       WHERE COALESCE((v_have->>(d.id||'_'||v.variant))::integer,0)>0
-         OR COALESCE((v_have->>((CASE d.id WHEN 'ochentas' THEN 'invader' WHEN 'blooper' THEN 'sensei' ELSE d.id END)||'_'||v.variant))::integer,0)>0);
+         OR COALESCE((v_have->>((CASE d.id WHEN 'ochentas' THEN 'invader' WHEN 'blooper' THEN 'sensei' WHEN 'aku' THEN 'caritele' WHEN 'bitwars' THEN 'guardianes' ELSE d.id END)||'_'||v.variant))::integer,0)>0);
   v_allowed := CASE WHEN v_discovered=25 THEN v_level1||v_level2 ELSE v_level1 END;
 
   -- 3 Base, 4º Base en 70% / especial 30%, 5º especial.
