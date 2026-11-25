@@ -4130,12 +4130,27 @@ function startTorneo(){
  }
  retaRerollUI(pool);
  retaOver=!!S.reta2.done;
- $('vStage').innerHTML='<iframe id="retaLive" class="reta-iframe" src="reta-diaria.html?embedded=1" title="Reta de playeras · 7 encuentros" loading="eager"></iframe>';
+ $('vStage').innerHTML='<iframe id="retaLive" class="reta-iframe" src="reta-diaria.html?embedded=1&amp;v=20261124-community" title="Reta de playeras · 7 encuentros" loading="eager"></iframe>';
+}
+async function retaCommunityResults(f,r){
+ const day=r.day,seed=r.seed,completed=r.round;
+ const matches=Array.isArray(r.matches)?r.matches.slice(0,7).map(m=>({winner:m.winner,loser:m.loser})):[];
+ if(!matches.length||matches.length!==completed)return;
+ const identity=globalThis.icmxAccountIdentity?.userId||null;
+ let results=null;
+ try{
+  const rows=await globalThis.icmxCommunityRequest('icmx_reta_pair_results',{p_matches:matches});
+  if(Array.isArray(rows)&&rows.length===matches.length&&rows.every((row,i)=>row.winner===matches[i].winner&&row.loser===matches[i].loser&&Number.isSafeInteger(row.winner_votes)&&row.winner_votes>=0&&Number.isSafeInteger(row.loser_votes)&&row.loser_votes>=0))results=rows;
+ }catch(e){/* Local Reta remains playable when the aggregate service is offline. */}
+ if(cur==='torneo'&&$('retaLive')===f&&S.reta2?.day===day&&S.reta2?.seed===seed&&S.reta2?.round===completed&&(globalThis.icmxAccountIdentity?.userId||null)===identity){
+  f.contentWindow.postMessage({type:'icmx-reta-community',day,seed,completed,results},location.origin);
+ }
 }
 function retaInitFrame(f){
  const pool=retaPool();
  if(!retaValid(S.reta2,pool)){startTorneo();return}
  f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,packsAvailable:packReady(),canTrade:dups()>=5,audioMuted:soundMuted},location.origin);
+ if(S.reta2.round>0)retaCommunityResults(f,S.reta2);
 }
 function retaElegir(f,msg){
  withLock(()=>{
@@ -4162,7 +4177,10 @@ function retaElegir(f,msg){
    ga('reta_completada',{campeona:r.champion,defendida:r.titleDefended?1:0});
   }else{r[lost]=r.roster[r.round+1]}
   const ok=save();
-  if(ok&&r.done&&r.matches?.length===7)communityReta(r.day,r.matches);
+  if(ok){
+   retaCommunityResults(f,r);
+   if(r.done&&r.matches?.length===7)communityReta(r.day,r.matches);
+  }
   if(!ok)toast('RETA: GUARDADO PENDIENTE');
   retaRerollUI(retaPool());
   ga('reta_eleccion',{ronda:r.round,diseno:msg.winner,campeona:r.champion});
@@ -4613,7 +4631,7 @@ $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
- Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261124cardcount')]).then(([mod,auth,players])=>{
+ Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261124reta'),import('./content/player-ranking.mjs?v=20261124cardcount')]).then(([mod,auth,players])=>{
   playerRanking=players.createPlayerRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{if(cur==='scores')renderScores();if(cur==='home'||cur==='title')refresh()}});
   playerRanking.refresh();
   communityRanking=mod.createCommunityRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{
@@ -4729,4 +4747,4 @@ import('./content/cloud-sync.mjs?v=20261124-legacy-recovery1').then(({startCloud
  cloudSync.check();
 })
 .catch(()=>{for(const id of ['cloudState','profileCloudStatus']){const e=$(id);if(e){e.dataset.sync='offline';e.textContent='NUBE NO DISPONIBLE · TU PROGRESO LOCAL SIGUE A SALVO'}}});
-</script><script type="module" src="content/auth-account.js?v=20261122chars"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
+</script><script type="module" src="content/auth-account.js?v=20261124reta"></script><script type="module" src="content/avatar-profile.js?v=20261120"></script></body></html>
