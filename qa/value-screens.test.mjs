@@ -24,7 +24,7 @@ test('Valor y POP sobre la imagen, con reacciones antes de la narrativa y sin f√
  key('id="profileValuePoints"');
  key('id="fDesignValue"');
  key('id="communityRankRows"');
- for(const id of ['zVoting','zRate','zVoteStatus','zNarrative','zDesignPopularity'])key('id="'+id+'"');
+ for(const id of ['zVoting','zRate','zLikeStatus','zNarrative','zDesignPopularity'])key('id="'+id+'"');
  key('content/card-runtime.js?v=');
  key('content/card-renderer.js?v=');
  key('content/card-data-adapter.js?v=');

@@ -1406,8 +1406,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #zoom #zRate .rb.zr-emoji.on{background:#ffd4001a!important;border-color:#FFD400!important}
 #zoom #zRate .rb.zr-emoji.on::after{top:2px;right:4px;color:#FFD400;font:800 10px AV,system-ui,sans-serif}
 #zoom #zGoty{font:500 11px/1.4 AV,system-ui,sans-serif!important;color:#bcb7d4!important}
-#zoom #zVoteStatus{margin:0;font:11px/1.4 AV,system-ui,sans-serif;color:#c9c3df}
-#zoom #zVoteStatus:empty{display:none}
+#zoom #zLikeStatus{margin:0;font:11px/1.4 AV,system-ui,sans-serif;color:#c9c3df}
+#zoom #zLikeStatus:empty{display:none}
 #zoom .z-narrative{box-sizing:border-box;margin:0 auto 6px;padding:12px 2px 8px}
 #zoom .z-narrative-kicker{margin-bottom:6px}
 #zoom .z-narrative p{margin:0;font:500 14px/1.55 AV,system-ui,sans-serif}
@@ -2510,7 +2510,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx" role="button" tabindex="0" aria-label="Tocar carta para regresar" title="Tocar para regresar"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <p class="z-return-hint" aria-hidden="true">TOCA LA CARTA PARA VOLVER</p>
- <div id="zVoting" hidden><p class="z-rate-title">¿Qué te parece este diseño?</p><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><p id="zVoteStatus" role="status" aria-live="polite"></p></div>
+ <div id="zVoting" hidden><p class="z-rate-title">¿Qué te parece este diseño?</p><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><p id="zLikeStatus" role="status" aria-live="polite"></p></div>
  <section class="z-narrative" id="zNarrative" tabindex="-1" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
  <section id="zDesignPopularity" class="icmx-pop-panel" aria-label="Popularidad global"></section>
 </dialog>
@@ -2951,6 +2951,44 @@ const MUSIC_FILES={general:'audio/vinyl-dreams.mp3',reta:'audio/pixel-showdown.m
 const MUSIC={general:new Audio(MUSIC_FILES.general),reta:new Audio(MUSIC_FILES.reta)};
 for(const audio of Object.values(MUSIC)){audio.loop=true;audio.preload='none';audio.volume=0}
 let musicAllowed=false,musicFade=0,musicWanted=null;
+const REVEAL_SFX_FILES={e:'audio/holo.mp3',r:'audio/gold.mp3',f:'audio/full.mp3',level:'audio/Collectible%20Complete.mp3'};
+// Reproducción directa: evita silenciar MP3 por restricciones de Web Audio/CORS.
+const REVEAL_SFX_GAIN={e:.32,r:.34,f:.24,level:.30};
+const REVEAL_SFX_FADE_MS=120;
+const revealSfx=new Audio();
+revealSfx.preload='auto';
+const revealSfxSeen=new Set();
+let revealFadeFrame=0,revealToken=0;
+function stopRevealSfx(){
+ revealToken++;cancelAnimationFrame(revealFadeFrame);
+ revealSfx.onplaying=null;revealSfx.pause();
+ try{revealSfx.currentTime=0}catch(e){}
+}
+function playSpecialSfx(v){
+ if(!REVEAL_SFX_FILES[v]||soundMuted||document.hidden)return;
+ stopRevealSfx();
+ const token=revealToken,target=REVEAL_SFX_GAIN[v],initial=target*.65;
+ // Nunca se inicia en silencio; el fade es un ajuste opcional, no un requisito para oír.
+ revealSfx.volume=initial;
+ revealSfx.src=REVEAL_SFX_FILES[v];
+ revealSfx.onplaying=()=>{
+  if(token!==revealToken)return;
+  revealSfx.onplaying=null;
+  const start=performance.now();
+  const fade=now=>{
+   if(token!==revealToken)return;
+   const p=Math.min(1,Math.max(0,(now-start)/REVEAL_SFX_FADE_MS));
+   revealSfx.volume=initial+(target-initial)*p;
+   if(p<1)revealFadeFrame=requestAnimationFrame(fade);
+  };
+  revealFadeFrame=requestAnimationFrame(fade);
+ };
+ try{const p=revealSfx.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}
+}
+function playRevealSfx(v,i){
+ if(!REVEAL_SFX_FILES[v]||v==='level'||revealSfxSeen.has(i))return;
+ revealSfxSeen.add(i);playSpecialSfx(v);
+}
 const AUDIO_ICON_ON='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 9a5 5 0 0 1 0 6M18 6a9 9 0 0 1 0 12"/></svg>';
 const AUDIO_ICON_OFF='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6m0-6-5 6"/></svg>';
 function showSoundState(){
@@ -3006,7 +3044,7 @@ function setSoundMuted(muted){
  soundMuted=!!muted;
  try{localStorage.setItem(AUDIO_PREF_KEY,soundMuted?'1':'0')}catch(e){}
  showSoundState();notifyRetaSound();
- if(soundMuted)musicStop();else{musicAllowed=true;musicForScreen()}
+ if(soundMuted){stopRevealSfx();musicStop()}else{musicAllowed=true;musicForScreen()}
 }
 function initSound(){
  showSoundState();
@@ -3022,10 +3060,10 @@ function initSound(){
  window.addEventListener('storage',e=>{
   if(e.key!==AUDIO_PREF_KEY)return;
   soundMuted=e.newValue==='1';showSoundState();notifyRetaSound();
-  if(soundMuted)musicStop();else if(musicAllowed)musicForScreen();
+  if(soundMuted){stopRevealSfx();musicStop()}else if(musicAllowed)musicForScreen();
  });
  document.addEventListener('visibilitychange',()=>{
-  if(document.hidden)musicStop();else if(musicAllowed&&!soundMuted)musicForScreen();
+  if(document.hidden){stopRevealSfx();musicStop()}else if(musicAllowed&&!soundMuted)musicForScreen();
  });
 }
 let AC;function beep(f,d=.07){if(soundMuted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
@@ -3103,6 +3141,7 @@ document.addEventListener('keydown',e=>{
 /* ---------- navegación ---------- */
 let cur='home';
 function go(id){
+ if(id!=='pack')stopRevealSfx();
  if(id!=='profile'&&$('profile')?.classList.contains('account-focus')){
   $('profile').classList.remove('account-focus');
   $('profileAccountPanel').hidden=true;
@@ -3345,10 +3384,11 @@ function showLevelUpIfPending(){
  dlg.querySelector('.p1-up-achieve-top b').textContent=expansion.from+'/'+expansion.from+' ✓';
  dlg.querySelector('.p1-up-loot span').textContent=(expansion.to-expansion.from)+' NUEVOS DISEÑOS';
  dlg.showModal();$('p1UpExplore').focus({preventScroll:true});
- [[0,523],[180,659],[360,784],[900,1047],[1190,1319],[1350,1568],[1570,2093]].forEach(([delay,note])=>setTimeout(()=>{if(dlg.open)beep(note,.15)},delay));
+ if(expansion.from===25&&expansion.to===50)playSpecialSfx('level');
+ else [[0,523],[180,659],[360,784],[900,1047],[1190,1319],[1350,1568],[1570,2093]].forEach(([delay,note])=>setTimeout(()=>{if(dlg.open)beep(note,.15)},delay));
 }
-$('p1UpExplore').onclick=()=>{$('p1LevelUp').close();page=0;go('album');const first=$('grid').querySelector('[data-release="'+(expandedFrom+1)+'"]');if(first){const scroller=$('album').querySelector('.p1-scroll');const top=scroller.scrollTop+first.getBoundingClientRect().top-scroller.getBoundingClientRect().top-scroller.clientTop-18;scroller.scrollTo({top:Math.max(0,top),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});first.classList.add('p1-expansion-highlight')}};
-$('p1UpContinue').onclick=()=>{$('p1LevelUp').close();$('sum').focus({preventScroll:true})};
+$('p1UpExplore').onclick=()=>{stopRevealSfx();$('p1LevelUp').close();page=0;go('album');const first=$('grid').querySelector('[data-release="'+(expandedFrom+1)+'"]');if(first){const scroller=$('album').querySelector('.p1-scroll');const top=scroller.scrollTop+first.getBoundingClientRect().top-scroller.getBoundingClientRect().top-scroller.clientTop-18;scroller.scrollTo({top:Math.max(0,top),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});first.classList.add('p1-expansion-highlight')}};
+$('p1UpContinue').onclick=()=>{stopRevealSfx();$('p1LevelUp').close();$('sum').focus({preventScroll:true})};
 $('p1LevelUp').addEventListener('cancel',e=>{e.preventDefault();$('p1UpContinue').click()});
 
 const VORD={f:0,r:1,e:2,b:3}; // de mejor a peor
@@ -3368,7 +3408,7 @@ function setPackPresentation(kind='standard'){
  img.alt=PACK_PRESENTATIONS[active].label;
  return active;
 }
-function resetPack(){pendingLevelUp=false;setPackPresentation('standard');$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.webp?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
+function resetPack(){stopRevealSfx();pendingLevelUp=false;setPackPresentation('standard');$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.webp?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
  $('stack').classList.remove('on');$('sum').classList.remove('on');$('stHint').style.display='none';$('openBtn').style.visibility='visible'}
 let tx=null;
 $('tearZone').addEventListener('pointerdown',e=>{tx=e.clientX;$('hand').style.display='none';try{$('tearZone').setPointerCapture(e.pointerId)}catch(_){}});
@@ -3549,7 +3589,7 @@ function resolveArtworkBackground(d,D){
 const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255};
 const icAwardsSeen=new Set(); // sellos vistos en el sobre actual
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
-function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();CINEMATIC_SHOWN.clear();icAwardsSeen.clear();
+function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();CINEMATIC_SHOWN.clear();revealSfxSeen.clear();stopRevealSfx();icAwardsSeen.clear();
  for(const c of hand)c._comp=!c._doneB&&dState(DB[c.d]).done&&hand.filter(x=>x.d===c.d).pop()===c; // completó en este sobre
  lastPack=new Set(hand.filter(c=>c._new).map(c=>c.d));showCard()}
 function caseOf(c){return !c._new?'rep':c._comp?'comp':c._dnew?'dnew':'vnew'}
@@ -3598,7 +3638,7 @@ function dxNav(){
  const move=step=>e=>{
   if(step<0&&idx===0)return;
   if(step>0&&D.classList.contains('cov'))return; // La carta especial necesita revelarse
-  idx+=step;
+  stopRevealSfx();idx+=step;
   if(idx===hand.length){finishDiscovery();return}
   showCard();
   if(e&&e.detail===0){
@@ -3657,7 +3697,7 @@ function startCinematicReveal(c,D){
   if(hand[idx]!==current)return;
   overlay.remove();D.classList.remove('dx-cinema','dx-cinema-'+c.v);
  },1750);
- meta.notes.forEach((note,i)=>setTimeout(()=>{if(cur==='pack'&&hand[idx]===current)beep(note,.08)},i*100));
+ // El audio de rareza se reproduce exclusivamente desde la revelación.
  return true;
 }
 
@@ -3674,7 +3714,7 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
    revealing=true;
    const cover=$('dcBack');if(cover){cover.classList.add('dx-opening');cover.disabled=true}
    const btn=$('dcReveal');if(btn)btn.disabled=true;
-   beep(c.v==='r'?1175:c.v==='f'?1568:988,.12);
+   playRevealSfx(c.v,idx);
    // Preparamos la imagen grande y la miniatura antes de quitar el reverso.
    // El DOM se construye una sola vez: no se reinician animaciones ni aparece el arte anterior.
    const d=DB[c.d],src=c.v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.webp?v='+IMGV:artOf(d.id);
@@ -3724,9 +3764,12 @@ function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
   const show=!D.classList.contains('dx-art-only');setArtworkView(show);
   ga('vista_ilustracion',{origen:'fondo',accion:show?'ver_arte':'ver_carta'});
  };
- const cinematic=startCinematicReveal(c,D);
- if(k==='rep')beep(440,.05);else if(v==='b')beep(988,.07);else if(!cinematic)jingle();
- if(k==='comp')setTimeout(()=>[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.1),i*120)),500)}
+ startCinematicReveal(c,D);
+ if(v==='b'){
+  if(k==='rep')beep(440,.05);else beep(988,.07);
+  if(k==='comp')setTimeout(()=>[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.1),i*120)),500);
+ }else playRevealSfx(v,idx);
+}
 $('stack').addEventListener('click',e=>{});
 function topCard(){return $('stack').querySelector('.sc[data-i="'+idx+'"]')}
 function hintTop(){const t=topCard();document.querySelectorAll('.sc').forEach(x=>x.classList.toggle('top',x===t));$('stHint').style.display='block';$('stHint').textContent=t&&t.classList.contains('down')?'Algo bueno viene… tócala para voltearla':'Aviéntala a un lado · '+(idx+1)+' de 5'}
@@ -3740,7 +3783,7 @@ function gStart(x,y,target){if(busy||G)return;const t=target.closest&&target.clo
 function gMove(x,y){if(!G)return;G.mx=x-G.x;G.my=y-G.y;if(G.t.classList.contains('down'))return;G.t.style.transform=`translate(${G.mx}px,${G.my*.4}px) rotate(${G.mx/16}deg)`}
 function gEnd(cancel){if(!G)return;const g=G;G=null;const t=g.t;const tap=Math.abs(g.mx)<10&&Math.abs(g.my)<10;
  if(cancel){backCard(t);return}
- if(t.classList.contains('down')){if(tap){t.classList.remove('down');t.style.transition='';t.style.transform='';jingle();toast({holo:'★ HOLO',dorada:'★★★ DORADA',full:'★★ ESPECIAL'}[hand[idx].r]);hintTop()}return}
+ if(t.classList.contains('down')){if(tap){t.classList.remove('down');t.style.transition='';t.style.transform='';playRevealSfx(hand[idx].v,idx);toast({holo:'★ HOLO',dorada:'★★★ DORADA',full:'★★ ESPECIAL'}[hand[idx].r]);hintTop()}return}
  const v=Math.abs(g.mx)/Math.max(1,performance.now()-g.t0);
  if(Math.abs(g.mx)>100||(Math.abs(g.mx)>40&&v>.6))throwCard(t,g.mx,g.my);else{backCard(t);if(tap){t.classList.remove('nudge');void t.offsetWidth;t.classList.add('nudge')}}}
 const ST=$('stack');
@@ -4029,18 +4072,18 @@ function openCard(k,options={}){
 function setVoting(on){
  $('zVoting').hidden=!on;
  $('zDesignPopularity').hidden=!on;
- if(on){paintRate();zGo();$('zVoteStatus').textContent='';}
+ if(on){paintRate();zGo();$('zLikeStatus').textContent='';}
 }
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb zr-emoji ${S.rate[zd()]===i?'on':''}" data-r="${i}" type="button" aria-label="${n}" title="${n}" aria-pressed="${S.rate[zd()]===i}">${REACTION_EMOJI[i]}</button>`).join('')}
 $('zRate').onclick=e=>{
  const b=e.target.closest('[data-r]');if(!b)return;
  syncIn();const id=zd(),r=+b.dataset.r,previous=S.rate[id],next=previous===r?null:r;
  if(next===null)delete S.rate[id];else S.rate[id]=next;
- const saved=save();$('zVoteStatus').textContent='';
+ const saved=save();$('zLikeStatus').textContent='';
  if(saved&&globalThis.icmxAccountIdentity?.userId&&!DB[id]?.bx){
   // Una reacción publica únicamente la calificación Tier.
   communityVote(id,'tier',next).then(ok=>{
-   if(!ok&&$('zoom').open&&zd()===id&&(S.rate[id]??null)===next)$('zVoteStatus').textContent='Calificación local guardada; no se publicó.';
+   if(!ok&&$('zoom').open&&zd()===id&&(S.rate[id]??null)===next)$('zLikeStatus').textContent='Calificación local guardada; no se publicó.';
   });
  }
  beep(next===null?330:[1319,1047,784,523][r],.08);paintRate();zGo();
