@@ -24,7 +24,7 @@ test('Valor y POP sobre la imagen, con reacciones antes de la narrativa y sin fÃ
  key('id="profileValuePoints"');
  key('id="fDesignValue"');
  key('id="communityRankRows"');
- for(const id of ['zVoting','zRate','zGoty','zLikeStatus','zNarrative'])key('id="'+id+'"');
+ for(const id of ['zVoting','zRate','zGoty','zVoteStatus','zNarrative'])key('id="'+id+'"');
  key('content/card-runtime.js?v=');
  key('content/card-renderer.js?v=');
  key('content/card-data-adapter.js?v=');
@@ -86,4 +86,9 @@ test('El nuevo renderer elimina los parches: un solo pie SVG sobre shell sin tin
  assert.doesNotMatch(html,/content\/card-value-overlay\.js\?v=/);
  assert.doesNotMatch(html,/ICMX_CARD_VALUE\.mount\(/);
  assert.doesNotMatch(css,/\.fx>canvas\.icmx-card-face-values/);
+});
+
+test('La ficha publica Ãºnicamente Tier, sin Like derivado',()=>{
+ assert.match(html,/communityVote\(id,'tier',next\)/);
+ assert.doesNotMatch(html,/communityVote\([^\n]*,'like',/);
 });

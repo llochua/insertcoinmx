@@ -44,7 +44,7 @@ async function open(identity,width){
    const token=req.headers().authorization,person=token?.replace('Bearer test-','');
    if(!identity||person!==identity)return send({error:'no session'},403);
    const a=req.postDataJSON(),key=person+':'+a.p_design;
-   if(!ids.includes(a.p_design)||!['like','tier'].includes(a.p_channel))return send({error:'invalid'},400);
+   if(!ids.includes(a.p_design)||a.p_channel!=='tier')return send({error:'invalid'},400);
    const row=votes.get(key)||{id:a.p_design,like:null,tier:null};row[a.p_channel]=a.p_value;votes.set(key,row);return send(null);
   }
   throw Error('Unexpected production path '+path);
@@ -69,38 +69,38 @@ try{
  const before=await a.evaluate(()=>JSON.stringify(S.have));
  await a.evaluate(()=>openCard('abuket_b'));
  assert.equal(await a.locator('#zRate button[data-r]').count(),4,'Solo cuatro reacciones');
- // Una reacción controla Tier y Like; el mismo botón permite retirarla sin duplicar votos.
- await a.locator('#zRate [data-r="0"]').click(); // GOTY: Tier GOTY + Like positivo
+ // Una reacción controla exclusivamente Tier; el mismo botón permite retirarla.
+ await a.locator('#zRate [data-r="0"]').click(); // GOTY
  await a.waitForFunction(()=>{
   const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
-  return x?.tiers.goty===1&&x?.likes.total===1&&x?.likes.positive===1;
+  return x?.tiers.goty===1&&x?.likes.total===0;
  });
- await a.locator('#zRate [data-r="0"]').click(); // Segundo toque: retirar ambos
+ await a.locator('#zRate [data-r="0"]').click(); // Segundo toque: retirar Tier
  await a.waitForFunction(()=>{
   const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
   return x?.tiers.goty===0&&x?.likes.total===0;
  });
  assert.equal(aggregates()[0].likes.total,0,'El retiro no deja Likes huérfanos');
- await a.locator('#zRate [data-r="1"]').click(); // GENIAL: Like positivo
+ await a.locator('#zRate [data-r="1"]').click(); // GENIAL
  await a.waitForFunction(()=>{
   const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
-  return x?.tiers.genial===1&&x?.likes.total===1&&x?.likes.positive===1;
+  return x?.tiers.genial===1&&x?.likes.total===0;
  });
  await b.evaluate(()=>openCard('abuket_e'));
- await b.locator('#zRate [data-r="3"]').click(); // MMM: Like negativo
+ await b.locator('#zRate [data-r="3"]').click(); // MMM
  await b.waitForFunction(()=>{
   const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
-  return x?.tiers.mmm===1&&x?.likes.total===2&&x?.likes.positive===1;
+  return x?.tiers.mmm===1&&x?.likes.total===0;
  });
- await b.locator('#zRate [data-r="2"]').click(); // OK: Tier neutro, sin Like
+ await b.locator('#zRate [data-r="2"]').click(); // OK
  await b.waitForFunction(()=>{
   const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
-  return x?.tiers.ok===1&&x?.tiers.mmm===0&&x?.likes.total===1;
+  return x?.tiers.ok===1&&x?.tiers.mmm===0&&x?.likes.total===0;
  });
  await b.locator('#zRate [data-r="0"]').click(); // Cambia a GOTY: reemplaza el voto de beta
  await b.waitForFunction(()=>{
   const x=communityRanking?.state.aggregates.find(x=>x.id==='abuket');
-  return x?.tiers.goty===1&&x?.tiers.ok===0&&x?.likes.total===2&&x?.likes.positive===2;
+  return x?.tiers.goty===1&&x?.tiers.ok===0&&x?.likes.total===0;
  });
  const expected=rankDesigns(aggregates()).find(x=>x.id==='abuket').score;
  await b.waitForFunction(v=>document.querySelector('#zFx svg.icmx-data [data-icmx-field="pop"]')?.textContent===String(v),expected);
