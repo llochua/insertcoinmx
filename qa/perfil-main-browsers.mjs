@@ -64,6 +64,10 @@ async function device(signed){
  // El juego siempre abre en su pantalla START; entrar primero como jugador real.
  await page.locator('#title .tstart').click();
  await page.locator('#title.on').waitFor({state:'hidden'});
+ await page.locator('#onb.on').waitFor({state:'visible'});
+ for(let step=0;step<3;step++)await page.locator('#onNext').click();
+ await page.locator('#onb').waitFor({state:'hidden'});
+ assert.equal(await page.locator('#icmxGuestGate:visible').count(),0,'existing player retains access after onboarding');
  await page.locator('#home .home-player-card').click();
  await page.locator('#profile.on').waitFor();
  return {context,page};
