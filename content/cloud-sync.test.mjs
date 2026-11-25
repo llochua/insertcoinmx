@@ -187,3 +187,13 @@ test('Beta sin CAPTCHA usa Auth real sin token, conserva UID y no repite alta',a
  const first=await ensureVerifiedGuest(params);h.storage.setItem(GUEST_BINDING,first.id);
  assert.equal((await ensureVerifiedGuest(params)).id,first.id);assert.equal(h.created,1);
 });
+
+
+test('Bienvenida nueva: tres sobres no consumidos siguen siendo partida fresca',()=>{
+ const fresh=backup({}, {welcomeLeft:3,welcomeTotal:3});
+ assert.equal(isFreshGuest(fresh),true);
+ assert.equal(hasGameProgress(fresh),false);
+ assert.equal(isFreshGuest(backup({}, {welcomeLeft:2,welcomeTotal:3})),false);
+ assert.equal(hasGameProgress(backup({}, {welcomeLeft:2,welcomeTotal:3})),true);
+ assert.equal(isFreshGuest(backup({}, {welcomeLeft:5})),true);
+});
