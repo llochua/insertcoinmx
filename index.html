@@ -1952,6 +1952,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-height:650px){#entryAccount .entry-account-brand img{width:64px}#entryAccount .entry-account-brand{margin-bottom:10px}#entryAccount .entry-account-shell{padding-top:12px;padding-bottom:17px}}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261121-global"><style>
 /* COLLECTION SCREEN — Insert Coin MX original arcade UI. */
+#album>.top{flex-shrink:0}
 #album .p1-scroll{min-height:0;overscroll-behavior:contain}
 #album .p1-panel{width:100%;max-width:1100px;margin:0 auto 19px;display:grid;gap:0}
 .p1-panel[hidden]{display:none!important}
@@ -3086,7 +3087,7 @@ function go(id){
   $('profileAccountPanel').hidden=true;
   $('profileWelcome').hidden=false;
  }
- if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh();if(id==='scores'||id==='album'||id==='pack')communityRanking?.refresh();if(id==='scores')playerRanking?.refresh()}
+ if(id==='pack'){syncIn();if(!packReady()){uxEmptyPacks();return}}if(id!==cur)ga('page_view',{page_title:id,page_location:location.origin+location.pathname+'#'+id});if(id!=='album'&&fd)closeFicha();if(id==='album'){syncIn();if(markLogros())save()}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));cur=id;if(id==='album'){const frame=$('album').closest('.crt');if(frame){frame.scrollTop=0;frame.scrollLeft=0}}musicForScreen();if(id==='pack')resetPack();else if(id==='torneo')startTorneo();else refresh();if(id==='scores'||id==='album'||id==='pack')communityRanking?.refresh();if(id==='scores')playerRanking?.refresh()}
 /* los datos de la comunidad llegan en vivo: solo repintar pantallas pasivas, nunca reiniciar el sobre ni el torneo ni un arrastre */
 function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySelector('.chip.ghost'))return;({home:renderHome,album:renderAlbum,tier:renderTier,scores:renderScores,profile:renderProfile}[cur]||(()=>{}))()}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
@@ -3325,7 +3326,7 @@ function showLevelUpIfPending(){
  dlg.showModal();$('p1UpExplore').focus({preventScroll:true});
  [[0,523],[180,659],[360,784],[900,1047],[1190,1319],[1350,1568],[1570,2093]].forEach(([delay,note])=>setTimeout(()=>{if(dlg.open)beep(note,.15)},delay));
 }
-$('p1UpExplore').onclick=()=>{$('p1LevelUp').close();page=0;go('album');const first=$('grid').querySelector('[data-release="'+(expandedFrom+1)+'"]');if(first){first.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});first.classList.add('p1-expansion-highlight')}};
+$('p1UpExplore').onclick=()=>{$('p1LevelUp').close();page=0;go('album');const first=$('grid').querySelector('[data-release="'+(expandedFrom+1)+'"]');if(first){const scroller=$('album').querySelector('.p1-scroll');const top=scroller.scrollTop+first.getBoundingClientRect().top-scroller.getBoundingClientRect().top-scroller.clientTop-18;scroller.scrollTo({top:Math.max(0,top),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});first.classList.add('p1-expansion-highlight')}};
 $('p1UpContinue').onclick=()=>{$('p1LevelUp').close();$('sum').focus({preventScroll:true})};
 $('p1LevelUp').addEventListener('cancel',e=>{e.preventDefault();$('p1UpContinue').click()});
 
