@@ -1614,8 +1614,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 @media(max-height:690px){#home .home-player-card{min-height:59px;margin-top:5px;padding:6px 10px}#home .home-player-avatar{width:37px;height:37px;flex-basis:37px}#home .home-player-avatar img{width:26px;height:26px}}
 @media(max-width:370px){#home .home-player-card{width:calc(100% - 20px);gap:7px}#home .home-player-count b{font-size:17px}#profile .profile-dial{width:102px;height:102px;flex-basis:102px}#profile .profile-collection{gap:13px}#profile .profile-head h2{font-size:18px}}
 /* Bienvenida V2: proteger la colección es la acción principal, invitado secundaria */
-.on-visual[data-step="2"] .on-play{display:none}
-.on-visual[data-step="2"] .on-save{display:flex}
+.on-visual[data-step="2"] .on-play{display:flex}
+.on-visual[data-step="2"] .on-save{display:none}
 .on-save{flex-direction:column;gap:14px}
 .on-save-visual{display:flex;align-items:center;justify-content:center;gap:clamp(7px,2vw,16px);width:100%}
 .on-save-device{display:flex;flex:0 0 clamp(88px,25vw,138px);width:clamp(88px,25vw,138px);height:clamp(148px,36vh,235px);flex-direction:column;align-items:center;padding:10px 7px 8px;gap:9px;border:4px solid #38315e;border-radius:18px;background:#141027;box-shadow:0 14px 25px rgba(0,0,0,.4)}
@@ -2545,9 +2545,9 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   </div>
   <div class="on-scene on-play">
    <div class="on-play-grid">
-    <div class="on-feature"><span class="on-label">ÁLBUM</span><img class="on-mini-card" src="c/F_gatosamurai.webp" alt=""></div>
-    <div class="on-feature"><span class="on-label">TIER</span><div class="on-ranks"><div class="on-rank"><strong>S</strong><img src="c/F_hyrule.webp" alt=""></div><div class="on-rank"><strong>A</strong><img src="c/fatality.webp" alt=""></div></div></div>
-    <div class="on-feature"><span class="on-label">RETA</span><div class="on-duel"><img src="c/fatality.webp" alt=""><b>VS</b><img src="c/F_shenzalcoatl.webp" alt=""></div></div>
+    <div class="on-feature"><span class="on-label">25 DISEÑOS</span><img class="on-mini-card" src="c/F_gatosamurai.webp" alt=""></div>
+    <div class="on-feature"><span class="on-label">DESBLOQUEA</span><svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="#ffd400" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 24h31m-12-12 12 12-12 12"/></svg></div>
+    <div class="on-feature"><span class="on-label">50 DISEÑOS</span><img class="on-mini-card" src="c/F_shenzalcoatl.webp" alt=""></div>
    </div>
   </div>
  </div>
@@ -3213,29 +3213,29 @@ function refresh(){try{renderTitle()}catch(e){}if(cur==='tier'&&document.querySe
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){beep(880);go(g.dataset.go)}const b=e.target.closest('[data-home]');if(b){beep(440);if(uxPackInProgress())uxConfirmPackExit();else go('home')}});
 /* ---------- bienvenida ---------- */
 const ON=[
- {k:'EL ÁLBUM · 01 / 03',t:'Las playeras que hemos hecho, ahora tienen una carta.',p:'Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección.'},
+ {k:'EL ÁLBUM · 01 / 03',t:'Colecciona los diseños de Insert Coin.',p:'Nuestras playeras gamer se convierten en cartas coleccionables. Descubre sus diseños y distintas versiones.'},
  {k:'TUS PRIMEROS SOBRES · 02 / 03',t:'¡Tienes 5 sobres para empezar!',p:'3 de bienvenida + 2 de la franja actual. Cada sobre trae 5 cartas. Recibe 2 más cada 6 horas.'},
- {k:'TU PARTIDA · 03 / 03',t:'¡No pierdas tus cartas!',p:'Crea una cuenta gratis para guardar tu colección y recuperarla en otro dispositivo. Si sigues como invitado, solo se guarda en este navegador.'}
+ {k:'TU OBJETIVO · 03 / 03',t:'Completa tu álbum.',p:'Consigue 25 diseños distintos para desbloquear otros 25. Cualquier versión de un diseño cuenta.'}
 ];
 const ON_PREVIEW=new URLSearchParams(location.search).get('preview')==='onboarding';
 let onI=0;
 function showOn(){
  const o=ON[onI],modal=$('onb');modal.classList.add('on');modal.setAttribute('aria-hidden','false');
- $('onVisual').dataset.step=String(onI);modal.classList.toggle('account-step',onI===ON.length-1);$('onK').textContent=o.k;$('onT').textContent=o.t;$('onP').textContent=o.p;
+ $('onVisual').dataset.step=String(onI);modal.classList.remove('account-step');$('onK').textContent=o.k;$('onT').textContent=o.t;$('onP').textContent=o.p;
  $('onDots').innerHTML=ON.map((_,i)=>'<i class="'+(i===onI?'on':'')+'"></i>').join('');
  $('onDots').setAttribute('aria-label','Paso '+(onI+1)+' de '+ON.length);
- $('onBack').hidden=onI===0;$('onNext').textContent=onI<2?'SIGUIENTE':'SEGUIR COMO INVITADO';$('onAccount').hidden=onI!==ON.length-1;
- if(onI===ON.length-1)$('onAccount').focus({preventScroll:true});else $('onNext').focus({preventScroll:true})
+ $('onBack').hidden=onI===0;$('onNext').textContent=onI<ON.length-1?'SIGUIENTE':'EMPEZAR';$('onAccount').hidden=true;
+ $('onNext').focus({preventScroll:true})
 }
 function closeOn(){
  $('onb').classList.remove('on');$('onb').setAttribute('aria-hidden','true');
- syncIn();if(!S.seen&&!ON_PREVIEW){S.seen=1;save()}
- // Ningún sobre se emite hasta que el jugador lo elija desde Inicio.
+ // La identidad se guarda solamente cuando el acceso existente se completa.
  go('home');$('home').focus({preventScroll:true});
+ if(!globalThis.icmxAvatarAuthUser?.id&&!globalThis.icmxAccountIdentity?.handle)openArcadeEntry('welcome');
 }
 $('onBack').onclick=()=>{if(onI>0){beep(440,.04);onI--;showOn()}};
 $('onSkip').onclick=()=>{beep(440,.04);closeOn(false)};
-$('onAccount').onclick=()=>{beep(880);closeOn(false);go('profile');revealProfileAuth('signup')};
+$('onAccount').onclick=()=>{beep(880);closeOn(false)};
 $('onNext').onclick=()=>{beep(880);if(onI<ON.length-1){onI++;showOn()}else closeOn()};
 document.addEventListener('keydown',e=>{if(!$('onb').classList.contains('on'))return;
  if(e.key==='Escape'){e.preventDefault();closeOn(false)}else if(e.key==='ArrowLeft'&&onI>0){e.preventDefault();onI--;showOn()}
@@ -3288,7 +3288,7 @@ async function openArcadeEntry(step='welcome'){
     persistLocalRecord();refresh();return true;
    }
   },step);
- }catch(_){if(step==='welcome')showOn()}
+ }catch(_){toast('NO SE PUDO CARGAR EL ACCESO · REINTENTA DESDE PERFIL')}
 }
 $('profileEditIdentity').onclick=()=>{go('home');openArcadeEntry('identity')};
 document.addEventListener('icmx:player-identity',()=>{
@@ -3870,7 +3870,8 @@ $('title').addEventListener('click',e=>{
  if(!globalThis.icmxAccountIdentity?.handle&&(!validArcadeIni(identity.ini)||!validArcadeHandle(identity.handle))){
    // Una colección antigua nunca se reinicia: solo se solicita la identidad faltante.
    const hasProgress=!!(S.seen||S.ini||S.last||Object.keys(S.have||{}).length||(Array.isArray(S.pk)&&S.pk.length));
-   openArcadeEntry('welcome');
+   if(!hasProgress&&!identity.ini&&!identity.handle){onI=0;showOn()}
+   else openArcadeEntry('welcome');
  }
 });
 document.addEventListener('pointermove',e=>{if(!$('title').classList.contains('on'))return;const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;$('tiHero').style.transform=`rotateY(${x*14}deg) rotateX(${-y*10}deg)`});
