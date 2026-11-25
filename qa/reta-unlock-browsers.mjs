@@ -165,7 +165,16 @@ try{
   assert.equal(await frame.locator('.top-insert-next').textContent(),'VER MI ÁLBUM');
   assert.match(await frame.locator('#topInsertClock').textContent(),/^\d{2}:\d{2}:\d{2}$/);
   await page.screenshot({path:'qa/screenshots/reta-top-insert-'+width+'.png'});
-  await page.evaluate(()=>{const k=Object.keys(S.have)[0];S.have[k]=6;save()});
+  // Canje: 14 repetidas todavía no alcanzan; 15 sí, incluyendo otras variantes.
+  const below=await page.evaluate(()=>{
+   const k=Object.keys(S.have)[0];S.have[k]=1;
+   S.have[k]=1+14-dups();save();return dups();
+  });
+  assert.equal(below,14);
+  assert.equal(await frame.locator('.top-insert-next[data-action="trade"]').count(),0);
+  assert.equal(await frame.locator('.top-insert-next').textContent(),'VER MI ÁLBUM');
+  const eligible=await page.evaluate(()=>{const k=Object.keys(S.have)[0];S.have[k]++;save();return dups()});
+  assert.equal(eligible,15);
   await frame.locator('.top-insert-next[data-action="trade"]').waitFor();
   assert.equal(await frame.locator('.top-insert-next').textContent(),'CANJEAR UN SOBRE EXTRA');
   assert.equal(await frame.locator('#topInsertWait').isVisible(),false);
