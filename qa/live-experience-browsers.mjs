@@ -33,11 +33,14 @@ try{
   const page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/rest/v1/rpc/icmx_community_aggregates',r=>r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'[]'}));
-  // El inicio real conserva la portada y ejecuta onboarding una sola vez.
+  // El inicio real conserva la portada y ejecuta onboarding en dos entradas distintas.
   const response=await page.goto(url,{waitUntil:'domcontentloaded'});
   assert.equal(response.status(),200);
   assert.equal(await page.locator('#title.on').count(),1,'portada pública intacta');
   await page.locator('#title').click({position:{x:120,y:240}});
+  await page.locator('#onb.on').waitFor({state:'visible'});
+  for(let step=0;step<3;step++)await page.locator('#onNext').click();
+  await page.locator('#onb').waitFor({state:'hidden'});
   await page.locator('#icmxGuestChoose').click();
   await page.locator('#icmxGuestIni').fill('TST');
   await page.locator('#icmxGuestHandle').fill('qa_guest');
@@ -49,12 +52,27 @@ try{
    saved:localStorage.getItem('icmx-album2'),
    have:JSON.stringify(S.have),fg:S.fg,extra:S.extra,freeUsed:S.freeUsed
   }));
-  assert.equal(JSON.parse(before.saved).seen,1,'onboarding se recuerda en el guardado real');
+  assert.equal(JSON.parse(before.saved).seen,1,'identidad se recuerda en el guardado real');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('icmx-onboarding-views-v1')),'1');
   assert.deepEqual(JSON.parse(before.have),{},'bienvenida no crea cartas');
   await page.reload({waitUntil:'domcontentloaded'});
   assert.equal(await page.evaluate(()=>S.seen),1,'progreso sobrevive recarga');
   await page.locator('#title').click({position:{x:120,y:240}});
   assert.equal(await page.locator('#icmxGuestGate:visible').count(),0,'guest access does not repeat after reload');
+  assert.equal(await page.locator('#onb.on').count(),0,'reload does not repeat onboarding');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('icmx-onboarding-views-v1')),'1');
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  await page.locator('#title').click({position:{x:120,y:240}});
+  await page.locator('#onb.on').waitFor();
+  for(let step=0;step<3;step++)await page.locator('#onNext').click();
+  assert.equal(await page.locator('#icmxGuestGate:visible').count(),0,'known guest goes home');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('icmx-onboarding-views-v1')),'2');
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  await page.locator('#title').click({position:{x:120,y:240}});
+  assert.equal(await page.locator('#onb.on').count(),0,'third entry goes home');
+  await page.locator('#homeHowToPlay').click();
+  for(let step=0;step<3;step++)await page.locator('#onNext').click();
+  assert.equal(await page.evaluate(()=>localStorage.getItem('icmx-onboarding-views-v1')),'2');
 
   const meta=await page.evaluate(()=>{
    go('pack');

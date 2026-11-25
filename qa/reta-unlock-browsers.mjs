@@ -80,6 +80,9 @@ try{
   await page.goto(url,{waitUntil:'domcontentloaded'});
   // Entrar como invitado en esta instalación local, sin tocar datos de usuarios.
   await page.locator('#title').click({position:{x:120,y:240}});
+  await page.locator('#onb.on').waitFor({state:'visible'});
+  for(let step=0;step<3;step++)await page.locator('#onNext').click();
+  await page.locator('#onb').waitFor({state:'hidden'});
   await page.locator('#icmxGuestChoose').click();
   await page.locator('#icmxGuestIni').fill('TST');
   await page.locator('#icmxGuestHandle').fill('qa_reta');

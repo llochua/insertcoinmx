@@ -33,6 +33,9 @@ try{
  await page.route('**/cdn.jsdelivr.net/**',r=>r.abort());
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.locator('#title').click();
+ await page.locator('#onb.on').waitFor({state:'visible'});
+ for(let step=0;step<3;step++)await page.locator('#onNext').click();
+ await page.locator('#onb').waitFor({state:'hidden'});
  await page.locator('#icmxGuestCreate').click();
  await page.locator('#entryAccount').waitFor({state:'visible'});
  assert.equal(await page.locator('#profileAuthInitials').isVisible(),true,'arcade identity is required for signup');
