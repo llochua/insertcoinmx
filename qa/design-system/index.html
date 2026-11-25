@@ -38,6 +38,7 @@
 .icmx-pop-panel .pop-unranked{font:800 20px/1.15 AV,system-ui,sans-serif;color:#fff}
 #fDesignValue{margin:0 0 14px}
 #zDesignPopularity{width:min(100%,480px);margin:8px auto 12px;flex:none}
+#zDesignPopularity[hidden]{display:none!important}
 @media(max-width:340px){.icmx-pop-panel{padding:11px}.icmx-pop-panel .pop-sources span{padding:6px}.icmx-pop-panel .pop-rank strong{font-size:20px}}
 
 </style>
@@ -2908,15 +2909,15 @@ let communityValueEngine=null;
   const svg=fx.querySelector(':scope > svg.icmx-data'),value=svg?.querySelector('[data-icmx-field="pop"]');
   if(!value)return;
   const ns='http://www.w3.org/2000/svg',full=variant==='f';
-  const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='POP'||t.dataset.labPopLabel==='true');
-  if(!label)return;
+  let label=svg.querySelector('[data-lab-pop-label]');
+  if(!label){const old=[...svg.querySelectorAll('text')].find(t=>t.textContent==='POP');if(!old)return;label=old.cloneNode(false);old.replaceWith(label);}
   const color=value.getAttribute('fill');
   label.textContent='POPULARIDAD';label.dataset.labPopLabel='true';
   label.setAttribute('x','909');label.setAttribute('y',full?'889':'101');
   label.setAttribute('text-anchor','end');label.setAttribute('font-size',full?'27':'29');label.setAttribute('letter-spacing','0');
   let icon=svg.querySelector('[data-lab-pop-flame]');
   if(!icon){icon=document.createElementNS(ns,'svg');icon.setAttribute('data-lab-pop-flame','true');icon.setAttribute('viewBox','0 0 24 24');icon.innerHTML=POP_FLAME.match(/<path[^>]*\/>/)[0].replace('currentColor',color);svg.appendChild(icon);}
-  icon.setAttribute('x',full?'650':'644');icon.setAttribute('y',full?'935':'151');icon.setAttribute('width','48');icon.setAttribute('height','48');
+  icon.setAttribute('x','660');icon.setAttribute('y',full?'887':'100');icon.setAttribute('width','32');icon.setAttribute('height','32');
  }
 const validValueCards=()=>CARDS.filter(c=>!c.bx&&c.img).map(c=>c.k);
 function collectionPointsLocal(){
