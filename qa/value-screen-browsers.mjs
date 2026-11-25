@@ -35,6 +35,9 @@ try{
  const response=await page.goto(url,{waitUntil:'domcontentloaded'});
  assert.equal(response.status(),200);
  await page.locator('#title').click();
+ await page.locator('#onb.on').waitFor({state:'visible'});
+ for(let step=0;step<3;step++)await page.locator('#onNext').click();
+ await page.locator('#onb').waitFor({state:'hidden'});
  await page.locator('#home .home-player-card').click();
  await page.locator('#profile.on').waitFor();
  await page.waitForFunction(()=>/^\d[\d.,]*$/.test(document.getElementById('profileValuePoints')?.textContent||''),null,{timeout:10000});
