@@ -1895,23 +1895,52 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #home #mGo.pack-wait span{font:800 10px/1.3 AV,system-ui,sans-serif;letter-spacing:.07em}
 #home #mGo.pack-wait time{font:800 22px/1.15 AV,system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
 #home #mGo.pack-wait:active{transform:none}
-/* Home: reserva una altura legible y encuadra las tres cartas completas.
-   El desplazamiento vertical es preferible a encoger o recortar el arte. */
-#home{overflow-y:auto!important;overflow-x:hidden!important;touch-action:pan-y}
+/* Home: una pantalla, sin scroll ni recorte del abanico. */
+#home{overflow:clip!important;touch-action:none}
 #home .amb{inset:0}
 #home .mh,#home .htest,#home .mtabs,#home .dupbar,#home .mgo{flex-shrink:0}
-#home .mfan{flex:1 0 auto;min-height:calc(min(60vw,260px)*1.395833 + 24px);container-type:size;overflow:visible}
+#home .mfan{flex:1 1 0;min-height:0;container-type:size;overflow:visible}
 #home .mc{
- --fan-card-w:min(68vw,280px,66cqw,calc(71.64cqh - 18px));
+ --fan-card-w:min(68vw,280px,66cqw,max(1px,calc(71.64cqh - 12px)));
  --fan-step:clamp(0px,calc(50cqw - var(--fan-card-w)*.51 - 8px),calc(var(--fan-card-w)*.60));
  width:var(--fan-card-w);transform-origin:50% 50%
 }
 #home .dupbar button{flex-shrink:0}
+#home .dupbar span{min-width:0;overflow-wrap:anywhere}
+#home .mc .lab{height:auto;min-height:46%}
 @container (max-height:350px){
  #home .mc .lab{padding:0 10px 10px}
  #home .mc .lab small{font-size:6px;margin-bottom:5px}
- #home .mc .lab b{font-size:clamp(20px,8cqh,28px)}
+ #home .mc .lab b{font-size:clamp(17px,8cqh,28px)}
  #home .mc .lab span{font-size:11px;margin-top:5px}
+}
+@container (max-height:220px){
+ #home .mc .lab{padding:0 7px 6px}
+ #home .mc .lab small{font-size:6px;margin-bottom:3px}
+ #home .mc .lab b{font-size:16px}
+ #home .mc .lab span{font-size:10px;margin-top:3px}
+}
+@media(max-height:760px){
+ #home .mh{padding:8px 14px 0}
+ #home .htest{margin-top:0;padding:2px 14px 0;min-height:8px}
+ #home .home-player-card{min-height:54px;margin-top:4px;padding:6px 10px}
+ #home .home-player-avatar{width:36px;height:36px;flex-basis:36px}
+ #home .mtabs{padding-bottom:7px}
+ #home .dupbar{margin:0 14px 7px;padding:6px 10px}
+ #home .dupbar button{min-height:34px}
+ #home .mgo{margin-bottom:12px;padding:12px 20px;min-height:44px}
+ #home #mGo.pack-wait{min-height:50px;padding:6px 16px;gap:3px}
+ #home #mGo.pack-wait time{font-size:20px}
+}
+@media(max-height:560px){
+ #home .mh{padding-top:4px}
+ #home .home-player-card{min-height:44px;margin-top:2px;padding:3px 9px}
+ #home .home-player-avatar{width:32px;height:32px;flex-basis:32px}
+ #home .home-player-copy{gap:2px}
+ #home .htest{padding-top:0}
+ #home .mtabs{padding-bottom:4px}
+ #home .dupbar{margin-bottom:4px;padding:4px 8px}
+ #home .mgo{margin-bottom:8px;padding:9px 16px}
 }
 @media(max-width:370px){
  #home .mtabs{gap:3px;padding-inline:4px}
