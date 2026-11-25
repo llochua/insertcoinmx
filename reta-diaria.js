@@ -19,6 +19,58 @@ const $=id=>document.getElementById(id);
 const isEmbedded=new URLSearchParams(location.search).get('embedded')==='1';
 if(isEmbedded)document.documentElement.classList.add('embedded');
 let dailyDay='',dailyState=null;
+let communityPacket=null,communityWait=null;
+function clearCommunity(){
+ communityPacket=null;communityWait=null;
+ $('communityDuel').hidden=true;$('communitySummary').hidden=true;
+}
+function displayCommunity(row,chosen,other){
+ const panel=$('communityDuel');
+ panel.replaceChildren();
+ const add=(tag,cls,copy,parent=panel)=>{
+  const node=document.createElement(tag);node.className=cls;node.textContent=copy;parent.appendChild(node);return node;
+ };
+ add('strong','community-title','LA COMUNIDAD ELIGIÓ');
+ if(!row||row.winner!==chosen||row.loser!==other){
+  add('p','community-note','Resultados no disponibles por ahora.');
+ }else{
+  const total=row.winner_votes+row.loser_votes;
+  if(total===0)add('p','community-note','Aún no hay votos de otros jugadores en este duelo.');
+  else{
+   const pct=Math.round(100*row.winner_votes/total);
+   const pair=add('div','community-pair','');
+   for(const [name,share,own] of [[chosen,pct,true],[other,100-pct,false]]){
+    const option=add('div','community-option'+(own?' chosen':''),'',pair);
+    add('span','community-name',safeName(name),option);
+    add('b','community-pct',share+'%',option);
+    const bar=add('div','community-bar','',option);
+    const fill=add('i','','',bar);fill.style.width=share+'%';
+   }
+   add('p','community-note',(row.winner_votes===row.loser_votes?'¡Empate!':row.winner_votes>row.loser_votes?'Coincides con la mayoría.':'Elegiste diferente.')+' · '+total+' '+(total===1?'voto':'votos'));
+  }
+ }
+ panel.hidden=false;
+}
+function displaySummary(packet){
+ const label=$('communitySummary');
+ if(!isEmbedded)return;
+ const rows=packet?.results;
+ label.hidden=false;
+ if(!Array.isArray(rows)||rows.length!==TOTAL){label.textContent='Resultados comunitarios no disponibles.';return}
+ const known=rows.filter(r=>r.winner_votes!==r.loser_votes);
+ const withVotes=rows.filter(r=>r.winner_votes+r.loser_votes>0);
+ const agreed=known.filter(r=>r.winner_votes>r.loser_votes).length;
+ label.textContent=known.length?'Coincidiste con la mayoría en '+agreed+' de '+known.length+' duelos con mayoría.':withVotes.length?'Los duelos con votos quedaron empatados.':'Aún no hay votos de otros jugadores en tus duelos.';
+}
+function waitForCommunity(completed){
+ return new Promise(resolve=>{
+  if(communityPacket?.completed===completed){resolve(communityPacket);return}
+  let settled=false;
+  const finish=packet=>{if(settled)return;settled=true;clearTimeout(timer);if(communityWait?.finish===finish)communityWait=null;resolve(packet)};
+  const timer=setTimeout(()=>finish(null),1400);
+  communityWait={completed,finish};
+ });
+}
 const artSrc=id=>DESIGNS[id]?.art||'d/'+id+'.webp';
 const ambientSrc=id=>DESIGNS[id]?.ambient||'c2/'+id+'.webp';
 const htmlEscape=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
@@ -159,7 +211,7 @@ function sound(kind){
 function select(side){
  if(locked||round>=TOTAL)return;
  locked=true;
- const id=slots[side],lostSide=side==="top"?"bottom":"top";
+ const id=slots[side],lostSide=side==="top"?"bottom":"top",other=slots[lostSide];
  if(isEmbedded)tellParent({type:'icmx-reta-choice',day:dailyDay,round,side,winner:id});
  const winner=$(side),loser=$(lostSide),n=++run;
  winner.classList.add("win");
@@ -174,10 +226,18 @@ function select(side){
  $("shock").classList.toggle("counter",counter&&!finisher);
  $("shock").classList.remove("show");void $("shock").offsetWidth;$("shock").classList.add("show");
  $("app").classList.add("impact");sound("hit");
- setTimeout(()=>{
+ setTimeout(async()=>{
   if(n!==run)return;
   $("app").classList.remove("impact");$("shock").classList.remove("show");
   winner.classList.remove("win");
+  if(isEmbedded){
+   const packet=await waitForCommunity(round+1);
+   if(n!==run)return;
+   displayCommunity(packet?.results?.[round],id,other);
+   await new Promise(resolve=>setTimeout(resolve,2100));
+   if(n!==run)return;
+   $('communityDuel').hidden=true;
+  }
   champion=id;round++;
   if(round>=TOTAL){
    $('app').classList.add('victory-hold');winner.classList.add('last-one');
@@ -201,6 +261,7 @@ function end(side){
  $('winnerName').textContent=safeName(champion);
  $('winnerStatus').textContent=(dailyState&&dailyState.done?dailyState.titleDefended:titleDefended)?'TÍTULO DEFENDIDO':'TU NUEVA CAMPEONA';
  $('winnerFuture').textContent='Mañana podrás defenderla.';
+ if(isEmbedded)displaySummary(communityPacket);
  const fallen=slots[side==='top'?'bottom':'top'];
  const earlier=PAIRS.filter(id=>id!==champion&&id!==fallen).slice(-1)[0]||fallen;
  $('winnerShirt').innerHTML=shirt(champion,'finish');
@@ -256,6 +317,7 @@ function hydrate(config){
  }
  const state=config.state;
  if(!state||!Array.isArray(state.roster)||state.roster.length!==8||state.roster.some(id=>!DESIGNS[id]))return;
+ clearCommunity();
  dailyState=state;dailyDay=state.day;
  // El sitio principal gobierna el audio: no hay segundo mute independiente.
  if(isEmbedded)muted=!!config.audioMuted;
@@ -283,6 +345,12 @@ if(isEmbedded){
   const data=event.data;
   if(data?.type==='icmx-audio-state')muted=!!data.muted;
   if(data?.type==='icmx-reta-init')hydrate(data);
+  if(data?.type==='icmx-reta-community'&&data.day===dailyDay&&data.seed===dailyState?.seed&&Number.isInteger(data.completed)&&(data.completed===round||data.completed===round+1)){
+   if(communityPacket&&communityPacket.completed>data.completed)return;
+   communityPacket=data;
+   if(communityWait?.completed===data.completed)communityWait.finish(data);
+   if(round===TOTAL)displaySummary(data);
+  }
  });
  window.parent.postMessage({type:'icmx-reta-ready'},location.origin);
 }else{
