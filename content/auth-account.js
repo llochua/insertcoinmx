@@ -469,6 +469,19 @@ initAccount();
 
 // Community reads use the public API, writes use the already verified account session.
 globalThis.icmxCommunityRequest=async function(name,args){
+ if(name==='icmx_reta_pair_results'){
+  const headers={apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'};
+  const expected=globalThis.icmxAccountIdentity?.userId;
+  if(expected){
+   if(!authClient)throw Error('Account session unavailable');
+   const {data,error}=await authClient.auth.getSession();
+   if(error||!data?.session?.access_token||data.session.user?.id!==expected||globalThis.icmxAccountIdentity?.userId!==expected)throw Error('Account session unavailable');
+   headers.Authorization='Bearer '+data.session.access_token;
+  }
+  const response=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+name,{method:'POST',headers,body:JSON.stringify(args)});
+  if(!response.ok)throw Error('Community results unavailable');
+  return response.json();
+ }
  const read=name==='icmx_community_aggregates'||name==='icmx_player_leaderboards';
  if(!read&&!['icmx_community_vote','icmx_community_reta'].includes(name))throw Error('Unknown community operation');
  if(read){
