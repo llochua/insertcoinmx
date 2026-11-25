@@ -67,7 +67,8 @@ test('real profile components exist on the game without duplicate IDs',()=>{
  for(const id of ['profile','profileAuthForm','profileAuthSend','profileCloudStatus','profileLinkCollection','onAccount'])
   assert.ok(ids.includes(id),'missing '+id);
  assert.match(page,/data-go="profile"/);
- assert.match(page,/SEGUIR COMO INVITADO/);
+ assert.match(page,/\?\s*'SIGUIENTE'\s*:\s*'EMPEZAR'/);
+ assert.match(page,/onMode==='entry'&&needsEntryAccess\(\)\)openArcadeEntry\('welcome'\)/);
 });
 
 test('signup uses official callback and shared auth storage, no local collection mutation',async()=>{
