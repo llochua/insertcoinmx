@@ -18,16 +18,12 @@
 @media(max-width:360px){.rs2 .rg{gap:9px}.rs2 .rg .rc{padding:8px}.rs2 .rc-story-cta{font-size:12px}.rs2 .rh-story-cta{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.rs2 .rg .rc{transition:none}}
 
-/* LAB · POP v2: secondary metadata, never the hero. */
-.icmx-pop-panel{width:100%;box-sizing:border-box;color:#aaa5c4;font-family:AV,system-ui,sans-serif;text-align:center}
-.icmx-pop-panel details{display:inline-block;max-width:100%;text-align:left}
-.icmx-pop-panel summary{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;min-height:32px;padding:4px 2px;font:600 11px/1.45 AV,system-ui,sans-serif;cursor:pointer;list-style:none;color:#bdb8d1}
-.icmx-pop-panel summary::-webkit-details-marker{display:none}
-.icmx-pop-panel summary svg{width:13px;height:13px;flex:none;opacity:.8}
-.icmx-pop-panel summary strong{font-weight:800;color:#d8d4e5}
-.icmx-pop-panel .pop-info{display:inline-grid;place-items:center;width:13px;height:13px;border:1px solid currentColor;border-radius:50%;font:700 9px/1 AV,system-ui,sans-serif;margin-left:3px}
+/* LAB · POP: secondary metadata. */
+.icmx-pop-panel{width:100%;box-sizing:border-box;color:#bdb8d1;font:600 11px/1.45 AV,system-ui,sans-serif;text-align:center}
+.icmx-pop-panel .pop-line{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;min-height:22px;margin:0}
+.icmx-pop-panel .pop-line svg{width:14px;height:14px;flex:none}
+.icmx-pop-panel strong{font-weight:700;color:#d8d4e5}
 .icmx-pop-panel .pop-demo{font-size:9px;color:#918ba9}
-.icmx-pop-panel .pop-explain{max-width:340px;padding:4px 7px 8px;margin:0;text-align:center;font:500 11px/1.55 AV,system-ui,sans-serif;color:#bdb8d1}
 #fDesignValue{margin:10px 0 0}
 #zDesignPopularity{width:min(100%,480px);margin:8px auto 10px;flex:none}
 #zDesignPopularity[hidden]{display:none!important}
@@ -2425,7 +2421,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <span class="icmx-global-eyebrow">POPULARIDAD · INSERT COIN MX</span>
    <h2 id="icmxGlobalTitle">RANKING GLOBAL DE DISEÑOS</h2>
    <p>Los diseños favoritos de la comunidad reunirán votos de Likes, Tier Lists y Reta.</p>
-   <div class="icmx-global-weights" aria-label="Cómo se calcula el valor comunitario"><span>TIER LIST <b>50%</b></span><span>RETA <b>50%</b></span></div>
+   
    <div class="icmx-global-empty" id="communityRankEmpty" role="status"><strong>— POP</strong><span id="communityRankStatus">SIN RESULTADOS GLOBALES VERIFICADOS</span></div><div id="communityRankRows" aria-label="Top 10 de diseños por popularidad" aria-live="polite"></div>
    <p class="icmx-global-note" id="communityRankNote">Los diseños sin votos permanecen sin clasificar.</p>
   </section>
@@ -2877,7 +2873,7 @@ let communityValueEngine=null;
   const rows=status==='ready'?communityRanking.state.rows.filter(r=>r.position!==null&&DB[r.id]&&!DB[r.id].bx).slice(0,10):[];
   $('communityRankEmpty').hidden=rows.length>0;
   $('communityRankStatus').textContent=status==='loading'?'CARGANDO RANKING':status==='offline'?'RANKING NO DISPONIBLE':status==='ready'?'AÚN SIN VOTOS COMUNITARIOS':'SIN RESULTADOS GLOBALES VERIFICADOS';
-  $('communityRankNote').textContent=rows.length?'Popularidad de 0 a 1,000 · Tier List 50% · Reta 50%.':'Los diseños sin votos permanecen sin clasificar.';
+  $('communityRankNote').textContent=rows.length?'Popularidad de los diseños en la comunidad.':'Los diseños sin votos permanecen sin clasificar.';
   $('communityRankRows').replaceChildren(...rows.map(r=>{
    const b=document.createElement('button');b.type='button';b.className='community-rank-row';b.dataset.design=r.id;
    const rank=document.createElement('span');rank.textContent=String(r.position).padStart(2,'0');
@@ -2887,33 +2883,37 @@ let communityValueEngine=null;
   }));
  }
  let labPopPreview=null;
- const POP_FLAME="<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path fill=\"currentColor\" d=\"M13.5 2c.5 4-2 6-4 8-1-1-1.5-2.5-1.5-4C4.5 9 3 12 3 15a9 9 0 0 0 18 0c0-4-3-8-5-9 .5 3-1 4-2 5 1-4-.5-7-0.5-9ZM12 21a4 4 0 0 1-4-4c0-1.8 1.2-3.5 3-5 .1 1.5.5 2.5 1.2 3.2.7-1 1-1.9 1-3.2 1.8 1.6 2.8 3.3 2.8 5a4 4 0 0 1-4 4Z\"/></svg>";
+ // Lucide Flame v0.456.0 (ISC license), inlined for offline LAB.
+ const POP_FLAME="<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/></svg>";
  function getGlobalPop(id){
   if(labPopPreview?.id===id)return labPopPreview.ranked?{score:638,position:12}:null;
   return communityRanking?.state.status==='ready'?communityRanking.get(id):null;
  }
  function renderPopPanel(node,id){
   const p=getGlobalPop(id),demo=labPopPreview?.id===id;
-  node.innerHTML='<details><summary>'+POP_FLAME+'<span>Popularidad</span> '+
-   (p?.position!=null?'<strong>'+p.score+'</strong><span>/ 1000 · #'+p.position+' global</span>':'<span>· Sin clasificar</span>')+
-   '<span class="pop-info" aria-label="Cómo se calcula">i</span>'+(demo?'<span class="pop-demo">DEMO LAB</span>':'')+'</summary>'+
-   '<p class="pop-explain">'+(p?.position==null?(demo||communityRanking?.state.status==='ready'?'Aún no hay votos de la comunidad. ':'Sin resultados comunitarios disponibles en LAB. '):'')+'Se calcula con las calificaciones de Tier List (50%) y las elecciones de Reta (50%).</p></details>';
+  node.innerHTML='<p class="pop-line">'+POP_FLAME+'<span>Popularidad</span> '+
+   (p?.position!=null?'<strong>'+p.score+'</strong><span>· #'+p.position+' global</span>':'<span>· Sin clasificar</span>')+
+   (demo?'<span class="pop-demo">· DEMO LAB</span>':'')+'</p>';
  }
  function paintLabPopOnCard(fx,variant){
   const svg=fx.querySelector(':scope > svg.icmx-data'),value=svg?.querySelector('[data-icmx-field="pop"]');
   if(!value)return;
-  const ns='http://www.w3.org/2000/svg',full=variant==='f';
+  const ns='http://www.w3.org/2000/svg',full=variant==='f',cy=full?968:175;
   let label=svg.querySelector('[data-lab-pop-label]');
   if(!label){const old=[...svg.querySelectorAll('text')].find(t=>t.textContent==='POP');if(!old)return;label=old.cloneNode(false);old.replaceWith(label);}
   const color=value.getAttribute('fill');
   label.textContent='POP';label.dataset.labPopLabel='true';
-  label.setAttribute('x',full?'706':'674');label.setAttribute('y',full?'945':'166');
-  label.setAttribute('text-anchor','start');label.setAttribute('font-size','23');label.setAttribute('letter-spacing','0');
-  value.setAttribute('font-size','48');value.setAttribute('y',full?'931':'149');
-  value.setAttribute('opacity','.88');
+  label.setAttribute('x','779');label.setAttribute('y',String(cy));
+  label.setAttribute('dominant-baseline','central');label.setAttribute('text-anchor','end');label.setAttribute('font-size','29');label.setAttribute('letter-spacing','0');
+  value.setAttribute('x','902');value.setAttribute('y',String(cy));
+  value.setAttribute('dominant-baseline','central');value.setAttribute('font-size','40');
+  value.setAttribute('opacity','.9');
   let icon=svg.querySelector('[data-lab-pop-flame]');
-  if(!icon){icon=document.createElementNS(ns,'svg');icon.setAttribute('data-lab-pop-flame','true');icon.setAttribute('viewBox','0 0 24 24');icon.innerHTML=POP_FLAME.match(/<path[^>]*\/>/)[0].replace('currentColor',color);svg.appendChild(icon);}
-  icon.setAttribute('x',full?'675':'643');icon.setAttribute('y',full?'941':'162');icon.setAttribute('width','25');icon.setAttribute('height','25');
+  if(!icon){
+   icon=document.createElementNS(ns,'svg');icon.setAttribute('data-lab-pop-flame','true');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('fill','none');icon.setAttribute('stroke',color);icon.setAttribute('stroke-width','2');icon.setAttribute('stroke-linecap','round');icon.setAttribute('stroke-linejoin','round');
+   const path=document.createElementNS(ns,'path');path.setAttribute('d',"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z");icon.appendChild(path);svg.appendChild(icon);
+  }
+  icon.setAttribute('x','685');icon.setAttribute('y',String(cy-17));icon.setAttribute('width','34');icon.setAttribute('height','34');
  }
 const validValueCards=()=>CARDS.filter(c=>!c.bx&&c.img).map(c=>c.k);
 function collectionPointsLocal(){
