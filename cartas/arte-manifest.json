@@ -1,45 +1,165 @@
 {
   "designs": {
+    "1up": {
+      "outputs": {
+        "c/1up.webp": "cb17e21aa65d559a5f4cebf3f20657db6f4a678247a79a18dc14634985b35ee2",
+        "c/1up_e.webp": "f29fad21e3f3ca7010f196b32cc5df2e6c9612dffaf9a7e5b7555205c4463477",
+        "c/1up_r.webp": "acd478f80c3bd69898b67a7391bab508fadda9e4de6a994810a7816934508da4",
+        "c/F_1up.webp": "3345112520aad2078a9eac334c5d10b716acaf4c2bd01e2ba50aa2cf842438a3",
+        "c2/1up.webp": "379df34448018705f256a65ef9da0465143cb7777b5570f28e73cd4f070a43d8",
+        "c2/1up_e.webp": "63d7579a160cab46bd8252f45a3c2f12578d3f74920d49a88dc0f60dd0cd86f3",
+        "c2/1up_r.webp": "0344d8f316ccc105f3e54f77a856cbdc61052b9fea6babdd0cf426a3a88d531a",
+        "c2/F_1up.webp": "3e538d76ef74f5b7543c6175d49d5e1c2d8f34cf39ca14e38e75545094be21ad",
+        "d/1up.webp": "7b56e1ab69bd082ca695d5ae8a3d31f2e235b5e3fd9afd5df1d17cf2d43aa5e6",
+        "fa/1up.webp": "f530df1245b7bc43b90a04c51e9074dfd80d865960eaf15cdd0c4246cb0ecfd9"
+      },
+      "sources": {
+        "cartas/arte/1up.png": "df1f170ee2cd51eff47c94d381e2362d5e9f2e10d9dcfe09691ec82572b19301",
+        "cartas/full/1up.jpg": "2db3f2129907a44a0c0ac9a967678c0233f39e7001e339089cbe07f102475d11"
+      }
+    },
+    "aku": {
+      "outputs": {
+        "c/F_aku.webp": "93ed6b0504319338591e94d78e25e20e85a20ab89d920eccf6190e378cf89709",
+        "c/aku.webp": "9856dcb06f43b9229a3a1e98af19d62d5e0c5b3342afc2bca84b6711c45d8ba4",
+        "c/aku_e.webp": "27f14b82e5a7cbfe454831064f1ced1d454da3e66709053e22ce1accbb52e04b",
+        "c/aku_r.webp": "3c36a7f33359357f850ad33341f4f006297a8bafdfd2736b1707675c31ec1ffe",
+        "c2/F_aku.webp": "f68bccc6a1b635e704c0868c763aff2e3ad3ec6e019830625c29953c790afdd4",
+        "c2/aku.webp": "63ed6d98bb9a55510e583d29d86828344b425a8186d62393832a83566fb18ee0",
+        "c2/aku_e.webp": "fff473181fb345b77f1bac76cb2dfbd9674b12c11b54b9c4a887403ea1727518",
+        "c2/aku_r.webp": "0f64da68298a365dfdb220a62bf1be816edaa44968dacebfd598f5fabc0ecfe4",
+        "d/aku.webp": "a1beb849998fc738d697e1cbb8880d0668376fff06cb01aa35f76fa27a40b6da",
+        "fa/aku.webp": "7bb63e4f733ff53c47c4ca64545768b9781d1ab9bfb8a02aecf07b1f96103107"
+      },
+      "sources": {
+        "cartas/arte/aku.png": "caa65efb2096d9f287f276393c8a93b111139fd461f60947ba47af0feb37c0d5",
+        "cartas/full/aku.jpg": "85e4b13c9bd41d904e61bc210cb6228ddcdb05f9fbdc11381edbc1320eb9d67c"
+      }
+    },
     "babyonboard": {
       "outputs": {
+        "c/F_babyonboard.webp": "248bdb7c7aca20ba59a5dd5440962755d7b6fa563930a07ed7416a2dba722da4",
         "c/babyonboard.webp": "86a9e945a0b81239aae82f3acd363dbe9a2826979c367b2c7f19f2273dd1a7d8",
         "c/babyonboard_e.webp": "b70598c58c1287eb1e75e936ad0fe38df3ddd6e29e058518304bb6e25ee0fb07",
         "c/babyonboard_r.webp": "6ac3e99ec5d2ba1c85cb85d8c98b5101ab298e07b27252d4b0a148a3636aa79b",
+        "c2/F_babyonboard.webp": "d30be12b8a9d1f3a67d3680f63a4b2db9f9cc45229892c07f64c000882d2150c",
         "c2/babyonboard.webp": "6588b6e281c83f7d4cb759468e9b069d4a6d9aa18e69250ab76b12084a638de3",
         "c2/babyonboard_e.webp": "c825d939d500fa419a03d0a4e10cbb685ad644425ffd4372c55c3e97b2bd7c23",
         "c2/babyonboard_r.webp": "8706b33cbf2f7e4fee36b31c3792e4300d0ae252e29e258db47ee00bebac654a",
-        "d/babyonboard.webp": "1e0a784424a53fb4d8b54b3ce70b41d8a370704f40d093d22945c91275358180"
+        "d/babyonboard.webp": "1e0a784424a53fb4d8b54b3ce70b41d8a370704f40d093d22945c91275358180",
+        "fa/babyonboard.webp": "fd3951c91b07fc0996cb39b16aa2aa2ef1bf1e149620b99a8aeb718c8574b526"
       },
       "sources": {
-        "cartas/arte/babyonboard.png": "e0f85b7ce79d1a4d9d74d4dba71cf3858b87a4dda06db81a28a6d568e59dfbef"
+        "cartas/arte/babyonboard.png": "e0f85b7ce79d1a4d9d74d4dba71cf3858b87a4dda06db81a28a6d568e59dfbef",
+        "cartas/full/babyonboard.jpg": "88c67b0aa65edc3cadf9bc5ac8cc7ac2a21f83c5ef86b995eef86a81473bfc70"
       }
     },
     "bitwars": {
       "outputs": {
+        "c/F_bitwars.webp": "68cce8c730ae85455284a4ee81ac0c4f6589e9928b6ed0468558a5632620b0e8",
         "c/bitwars.webp": "3953454575a14319af20903358a87243c9df30a03acff0a7b8c6398ecb7a8f44",
         "c/bitwars_e.webp": "e15edc1c2da91a42f1fee7c98f38c6e50c73e15ec1b6bd6ef8919438068f369e",
         "c/bitwars_r.webp": "868f479ef0625bf379f1523b40a9c559db7a440aef6dd24e2baf0c8b0810db23",
+        "c2/F_bitwars.webp": "d4c1a2ef8cd607f9dab5876586f6030ea9dc96102d460448311aa0541a13d09b",
         "c2/bitwars.webp": "01ffcbc68d527935ae1f924b884de8250aca47e328ba68e69d7eef2dbc30ddf0",
         "c2/bitwars_e.webp": "d352f9c7ad76fc113c93dbfc97db8cebc166f7899ab66266c1919247a36e52b0",
         "c2/bitwars_r.webp": "e3dc7e1c7b9a8eff91742f4f7dcaa73d32cf461ca2fa644988eea6d51d7453c8",
-        "d/bitwars.webp": "6d97d52daf52b25cfe4443a8f733687e9ca48953fb8389bbc144c82873102ec4"
+        "d/bitwars.webp": "6d97d52daf52b25cfe4443a8f733687e9ca48953fb8389bbc144c82873102ec4",
+        "fa/bitwars.webp": "995aaa5c2e880b2630dbfed6305bfc07095eecbd6719d65a10b460900bd06106"
       },
       "sources": {
-        "cartas/arte/bitwars.png": "50720129c4f8c2bdb5992c251aab6bcf58ad9bfcf0562c635fc1beb189ebd080"
+        "cartas/arte/bitwars.png": "50720129c4f8c2bdb5992c251aab6bcf58ad9bfcf0562c635fc1beb189ebd080",
+        "cartas/full/bitwars.jpg": "d81d6cb37f83874f9e08fdc08216124d1d0ebab298542aeea93143190e9641d7"
+      }
+    },
+    "booit": {
+      "outputs": {
+        "c/F_booit.webp": "6c8a13dd20933f1098ba38fed91a3a15197d4db6bd2882d9e132931af443b9fa",
+        "c/booit.webp": "42c7766db2686b25152e0dc5671aa603e5afd308cb5726ec7f74d65312405710",
+        "c/booit_e.webp": "ab80a54028e271d02b431b96df472b06ff0a83e05ff00d1640cb762dbdef9030",
+        "c/booit_r.webp": "e64f9138afc1596e84fb7a348dc4ec5ddfe7748a5c7bd06cf2daf94e9065029f",
+        "c2/F_booit.webp": "9dddece95c1b957f83f563c2842e78737067b6f85129c7b056e30a6867c18a2f",
+        "c2/booit.webp": "727d08fad3443fd3b8836706e7cc6e72dc8f924d29d5a0fc9b47aec57eff7825",
+        "c2/booit_e.webp": "9ba6ca4312a4df7acdafdea5257fe319f3eb7135d9724bf0b64c23640175df69",
+        "c2/booit_r.webp": "fef23fe48c5f3a0a462f250265e11e49c3a22c492a39aafff84725ed786d44d4",
+        "d/booit.webp": "7b1204f31f460aaf00fe00b4e0d8443b8a238518c24d1e295907f2890ae7ea33",
+        "fa/booit.webp": "9542329556fdbf37a2c27876545033ff38a75eb6654fcd7363bc718610ac26d8"
+      },
+      "sources": {
+        "cartas/arte/booit.png": "61d1f8987ff6a553689aa827125d543d75723001622b46e78c4a5c7752bfc113",
+        "cartas/full/booit.jpg": "10a104d672f4f6e590341439a9694bb9653fabecdb53fef932b1dd6cc8bef4d4"
+      }
+    },
+    "bort": {
+      "outputs": {
+        "c/F_bort.webp": "2ddeab67e2c7e5b2f9410f3b28369b905e6a1aa342930018e0049442d252cc0a",
+        "c/bort.webp": "ebf070fa8588e29fe7a26a1174f398ea9af34249bb58bf1dbb7898a0072415b6",
+        "c/bort_e.webp": "2644faa9424c2e23a58618359d7be5c0671a730fb402963aa81088cc4bc834e5",
+        "c/bort_r.webp": "4045e0c0ed6b719548994a9e85d89fbf6218ec414a4bd66334b181ad22539285",
+        "c2/F_bort.webp": "c993ef57c8b73f709b07ec88fe773bb6231766bef9b6274c8924fcfd0acffcd6",
+        "c2/bort.webp": "994a124ba7e2475e6064ee146de1517918aa12c710f4149b586d030f360b6878",
+        "c2/bort_e.webp": "2fcfc3b6b356077f61eba3dcf8e14c4242b69752cbde0ad32b0ac42a09d19d78",
+        "c2/bort_r.webp": "cae7cabed89e9b422dd29b8e8bd08379f26f652ebb61586f1fbe9fc592771c3c",
+        "d/bort.webp": "8e9e41711b199545901c318254fe001295a42a7df7a80a2eb1d572bdb48dad2d",
+        "fa/bort.webp": "7ffc787f62cab0e67f1654b96416bcf1f400d42fc9e84eefcae55addbd1a96a1"
+      },
+      "sources": {
+        "cartas/arte/bort.png": "849c37929f282586a524c78c91c01ed12296701c2e14f17a5122b2c15b0e9510",
+        "cartas/full/bort.jpg": "92394dd979e0df6490e8f08fbd4662419f508f02cf736a33f0daa016ec212f26"
+      }
+    },
+    "captor": {
+      "outputs": {
+        "c/F_captor.webp": "8a17a2b9fb5b65700dacf3d29d96e365d7dffd6d711fa156ed90a3b1fc795588",
+        "c/captor.webp": "ee7089efdc14b7fcfee246910b2e644bf16a2e3152540c2da5601528d00b1c20",
+        "c/captor_e.webp": "4b903bb802891591974786978680530787a4810c587bb17d6bce824d1ca94a5c",
+        "c/captor_r.webp": "307cb520828fb7475f8dd00c7fa2db271ffaef3bdf8cbb1abacc0199989caff4",
+        "c2/F_captor.webp": "4ae494ccaac18644a90f820776243820f5f266afd2701a97dd7d3f759503268a",
+        "c2/captor.webp": "774695d856821dff8f306c69c740646d09a609ef4aa1d6d6c22d725f59367088",
+        "c2/captor_e.webp": "5e1302d8e45e6d62189bd00f03f287067fff8b8a4f44d05486fac6f3da551541",
+        "c2/captor_r.webp": "b925386720680084572a5969277e972cca31fcbe8d0984256184706f4f0742bd",
+        "d/captor.webp": "4646ce441a5f382642b9f3e66ffa1c83de7f31105bce0f01ae6182713b09a928",
+        "fa/captor.webp": "79e5182af0662508e564e986f0e40c7cbfe42347b4d5a3eb8ddf96ae3479e093"
+      },
+      "sources": {
+        "cartas/arte/captor.png": "6725212e89e2e18845b873c45727d836feb9eb1e5811c20a259f635d2cbd2cb6",
+        "cartas/full/captor.jpg": "ac55f15e573e1b5d78450c5858064ae6f995a30f9dacebc016ccd76fffdbf5fa"
+      }
+    },
+    "carton": {
+      "outputs": {
+        "c/F_carton.webp": "419d6a5bc71a54112cdfa6601e61f55dd94d3f3c3d5d7d5593594afee4029ab3",
+        "c/carton.webp": "8fce4e38d91327c9e9a4e9184a4001b5de07aa6a49b87887e8ff9a7c2fcdf892",
+        "c/carton_e.webp": "1f438c6179b713b13fe1bac984be436ea8ec3c81a3b4954ecfe2a6cdc44abf56",
+        "c/carton_r.webp": "51649daeca18866814a4ff5a12c0c24088b7865ff9cff8ce5a3c7eb18dc0be71",
+        "c2/F_carton.webp": "1585b4857c6825387ff077a91fbe07f528b12d3d64da3303b2a8389d32f3b308",
+        "c2/carton.webp": "3af4327934708823ad98bfb90d5f32eff0f359336fdd0ff1fa981f4767c72b68",
+        "c2/carton_e.webp": "6568192a9bb3107f65da7c7070d81b7e4fd2f303cdc47d616841ead0cf844939",
+        "c2/carton_r.webp": "1e148876f37bd83f514752f937d4a9df3db05ff8c6580bd5274a3102a5507e70",
+        "d/carton.webp": "82f0b311925c2c4e356bde35579326b203a4901413c601e394a0616c4b6f149a",
+        "fa/carton.webp": "6ffd1bd90e2cff19b28dad2a8f7d2a54b452d33ccaf3ca5fb54d8f46fb8dffd3"
+      },
+      "sources": {
+        "cartas/arte/carton.png": "43088d46122ee13de4c79e5718050e2bcf0fe709a2cd2d97a589db576291469a",
+        "cartas/full/carton.jpg": "bb0b1c3b16c43c076702b4f110369191c7bfa83ffd5eb43d7cce6ac9f0aa5f0b"
       }
     },
     "enjoy": {
       "outputs": {
+        "c/F_enjoy.webp": "aeb442d24af52cb66e7e9e82b84bc73b71df7988d55a0a1ad5a760cb64d169f4",
         "c/enjoy.webp": "b1709c974ac069386a1d8d8028d1a761ecc1c4df634d9a115a840a2128206b17",
         "c/enjoy_e.webp": "da86f74a919e5ff89e0633e5b6777e287df353755ab763fb868a4edc5f3d6795",
         "c/enjoy_r.webp": "e38af8d615033052477f168493ec80be35866c8ad21c302dc3b272c69344c56b",
+        "c2/F_enjoy.webp": "6f6244c5f3ac3f1603bbad7dd6be23ef141a0955f63105a6ac7f54e1c0ec84e4",
         "c2/enjoy.webp": "1ef3a87dfc25d41c048fe430ee18ab62c2450ba488004ea2ea9a2214920625ea",
         "c2/enjoy_e.webp": "2b393e0c0f608cabf6279e5e34be4a73e90eef5e0fab4114e5cb60c7ce09d371",
         "c2/enjoy_r.webp": "42ac0f072668a2cff21c8db670a5232b7e7d0d3a29f726e79c315b1cb6a45fb9",
-        "d/enjoy.webp": "94578a76ae7a49c5373547475bf089cd1525a660310dd8ec715121325f98aca3"
+        "d/enjoy.webp": "94578a76ae7a49c5373547475bf089cd1525a660310dd8ec715121325f98aca3",
+        "fa/enjoy.webp": "ef09538e9c0df07d564c431ac160202093c5e4032739fbb12a0e3fcf1d6cebcd"
       },
       "sources": {
-        "cartas/arte/enjoy.png": "074d597250ca8dab49996b2494f39b9500a78867c11d2d56900a63460f64ecb0"
+        "cartas/arte/enjoy.png": "074d597250ca8dab49996b2494f39b9500a78867c11d2d56900a63460f64ecb0",
+        "cartas/full/enjoy.jpg": "51eb50688d62e0dd992f8421e3141e8edcfe4e7f7eb5b4670e168732b2067606"
       }
     },
     "piccolovolution": {
@@ -56,6 +176,24 @@
         "cartas/arte/piccolovolution.png": "68fe3542f879557d433fe5c5a4fb51884bffd617e6ec1ba28db8dab897f6d7db"
       }
     },
+    "thankyou": {
+      "outputs": {
+        "c/F_thankyou.webp": "62972a42e3ba27a76a070bbf38a22e8748381280d1dd0449d67a49619877edab",
+        "c/thankyou.webp": "0b8bd38198fd6bc0dcbf335dc56604ce789c0a07303f9d90d742521d67fd7155",
+        "c/thankyou_e.webp": "4ea16a7edb566d3321358798b43e596133f39aa3481f0b141693b339bd6bb331",
+        "c/thankyou_r.webp": "e2a4b8807f172188d9c5067bf63957313d97c84e2c445cd0f2b6fdef4440fed7",
+        "c2/F_thankyou.webp": "91526fd68c967ece2c34a09bfb7c26d5273af970d310d49ffa48e7f81a38b372",
+        "c2/thankyou.webp": "39f75d7569aea5e9a5d0b52787d027eb24425103b71879782d2c19ae6ae0e141",
+        "c2/thankyou_e.webp": "ad052c2a9291654365628a44f7bf85b5c537f02fa3e68cec6318a7807cb23226",
+        "c2/thankyou_r.webp": "5ba642a946ed5c75a6e7f77a9cd98594202e5c2bc2d3d8dd7f7ab6deea22ec30",
+        "d/thankyou.webp": "fc6b74c4a8149550c8993e7485e3d073c42fbbfbf8bb3bad5d7bb868a8160115",
+        "fa/thankyou.webp": "fbb576bd26067152fa6497952842c243cffaabfedabb81ccee51d5f18020da8b"
+      },
+      "sources": {
+        "cartas/arte/thankyou.png": "648468193e5986188d15bbb78cc3ffdda110ed2b9ccc8eca39e34364f89de77b",
+        "cartas/full/thankyou.jpg": "1d1ebca70c8325c45f6ef3d6f1ca32e0facc8a8c9705eabd46bd68aa5c6b2cf7"
+      }
+    },
     "thelostgame": {
       "outputs": {
         "c/thelostgame.webp": "5590137fec253805350c989823aa5de6aa4181114714b9f72638c908bedcaf8e",
@@ -68,6 +206,42 @@
       },
       "sources": {
         "cartas/arte/thelostgame.png": "32770ce722d0e0e09734d067323c13ec9b5d74195489c69610e336314c827b01"
+      }
+    },
+    "triforce": {
+      "outputs": {
+        "c/F_triforce.webp": "215dede4a10fb9027b4811a24e28d5f28b8ffe67f5aedcdbdc1a96204078c5e0",
+        "c/triforce.webp": "fb8d6b8749c2493b606d6f9e6d7ca45febc607d6491a31f40900e97791658837",
+        "c/triforce_b.webp": "db4364ec5ed54b0722ebe871d604e5de5357e2bed94db32104e4044f59d84210",
+        "c/triforce_e.webp": "761452dcd6b658d6f6df797348022a5a4b2d1ec722da90c912db4f72c8f78b38",
+        "c2/F_triforce.webp": "424b42520319569bec53d59b751c1c986198d990dcd6addc7a314a230f987ae7",
+        "c2/triforce.webp": "bc511fe22410ac9a7e39de42116952b1666d9ab303520b4e2da26969575dceaf",
+        "c2/triforce_b.webp": "be547ebe5ee55b8122ad531fc1a363a52d52687de525b6709439fa78bed59fab",
+        "c2/triforce_e.webp": "326d6012eccd6c7837b1c2a762a9c901d7a2a3fcb28f706d0824be09c372f9db",
+        "d/triforce.webp": "f02c24562b0497bbc8d4f67c25ba55b74e17c57ab7455e86ec4402aa79f00bf4",
+        "fa/triforce.webp": "b5d6c4c6165a01f7a80e7cf23a6b176620b454af5fc0e06d20f7570d88a063cd"
+      },
+      "sources": {
+        "cartas/arte/triforce.png": "8ef045706379cc2bcd85169a2b9823866b2b926577e5ebdf969ec35872481425",
+        "cartas/full/triforce.jpg": "f09de7d55cd8d1b47966014723f552b77d38348f7bdb46313ce2cc3ada4094b0"
+      }
+    },
+    "universe": {
+      "outputs": {
+        "c/F_universe.webp": "b6fdc0d6a3d8c2b3162039e1438bd714b8906e423a1b0f1092b1f95f5b80523d",
+        "c/universe.webp": "83f8cf6448a8355911a3d5250ed97ea0287cfc76df4bdc6a29be2b9838e4bcb5",
+        "c/universe_e.webp": "ab217e1cb4646a1f867cb60d7d8d7ec7e70b0e4c52191b94ac89fb0be92c58a2",
+        "c/universe_r.webp": "11b1542eab4906f86d121e3ee4b5520a05749efaf04e4315098d453903381b0e",
+        "c2/F_universe.webp": "12510a8f1031f7830e6606c9d1f61a2f1c245a9c3eaf849a9c6ff767d45a2760",
+        "c2/universe.webp": "4add14dfa03c7c883ddb5cf604e2b09fec40a43107a4c47d5bb24eb807f490fa",
+        "c2/universe_e.webp": "9aa0cb3bdb49091e213cbeaba41b2da9ca6f2811a902d160f221c8670b9a7aa5",
+        "c2/universe_r.webp": "4a140d9b67fed956374095fb0c11b51f3c02deeeba8240c2ee8ac61cd3b159f5",
+        "d/universe.webp": "ef3660981145c4b704a230cf675af7304d378a999f4da321b5537df2702e8d21",
+        "fa/universe.webp": "623ef1f5c6ffb897d1bdbd2660d46015a233ec85ee815e17c5a5b9bd5675b166"
+      },
+      "sources": {
+        "cartas/arte/universe.png": "12591e7e9f3056c6c3b12a0001ba11e549b0180820782b7040d50a3797291683",
+        "cartas/full/universe.jpg": "9c6c1397310c8d5ae05056e24b0e32158e861f8db6d94d54485e23616e6cc12e"
       }
     },
     "vegetavolution": {
@@ -84,18 +258,40 @@
         "cartas/arte/vegetavolution.png": "4bf49dfbe2197ebfe0b82b61e713d4f8c1dc235c51265b150fe011cb51546a07"
       }
     },
+    "versus": {
+      "outputs": {
+        "c/F_versus.webp": "4fa1bee2be19bca0b6cb370cb3b3d9db923ba8fe2525d0153ba0b4cb53c583b7",
+        "c/versus.webp": "ccb721a38eaaa54d56866deb0a3fce9c980474bc4cbe93a8e7b64a092e2e966a",
+        "c/versus_e.webp": "1903338eada8ff09f1923c8c04462f3498e37e170cdd96b61db03015019b798a",
+        "c/versus_r.webp": "7c1a0f29fd94ae61df96f73e284d470485a1d680f3d52e999c7871fb06887007",
+        "c2/F_versus.webp": "6d13ca53321d32ab8c6a8eaad862ef2d0a3757961dcca2b7d96fe83b1d0809c3",
+        "c2/versus.webp": "64ae89ae96298e26e223aa4dfb9215d02ac93a7b5ab9b1eb33394c4233ec6bb1",
+        "c2/versus_e.webp": "8c821c08ef169c78d5b0a75b978469c2ed084c3da7b9c67313d5caefa503925c",
+        "c2/versus_r.webp": "6c6c0b0259dff21fb9d4d86cd00ac69cb8a59298684d5b7c032607e355cf87b1",
+        "d/versus.webp": "a9fdcc15641593000f4f4f82eaa70b7f4399dd16cbf2309c32125181572618da",
+        "fa/versus.webp": "f883a918a18fb527d0fded94d8d3596bc3c369054de891d17f5cd33f88ba185d"
+      },
+      "sources": {
+        "cartas/arte/versus.png": "c7d8eac76e3c1511c05ef7b0f8c538e3e31a06d7f8cb2bd71b46bb31d1982950",
+        "cartas/full/versus.jpg": "5e3047989651cefed8f5150062cfd13dd9319bd782a039e289d300b770324803"
+      }
+    },
     "virtual": {
       "outputs": {
+        "c/F_virtual.webp": "d99a894764c9c1d64d6ea09c7928c4bfb3c8393240e86c88771cef4722f0dde9",
         "c/virtual.webp": "f0b9119855b3dc0599e03e8118d3751e8bc924307c083b5a7b3c8e69fc6e8ae3",
         "c/virtual_e.webp": "f6fc48e8026f0c42d81a3e7a8990d2aa7ddaec8fb12bc01ab3870ff1622cc273",
         "c/virtual_r.webp": "8306ed85a74da57ed8e84a3042763e7d8553312e12f62c918372f128657c3244",
+        "c2/F_virtual.webp": "c5a86831e5976c8b89d4bc471efff47427df65f6a2eb4600e7147e8b7c3de3c8",
         "c2/virtual.webp": "134528e06f775e974681c9d3d091e68dbe1041b7dd3f5e3a1198dcf993b511e0",
         "c2/virtual_e.webp": "ec9419cdb95b5253b0ad4a022c1b8220b70a04038bcda64216c3673c6c5ceaf7",
         "c2/virtual_r.webp": "402c9dd7a89bce3901aa81a6e1d92d1f8f61447274e68bb2919cadf9c931c150",
-        "d/virtual.webp": "2a3473a399348a121c7745434fd6fb78c38e8b5cb074766cdfc088e1754fba9d"
+        "d/virtual.webp": "2a3473a399348a121c7745434fd6fb78c38e8b5cb074766cdfc088e1754fba9d",
+        "fa/virtual.webp": "c2a8911133422de91437252895507459775a27ff8688bcaef6c38bd9c7564ed1"
       },
       "sources": {
-        "cartas/arte/virtual.png": "2cc9061ee14c749178714dc59a1d43d36dac2a8da838b12936f8bb6e2de49f93"
+        "cartas/arte/virtual.png": "2cc9061ee14c749178714dc59a1d43d36dac2a8da838b12936f8bb6e2de49f93",
+        "cartas/full/virtual.jpg": "a8c094846fcfb1576c564d60089bee77f3f5f437924ce3832059f5637f8c72a8"
       }
     }
   },
