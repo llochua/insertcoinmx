@@ -3261,7 +3261,7 @@ const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs
  return [
  {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' + '+cyclePacksLeft()+' DE FRANJA':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR AHORA, TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' cartas obtenidas',img:'F_hyrule',rr:'full',go:'VER'},
- {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
+ {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Con cuál farmeas más aura? Construye tu Top Insert.',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
  {id:'scores',t:'Récords',k:'HIGH SCORES',s:top?'Top: '+(top.ini||'???')+' · '+top.score:'Tu identidad arcade y tus récords',img:'F_samus',rr:'full',go:'VER'}]};
 function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,imgDir=light?'c':'c2';
@@ -4223,7 +4223,7 @@ function retaUnlockCopy(count){
 function refreshRetaUnlock(){
  if(cur!=='torneo')return;
  const panel=$('vStage').querySelector('.reta-unlock');
- if(!panel)return;
+ if(!panel){const f=$('retaLive');if(f)f.contentWindow.postMessage({type:'icmx-reta-pack-state',day:S.reta2?.day,...retaPackState()},location.origin);return;}
  // Si la nube u otra pestaña añadió el octavo diseño, entrar a jugar sin quedarse bloqueado.
  if(retaPool().length!==Number(panel.dataset.designs)){startTorneo();return}
  const available=!!packReady(),button=panel.querySelector('[data-reta-unlock-action]');
@@ -4258,12 +4258,15 @@ function startTorneo(){
  }
  retaRerollUI(pool);
  retaOver=!!S.reta2.done;
- $('vStage').innerHTML='<iframe id="retaLive" class="reta-iframe" src="reta-diaria.html?embedded=1" title="Reta de playeras · 7 encuentros" loading="eager"></iframe>';
+ $('vStage').innerHTML='<iframe id="retaLive" class="reta-iframe" src="reta-diaria.html?embedded=1&amp;v=top-insert-1" title="Reta de playeras · 7 encuentros" loading="eager"></iframe>';
+}
+function retaPackState(){
+ return {packsAvailable:!!packReady(),canTrade:dups()>=5,nextPackCountdown:nextPackCountdown()};
 }
 function retaInitFrame(f){
  const pool=retaPool();
  if(!retaValid(S.reta2,pool)){startTorneo();return}
- f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,packsAvailable:packReady(),canTrade:dups()>=5,audioMuted:soundMuted},location.origin);
+ f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,...retaPackState(),audioMuted:soundMuted},location.origin);
 }
 function retaElegir(f,msg){
  withLock(()=>{
@@ -4306,8 +4309,9 @@ window.addEventListener('message',e=>{
  if(m.type==='icmx-reta-pack'&&S.reta2&&m.day===S.reta2.day){
   syncIn();
   if(m.action==='album')go('album');
-  else if(m.action==='trade')uxEmptyPacks();
-  else go('pack');
+  else if(packReady())go('pack');
+  else if(dups()>=5)uxEmptyPacks();
+  else go('album');
  }
 });
 /* ---------- récords: marcador arcade restaurado desde QA ---------- */

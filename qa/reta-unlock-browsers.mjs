@@ -140,6 +140,43 @@ try{
   await first.click();
   await page.waitForFunction(()=>S.reta2?.round===1,{timeout:9000});
   assert.equal(await page.evaluate(()=>S.reta2.round),1,'el jugador puede elegir y avanzar una ronda');
+  // Completa los siete duelos sin pausas nuevas, alternando hacia el retador.
+  const frame=page.frameLocator('#retaLive');
+  for(let r=1;r<7;r++){
+   await page.waitForFunction(()=>!document.getElementById('retaLive').contentDocument.getElementById('app').classList.contains('impact'));
+   await frame.locator('.fighter:not(.is-champion)').click();
+   await page.waitForFunction(n=>S.reta2?.round===n,r+1);
+  }
+  await frame.locator('#showTopInsert').waitFor({state:'visible'});
+  await frame.locator('#showTopInsert').click();
+  await frame.locator('#topInsert').waitFor({state:'visible'});
+  const expected=await page.evaluate(()=>({champ:S.reta2.champion,choices:S.reta2.matches.map(m=>m.winner)}));
+  const actualTop=await page.locator('#retaLive').evaluate(f=>{
+   const d=f.contentDocument,list=d.getElementById('topInsertList'),top=d.getElementById('topInsert');
+   return {ids:[...list.querySelectorAll('.top-insert-shirt svg')].map(e=>e.dataset.shirtId),counts:[...list.querySelectorAll('.top-insert-count')].map(e=>Number(e.textContent.match(/\d+/)[0])),
+    champ:list.querySelector('.champion svg')?.dataset.shirtId,visible:!top.hidden&&d.elementFromPoint(12,12)?.closest('#topInsert')!==null,
+    listFits:list.scrollHeight<=list.clientHeight+1,footerFits:top.querySelector('footer').getBoundingClientRect().bottom<=f.contentWindow.innerHeight+1};
+  });
+  assert.equal(actualTop.champ,expected.champ);
+  assert.equal(actualTop.ids.length,new Set(expected.choices).size);
+  assert.equal(actualTop.counts.reduce((a,b)=>a+b,0),7);
+  assert.ok(actualTop.visible&&actualTop.listFits&&actualTop.footerFits,'Top visible sin scroll: '+JSON.stringify(actualTop));
+  await frame.locator('.top-insert-next').waitFor();
+  assert.equal(await frame.locator('.top-insert-next').textContent(),'VER MI ÁLBUM');
+  assert.match(await frame.locator('#topInsertClock').textContent(),/^\d{2}:\d{2}:\d{2}$/);
+  await page.screenshot({path:'qa/screenshots/reta-top-insert-'+width+'.png'});
+  await page.evaluate(()=>{const k=Object.keys(S.have)[0];S.have[k]=6;save()});
+  await frame.locator('.top-insert-next[data-action="trade"]').waitFor();
+  assert.equal(await frame.locator('.top-insert-next').textContent(),'CANJEAR UN SOBRE EXTRA');
+  assert.equal(await frame.locator('#topInsertWait').isVisible(),false);
+  await page.evaluate(()=>{S.extra=1;save()});
+  await frame.locator('.top-insert-next[data-action="pack"]').waitFor();
+  assert.equal(await frame.locator('.top-insert-next').textContent(),'ABRIR SOBRE');
+  await frame.locator('#topInsertBack').click();
+  await frame.locator('#showTopInsert').waitFor({state:'visible'});
+  await frame.locator('#showTopInsert').click();
+  await frame.locator('.top-insert-next').click();
+  await page.locator('#pack.on').waitFor();
   assert.deepEqual(errors,[],'sin excepciones de navegador');
   console.log('✓ Reta móvil '+width+'px: 5 con sobres → abrir; 7 agotados → contador/álbum; 8 → juega 1ª ronda');
   await context.close();
