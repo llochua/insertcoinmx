@@ -1895,6 +1895,25 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #home #mGo.pack-wait span{font:800 10px/1.3 AV,system-ui,sans-serif;letter-spacing:.07em}
 #home #mGo.pack-wait time{font:800 22px/1.15 AV,system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
 #home #mGo.pack-wait:active{transform:none}
+/* Home: el abanico se adapta al alto libre, incluso con canje visible. */
+#home .mh,#home .htest,#home .mtabs,#home .dupbar,#home .mgo{flex-shrink:0}
+#home .mfan{flex:1 0 224px;min-height:224px;container-type:size;overflow:clip}
+#home .mc{width:min(68vw,280px,calc(71.64cqh - 16px))}
+#home .dupbar button{flex-shrink:0}
+@container (max-height:350px){
+ #home .mc .lab{padding:0 10px 10px}
+ #home .mc .lab small{font-size:6px;margin-bottom:5px}
+ #home .mc .lab b{font-size:clamp(20px,8cqh,28px)}
+ #home .mc .lab span{font-size:11px;margin-top:5px}
+}
+@media(max-height:650px){
+ #home{overflow-y:auto!important;overflow-x:hidden!important;touch-action:pan-y}
+ #home .amb{inset:0}
+}
+@media(max-width:370px){
+ #home .mtabs{gap:3px;padding-inline:4px}
+ #home .mtabs button{padding-inline:clamp(3px,1.6vw,6px)}
+}
 @media(max-height:650px){#entryAccount .entry-account-brand img{width:64px}#entryAccount .entry-account-brand{margin-bottom:10px}#entryAccount .entry-account-shell{padding-top:12px;padding-bottom:17px}}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261121-global"><style id="icmxLabCSS">
 #icmxLabTools{position:fixed;z-index:10000;top:max(8px,env(safe-area-inset-top));left:8px;max-width:min(330px,calc(100vw - 16px));font-family:AV,system-ui,sans-serif}
@@ -2231,6 +2250,10 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
   <p>Jugador @lab_player · LAB. No necesita contraseña; no hay Auth, nube ni rankings reales.</p>
   <div class="lab-grid">
    <button type="button" data-lab-action="home">Inicio</button>
+   <button type="button" data-lab-home="1:0">Inicio · 2 sobres, sin repetidas</button>
+   <button type="button" data-lab-home="0:0">Inicio · sin sobres ni repetidas</button>
+   <button type="button" data-lab-home="1:5">Inicio · 2 sobres + 5 repetidas</button>
+   <button type="button" data-lab-home="0:5">Inicio · sin sobres + 5 repetidas</button>
    <button type="button" data-lab-action="pack">Abrir un sobre</button>
    <button type="button" data-lab-seed="5">Reta · 5 diseños</button>
    <button type="button" data-lab-seed="7">Reta · 7 diseños</button>
@@ -3074,8 +3097,10 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ---------- navegación ---------- */
-let cur='home';
+let cur='home',labHomePreview=null;
+const homePackReady=()=>labHomePreview?labHomePreview.ready:packReady();
 function go(id){
+ if(id!=='home')labHomePreview=null;
  if(id!=='profile'&&$('profile')?.classList.contains('account-focus')){
   $('profile').classList.remove('account-focus');
   $('profileAccountPanel').hidden=true;
@@ -3191,9 +3216,9 @@ function menuArtLoad(img,m,dir){
  img.src=menuArtSrc(m,dir);
  img.closest('.fx')?.classList.toggle('menu-illustration',menuArtOK.has(m.id));
 }
-const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(playerRanking?.state.boards?.cards||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
+const MODES=()=>{const u=uniq(),N=NAV,r=homePackReady(),f=freePacksLeft();const docs=(playerRanking?.state.boards?.cards||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' + '+cyclePacksLeft()+' DE FRANJA':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
+ {id:'pack',t:'Sobres',k:r?(labHomePreview?'HOY · 2 RESTANTES':S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' + '+cyclePacksLeft()+' DE FRANJA':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR AHORA, TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' cartas obtenidas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -3212,8 +3237,8 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,i
  if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
  [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
  const m=M[mi];updateHomePackCTA(m);$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.webp'})`;
- const d=dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
- $('test').textContent=(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
+ const d=labHomePreview?labHomePreview.dups:dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
+ $('test').textContent=labHomePreview?'LAB · VISTA DE PRUEBA':(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function updateHomePackCTA(m=MODES()[mi]){
  const button=$('mGo'),waiting=m.id==='pack'&&m.off;
  if(waiting){
@@ -3224,7 +3249,7 @@ function updateHomePackCTA(m=MODES()[mi]){
  button.classList.toggle('off',!!(m.lock||m.off));
  button.disabled=!!waiting;
 }
-function mEnter(){const m=MODES()[mi];if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
+function mEnter(){const m=MODES()[mi];if(labHomePreview&&m.id==='pack'){toast('LAB: VISTA DE PRUEBA');return}if(m.lock){beep(150,.2);toast('NECESITAS '+(m.id==='tier'?20:16)+'<br>CARTAS');return}
  if(m.id==='pack'&&m.off){updateHomePackCTA(m);return}beep(880);setTimeout(()=>beep(1320,.08),70);go(m.id)}
 let mMoved=false,msx=null,msy=null;
 $('mGo').onclick=mEnter;
@@ -3235,7 +3260,7 @@ $('home').addEventListener('touchmove',e=>{if(msx!==null&&Math.abs(e.touches[0].
 $('home').addEventListener('touchend',e=>{if(msx===null)return;const dx=e.changedTouches[0].clientX-msx;msx=null;if(Math.abs(dx)>40){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
 let mmd=null;$('home').addEventListener('mousedown',e=>mmd=e.clientX);$('home').addEventListener('mouseup',e=>{if(mmd===null)return;const dx=e.clientX-mmd;mmd=null;if(Math.abs(dx)>40){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
 function countdown(){const n=new Date();const m=new Date(n);m.setHours(24,0,0,0);const s=Math.floor((m-n)/1000);return String(s/3600|0).padStart(2,'0')+':'+String((s%3600)/60|0).padStart(2,'0')}
-setInterval(()=>{if(cur!=='home'||mi!==0)return;const waiting=$('mGo').classList.contains('pack-wait');const available=!!packReady();if(waiting===available)renderHome();else if(waiting)updateHomePackCTA();},1000);
+setInterval(()=>{if(cur!=='home'||mi!==0)return;const waiting=$('mGo').classList.contains('pack-wait');const available=!!homePackReady();if(waiting===available)renderHome();else if(waiting)updateHomePackCTA();},1000);
 /* cambio de día sin recargar: a medianoche local, cada 30 s y al volver a la pestaña o la app */
 let dayNow=today(),retaOver=false;
 function dayTick(){const d=today();if(d===dayNow)return;dayNow=d;
@@ -3278,7 +3303,7 @@ function trade(after){
  }
  withLock(()=>{syncIn();if(dups()<5){after&&after();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})
 }
-$('tDupB').onclick=()=>trade(renderHome);
+$('tDupB').onclick=()=>{if(labHomePreview){toast('LAB: VISTA DE PRUEBA');return}trade(renderHome)};
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
 /* ---------- sobre ---------- */
 /* Sobre (Etapa 4): 3 Base + 1 sorpresa (30% de ser Especial o mejor) + 1 Especial o mejor segura.
@@ -4689,6 +4714,11 @@ if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
  };
  $('icmxLabTools').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b||b.id==='icmxLabToggle')return;
+  if(b.dataset.labHome!==undefined){
+   const [ready,dups]=b.dataset.labHome.split(':').map(Number);
+   labHomePreview={ready:!!ready,dups};mi=0;closeMenu();go('home');return;
+  }
+  labHomePreview=null;
   if(b.dataset.labLevelSeed!==undefined){
    const count=Number(b.dataset.labLevelSeed);
    if(![0,24,25].includes(count))return;
