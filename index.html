@@ -947,6 +947,7 @@ body.savewarn .view,body.savewarn #title{bottom:calc(58px + env(safe-area-inset-
 .rc b{font:700 15px AV;color:#fff;margin-top:2px}
 .rc-t{display:flex;gap:6px;flex-wrap:wrap}.rc-t span{font:700 10px AV;letter-spacing:.1em;padding:4px 7px 3px;border-radius:4px}
 .rc-n{box-shadow:inset 0 0 0 1.5px #fff;color:#fff}.rc-r{color:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3)}
+.rc-t .rc-qty{background:#ffd83d;color:#18131e;font-weight:800;letter-spacing:0}.rc-t .rc-total{flex-basis:100%;padding:0;color:rgba(255,255,255,.78);font:600 11px/1.4 AV,system-ui,sans-serif;letter-spacing:0}
 .rb-p{font:600 13px AV;color:rgba(255,255,255,.6);margin-top:14px}
 .rs-trade{all:unset;cursor:pointer;display:block;text-align:center;margin-top:14px;width:100%;box-sizing:border-box;padding:13px;border-radius:10px;font:700 13px AV;color:#FFD400;box-shadow:inset 0 0 0 1.5px rgba(255,212,0,.6)}
 .rs-pg{margin:28px 20px 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);font:600 12px AV;color:rgba(255,255,255,.45);text-align:center}
@@ -3814,6 +3815,16 @@ setInterval(()=>{
   const clock=$('sNextTime');if(clock)clock.textContent=nextPackCountdown();
  }
 },1000);
+function groupSummaryCards(cards,hero){
+ const byKey=new Map();
+ for(const card of cards){
+  const group=byKey.get(card.k);
+  if(!group){byKey.set(card.k,{card,count:1});continue}
+  group.count++;
+  if(card===hero||(group.card!==hero&&card._new&&!group.card._new))group.card=card;
+ }
+ return [...byKey.values()];
+}
 function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');const entering=!s.classList.contains('on');s.classList.add('on');
  const comp=hand.filter(c=>c._comp),rank=c=>(c._comp?-10:0)+VORD[c.v]+(c._new?0:5);
  const H=hand.slice().sort((a,b)=>rank(a)-rank(b))[0],d=DB[H.d],v=H.v,st=dState(d);
@@ -3823,10 +3834,11 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:.8"><img src="${artOf(d.id)}" alt=""></span>`}</span></div>`;
  const lab=H._comp?'COLECCIÓN COMPLETA':'LO MEJOR DE TU SOBRE';
  const vchips=st.vs.filter(x=>x.st!=='soon').map(x=>`<span class="rh-c${x.h?' on':''}">${x.h?'✓ ':''}${VSHORT[x.v]}</span>`).join('');
- const tag=c=>`<span class="rc-t"><span class="dx-v v-${c.v}">${VSHORT[c.v].toUpperCase()}</span>${c._new?'<span class="rc-n">NUEVA</span>':`<span class="rc-r">REPETIDA ×${S.have[c.k]}</span>`}</span>`;
+ const groups=groupSummaryCards(hand,H),counts=new Map(groups.map(g=>[g.card.k,g.count]));
+ const tag=c=>{const qty=counts.get(c.k)||1,total=S.have[c.k]||0;return `<span class="rc-t"><span class="dx-v v-${c.v}">${VSHORT[c.v].toUpperCase()}</span>${c._new?'<span class="rc-n">NUEVA</span>':''}${!c._new||qty>1?`<span class="rc-qty">+${qty}</span><span class="rc-total">${total} en tu colección</span>`:''}</span>`};
  const card=c=>`<button type="button" class="rc ${c._new?'nw':'rp'}" data-k="${c.k}" aria-label="Ver ${esc(c.n)}, ${VSHORT[c.v]}${summaryStoryCta(c)?'. '+summaryStoryCta(c):''}"><span class="fx idle r-${c.img?c.r:'comun'}"><img src="${imgOf(c,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span><b>${esc(c.n)}</b>${summaryStoryCta(c)?`<span class="rc-story-cta">${summaryStoryCta(c)} <span aria-hidden="true">→</span></span>`:''}${tag(c)}</button>`;
- const rest=hand.filter(c=>c!==H),G={comp:rest.filter(c=>c._comp),dnew:rest.filter(c=>c._new&&!c._comp&&c._dnew),vnew:rest.filter(c=>c._new&&!c._comp&&!c._dnew),rep:rest.filter(c=>!c._new)};
- const sec=(t,L)=>L.length?`<section class="rs-group"><h3>${t}<span>${L.length}</span></h3><div class="rg">${L.map(card).join('')}</div></section>`:'';
+ const rest=groups.filter(g=>g.card.k!==H.k).map(g=>g.card),G={comp:rest.filter(c=>c._comp),dnew:rest.filter(c=>c._new&&!c._comp&&c._dnew),vnew:rest.filter(c=>c._new&&!c._comp&&!c._dnew),rep:rest.filter(c=>!c._new)};
+ const sec=(t,L)=>L.length?`<section class="rs-group"><h3>${t}<span>${t==='Repetidas'?L.reduce((n,c)=>n+counts.get(c.k),0):L.length}</span></h3><div class="rg">${L.map(card).join('')}</div></section>`:'';
  const n=dups(),PD=DESIGNS.filter(x=>!x.bx),disc=PD.filter(x=>dState(x).own).length;
  const tradeH=n>=5?'<button class="rs-trade" id="sTrade">Cambiar 5 repetidas por un sobre extra</button>':`<p class="rb-p">Llevas ${n%5} de 5 repetidas para un sobre extra</p>`;
  const finish=summaryStatus();
@@ -3837,7 +3849,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
   </header>
   <div class="rh dx v-${v}${hasCol(d.id)?'':' neu'}" style="--bg:${dcol(d.id)}">${art}${v==='e'?'<i class="dx-mat holo"></i>':v==='r'?'<i class="dx-mat gold"></i>':''}<div class="dx-fade"></div>
    <button type="button" class="dx-card" data-k="${H.k}" aria-label="Ver ${esc(d.n)}, ${VSHORT[H.v]}${summaryStoryCta(H)?'. '+summaryStoryCta(H):''}"><span class="fx idle r-${H.img?H.r:'comun'}"><img src="${imgOf(H,'c')}" alt=""><i class="foil"></i><i class="glare"></i></span></button>
-   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${H._comp?`<div class="rh-vs">${vchips}</div>`:tag(H)}${summaryStoryCta(H)?`<button type="button" class="rh-story-cta" data-k="${H.k}" aria-label="${summaryStoryCta(H)} de ${esc(d.n)}">${summaryStoryCta(H)} <span aria-hidden="true">→</span></button>`:''}</div></div>
+   <div class="dx-info"><div class="dx-lab">${lab}</div><h2>${esc(d.n)}</h2>${H._comp?`<div class="rh-vs">${vchips}</div>${counts.get(H.k)>1?tag(H):''}`:tag(H)}${summaryStoryCta(H)?`<button type="button" class="rh-story-cta" data-k="${H.k}" aria-label="${summaryStoryCta(H)} de ${esc(d.n)}">${summaryStoryCta(H)} <span aria-hidden="true">→</span></button>`:''}</div></div>
   <section class="rs-follow" aria-label="Qué sigue después de este sobre">
    <div class="rs-wait" id="sWait" ${packReady()?'hidden':''}>
     <span>PRÓXIMOS 2 SOBRES</span><strong>En <time id="sNextTime">${nextPackCountdown()}</time></strong>
@@ -3853,7 +3865,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
   <div class="rs-group rs-redeem">${tradeH}</div>
   <div class="rs-pg">${disc} diseños descubiertos · ${AV.filter(c=>S.have[c.k]).length} cartas obtenidas</div>
  </div>`;
- for(const c of hand)mountFaceValueLazy(s.querySelector('.rc[data-k="'+c.k+'"] .fx'),c);
+ for(const c of rest)mountFaceValueLazy(s.querySelector('.rc[data-k="'+c.k+'"] .fx'),c);
  mountFaceValueLazy(s.querySelector('.rh .dx-card .fx'),H);
  if(entering){s.scrollTop=0;ga('resumen_sobre_visto',{tipo:lastOpenedPack?.kind||'extra',paso:lastOpenedPack?.number||0});showLevelUpIfPending()}
  refreshSummaryActions();
