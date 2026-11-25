@@ -24,7 +24,7 @@ test('Valor y POP sobre la imagen, con reacciones antes de la narrativa y sin f�
  key('id="profileValuePoints"');
  key('id="fDesignValue"');
  key('id="communityRankRows"');
- for(const id of ['zVoting','zRate','zGoty','zLikeStatus','zNarrative'])key('id="'+id+'"');
+ for(const id of ['zVoting','zRate','zVoteStatus','zNarrative','zDesignPopularity'])key('id="'+id+'"');
  key('content/card-runtime.js?v=');
  key('content/card-renderer.js?v=');
  key('content/card-data-adapter.js?v=');
@@ -35,7 +35,7 @@ test('Valor y POP sobre la imagen, con reacciones antes de la narrativa y sin f�
  assert.doesNotMatch(zoom,/zCommunityFormula|zLikeYes|zLikeNo/,'Sin fórmula ni botones de Like duplicados');
  assert.match(html,/const TN=\['GOTY','GENIAL','OK','MMM'\]/);
  assert.match(html,/previous===r\?null:r/,'Segundo toque retira la reacción');
- assert.doesNotMatch(html,/id="zVariantPoints"|id="zDesignPopularity"|class="icmx-card-value"/);
+ assert.doesNotMatch(html,/id="zVariantPoints"|id="zGoty"|class="icmx-card-value"/);
  assert.match(renderer,/field:'pop'/);
  assert.match(html,/ICMX_CARD_RUNTIME\?\.mount\(fx,card,updateCardValueUI\(card\)\)/);
  assert.match(css,/#zoom \.icmx-card-value-note/);
@@ -86,4 +86,16 @@ test('El nuevo renderer elimina los parches: un solo pie SVG sobre shell sin tin
  assert.doesNotMatch(html,/content\/card-value-overlay\.js\?v=/);
  assert.doesNotMatch(html,/ICMX_CARD_VALUE\.mount\(/);
  assert.doesNotMatch(css,/\.fx>canvas\.icmx-card-face-values/);
+});
+
+test('La ficha publica únicamente Tier, sin Like derivado',()=>{
+ assert.match(html,/communityVote\(id,'tier',next\)/);
+ assert.doesNotMatch(html,/communityVote\([^\n]*,'like',/);
+});
+
+test('POP remains secondary and GOTY remains only a reaction',()=>{
+ assert.doesNotMatch(renderer,/etiqueta_goty|— GOTY/);
+ assert.match(renderer,/data-icmx-pop-icon/);
+ assert.match(html,/<div class="fv" id="fVers"><\/div><section id="fDesignValue"/);
+ assert.doesNotMatch(html,/class="pop-meter"|class="pop-sources"/);
 });
