@@ -4637,7 +4637,7 @@ claimPend();initSound();go('home');STORE.init();
 if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
 /* Integración segura: nunca reemplaza un progreso distinto sin revisión.
    Los visitantes sin sesión continúan jugando y guardando localmente. */
-import('./content/cloud-sync.mjs?v=20261124-welcome3').then(({startCloudSync,sameProgress})=>startCloudSync({
+import('./content/cloud-sync.mjs?v=20261124-legacy-recovery1').then(({startCloudSync,sameProgress})=>startCloudSync({
  verifiedGuests:VERIFIED_GUEST_PLAY,
  guestSession:async auth=>{
   const {ensureVerifiedGuest}=await import('./content/verified-guest.mjs?v=20261121-beta2');

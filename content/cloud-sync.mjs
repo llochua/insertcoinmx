@@ -129,6 +129,28 @@ export function decideSync({local,remote,base,remoteRevision}){
  return 'matched';
 }
 
+// Corte real de lanzamiento: 21 nov 2026. El día 21 es ambiguo (hora local).
+// Solo recuperar automáticamente una economía demostrablemente anterior al corte.
+// No usar exportedAt del respaldo local: buildBackup lo genera al leer.
+export function isLegacyResetCandidate({local,base,epoch,pending=false}){
+ if(pending||epoch==='public-2026-launch-v2')return false;
+ const prior=b=>{
+  const d=assertBackup(b).data;
+  const oldDate=v=>typeof v==='string'&&/^2026-11-(?:0[1-9]|1[0-9]|20)$/.test(v);
+  if(!oldDate(d.last)||!Object.keys(d.have).length||d.test)return false;
+  if([d.freeDay,d.rdia].some(v=>v&&!oldDate(v)))return false;
+  // Un ciclo posterior al corte es evidencia de actividad reciente.
+  if(Number.isFinite(d.freeCycle)&&d.freeCycle>=Math.floor(Date.UTC(2026,10,21)/(6*60*60*1000)))return false;
+  return true;
+ };
+ if(!prior(local))return false;
+ if(base){
+  const at=Date.parse(base.backup.exportedAt);
+  if(!Number.isFinite(at)||at>=Date.UTC(2026,10,21)||!prior(base.backup))return false;
+ }
+ return true;
+}
+
 function readBaseline(storage,userId){
  try{
   const value=JSON.parse(storage.getItem(BASE_PREFIX+userId));
@@ -248,6 +270,35 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus,verifiedGu
    return;
   }
   let action=decideSync({local,remote,base,remoteRevision:rev});
+  // El reset quedó desactivado antes de que todos los navegadores lo recibieran.
+  // Únicamente migrar progreso antiguo con evidencia; nunca subir cartas locales,
+  // eliminar Auth, descartar peticiones pendientes ni sustituir otra cuenta.
+  const hasPending=()=>Boolean(localStorage.getItem('icmx-cloud-pack-request-v1:'+uid)||
+   localStorage.getItem('icmx-cloud-exchange-request-v1:'+uid));
+  if(verifiedGuests&&action!=='matched'&&isLegacyResetCandidate({
+   local,base,epoch:localStorage.getItem('icmx-game-epoch'),pending:hasPending()
+  })){
+   let current=remote,revision=rev;
+   if(!current){
+    const {data,error}=await client.rpc('ensure_player_snapshot');
+    if(error)throw error;
+    if(!['created','existing'].includes(data?.status)||!Number.isSafeInteger(Number(data.revision))||Number(data.revision)<1)
+     throw Error('No se pudo inicializar la partida vigente');
+    current=assertBackup(data.state);revision=Number(data.revision);
+   }
+   const {data:identity,error:identityError}=await client.auth.getUser();
+   if(identityError||identity?.user?.id!==uid||localStorage.getItem(ACCOUNT_BINDING)!==bound||
+      !sameProgress(readLocal(),local)||hasPending()){rerun=true;return}
+   archiveConflict(localStorage,{owner:uid,local});
+   if(!sameProgress(readLocal(),local)||localStorage.getItem(ACCOUNT_BINDING)!==bound||hasPending()){rerun=true;return}
+   if(!restoreLocal(current)?.ok)throw Error('No se pudo recuperar la partida vigente');
+   localStorage.setItem(ACCOUNT_BINDING,uid);
+   persistBaseline(localStorage,uid,revision,current);
+   // Marcar solo después de comprobar respaldo, restauración y baseline.
+   localStorage.setItem('icmx-game-epoch','public-2026-launch-v2');
+   status('synced','NUBE AL DÍA · PARTIDA RECUPERADA');
+   rerun=true;return;
+  }
   const localEconomyChanged=remote&&economySignature(local)!==economySignature(remote);
   if(action==='upload'&&localEconomyChanged)action='conflict';
   if(action==='conflict'&&remote&&bound===uid&&base){
@@ -662,6 +713,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus,verifiedGu
   if(e.key==='icmx-auth-qa-nov2026'||e.key==='icmx-album2')check();
  };
  window.addEventListener('focus',onFocus);
+ window.addEventListener('online',onFocus);
  document.addEventListener('visibilitychange',onFocus);
  window.addEventListener('storage',onStorage);
  interval=setInterval(()=>{if(!document.hidden)check()},15000);
@@ -670,6 +722,7 @@ export async function startCloudSync({readLocal,restoreLocal,onStatus,verifiedGu
   stopped=true;clearTimeout(debounce);clearInterval(interval);
   listener?.subscription?.unsubscribe();
   window.removeEventListener('focus',onFocus);
+  window.removeEventListener('online',onFocus);
   document.removeEventListener('visibilitychange',onFocus);
   window.removeEventListener('storage',onStorage);
  }};
