@@ -167,6 +167,7 @@ const footer={
 async function layerCanvas(ctx,lay){
  if(lay.type==='text'){canvasText(ctx,lay);return}
  if(lay.type==='star'){star(ctx,lay);return}
+ if(lay.type==='pop-icon'){ctx.save();ctx.translate(lay.x,lay.y);ctx.scale(lay.size/24,lay.size/24);ctx.strokeStyle=lay.color;ctx.lineWidth=2;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke(new Path2D(lay.path));ctx.restore();return}
  if(lay.type==='footer-plate'){
   const g=ctx.createLinearGradient(49,0,911,0);
   footer[lay.variant].forEach(([color,at])=>g.addColorStop(at,color));

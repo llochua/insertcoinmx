@@ -17,6 +17,18 @@
 .rs2 .rh-story-cta:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
 @media(max-width:360px){.rs2 .rg{gap:9px}.rs2 .rg .rc{padding:8px}.rs2 .rc-story-cta{font-size:12px}.rs2 .rh-story-cta{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.rs2 .rg .rc{transition:none}}
+/* POP: secondary metadata. */
+.icmx-pop-panel{width:100%;box-sizing:border-box;color:#bdb8d1;font:600 11px/1.45 AV,system-ui,sans-serif;text-align:center}
+.icmx-pop-panel .pop-line{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;min-height:22px;margin:0}
+.icmx-pop-panel .pop-line svg{width:14px;height:14px;flex:none}
+.icmx-pop-panel strong{font-weight:700;color:#d8d4e5}
+.icmx-pop-panel .pop-demo{font-size:9px;color:#918ba9}
+#fDesignValue{margin:10px 0 0}
+#zDesignPopularity{width:min(100%,480px);margin:8px auto 10px;flex:none}
+#zDesignPopularity[hidden]{display:none!important}
+#ficha .fv.n1{grid-template-columns:minmax(0,70%);justify-content:center}
+@media(min-width:560px){#ficha .fv.n1{grid-template-columns:minmax(0,250px)!important}}
+
 </style>
 <!-- Google Analytics 4 (G-1PZ5B99JMH) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1PZ5B99JMH"></script>
@@ -2493,13 +2505,14 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  </div>
 </div>
 </div>
-<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div><p id="fDesignValue" class="icmx-ficha-pop">POPULARIDAD GLOBAL · SIN CLASIFICAR</p></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
+<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><section id="fDesignValue" class="icmx-pop-panel" aria-label="Popularidad global"></section><div class="fsoon" id="fSoon"></div></div></div>
 <dialog class="zoom" id="zoom" aria-labelledby="zName">
  <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx" role="button" tabindex="0" aria-label="Tocar carta para regresar" title="Tocar para regresar"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <p class="z-return-hint" aria-hidden="true">TOCA LA CARTA PARA VOLVER</p>
- <div id="zVoting" hidden><p class="z-rate-title">¿Qué te parece este diseño?</p><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><div id="zGoty"></div><p id="zLikeStatus" role="status" aria-live="polite"></p></div>
+ <div id="zVoting" hidden><p class="z-rate-title">¿Qué te parece este diseño?</p><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><p id="zLikeStatus" role="status" aria-live="polite"></p></div>
  <section class="z-narrative" id="zNarrative" tabindex="-1" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
+ <section id="zDesignPopularity" class="icmx-pop-panel" aria-label="Popularidad global"></section>
 </dialog>
 <div class="toast" id="toast"></div>
 <div class="ux-backdrop" id="uxOverlay" role="dialog" aria-modal="true" aria-labelledby="uxTitle" aria-describedby="uxDesc" aria-hidden="true">
@@ -2518,8 +2531,8 @@ window.ICMX_VERIFIED_GUEST_PLAY=/^(?:www\.)?insertcoinmx\.com$/i.test(location.h
 <script src="content/player1-levels.js?v=5"></script>
 <script src="content/card-texts.js?v=20261124-editorial3"></script>
 <script src="content/card-data-adapter.js?v=20261124-hidden"></script>
-<script src="content/card-renderer.js?v=20261124-serial"></script>
-<script src="content/card-runtime.js?v=20261124-serial"></script>
+<script src="content/card-renderer.js?v=20261125popv2"></script>
+<script src="content/card-runtime.js?v=20261125popv2"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
    b Base · e Especial · r Rara · f Full. La clave de una carta es diseño+'_'+letra (ej. fatality_r, x_f).
@@ -2805,7 +2818,7 @@ let communityValueEngine=null;
   const rows=status==='ready'?communityRanking.state.rows.filter(r=>r.position!==null&&DB[r.id]&&!DB[r.id].bx).slice(0,10):[];
   $('communityRankEmpty').hidden=rows.length>0;
   $('communityRankStatus').textContent=status==='loading'?'CARGANDO RANKING':status==='offline'?'RANKING NO DISPONIBLE':status==='ready'?'AÚN SIN VOTOS COMUNITARIOS':'SIN RESULTADOS GLOBALES VERIFICADOS';
-  $('communityRankNote').textContent=rows.length?'POP de 0 a 1,000 · las cuatro variantes comparten popularidad.':'Los diseños sin votos permanecen sin clasificar.';
+  $('communityRankNote').textContent=rows.length?'Popularidad de los diseños en la comunidad.':'Los diseños sin votos permanecen sin clasificar.';
   $('communityRankRows').replaceChildren(...rows.map(r=>{
    const b=document.createElement('button');b.type='button';b.className='r rank-'+r.position;b.dataset.design=r.id;
    const rank=document.createElement('span');rank.textContent=String(r.position).padStart(2,'0');
@@ -2819,6 +2832,14 @@ let communityValueEngine=null;
  function getGlobalPop(id){
   return communityRanking?.state.status==='ready'?communityRanking.get(id):null;
  }
+ const POP_FLAME="<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/></svg>";
+ function renderPopPanel(node,id){
+  const p=getGlobalPop(id);
+  node.innerHTML='<p class="pop-line">'+POP_FLAME+'<span>Popularidad</span> '+
+   (p?.position!=null?'<strong>'+p.score+'</strong><span>· #'+p.position+' global</span>':'<span>· Sin clasificar</span>')+
+   '</p>';
+ }
+
 const validValueCards=()=>CARDS.filter(c=>!c.bx&&c.img).map(c=>c.k);
 function collectionPointsLocal(){
  if(!communityValueEngine)return null;
@@ -3977,7 +3998,7 @@ function openFicha(id){if(!DB[id]||!dState(DB[id]).own)return;fd=id;ga('ver_fich
 function closeFicha(){fd=null;$('ficha').classList.remove('on');$('ficha').setAttribute('aria-hidden','true')}
 function renderFicha(){const d=DB[fd];if(!d||!dState(d).own)return closeFicha();const st=dState(d);
  $('fMeta').innerHTML=d.cat+(d.bx?' · BONUS':player1.numberOf(d.id)?' · #'+String(player1.numberOf(d.id)).padStart(3,'0'):' · ARCHIVO')+(st.done?'<span class="fdone">★ COMPLETO</span>':st.was?'<span class="fdone was">★ COMPLETADO '+fday(S.logro[d.id]).toUpperCase()+' · NUEVA VERSIÓN</span>':'');$('fName').textContent=d.n;
- const pop=getGlobalPop(d.id);$('fDesignValue').textContent=pop?.position!=null?'POPULARIDAD GLOBAL · '+pop.score+' POP · #'+pop.position:'POPULARIDAD GLOBAL · SIN CLASIFICAR';
+ renderPopPanel($('fDesignValue'),d.id);
  const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
  const inLevel=player1View(S.have).eligible.has(d.id);const col=st.vs.filter(x=>x.st==='have'||(inLevel&&x.st==='av'));$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
@@ -3995,7 +4016,7 @@ let zk=null,zLoadToken=0,zReturnFocus=null;
 /* acepta una clave de carta o un id de diseño (desde el Tier): muestra la versión que tienes; si no, la que ya tiene imagen */
 function cardFor(k){if(CB[k])return CB[k];const d=designId(k);if(!d)return null;const L=VL.map(v=>CB[d+'_'+v]);return L.find(c=>c.img&&S.have[c.k])||L.find(c=>S.have[c.k])||L.find(c=>c.img)||L[0]}
 const zd=()=>CB[zk]?CB[zk].d:zk; // las calificaciones son por diseño, no por versión
-const zGo=()=>{const t=communityRanking?.state.status==='ready'?communityRanking.state.aggregates.find(r=>r.id===zd())?.tiers:null;const total=t?Object.values(t).reduce((a,b)=>a+b,0):0;$('zGoty').textContent=total?Math.round(100*t.goty/total)+'% la pone GOTY':communityRanking?.state.status==='ready'?'Sin calificaciones globales todavía':communityRanking?.state.status==='loading'?'Cargando calificaciones…':'Calificaciones globales no disponibles'};
+const zGo=()=>renderPopPanel($('zDesignPopularity'),zd());
 function openCard(k,options={}){
  const cc=cardFor(k);if(!cc||(cur==='album'&&!S.have[cc.k]))return;
  const storyFirst=!!options.storyFirst&&!!storyFor(cc);
@@ -4050,6 +4071,7 @@ function openCard(k,options={}){
 }
 function setVoting(on){
  $('zVoting').hidden=!on;
+ $('zDesignPopularity').hidden=!on;
  if(on){paintRate();zGo();$('zLikeStatus').textContent='';}
 }
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb zr-emoji ${S.rate[zd()]===i?'on':''}" data-r="${i}" type="button" aria-label="${n}" title="${n}" aria-pressed="${S.rate[zd()]===i}">${REACTION_EMOJI[i]}</button>`).join('')}
@@ -4059,11 +4081,9 @@ $('zRate').onclick=e=>{
  if(next===null)delete S.rate[id];else S.rate[id]=next;
  const saved=save();$('zLikeStatus').textContent='';
  if(saved&&globalThis.icmxAccountIdentity?.userId&&!DB[id]?.bx){
-  // Una interacción: GOTY/GENIAL = positivo, OK = neutral, MMM = negativo.
-  // Retirar una reacción retira ambos votos; el cálculo global conserva sus ponderaciones.
-  const like=next===null||next===2?null:next===3?0:1;
-  Promise.all([communityVote(id,'tier',next),communityVote(id,'like',like)]).then(results=>{
-   if(results.some(ok=>!ok)&&$('zoom').open&&zd()===id&&(S.rate[id]??null)===next)$('zLikeStatus').textContent='Calificación local guardada; no se publicó completamente.';
+  // Una reacción publica únicamente la calificación Tier.
+  communityVote(id,'tier',next).then(ok=>{
+   if(!ok&&$('zoom').open&&zd()===id&&(S.rate[id]??null)===next)$('zLikeStatus').textContent='Calificación local guardada; no se publicó.';
   });
  }
  beep(next===null?330:[1319,1047,784,523][r],.08);paintRate();zGo();
@@ -4725,7 +4745,7 @@ $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
- Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261124cardcount')]).then(([mod,auth,players])=>{
+ Promise.all([import('./content/community-ranking.mjs?v=20261125popv2'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261124cardcount')]).then(([mod,auth,players])=>{
   playerRanking=players.createPlayerRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{if(cur==='scores')renderScores();if(cur==='home'||cur==='title')refresh()}});
   playerRanking.refresh();
   communityRanking=mod.createCommunityRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{
@@ -4737,7 +4757,7 @@ $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[d
   }});
   if(['scores','album','pack'].includes(cur)||$('zoom').open)communityRanking.refresh();
  }).catch(()=>{});
- import('./content/community-value.mjs').then(mod=>{
+ import('./content/community-value.mjs?v=20261125popv2').then(mod=>{
  communityValueEngine=mod;
  if(cur==='scores')renderScores();
  if(cur==='profile')renderProfile();

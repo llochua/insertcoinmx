@@ -81,6 +81,10 @@
     layers.push({type:'ability-icon',cx,cy,radius:opts.radius||44,
       badge:opts.badge!==false,color:opts.color||'#20191d'});
   }
+  // Lucide Flame v0.456.0 (ISC), identical vector in SVG and shared images.
+  function layerPopIcon(layers, x, y, color) {
+    layers.push({type:'pop-icon',x,y,size:34,color,path:"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"});
+  }
   function layerStar(layers, cx, cy, radius, points=5, color='#ffd21f') {
     layers.push({type:'star',cx,cy,radius,points,color});
   }
@@ -139,16 +143,15 @@
     if (variant !== 'f') {
       layerImage(layers,pill,50,48);
       layerText(layers,card.nombre,84,151,60,ink,{maxWidth:455});
-      layerText(layers,'POP',594,160,23.4,ink,{maxWidth:95});
-      // POP siempre dentro del encabezado (y=133–219): jamás invade el arte.
-      layerText(layers,popOf(options),909,135,74,ink,
-        {maxWidth:205,align:'end',field:'pop',clipBox:{x:699,y:132,width:214,height:88}});
+      layerPopIcon(layers,685,158,ink);
+      layerText(layers,'POP',779,160,29,ink,{align:'end',maxWidth:58});
+      layerText(layers,popOf(options),902,155,40,ink,
+        {maxWidth:112,align:'end',field:'pop',clipBox:{x:786,y:132,width:127,height:88}});
       const [r1,r2]=splitRef(card),offset=r2?28:0;
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',186,884,{tint:ink,width:264,height:26});
-      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_goty.png',790,900+offset,{tint:ink,width:102,height:78});
       layerAbilityIcon(layers,125.5,929.5+offset);
-      layerText(layers,r1,193,926,49.2,ink,{maxWidth:590});
-      if (r2) layerText(layers,r2,193,982,49.2,ink,{maxWidth:590});
+      layerText(layers,r1,193,926,49.2,ink,{maxWidth:690});
+      if (r2) layerText(layers,r2,193,982,49.2,ink,{maxWidth:690});
       const habilidad=wrapLine(card.linea,r2?75:49);
       habilidad.forEach((line,i)=>layerText(layers,line,86,(r2?1045:999)+i*44.6,37.2,ink,
         {maxWidth:800,family:'"Carlito", Arial, sans-serif',weight:400}));
@@ -176,14 +179,13 @@
     } else {
       layerImage(layers,pill,32,30);
       layerText(layers,card.nombre,48,922,64,'#ffffff',{maxWidth:590});
-      layerText(layers,'POP',910,892,21,'#ffffff',{align:'end',spacing:4});
-      // Full: bloque numérico encima de habilidad/GOTY, no a la altura de esa fila.
-      layerText(layers,popOf(options),909,924,79,'#ffffff',
-        {align:'end',maxWidth:230,field:'pop',clipBox:{x:665,y:922,width:249,height:100}});
+      layerPopIcon(layers,685,951,'#ffffff');
+      layerText(layers,'POP',779,953,29,'#ffffff',{align:'end',maxWidth:58});
+      layerText(layers,popOf(options),902,948,40,'#ffffff',
+        {align:'end',maxWidth:112,field:'pop',clipBox:{x:786,y:922,width:128,height:100}});
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',48,1006,{tint:'#ffffff',width:264,height:26});
       layerAbilityIcon(layers,62,1064,{radius:22,badge:false,color:'#ffd21f'});
-      layerText(layers,(card.ref+' '+(card.ref2||'')).trim(),84,1050,38,'#ffd21f',{maxWidth:560});
-      layerText(layers,'— GOTY',910,1050,38,'#ffd21f',{align:'end',maxWidth:210});
+      layerText(layers,(card.ref+' '+(card.ref2||'')).trim(),84,1050,38,'#ffd21f',{maxWidth:800});
       layerText(layers,card.frase,78,1145,30,'#191200',
         {maxWidth:800,family:'"Carlito", Arial, sans-serif',weight:400});
       layerText(layers,'Carta '+numLabel(card,variant,options),48,1262,23.4,'#ffffff',{maxWidth:270});
@@ -237,6 +239,8 @@
           transform:'translate('+lay.cx+' '+lay.cy+') scale('+(lay.radius/44)+')',
           'data-icmx-ability-icon':'zap'
         }));
+      } else if (lay.type==='pop-icon') {
+        svg.appendChild(el('path',{d:lay.path,fill:'none',stroke:lay.color,'stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round',transform:'translate('+lay.x+' '+lay.y+') scale('+(lay.size/24)+')','data-icmx-pop-icon':'flame'}));
       } else if (lay.type==='star') {
         svg.appendChild(el('path',{d:starPath(lay),fill:lay.color,'data-icmx-star':lay.points,
           'aria-hidden':'true'}));
@@ -291,7 +295,7 @@
   }
   function updateValues(svg,variant,options={}) {
     const values={pop:popOf(options),points:'Valor '+pointsOf(variant,options)};
-    const layouts={pop:{size:variant==='f'?79:74,maxWidth:variant==='f'?230:205},
+    const layouts={pop:{size:40,maxWidth:112},
       points:{size:23.4,maxWidth:variant==='f'?230:204}};
     for(const [field,value] of Object.entries(values)){
       const tx=svg.querySelector('[data-icmx-field="'+field+'"]');

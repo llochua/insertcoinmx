@@ -71,7 +71,7 @@ test('rareza usa estrellas SVG 0/1/2/3 y habilidad usa ícono diferente',()=>{
   }
 });
 test('POP respeta su caja con posición controlada Base y Full',()=>{
-  for(const [variant,y] of [['b',135],['f',924]]){
+  for(const [variant,y] of [['b',155],['f',948]]){
     const layers=api.makeLayers(sample,variant,{pop:143,fullTotal:74});
     const pop=layers.find(x=>x.field==='pop');
     assert.equal(pop.text,'143');

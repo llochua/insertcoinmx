@@ -189,3 +189,7 @@ Aprobación explícita del creador para el cambio de estado:
 **Revisión previa a publicación del registro:** confirmar con el creador los acuerdos editoriales cuyo origen es conversacional (no un commit), especialmente experiencia de Archivo, relatos, gestos y premios; no interpretarlos como evidencia de una función completa. Comprobar que la próxima actualización de la rama no introduzca archivos de ejecución y que pase los checks obligatorios.
 
 **v0.2 revisada, aún en PR #132 para validación del creador.** Se corrigió el corte de Fase 1 y se inventariaron 42 decisiones/criterios y 8 observaciones (1 resuelta). No declarar el conjunto definitivamente ratificado por la sola creación del archivo. Los hallazgos `INC-*` son para planificación posterior, no órdenes de implementación. **No se modifican producción, cuentas, colecciones ni ilustraciones.**
+
+## Actualización 25 nov 2026 — POP v2
+
+Aprobado: eliminar Likes del POP y de las reacciones publicadas; Tier List 50% y Reta 50%. Se conserva el prior neutral de 10 por canal, rango 0–1000, sin clasificar si no hay calificaciones ni retas. Los Likes históricos quedan fuera del cálculo y se conserva el contrato SQL anterior por compatibilidad, sin borrar datos. No se modifican PTS ni colecciones. Esta decisión sustituye los pesos iniciales de IC-POP-01; pendiente de pruebas y publicación.

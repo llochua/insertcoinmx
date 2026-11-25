@@ -64,16 +64,17 @@ try{
   assert(plateBounds.x<=75 && plateBounds.x+plateBounds.width>=870 &&
     plateBounds.y<=1250 && plateBounds.y+plateBounds.height>=1280,
     'placa cubre la zona completa, no parches detrás de cifras');
-  assert.equal(await page.locator('#dynNew .icmx-data mask').count(),2,'mask luminance en etiquetas');
+  assert.equal(await page.locator('#dynNew .icmx-data mask').count(),1,'solo máscara de habilidad; GOTY eliminado');
   const pop=page.locator('#dynNew text[data-icmx-field="pop"]');
   assert.equal(await pop.count(),1,'POP dinámico único');
+  assert.equal(await page.locator('#dynNew [data-icmx-pop-icon="flame"]').count(),1,'Lucide Flame');
   assert.match(await pop.getAttribute('clip-path'),/url\(#icmx-pop-clip-/);
   assert.equal(await page.locator('#dynNew .icmx-data path[data-icmx-ability-icon="zap"]').count(),1,
     'habilidad usa rayo vectorial, no estrellas');
   assert.equal(await page.locator('#icmxDynamicLab .dyn-note[data-error="true"]').count(),0);
   assert.equal(await page.locator('#dynNumber').inputValue(),'001/???',
     'el LAB presenta numeración abierta sin cambiar el catálogo persistente');
-  for(const n of [7,26,143]){
+  for(const n of [7,26,143,1000]){
     await page.locator('#dynPop').fill(String(n));
     const text=page.locator('#dynNew text[data-icmx-field="pop"]');
     assert.equal(await text.textContent(),String(n));
@@ -128,8 +129,8 @@ try{
     'Full usa el mismo rayo de habilidad (no una estrella adicional)');
   const popFull=page.locator('#dynNew text[data-icmx-field="pop"]');
   assert.match(await popFull.getAttribute('clip-path'),/url\(#icmx-pop-clip-/);
-  assert.equal(await popFull.getAttribute('y'),'924','Full POP arriba de GOTY');
-  for(const n of [7,26,143]){
+  assert.equal(await popFull.getAttribute('y'),'948','Full POP dentro de su encabezado');
+  for(const n of [7,26,143,1000]){
     await page.locator('#dynPop').fill(String(n));
     const text=page.locator('#dynNew text[data-icmx-field="pop"]');
     assert.equal(await text.textContent(),String(n));
