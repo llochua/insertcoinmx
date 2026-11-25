@@ -54,6 +54,9 @@ async function open(identity,width){
  await page.waitForFunction(()=>document.documentElement.dataset.icmxAvatarReady==='true');
  if(identity)await page.waitForFunction(id=>globalThis.icmxAccountIdentity?.userId===id,identity);
  await page.locator('#title').click();
+ await page.locator('#onb.on').waitFor({state:'visible'});
+ for(let step=0;step<3;step++)await page.locator('#onNext').click();
+ await page.locator('#onb').waitFor({state:'hidden'});
  await page.evaluate(()=>go('scores'));
  await page.waitForFunction(()=>communityRanking?.state.status==='ready');
  return page;
