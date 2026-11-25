@@ -5,6 +5,8 @@
 (function (root) {
   'use strict';
   const NS = 'http://www.w3.org/2000/svg';
+  // Opt-in for the isolated LAB; production rendering remains unchanged.
+  const hideGoty = typeof document !== 'undefined' && document.currentScript?.dataset.icmxHideGoty === 'true';
   const VARIANTS = Object.freeze({b:'comun',e:'holo',r:'dorada',f:'full'});
   const DEFAULT_POINTS = Object.freeze({b:10,e:25,r:50,f:100});
   const COLORS = Object.freeze({b:'#191200',e:'#131111',r:'#191203',f:'#ffffff'});
@@ -145,10 +147,10 @@
         {maxWidth:205,align:'end',field:'pop',clipBox:{x:699,y:132,width:214,height:88}});
       const [r1,r2]=splitRef(card),offset=r2?28:0;
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',186,884,{tint:ink,width:264,height:26});
-      layerImage(layers,rootPath+'cartas/plantillas/etiqueta_goty.png',790,900+offset,{tint:ink,width:102,height:78});
+      if (!hideGoty) layerImage(layers,rootPath+'cartas/plantillas/etiqueta_goty.png',790,900+offset,{tint:ink,width:102,height:78});
       layerAbilityIcon(layers,125.5,929.5+offset);
-      layerText(layers,r1,193,926,49.2,ink,{maxWidth:590});
-      if (r2) layerText(layers,r2,193,982,49.2,ink,{maxWidth:590});
+      layerText(layers,r1,193,926,49.2,ink,{maxWidth:hideGoty?690:590});
+      if (r2) layerText(layers,r2,193,982,49.2,ink,{maxWidth:hideGoty?690:590});
       const habilidad=wrapLine(card.linea,r2?75:49);
       habilidad.forEach((line,i)=>layerText(layers,line,86,(r2?1045:999)+i*44.6,37.2,ink,
         {maxWidth:800,family:'"Carlito", Arial, sans-serif',weight:400}));
@@ -182,8 +184,8 @@
         {align:'end',maxWidth:230,field:'pop',clipBox:{x:665,y:922,width:249,height:100}});
       layerImage(layers,rootPath+'cartas/plantillas/etiqueta_habilidad.png',48,1006,{tint:'#ffffff',width:264,height:26});
       layerAbilityIcon(layers,62,1064,{radius:22,badge:false,color:'#ffd21f'});
-      layerText(layers,(card.ref+' '+(card.ref2||'')).trim(),84,1050,38,'#ffd21f',{maxWidth:560});
-      layerText(layers,'— GOTY',910,1050,38,'#ffd21f',{align:'end',maxWidth:210});
+      layerText(layers,(card.ref+' '+(card.ref2||'')).trim(),84,1050,38,'#ffd21f',{maxWidth:hideGoty?800:560});
+      if (!hideGoty) layerText(layers,'— GOTY',910,1050,38,'#ffd21f',{align:'end',maxWidth:210});
       layerText(layers,card.frase,78,1145,30,'#191200',
         {maxWidth:800,family:'"Carlito", Arial, sans-serif',weight:400});
       layerText(layers,'Carta '+numLabel(card,variant,options),48,1262,23.4,'#ffffff',{maxWidth:270});

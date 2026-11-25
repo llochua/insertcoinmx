@@ -17,6 +17,18 @@
 .rs2 .rh-story-cta:focus-visible{outline:2px solid #FFD400;outline-offset:3px}
 @media(max-width:360px){.rs2 .rg{gap:9px}.rs2 .rg .rc{padding:8px}.rs2 .rc-story-cta{font-size:12px}.rs2 .rh-story-cta{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.rs2 .rg .rc{transition:none}}
+
+/* LAB · POP: secondary metadata. */
+.icmx-pop-panel{width:100%;box-sizing:border-box;color:#bdb8d1;font:600 11px/1.45 AV,system-ui,sans-serif;text-align:center}
+.icmx-pop-panel .pop-line{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;min-height:22px;margin:0}
+.icmx-pop-panel .pop-line svg{width:14px;height:14px;flex:none}
+.icmx-pop-panel strong{font-weight:700;color:#d8d4e5}
+.icmx-pop-panel .pop-demo{font-size:9px;color:#918ba9}
+#fDesignValue{margin:10px 0 0}
+#zDesignPopularity{width:min(100%,480px);margin:8px auto 10px;flex:none}
+#zDesignPopularity[hidden]{display:none!important}
+#ficha .fv.n1{grid-template-columns:minmax(0,70%);justify-content:center}
+@media(min-width:560px){#ficha .fv.n1{grid-template-columns:minmax(0,250px)!important}}
 </style>
 <!-- Google Analytics 4 (G-1PZ5B99JMH) -->
 
@@ -2294,6 +2306,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <button type="button" data-lab-seed="8">Reta · 8 diseños</button>
    <button type="button" data-lab-action="profile">Perfil</button>
    <button type="button" data-lab-action="album">Álbum</button>
+   <button type="button" data-lab-pop="ranked">Popularidad · con votos</button>
+   <button type="button" data-lab-pop="unranked">Popularidad · sin votos</button>
    <button type="button" data-lab-level-seed="0">Álbum · 0/25</button>
    <button type="button" data-lab-level-seed="24">Álbum · 24/25</button>
    <button type="button" data-lab-level-seed="25">Álbum expandido · 25/50</button>
@@ -2407,7 +2421,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <span class="icmx-global-eyebrow">POPULARIDAD · INSERT COIN MX</span>
    <h2 id="icmxGlobalTitle">RANKING GLOBAL DE DISEÑOS</h2>
    <p>Los diseños favoritos de la comunidad reunirán votos de Likes, Tier Lists y Reta.</p>
-   <div class="icmx-global-weights" aria-label="Cómo se calcula el valor comunitario"><span>TIER LIST <b>50%</b></span><span>RETA <b>50%</b></span></div>
+   
    <div class="icmx-global-empty" id="communityRankEmpty" role="status"><strong>— POP</strong><span id="communityRankStatus">SIN RESULTADOS GLOBALES VERIFICADOS</span></div><div id="communityRankRows" aria-label="Top 10 de diseños por popularidad" aria-live="polite"></div>
    <p class="icmx-global-note" id="communityRankNote">Los diseños sin votos permanecen sin clasificar.</p>
   </section>
@@ -2544,13 +2558,14 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  </div>
 </div>
 </div>
-<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div><p id="fDesignValue" class="icmx-ficha-pop">POPULARIDAD GLOBAL · SIN CLASIFICAR</p></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><div class="fsoon" id="fSoon"></div></div></div>
+<div class="ficha" id="ficha" aria-hidden="true"><div class="fsh" role="dialog" aria-modal="true" aria-labelledby="fName"><div class="fhd"><div class="fti"><small id="fMeta"></small><h2 id="fName"></h2><div class="fpr" id="fProg"></div></div><button type="button" class="ic-close" id="fClose" aria-label="Cerrar ficha" title="Cerrar ficha"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 5L19 19M19 5L5 19"/></svg></button></div><div class="fv" id="fVers"></div><section id="fDesignValue" class="icmx-pop-panel" aria-label="Popularidad global"></section><div class="fsoon" id="fSoon"></div></div></div>
 <dialog class="zoom" id="zoom" aria-labelledby="zName">
  <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx" role="button" tabindex="0" aria-label="Tocar carta para regresar" title="Tocar para regresar"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <p class="z-return-hint" aria-hidden="true">TOCA LA CARTA PARA VOLVER</p>
  <div id="zVoting" hidden><p class="z-rate-title">¿Qué te parece este diseño?</p><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><div id="zGoty"></div><p id="zVoteStatus" role="status" aria-live="polite"></p></div>
  <section class="z-narrative" id="zNarrative" tabindex="-1" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
+ <section id="zDesignPopularity" class="icmx-pop-panel" aria-label="Popularidad global"></section>
 </dialog>
 <div class="toast" id="toast"></div>
 <div class="ux-backdrop" id="uxOverlay" role="dialog" aria-modal="true" aria-labelledby="uxTitle" aria-describedby="uxDesc" aria-hidden="true">
@@ -2569,7 +2584,7 @@ window.ICMX_VERIFIED_GUEST_PLAY=false;</script>
 <script src="content/player1-levels.js?v=5"></script>
 <script src="content/card-texts.js?v=20261124-editorial2"></script>
 <script src="content/card-data-adapter.js?v=20261124-hidden"></script>
-<script src="content/card-renderer.js?v=20261124-serial"></script>
+<script src="content/card-renderer.js?v=20261125-no-goty" data-icmx-hide-goty="true"></script>
 <script src="content/card-runtime.js?v=20261124-serial"></script>
 <script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
@@ -2858,7 +2873,7 @@ let communityValueEngine=null;
   const rows=status==='ready'?communityRanking.state.rows.filter(r=>r.position!==null&&DB[r.id]&&!DB[r.id].bx).slice(0,10):[];
   $('communityRankEmpty').hidden=rows.length>0;
   $('communityRankStatus').textContent=status==='loading'?'CARGANDO RANKING':status==='offline'?'RANKING NO DISPONIBLE':status==='ready'?'AÚN SIN VOTOS COMUNITARIOS':'SIN RESULTADOS GLOBALES VERIFICADOS';
-  $('communityRankNote').textContent=rows.length?'Popularidad de 0 a 1,000 · Tier List 50% · Reta 50%.':'Los diseños sin votos permanecen sin clasificar.';
+  $('communityRankNote').textContent=rows.length?'Popularidad de los diseños en la comunidad.':'Los diseños sin votos permanecen sin clasificar.';
   $('communityRankRows').replaceChildren(...rows.map(r=>{
    const b=document.createElement('button');b.type='button';b.className='community-rank-row';b.dataset.design=r.id;
    const rank=document.createElement('span');rank.textContent=String(r.position).padStart(2,'0');
@@ -2867,8 +2882,38 @@ let communityValueEngine=null;
    b.append(rank,name,score);return b;
   }));
  }
+ let labPopPreview=null;
+ // Lucide Flame v0.456.0 (ISC license), inlined for offline LAB.
+ const POP_FLAME="<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/></svg>";
  function getGlobalPop(id){
+  if(labPopPreview?.id===id)return labPopPreview.ranked?{score:638,position:12}:null;
   return communityRanking?.state.status==='ready'?communityRanking.get(id):null;
+ }
+ function renderPopPanel(node,id){
+  const p=getGlobalPop(id),demo=labPopPreview?.id===id;
+  node.innerHTML='<p class="pop-line">'+POP_FLAME+'<span>Popularidad</span> '+
+   (p?.position!=null?'<strong>'+p.score+'</strong><span>· #'+p.position+' global</span>':'<span>· Sin clasificar</span>')+
+   (demo?'<span class="pop-demo">· DEMO LAB</span>':'')+'</p>';
+ }
+ function paintLabPopOnCard(fx,variant){
+  const svg=fx.querySelector(':scope > svg.icmx-data'),value=svg?.querySelector('[data-icmx-field="pop"]');
+  if(!value)return;
+  const ns='http://www.w3.org/2000/svg',full=variant==='f',cy=full?968:175;
+  let label=svg.querySelector('[data-lab-pop-label]');
+  if(!label){const old=[...svg.querySelectorAll('text')].find(t=>t.textContent==='POP');if(!old)return;label=old.cloneNode(false);old.replaceWith(label);}
+  const color=value.getAttribute('fill');
+  label.textContent='POP';label.dataset.labPopLabel='true';
+  label.setAttribute('x','779');label.setAttribute('y',String(cy));
+  label.setAttribute('dominant-baseline','central');label.setAttribute('text-anchor','end');label.setAttribute('font-size','29');label.setAttribute('letter-spacing','0');
+  value.setAttribute('x','902');value.setAttribute('y',String(cy));
+  value.setAttribute('dominant-baseline','central');value.setAttribute('font-size','40');
+  value.setAttribute('opacity','.9');
+  let icon=svg.querySelector('[data-lab-pop-flame]');
+  if(!icon){
+   icon=document.createElementNS(ns,'svg');icon.setAttribute('data-lab-pop-flame','true');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('fill','none');icon.setAttribute('stroke',color);icon.setAttribute('stroke-width','2');icon.setAttribute('stroke-linecap','round');icon.setAttribute('stroke-linejoin','round');
+   const path=document.createElementNS(ns,'path');path.setAttribute('d',"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z");icon.appendChild(path);svg.appendChild(icon);
+  }
+  icon.setAttribute('x','685');icon.setAttribute('y',String(cy-17));icon.setAttribute('width','34');icon.setAttribute('height','34');
  }
 const validValueCards=()=>CARDS.filter(c=>!c.bx&&c.img).map(c=>c.k);
 function collectionPointsLocal(){
@@ -2887,7 +2932,7 @@ function mountFaceValue(fx,card){
  if(!fx||!card)return;
  const task=window.ICMX_CARD_RUNTIME?.mount(fx,card,updateCardValueUI(card));
  if(!task){const img=fx.querySelector('img');if(img&&!img.getAttribute('src')&&img.dataset.icmxOriginal)img.src=img.dataset.icmxOriginal;}
- return task;
+ return task?.then(ok=>{if(ok)paintLabPopOnCard(fx,card.v);return ok});
 }
 let faceCardObserver=null;
 const pendingFaceCards=new WeakMap();
@@ -3987,7 +4032,7 @@ function openFicha(id){if(!DB[id]||!dState(DB[id]).own)return;fd=id;ga('ver_fich
 function closeFicha(){fd=null;$('ficha').classList.remove('on');$('ficha').setAttribute('aria-hidden','true')}
 function renderFicha(){const d=DB[fd];if(!d||!dState(d).own)return closeFicha();const st=dState(d);
  $('fMeta').innerHTML=d.cat+(d.bx?' · BONUS':player1.numberOf(d.id)?' · #'+String(player1.numberOf(d.id)).padStart(3,'0'):' · ARCHIVO')+(st.done?'<span class="fdone">★ COMPLETO</span>':st.was?'<span class="fdone was">★ COMPLETADO '+fday(S.logro[d.id]).toUpperCase()+' · NUEVA VERSIÓN</span>':'');$('fName').textContent=d.n;
- const pop=getGlobalPop(d.id);$('fDesignValue').textContent=pop?.position!=null?'POPULARIDAD GLOBAL · '+pop.score+' POP · #'+pop.position:'POPULARIDAD GLOBAL · SIN CLASIFICAR';
+ renderPopPanel($('fDesignValue'),d.id);
  const r=S.rate[d.id];$('fProg').innerHTML=pips(st,0)+`<span><b>${st.got}</b> de ${st.tot} conseguidas</span>`+(r!==undefined?`<span class="rt" style="background:${TC[r]}">${TN[r]}</span>`:'');
  const inLevel=player1View(S.have).eligible.has(d.id);const col=st.vs.filter(x=>x.st==='have'||(inLevel&&x.st==='av'));$('fVers').className='fv n'+col.length;$('fVers').style.setProperty('--n',col.length);
  $('fVers').innerHTML=col.map(x=>{const lb=`<span class="vl"><i class="${x.v}"></i>${VN[x.v]}${x.st==='have'?(x.h>1?`<em>· x${x.h}</em>`:''):'<em>· te falta</em>'}</span>`;
@@ -4060,7 +4105,8 @@ function openCard(k,options={}){
 }
 function setVoting(on){
  $('zVoting').hidden=!on;
- if(on){paintRate();zGo();$('zVoteStatus').textContent='';}
+ $('zDesignPopularity').hidden=!on;
+ if(on){paintRate();zGo();renderPopPanel($('zDesignPopularity'),zd());$('zVoteStatus').textContent='';}
 }
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb zr-emoji ${S.rate[zd()]===i?'on':''}" data-r="${i}" type="button" aria-label="${n}" title="${n}" aria-pressed="${S.rate[zd()]===i}">${REACTION_EMOJI[i]}</button>`).join('')}
 $('zRate').onclick=e=>{
@@ -4763,6 +4809,14 @@ if(ON_PREVIEW){$('title').classList.remove('on');onI=0;showOn()}
    labHomePreview={ready:!!ready,dups};mi=0;closeMenu();go('home');return;
   }
   labHomePreview=null;
+  if(b.dataset.labPop!==undefined){
+   syncIn();
+   let card=AV.find(c=>!c.bx&&c.img&&S.have[c.k])||AV.find(c=>!c.bx&&c.img&&c.v==='b');
+   if(!card){toast('NO HAY CARTA PARA LA DEMO');return}
+   if(!S.have[card.k]){S.have[card.k]=1;save();}
+   labPopPreview={id:card.d,ranked:b.dataset.labPop==='ranked'};
+   closeMenu();go('album');openFicha(card.d);return;
+  }
   if(b.dataset.labLevelSeed!==undefined){
    const count=Number(b.dataset.labLevelSeed);
    if(![0,24,25].includes(count))return;
