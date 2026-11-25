@@ -1394,8 +1394,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #zoom #zRate .rb.zr-emoji.on{background:#ffd4001a!important;border-color:#FFD400!important}
 #zoom #zRate .rb.zr-emoji.on::after{top:2px;right:4px;color:#FFD400;font:800 10px AV,system-ui,sans-serif}
 #zoom #zGoty{font:500 11px/1.4 AV,system-ui,sans-serif!important;color:#bcb7d4!important}
-#zoom #zLikeStatus{margin:0;font:11px/1.4 AV,system-ui,sans-serif;color:#c9c3df}
-#zoom #zLikeStatus:empty{display:none}
+#zoom #zVoteStatus{margin:0;font:11px/1.4 AV,system-ui,sans-serif;color:#c9c3df}
+#zoom #zVoteStatus:empty{display:none}
 #zoom .z-narrative{box-sizing:border-box;margin:0 auto 6px;padding:12px 2px 8px}
 #zoom .z-narrative-kicker{margin-bottom:6px}
 #zoom .z-narrative p{margin:0;font:500 14px/1.55 AV,system-ui,sans-serif}
@@ -2498,7 +2498,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <header class="z-bar"><h2 id="zName"></h2><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button><button type="button" class="ic-close" id="zClose" aria-label="Cerrar vista ampliada" title="Cerrar vista ampliada" autofocus><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.5 10.5h6M16 16l5 5"/></svg></button></header>
  <div class="fx idle" id="zFx" role="button" tabindex="0" aria-label="Tocar carta para regresar" title="Tocar para regresar"><img id="zImg" alt=""><i class="foil"></i><i class="glare"></i><span class="z-load" id="zLoad" role="status" aria-live="polite"></span></div>
  <p class="z-return-hint" aria-hidden="true">TOCA LA CARTA PARA VOLVER</p>
- <div id="zVoting" hidden><p class="z-rate-title">¿Qué te parece este diseño?</p><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><div id="zGoty"></div><p id="zLikeStatus" role="status" aria-live="polite"></p></div>
+ <div id="zVoting" hidden><p class="z-rate-title">¿Qué te parece este diseño?</p><div id="zRate" role="group" aria-label="Califica este diseño con una reacción"></div><div id="zGoty"></div><p id="zVoteStatus" role="status" aria-live="polite"></p></div>
  <section class="z-narrative" id="zNarrative" tabindex="-1" hidden><div class="z-narrative-kicker" id="zNarrativeKicker"></div><p id="zNarrativeText"></p></section>
 </dialog>
 <div class="toast" id="toast"></div>
@@ -2805,7 +2805,7 @@ let communityValueEngine=null;
   const rows=status==='ready'?communityRanking.state.rows.filter(r=>r.position!==null&&DB[r.id]&&!DB[r.id].bx).slice(0,10):[];
   $('communityRankEmpty').hidden=rows.length>0;
   $('communityRankStatus').textContent=status==='loading'?'CARGANDO RANKING':status==='offline'?'RANKING NO DISPONIBLE':status==='ready'?'AÚN SIN VOTOS COMUNITARIOS':'SIN RESULTADOS GLOBALES VERIFICADOS';
-  $('communityRankNote').textContent=rows.length?'POP de 0 a 1,000 · las cuatro variantes comparten popularidad.':'Los diseños sin votos permanecen sin clasificar.';
+  $('communityRankNote').textContent=rows.length?'Popularidad de 0 a 1,000 · Tier List 50% · Reta 50%.':'Los diseños sin votos permanecen sin clasificar.';
   $('communityRankRows').replaceChildren(...rows.map(r=>{
    const b=document.createElement('button');b.type='button';b.className='r rank-'+r.position;b.dataset.design=r.id;
    const rank=document.createElement('span');rank.textContent=String(r.position).padStart(2,'0');
@@ -4007,20 +4007,18 @@ function openCard(k,options={}){
 }
 function setVoting(on){
  $('zVoting').hidden=!on;
- if(on){paintRate();zGo();$('zLikeStatus').textContent='';}
+ if(on){paintRate();zGo();$('zVoteStatus').textContent='';}
 }
 function paintRate(){$('zRate').innerHTML=TN.map((n,i)=>`<button class="rb zr-emoji ${S.rate[zd()]===i?'on':''}" data-r="${i}" type="button" aria-label="${n}" title="${n}" aria-pressed="${S.rate[zd()]===i}">${REACTION_EMOJI[i]}</button>`).join('')}
 $('zRate').onclick=e=>{
  const b=e.target.closest('[data-r]');if(!b)return;
  syncIn();const id=zd(),r=+b.dataset.r,previous=S.rate[id],next=previous===r?null:r;
  if(next===null)delete S.rate[id];else S.rate[id]=next;
- const saved=save();$('zLikeStatus').textContent='';
+ const saved=save();$('zVoteStatus').textContent='';
  if(saved&&globalThis.icmxAccountIdentity?.userId&&!DB[id]?.bx){
-  // Una interacción: GOTY/GENIAL = positivo, OK = neutral, MMM = negativo.
-  // Retirar una reacción retira ambos votos; el cálculo global conserva sus ponderaciones.
-  const like=next===null||next===2?null:next===3?0:1;
-  Promise.all([communityVote(id,'tier',next),communityVote(id,'like',like)]).then(results=>{
-   if(results.some(ok=>!ok)&&$('zoom').open&&zd()===id&&(S.rate[id]??null)===next)$('zLikeStatus').textContent='Calificación local guardada; no se publicó completamente.';
+  // Una reacción publica únicamente la calificación Tier.
+  communityVote(id,'tier',next).then(ok=>{
+   if(!ok&&$('zoom').open&&zd()===id&&(S.rate[id]??null)===next)$('zVoteStatus').textContent='Calificación local guardada; no se publicó.';
   });
  }
  beep(next===null?330:[1319,1047,784,523][r],.08);paintRate();zGo();
@@ -4678,7 +4676,7 @@ $('profileQuickSignup').onclick=()=>revealProfileAuth('signup');
 $('profileQuickLogin').onclick=()=>revealProfileAuth('login');
 /* ---------- arranque ---------- */
 $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[data-design]');if(b)openCard(b.dataset.design)});
- Promise.all([import('./content/community-ranking.mjs'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261124cardcount')]).then(([mod,auth,players])=>{
+ Promise.all([import('./content/community-ranking.mjs?v=20261125popv2'),import('./content/auth-account.js?v=20261122chars'),import('./content/player-ranking.mjs?v=20261124cardcount')]).then(([mod,auth,players])=>{
   playerRanking=players.createPlayerRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{if(cur==='scores')renderScores();if(cur==='home'||cur==='title')refresh()}});
   playerRanking.refresh();
   communityRanking=mod.createCommunityRanking({request:globalThis.icmxCommunityRequest,onChange:()=>{
@@ -4690,7 +4688,7 @@ $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[d
   }});
   if(['scores','album','pack'].includes(cur)||$('zoom').open)communityRanking.refresh();
  }).catch(()=>{});
- import('./content/community-value.mjs').then(mod=>{
+ import('./content/community-value.mjs?v=20261125popv2').then(mod=>{
  communityValueEngine=mod;
  if(cur==='scores')renderScores();
  if(cur==='profile')renderProfile();

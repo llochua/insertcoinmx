@@ -3,9 +3,9 @@
  * Puro y sin lecturas/escrituras: NO atribuye votos ni puntos a jugadores.
  * La identidad, autenticidad de sobres y anti-duplicados se validarán en Supabase.
  */
-export const SCORING_VERSION = 'public-2026-value-v1';
+export const SCORING_VERSION = 'public-2026-value-v2';
 export const VARIANT_POINTS = Object.freeze({b:10,e:25,r:50,f:100});
-export const POPULARITY_WEIGHTS = Object.freeze({likes:0.35,tiers:0.35,reta:0.30});
+export const POPULARITY_WEIGHTS = Object.freeze({tiers:0.50,reta:0.50});
 export const TIER_VALUES = Object.freeze({goty:1,genial:0.75,ok:0.4,mmm:0});
 export const BAYES_PRIOR_VOTES = 10;
 const CARD_KEY=/^[a-z0-9]{1,40}_[berf]$/;
@@ -50,15 +50,12 @@ function bayes(normalizedTotal,observations){
 }
 /**
  * Entradas agregadas por diseño provenientes del backend, no votos del cliente.
- * likes: {positive,total} — 1 elección verificable por identidad/diseño.
+ * Los Likes históricos del backend se ignoran por completo.
  * tiers: {goty,genial,ok,mmm} — una calificación vigente por identidad/diseño.
  * reta: {wins,matches} — el último resultado válido por encuentro, sin rerolls descartados.
  * Sin votos: sin valor todavía (null); datos escasos: prior neutro 50/100.
  */
-export function scoreDesign({likes={},tiers={},reta={}}={}){
- const positive=safeCount(likes.positive??0,'likes.positive');
- const total=safeCount(likes.total??0,'likes.total');
- if(positive>total)throw new RangeError('likes.positive excede likes.total');
+export function scoreDesign({tiers={},reta={}}={}){
  const counts={};
  for(const tier of Object.keys(TIER_VALUES))counts[tier]=safeCount(tiers[tier]??0,'tiers.'+tier);
  const tierCount=Object.values(counts).reduce((a,b)=>a+b,0);
@@ -66,13 +63,12 @@ export function scoreDesign({likes={},tiers={},reta={}}={}){
  const wins=safeCount(reta.wins??0,'reta.wins');
  const matches=safeCount(reta.matches??0,'reta.matches');
  if(wins>matches)throw new RangeError('reta.wins excede reta.matches');
- const interactions=total+tierCount+matches;
+ const interactions=tierCount+matches;
  if(!Number.isSafeInteger(interactions))throw new RangeError('Demasiadas interacciones');
  if(interactions===0)return {score:null,status:'unranked',interactions:0,
-  components:{likes:null,tiers:null,reta:null},counts:{likes:0,tiers:0,reta:0}};
+  components:{tiers:null,reta:null},counts:{tiers:0,reta:0}};
  const tierValue=Object.entries(TIER_VALUES).reduce((a,[name,value])=>a+counts[name]*value,0);
  const component={
-  likes:bayes(positive,total),
   tiers:bayes(tierValue,tierCount),
   reta:bayes(wins,matches)
  };
@@ -80,7 +76,7 @@ export function scoreDesign({likes={},tiers={},reta={}}={}){
   .reduce((sum,[source,weight])=>sum+weight*component[source],0));
  return {score,status:'ranked',interactions,
   components:Object.fromEntries(Object.entries(component).map(([k,v])=>[k,Math.round(v*1000)])),
-  counts:{likes:total,tiers:tierCount,reta:matches}};
+  counts:{tiers:tierCount,reta:matches}};
 }
 /** Orden estable; sin votos aparece como 'sin clasificar' y sin puesto artificial. */
 export function rankDesigns(designs){

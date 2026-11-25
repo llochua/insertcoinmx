@@ -4,7 +4,7 @@ import {createCommunityRanking,validRetaMatches} from '../content/community-rank
 const ballot=['b','c','d','e','f','g','h'].map(loser=>({winner:'a',loser}));
 test('server aggregates produce shared design positions, never local votes',async()=>{
  const c=createCommunityRanking({request:async()=>[
-  {id:'a',likes:{positive:5,total:5}},
+  {id:'a',tiers:{goty:5}},
   {id:'b',tiers:{mmm:5}},
   {id:'c'}
  ]});
@@ -35,13 +35,15 @@ test('an incomplete Reta never reaches the RPC',async()=>{
 test('a stale fetch cannot replace newer rankings',async()=>{
  const pending=[],c=createCommunityRanking({request:()=>new Promise(r=>pending.push(r))});
  const a=c.refresh(),b=c.refresh();
- pending[1]([{id:'new',likes:{positive:1,total:1}}]);await b;
+ pending[1]([{id:'new',tiers:{goty:1}}]);await b;
  pending[0]([{id:'old'}]);await a;
  assert.equal(c.state.rows[0].id,'new');
 });
 test('votes send only the action and derive POP from aggregated server response',async()=>{
  const calls=[],c=createCommunityRanking({request:async(name,args)=>{calls.push([name,args]);return name.endsWith('aggregates')?[]:null}});
- await c.vote('a','like',1);
- assert.deepEqual(calls[0],['icmx_community_vote',{p_design:'a',p_channel:'like',p_value:1}]);
+ await assert.rejects(c.vote('a','like',1));
+ assert.equal(calls.length,0);
+ await c.vote('a','tier',1);
+ assert.deepEqual(calls[0],['icmx_community_vote',{p_design:'a',p_channel:'tier',p_value:1}]);
  assert.equal(calls[1][0],'icmx_community_aggregates');
 });

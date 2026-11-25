@@ -1,4 +1,4 @@
-import {rankDesigns} from './community-value.mjs';
+import {rankDesigns} from './community-value.mjs?v=20261125popv2';
 /** One request per refresh, never substitutes local votes for global data. */
 export function createCommunityRanking({request,onChange=()=>{}}){
  let sequence=0,state={status:'idle',rows:[],aggregates:[]};
@@ -18,6 +18,7 @@ export function createCommunityRanking({request,onChange=()=>{}}){
    return state;
   },
   async vote(design,channel,value){
+   if(channel!=='tier')throw Error('Unsupported vote channel');
    await request('icmx_community_vote',{p_design:design,p_channel:channel,p_value:value});
    return this.refresh();
   },
