@@ -297,6 +297,64 @@ try{
  }
 
 
+
+ // Recorrido de bienvenida desde portada, no modo preview.
+ for(const [width,height] of [[390,844],[320,640]]){
+  const ctx=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
+  const errors=[];const flow=LAB_URL+'?flow=onboarding';
+  const open=async()=>{const p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));await p.goto(flow,{waitUntil:'domcontentloaded'});await p.locator('#title.on .tstart').click();return p};
+  const count=p=>p.evaluate(()=>localStorage.getItem('icmx-ui-lab-onboarding-views-v1'));
+  const complete=async p=>{
+   await p.locator('#onb.on').waitFor({state:'visible'});
+   assert.equal(await p.locator('#onT').textContent(),'Las playeras que hemos hecho, ahora tienen una carta.');
+   await p.locator('#onNext').click();
+   assert.equal(await p.locator('#onT').textContent(),'¡Tienes 5 sobres para empezar!');
+   await p.locator('#onNext').click();
+   assert.equal(await p.locator('#onT').textContent(),'Completa tu álbum.');
+   assert.equal(await p.locator('#onNext').textContent(),'EMPEZAR');
+   await p.locator('#onNext').click();
+   await p.locator('#onb').waitFor({state:'hidden'});
+  };
+  let p=await open();
+  await complete(p);
+  await p.locator('#icmxGuestWelcome').waitFor({state:'visible'});
+  assert.equal(await count(p),'1');
+  await p.screenshot({path:'qa/screenshots/ui-lab-onboarding-access-'+width+'.png'});
+  await p.locator('#icmxGuestLogin').click();
+  await p.locator('#entryAccount').waitFor({state:'visible'});
+  await p.locator('#entryAccountBack').click();
+  await p.locator('#icmxGuestWelcome').waitFor({state:'visible'});
+  await p.locator('#icmxGuestCreate').click();
+  await p.locator('#entryAccount').waitFor({state:'visible'});
+  await p.locator('#entryAccountBack').click();
+  await p.locator('#icmxGuestChoose').click();
+  await p.locator('#icmxGuestIni').fill('QA1');
+  await p.locator('#icmxGuestHandle').fill('qa_player');
+  await p.locator('#icmxGuestPlay').click();
+  await p.locator('#icmxGuestGate').waitFor({state:'hidden'});
+  await p.locator('#home.on').waitFor({state:'visible'});
+  assert.equal(await p.evaluate(()=>arcadeIdentity().handle),'qa_player');
+  await p.reload({waitUntil:'domcontentloaded'});
+  await p.locator('#title.on .tstart').click();
+  assert.equal(await count(p),'1');
+  assert.equal(await p.locator('#onb.on').count(),0);
+  await p.close();
+  p=await open();await complete(p);
+  assert.equal(await count(p),'2');
+  assert.equal(await p.locator('#icmxGuestGate:visible').count(),0);
+  await p.close();
+  p=await open();
+  assert.equal(await p.locator('#onb.on').count(),0);
+  assert.equal(await count(p),'2');
+  await p.locator('#homeHowToPlay').click();await complete(p);
+  assert.equal(await count(p),'2');
+  assert.equal(await p.locator('#icmxGuestGate:visible').count(),0);
+  assert.equal(await p.evaluate(()=>arcadeIdentity().handle),'qa_player');
+  assert.deepEqual(errors,[],'onboarding runtime errors');
+  console.log('✓ ONBOARDING '+width+'px: portada, 2 entradas, recarga, acceso, invitado, consulta');
+  await ctx.close();
+ }
+
  // Auditar el renderizador sobre TODAS las cartas con arte disponible.
  // Nada de aprobar el motor por una selección pequeña de cartas.
  const desktop=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'no-preference'});
