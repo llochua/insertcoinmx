@@ -2982,7 +2982,7 @@ const MUSIC={general:new Audio(MUSIC_FILES.general),reta:new Audio(MUSIC_FILES.r
 for(const audio of Object.values(MUSIC)){audio.loop=true;audio.preload='none';audio.volume=0}
 let musicAllowed=false,musicFade=0,musicWanted=null;
 // LAB: un solo SFX por carta especial, sin mezclar los pitidos anteriores.
-const REVEAL_SFX_FILES={e:'audio/holo.mp3',r:'audio/gold.mp3',f:'audio/full.mp3',level:'audio/collectible-complete.mp3'};
+const REVEAL_SFX_FILES={e:'audio/holo.mp3',r:'audio/gold.mp3',f:'audio/full.mp3',level:'audio/Collectible%20Complete.mp3'};
 // Ganancias independientes: compensan el nivel original de cada MP3.
 const REVEAL_SFX_GAIN={e:.22,r:.24,f:.14,level:.17};
 const REVEAL_SFX_FADE=.12;
