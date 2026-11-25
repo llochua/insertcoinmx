@@ -2298,8 +2298,8 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <button type="button" data-lab-action="home">Inicio</button>
    <button type="button" data-lab-home="1:0">Inicio · 2 sobres, sin repetidas</button>
    <button type="button" data-lab-home="0:0">Inicio · sin sobres ni repetidas</button>
-   <button type="button" data-lab-home="1:5">Inicio · 2 sobres + 5 repetidas</button>
-   <button type="button" data-lab-home="0:5">Inicio · sin sobres + 5 repetidas</button>
+   <button type="button" data-lab-home="1:15">Inicio · 2 sobres + 15 repetidas</button>
+   <button type="button" data-lab-home="0:15">Inicio · sin sobres + 15 repetidas</button>
    <button type="button" data-lab-action="pack">Abrir un sobre</button>
    <button type="button" data-lab-seed="5">Reta · 5 diseños</button>
    <button type="button" data-lab-seed="7">Reta · 7 diseños</button>
@@ -2844,6 +2844,7 @@ const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
 const ga=()=>{};
 try{if(S.last&&S.last<today())ga('regreso',{dias_desde_ultimo_sobre:Math.round((new Date(today())-new Date(S.last))/864e5)})}catch(e){}
 const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
+const TRADE_COST=15;
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
 let communityValueEngine=null;
  let communityRanking=null;
@@ -3159,15 +3160,15 @@ function nextPackCountdown(){
 }
 function uxEmptyPacks(otherTab=false){
  syncIn();if(packReady()){go('pack');return}
- const canTrade=dups()>=5;
+ const canTrade=dups()>=TRADE_COST;
  ga('sobres_agotados',{origen:cur,canje_disponible:canTrade?1:0});
  uxShow({
   kicker:'SOBRES · CADA 6 HORAS',
   title:otherTab?'Tu sobre se abrió en otra pestaña':'¡Por ahora, sin sobres!',
   desc:otherTab?'El progreso se actualizó. Tus cartas siguen guardadas en el álbum.':'Recibirás 2 sobres nuevos en el siguiente ciclo de 6 horas.',
-  note:canTrade?'Tienes al menos 5 repetidas para conseguir un sobre extra.':'Puedes seguir explorando tu colección mientras esperas.',
+  note:canTrade?'Tienes al menos 15 repetidas para conseguir un sobre extra.':'Puedes seguir explorando tu colección mientras esperas.',
   countdown:true,
-  primary:canTrade?'CAMBIAR 5 REPETIDAS':'VER MI ÁLBUM',
+  primary:canTrade?'CAMBIAR 15 REPETIDAS':'VER MI ÁLBUM',
   secondary:'VOLVER',
   onPrimary:canTrade?()=>trade(()=>go('pack')):()=>go('album')
  });
@@ -3337,7 +3338,7 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,i
  if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
  [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
  const m=M[mi];updateHomePackCTA(m);$('mAmb').style.backgroundImage=`url(${menuArtOK.has(m.id)?MENU_ART[m.id]:'c/'+m.img+'.webp'})`;
- const d=labHomePreview?labHomePreview.dups:dups();$('dupBar').classList.toggle('on',d>=5);$('tDup').textContent='Tienes '+d+' repetidas: cambia 5 por un sobre extra';$('tDupB').disabled=d<5;
+ const d=labHomePreview?labHomePreview.dups:dups();$('dupBar').classList.toggle('on',d>=TRADE_COST);$('tDup').textContent='Tienes '+d+' repetidas: cambia 15 por un sobre extra';$('tDupB').disabled=d<TRADE_COST;
  $('test').textContent=labHomePreview?'LAB · VISTA DE PRUEBA':(S.test||PRUEBA)?'PRUEBA · SOBRES ILIMITADOS':''}
 function updateHomePackCTA(m=MODES()[mi]){
  const button=$('mGo'),waiting=m.id==='pack'&&m.off;
@@ -3396,13 +3397,13 @@ function trade(after){
     jingle();toast('¡SOBRE EXTRA!');after&&after();return;
    }
    if(result?.status==='not_enough_duplicates'){
-    toast('NECESITAS CINCO REPETIDAS');after&&after();return;
+    toast('NECESITAS 15 REPETIDAS');after&&after();return;
    }
    toast('CANJE PENDIENTE<br>REINTENTA SIN PERDER CARTAS');
   }).catch(()=>{serverTradeBusy=false;toast('CANJE PENDIENTE<br>REINTENTA')});
   return;
  }
- withLock(()=>{syncIn();if(dups()<5){after&&after();return}let need=5;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})
+ withLock(()=>{syncIn();if(dups()<TRADE_COST){after&&after();return}let need=TRADE_COST;for(const k in S.have){while(S.have[k]>1&&need>0){S.have[k]--;need--}}S.extra++;save();jingle();toast('¡SOBRE EXTRA!');after&&after()})
 }
 $('tDupB').onclick=()=>{if(labHomePreview){toast('LAB: VISTA DE PRUEBA');return}trade(renderHome)};
 let lt=0,lc=0;$('logo').onclick=()=>{const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;if(lc>=5){syncIn();S.test=S.test?0:1;save();toast(S.test?'MODO PRUEBA ON':'MODO PRUEBA OFF');renderHome();lc=0}};
@@ -3964,7 +3965,7 @@ function showSum(){$('stack').classList.remove('on');$('stHint').style.display='
  const rest=groups.filter(g=>g.card.k!==H.k).map(g=>g.card),G={comp:rest.filter(c=>c._comp),dnew:rest.filter(c=>c._new&&!c._comp&&c._dnew),vnew:rest.filter(c=>c._new&&!c._comp&&!c._dnew),rep:rest.filter(c=>!c._new)};
  const sec=(t,L)=>L.length?`<section class="rs-group"><h3>${t}<span>${t==='Repetidas'?L.reduce((n,c)=>n+counts.get(c.k),0):L.length}</span></h3><div class="rg">${L.map(card).join('')}</div></section>`:'';
  const n=dups(),PD=DESIGNS.filter(x=>!x.bx),disc=PD.filter(x=>dState(x).own).length;
- const tradeH=n>=5?'<button class="rs-trade" id="sTrade">Cambiar 5 repetidas por un sobre extra</button>':`<p class="rb-p">Llevas ${n%5} de 5 repetidas para un sobre extra</p>`;
+ const tradeH=n>=TRADE_COST?'<button class="rs-trade" id="sTrade">Cambiar 15 repetidas por un sobre extra</button>':`<p class="rb-p">Llevas ${n} de 15 repetidas para un sobre extra</p>`;
  const finish=summaryStatus();
  s.innerHTML=`<div class="rs2${entering?' rs-enter':''}">
   <header class="rs-finish" role="status">
@@ -4322,7 +4323,7 @@ function startTorneo(){
 function retaInitFrame(f){
  const pool=retaPool();
  if(!retaValid(S.reta2,pool)){startTorneo();return}
- f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,packsAvailable:packReady(),canTrade:dups()>=5,audioMuted:soundMuted},location.origin);
+ f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,packsAvailable:packReady(),canTrade:dups()>=TRADE_COST,audioMuted:soundMuted},location.origin);
 }
 function retaElegir(f,msg){
  withLock(()=>{
