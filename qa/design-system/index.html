@@ -2742,11 +2742,11 @@ function normalize(o){const t=today();
   if(after(v,t)&&((o.sv||0)<2||after(v,addDays(t,2))))o[f]=t}
  o.sv=2;if(!Number.isInteger(o.rev)||o.rev<0)o.rev=0;if((o.mv||0)<2)migrate(o);if(o.fg!==1)o.fg=(isObj(o.have)&&Object.keys(o.have).length)||o.last||(Array.isArray(o.pk)&&o.pk.length)?1:0;
  /* Un progreso existente mantiene sus cartas y NO recibe una segunda bienvenida.
-    Nuevo jugador: 5 sobres de inicio. Veteranía anterior: cuenta como usado 1 sobre
+    Nuevo jugador: 3 sobres de inicio. Veteranía anterior: cuenta como usado 1 sobre
     del día de su último consumo, para no quitarle el segundo sobre al actualizar. */
  const oldQuota=!Number.isInteger(o.welcomeLeft)||o.welcomeLeft<0||o.welcomeLeft>5;
  if(oldQuota){const played=!!(Object.keys(o.have||{}).length||o.last||(Array.isArray(o.pk)&&o.pk.length));
-  o.welcomeLeft=played?0:5;
+  o.welcomeLeft=played?0:3;o.welcomeTotal=3;
   if(played&&o.last&&DRE.test(o.last)){o.freeDay=o.last;o.freeUsed=1}}
  if(typeof o.freeDay!=='string'||!DRE.test(o.freeDay))o.freeDay='';
  if(!Number.isInteger(o.freeUsed))o.freeUsed=0;
@@ -2849,16 +2849,17 @@ function mountFaceValueLazy(fx,card){
  faceCardObserver.observe(fx);
 }
 const PRUEBA=true; // quitar al lanzar: sobres ilimitados para revisar
-/* Regla pactada: 5 sobres de bienvenida, luego 2 cada 6 horas.
+/* Regla pactada: 3 sobres de bienvenida más 2 del ciclo de 6 horas.
    La bienvenida se conserva hasta gastarla; los ciclos de 6 horas
    se calculan por reloj. Los canjes extra van aparte. */
 const PACK_INTERVAL=6*60*60*1000;
 const packCycle=()=>Math.floor(Date.now()/PACK_INTERVAL);
-const freePacksLeft=()=>{
- if(S.welcomeLeft>0)return S.welcomeLeft;
+const welcomeTotal=()=>S.welcomeTotal===3?3:5;
+const cyclePacksLeft=()=>{
  const cycle=packCycle();
  return S.freeCycle===cycle?Math.max(0,2-(S.freeUsed||0)):2;
 };
+const freePacksLeft=()=>S.welcomeLeft>0?S.welcomeLeft:cyclePacksLeft();
 const packReady=()=>PRUEBA||S.test||freePacksLeft()>0||S.extra>0;
 /* ---------- datos compartidos ---------- */
 const RECORDS_EDITION='public-2026-launch-v2';
@@ -2881,8 +2882,7 @@ const PKRE=/^[a-z0-9]{6,24}$/;
 function applyPack(p){S.pk=Array.isArray(S.pk)?S.pk:[];if(S.pk.includes(p.id))return false;
  for(const k in p.have)S.have[k]=(S.have[k]||0)+p.have[k];
  if(p.fg)S.fg=1;
- if(p.welcome){S.welcomeLeft=Math.max(0,(S.welcomeLeft||0)-p.welcome);
-  if(S.welcomeLeft===0){S.freeDay=p.last;S.freeUsed=2}}
+ if(p.welcome){S.welcomeLeft=Math.max(0,(S.welcomeLeft||0)-p.welcome)}
  if(p.daily&&p.dailyDay){
   const cycle=p.dailyCycle??packCycle();
   if(!Number.isInteger(S.freeCycle)||cycle>S.freeCycle){S.freeCycle=cycle;S.freeUsed=0}
@@ -3088,7 +3088,7 @@ document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g
 /* ---------- bienvenida ---------- */
 const ON=[
  {k:'EL ÁLBUM · 01 / 03',t:'Las playeras que hemos hecho, ahora tienen una carta.',p:'Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección.'},
- {k:'TUS PRIMEROS SOBRES · 02 / 03',t:'¡Tienes 5 sobres para empezar!',p:'Cada sobre trae 5 cartas. Después de la bienvenida, recibirás 2 sobres cada 6 horas.'},
+ {k:'TUS PRIMEROS SOBRES · 02 / 03',t:'¡Tienes 5 sobres para empezar!',p:'3 de bienvenida + 2 de la franja actual. Cada sobre trae 5 cartas. Recibe 2 más cada 6 horas.'},
  {k:'TU PARTIDA · 03 / 03',t:'¡No pierdas tus cartas!',p:'Crea una cuenta gratis para guardar tu colección y recuperarla en otro dispositivo. Si sigues como invitado, solo se guarda en este navegador.'}
 ];
 const ON_PREVIEW=new URLSearchParams(location.search).get('preview')==='onboarding';
@@ -3193,7 +3193,7 @@ function menuArtLoad(img,m,dir){
 }
 const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=(playerRanking?.state.boards?.cards||[]).slice().sort((x,y)=>(y.score||0)-(x.score||0));const top=docs[0];
  return [
- {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' RESTANTES':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
+ {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' + '+cyclePacksLeft()+' DE FRANJA':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' cartas obtenidas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -3383,7 +3383,7 @@ function openServerPack(){
    return c;
   });
   lastOpenedPack=result.kind==='welcome'
-   ?{kind:'welcome',number:5-S.welcomeLeft}
+   ?{kind:'welcome',number:welcomeTotal()-S.welcomeLeft,total:welcomeTotal()}
    :result.kind==='daily'
    ?{kind:'daily',number:S.freeUsed}
    :{kind:'extra',number:0};
@@ -3427,7 +3427,7 @@ function openPack(){
    c._prev=VL.filter(v=>S.have[c.d+'_'+v]);c._dnew=c._new&&!c._prev.length&&!seenD[c.d];seenD[c.d]=1;c._doneB=doneB.has(c.d)});
   const u0=uniq(),beforeLevelHave={...S.have};applyPack(p);recordLevelUp(beforeLevelHave,S.have);
    // Se guarda el lugar de ESTE sobre, antes de agotar la cuota o cruzar medianoche.
-   lastOpenedPack=p.welcome?{kind:'welcome',number:5-S.welcomeLeft}
+   lastOpenedPack=p.welcome?{kind:'welcome',number:welcomeTotal()-S.welcomeLeft,total:welcomeTotal()}
     :p.daily?{kind:'daily',number:S.freeUsed}
     :p.extra?{kind:'extra',number:0}:{kind:'test',number:0};
    markLogros();MINE.push(p);save();
@@ -3726,7 +3726,7 @@ ST.addEventListener('touchcancel',()=>gEnd(true));
 function renderTitle(){$('tiOne').textContent=uniq();const docs=(playerRanking?.state.boards?.cards||[]).slice().sort((a,b)=>(b.score||0)-(a.score||0));
  const top=docs[0];$('tiHi').textContent=top?((top.ini||'???')+' '+top.score):'---';
  const list=docs.slice(0,5).map((d,i)=>`<i>${i+1}.</i> ${d.ini||'???'} ${d.score||0}`).join('   ·   ');
- $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'5 SOBRES DE BIENVENIDA · 2 DIARIOS   ·   COLECCIONA CARTAS   ·   INSERTCOINMX.COM'}
+ $('tiTick').innerHTML=(list?'RECORDS   '+list+'   ·   ':'')+'3 SOBRES DE BIENVENIDA · 2 CADA 6 HORAS   ·   COLECCIONA CARTAS   ·   INSERTCOINMX.COM'}
 renderTitle();
 $('title').addEventListener('click',e=>{
  if(e.target.closest('[data-sound-toggle]'))return;
@@ -3778,13 +3778,13 @@ window.addEventListener('mouseup',()=>{if(mdown){mdown=false;gEnd(false)}});
    El estado del sobre se conserva en esta sesión; no se agregan datos persistentes. */
 function summaryStatus(){
  const p=lastOpenedPack||{kind:'extra',number:0};
- if(p.kind==='welcome')return {kicker:'SOBRES DE BIENVENIDA',step:p.number+' DE 5',title:p.number===5?'¡Completaste tus 5 sobres!':'¡Sobre '+p.number+' de 5 completado!'};
+ if(p.kind==='welcome'){const total=p.total||welcomeTotal();return {kicker:'SOBRES DE BIENVENIDA',step:p.number+' DE '+total,title:p.number===total?'¡Completaste tus '+total+' sobres!':'¡Sobre '+p.number+' de '+total+' completado!'};}
  if(p.kind==='daily')return {kicker:'SOBRES DE HOY',step:p.number+' DE 2',title:p.number===2?'¡Abriste tus 2 sobres de hoy!':'¡Sobre 1 de 2 completado!'};
  return {kicker:p.kind==='test'?'MODO PRUEBA':'SOBRE EXTRA',step:'COMPLETADO',title:'¡Sobre completado!'};
 }
 function nextSummaryPackLabel(){
  if(PRUEBA||S.test)return 'ABRIR OTRO SOBRE';
- if(S.welcomeLeft>0)return 'ABRIR SOBRE '+(6-S.welcomeLeft)+' DE 5';
+ if(S.welcomeLeft>0)return 'ABRIR SOBRE '+(welcomeTotal()+1-S.welcomeLeft)+' DE '+welcomeTotal();
  const free=freePacksLeft();
  if(free>0)return 'ABRIR SOBRE '+(3-free)+' DE 2';
  if(S.extra>0)return S.extra===1?'ABRIR SOBRE EXTRA':'ABRIR SOBRE EXTRA · '+S.extra+' DISPONIBLES';
@@ -4377,7 +4377,8 @@ function validateBackup(text,{fromCloud=false}={}){const E=m=>({ok:false,err:m})
    else if(k==='last'||k==='rdia'){if(!isDay(v))throw 'Una fecha del respaldo no es válida.';out[k]=v}
    else if(k==='extra'){if(!isInt(v,0,999))throw 'Los sobres extra del respaldo no son válidos.';out.extra=v}
    else if(k==='welcomeLeft'||k==='freeUsed'){if(!isInt(v,0,k==='welcomeLeft'?5:2))throw 'Los sobres gratuitos del respaldo no son válidos.';out[k]=v}
-   else if(k==='freeDay'){if(!isDay(v))throw 'La fecha de sobres gratuitos no es válida.';out.freeDay=v}
+   else if(k==='welcomeTotal'){if(v!==3&&v!==5)throw 'Cuota inicial inválida.';out[k]=v}
+    else if(k==='freeDay'){if(!isDay(v))throw 'La fecha de sobres gratuitos no es válida.';out.freeDay=v}
    else if(k==='champ'){if(typeof v!=='string'||(v!==''&&!IDRE.test(v)))throw 'El campeón del respaldo no es válido.';out.champ=v}
    else if(k==='reta2'){if(!isObj(v))throw 'La Reta diaria del respaldo no es válida.';safeVal(v,1);out.reta2=v}
    else if(k==='rlast'){if(!(v===null||isInt(v,0,9999)))throw 'La última reta del respaldo no es válida.';out.rlast=v}
