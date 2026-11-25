@@ -1897,6 +1897,57 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #home #mGo.pack-wait span{font:800 10px/1.3 AV,system-ui,sans-serif;letter-spacing:.07em}
 #home #mGo.pack-wait time{font:800 22px/1.15 AV,system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
 #home #mGo.pack-wait:active{transform:none}
+/* Home: una pantalla, sin scroll ni recorte del abanico. */
+#home{overflow:clip!important;touch-action:none}
+#home .amb{inset:0}
+#home .mh,#home .htest,#home .mtabs,#home .dupbar,#home .mgo{flex-shrink:0}
+#home .mfan{flex:1 1 0;min-height:0;container-type:size;overflow:visible}
+#home .mc{
+ --fan-card-w:min(68vw,280px,66cqw,max(1px,calc(71.64cqh - 12px)));
+ --fan-step:clamp(0px,calc(50cqw - var(--fan-card-w)*.51 - 8px),calc(var(--fan-card-w)*.60));
+ width:var(--fan-card-w);transform-origin:50% 50%
+}
+#home .dupbar button{flex-shrink:0}
+#home .dupbar span{min-width:0;overflow-wrap:anywhere}
+#home .mc .lab{height:auto;min-height:46%}
+@container (max-height:350px){
+ #home .mc .lab{padding:0 10px 10px}
+ #home .mc .lab small{font-size:6px;margin-bottom:5px}
+ #home .mc .lab b{font-size:clamp(17px,8cqh,28px)}
+ #home .mc .lab span{font-size:11px;margin-top:5px}
+}
+@container (max-height:220px){
+ #home .mc .lab{padding:0 7px 6px}
+ #home .mc .lab small{font-size:6px;margin-bottom:3px}
+ #home .mc .lab b{font-size:16px}
+ #home .mc .lab span{font-size:10px;margin-top:3px}
+}
+@media(max-height:760px){
+ #home .mh{padding:8px 14px 0}
+ #home .htest{margin-top:0;padding:2px 14px 0;min-height:8px}
+ #home .home-player-card{min-height:54px;margin-top:4px;padding:6px 10px}
+ #home .home-player-avatar{width:36px;height:36px;flex-basis:36px}
+ #home .mtabs{padding-bottom:7px}
+ #home .dupbar{margin:0 14px 7px;padding:6px 10px}
+ #home .dupbar button{min-height:34px}
+ #home .mgo{margin-bottom:12px;padding:12px 20px;min-height:44px}
+ #home #mGo.pack-wait{min-height:50px;padding:6px 16px;gap:3px}
+ #home #mGo.pack-wait time{font-size:20px}
+}
+@media(max-height:560px){
+ #home .mh{padding-top:4px}
+ #home .home-player-card{min-height:44px;margin-top:2px;padding:3px 9px}
+ #home .home-player-avatar{width:32px;height:32px;flex-basis:32px}
+ #home .home-player-copy{gap:2px}
+ #home .htest{padding-top:0}
+ #home .mtabs{padding-bottom:4px}
+ #home .dupbar{margin-bottom:4px;padding:4px 8px}
+ #home .mgo{margin-bottom:8px;padding:9px 16px}
+}
+@media(max-width:370px){
+ #home .mtabs{gap:3px;padding-inline:4px}
+ #home .mtabs button{padding-inline:clamp(3px,1.6vw,6px)}
+}
 @media(max-height:650px){#entryAccount .entry-account-brand img{width:64px}#entryAccount .entry-account-brand{margin-bottom:10px}#entryAccount .entry-account-shell{padding-top:12px;padding-bottom:17px}}
 </style><link rel="stylesheet" href="content/community-value-ui.css?v=20261121-global"><style>
 /* COLLECTION SCREEN — Insert Coin MX original arcade UI. */
@@ -3146,7 +3197,7 @@ function menuArtLoad(img,m,dir){
 }
 const MODES=()=>{const u=uniq(),N=NAV,r=packReady(),f=freePacksLeft();const docs=playerRanking?.state.boards?.pts||[];const top=docs[0];
  return [
- {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' + '+cyclePacksLeft()+' DE FRANJA':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR HOY TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
+ {id:'pack',t:'Sobres',k:r?(S.test||PRUEBA?'MODO PRUEBA':f>0?(S.welcomeLeft>0?'BIENVENIDA · '+f+' + '+cyclePacksLeft()+' DE FRANJA':'HOY · '+f+' RESTANTES'):'SOBRES EXTRA · '+S.extra):'POR AHORA, TERMINASTE',s:r?(firstPack()?'5 cartas · Arte Especial garantizada en tu bienvenida':'5 cartas por sobre · una Holo o mejor'):'Recibe 2 sobres cada 6 horas',img:'F_gatosamurai',rr:'full',go:r?'ABRIR SOBRE':'2 SOBRES DISPONIBLES EN '+nextPackCountdown(),off:!r},
  {id:'album',t:'Álbum',k:'TU COLECCIÓN',s:u+' cartas obtenidas',img:'F_hyrule',rr:'full',go:'VER'},
  {id:'torneo',t:'Reta',k:'HERE COMES A NEW CHALLENGER',s:'¿Esta o esta? Mira qué eligió la comunidad',img:'fatality',rr:'dorada',go:'RETAR'},
  {id:'tier',t:'Tier',k:u>=20?'TU RANKING':'BLOQUEADO',s:u>=20?'Ordena tus cartas':'Faltan '+(20-u)+' cartas',img:'nerv',rr:'holo',go:u>=20?'ORDENAR':'FALTAN '+(20-u),lock:u<20},
@@ -3160,7 +3211,7 @@ function renderHome(){const u=uniq(),N=NAV,M=MODES(),light=menuCompact.matches,i
   [...fan.children].forEach((el,i)=>el.onclick=()=>{if(mMoved)return;if(i!==mi){mi=i;beep(660,.03);renderHome()}else mEnter()})}
  [...fan.children].forEach((el,i)=>{const m=M[i],pic=el.querySelector('.fx>img'),src=imgDir+'/'+m.img+'.webp';menuArtLoad(pic,m,imgDir);el.classList.toggle('lock',!!m.lock);el.classList.toggle('is-selected',i===mi);el.querySelector('small').textContent=m.k;el.querySelector('b').textContent=m.t;el.querySelector('.lab span').textContent=m.s;
   let d=i-mi;if(d>2)d-=5;if(d<-2)d+=5;const a=Math.abs(d);
-  el.style.transform=`translate(-50%,-50%) translateX(${d*60}%) rotate(${d*11}deg) translateY(${a*6}%) scale(${1-a*.16})`;el.style.zIndex=10-a;el.style.filter=light?'':(a?`brightness(${1-a*.3})`:'');el.style.opacity=a>1?0:1;el.style.pointerEvents=a>1?'none':''});
+  el.style.transform=`translate(-50%,-50%) translateX(calc(var(--fan-step) * ${d})) translateY(${a*2.5}%) rotate(${d*10}deg) scale(${1-a*.18})`;el.style.zIndex=10-a;el.style.filter=light?'':(a?`brightness(${1-a*.3})`:'');el.style.opacity=a>1?0:1;el.style.pointerEvents=a>1?'none':''});
  const tabs=$('mTabs');
  if(tabs.children.length!==M.length)tabs.innerHTML=M.map((m,i)=>`<button data-i="${i}">${m.t.replace(' del día','')}</button>`).join('');
  [...tabs.children].forEach((tab,i)=>{tab.classList.toggle('on',i===mi);tab.classList.toggle('lock',!!M[i].lock);tab.setAttribute('aria-pressed',String(i===mi))});
@@ -3184,8 +3235,9 @@ $('mGo').onclick=mEnter;
 $('mTabs').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;mi=+b.dataset.i;beep(660,.03);renderHome()};
 menuCompact.addEventListener('change',()=>{if(cur==='home')renderHome()});
 $('home').addEventListener('touchstart',e=>{const p=e.touches[0];msx=p.clientX;msy=p.clientY;mMoved=false},{passive:true});
-$('home').addEventListener('touchmove',e=>{if(msx!==null&&Math.abs(e.touches[0].clientX-msx)>10)e.preventDefault()},{passive:false});
-$('home').addEventListener('touchend',e=>{if(msx===null)return;const dx=e.changedTouches[0].clientX-msx;msx=null;if(Math.abs(dx)>40){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
+$('home').addEventListener('touchmove',e=>{if(msx===null)return;const p=e.touches[0],dx=Math.abs(p.clientX-msx),dy=Math.abs(p.clientY-msy);if(dx>10&&dx>dy)e.preventDefault()},{passive:false});
+$('home').addEventListener('touchend',e=>{if(msx===null)return;const p=e.changedTouches[0],dx=p.clientX-msx,dy=p.clientY-msy;msx=msy=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
+$('home').addEventListener('touchcancel',()=>{msx=msy=null;mMoved=false});
 let mmd=null;$('home').addEventListener('mousedown',e=>mmd=e.clientX);$('home').addEventListener('mouseup',e=>{if(mmd===null)return;const dx=e.clientX-mmd;mmd=null;if(Math.abs(dx)>40){mMoved=true;mi=(mi+(dx<0?1:-1)+5)%5;beep(660,.03);renderHome();setTimeout(()=>mMoved=false,350)}});
 function countdown(){const n=new Date();const m=new Date(n);m.setHours(24,0,0,0);const s=Math.floor((m-n)/1000);return String(s/3600|0).padStart(2,'0')+':'+String((s%3600)/60|0).padStart(2,'0')}
 setInterval(()=>{if(cur!=='home'||mi!==0)return;const waiting=$('mGo').classList.contains('pack-wait');const available=!!packReady();if(waiting===available)renderHome();else if(waiting)updateHomePackCTA();},1000);
