@@ -2288,7 +2288,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-account:not([hidden]){margin-top:20px}
 @media(max-width:360px){#profile .profile-scroll{padding-inline:12px}#profile .pc-ticket,#profile .pc-collection{padding-inline:13px}#profile .pc-avatar{width:55px;height:55px;flex-basis:55px}#profile .pc-identity{gap:11px}#profile .pc-player-name h2{font-size:18px}#profile .pc-score-number #profileValuePoints{font-size:43px}#profile .pc-stats span{font-size:9px}#profile .pc-stats{padding-inline:6px}#profile .pc-collection-title{font-size:16px}}
 </style>
-</head><body>
+<link rel="stylesheet" href="qa/design-system/legendary-lab.css?v=3"></head><body>
 <aside id="icmxLabTools" aria-label="Controles del laboratorio">
  <button type="button" id="icmxLabToggle" aria-expanded="false" aria-controls="icmxLabPanel">LAB · ∞ SOBRES <span aria-hidden="true">⌄</span></button>
  <section id="icmxLabPanel" hidden>
@@ -2301,6 +2301,10 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
    <button type="button" data-lab-home="1:15">Inicio · 2 sobres + 15 repetidas</button>
    <button type="button" data-lab-home="0:15">Inicio · sin sobres + 15 repetidas</button>
    <button type="button" data-lab-action="pack">Abrir un sobre</button>
+   <button type="button" data-lab-legendary="kame">Probar Legendary · Kame</button>
+   <button type="button" data-lab-legendary="enjoy">Probar Legendary · Enjoy</button>
+   <button type="button" data-lab-legendary="hipstermario">Probar Legendary · Hipster</button>
+   <button type="button" data-lab-legendary="none">Probar sobre inusual sin Legendary</button>
    <button type="button" data-lab-seed="5">Reta · 5 diseños</button>
    <button type="button" data-lab-seed="7">Reta · 7 diseños</button>
    <button type="button" data-lab-seed="8">Reta · 8 diseños</button>
@@ -2586,7 +2590,7 @@ window.ICMX_VERIFIED_GUEST_PLAY=false;</script>
 <script src="content/card-data-adapter.js?v=20261124-hidden"></script>
 <script src="content/card-renderer.js?v=20261125popv2"></script>
 <script src="content/card-runtime.js?v=20261125popv2"></script>
-<script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
+<script src="qa/design-system/legendary-lab.js?v=1"></script><script src="qa/design-system/legendary-audio.js?v=1"></script><script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
    b Base · e Especial · r Rara · f Full. La clave de una carta es diseño+'_'+letra (ej. fatality_r, x_f).
    Para agregar un diseño nuevo:
@@ -2665,7 +2669,7 @@ const DESIGNS=[
 {id:'jaws',ex:'er',n:"Jaws 19",cat:'PELÍCULAS',r:'comun',no:49},
 {id:'jokers',ex:'er',n:"Jokers",cat:'PELÍCULAS',r:'comun',no:50},
 {id:'kaiji',ex:'er',n:"Kaiju Club",cat:'PELÍCULAS',r:'comun',no:51},
-{id:'kame',ex:'er',n:"Kame Hame Ha",cat:'ANIME',r:'comun',no:52,f:46},
+{id:'kame',ex:'er',n:"Kame",cat:'ANIME',r:'comun',no:52,f:46},
 {id:'karma',ex:'er',n:"Karma",cat:'GAMER',r:'comun',no:53,f:71},
 {id:'karting',bx:1,ex:'er',n:"Karting Party",cat:'GAMER',r:'comun',no:0},
 {id:'keepcalm',ex:'er',n:"Keep Calm",cat:'ANIME',r:'comun',no:54,f:19},
@@ -2770,12 +2774,18 @@ const mk=(d,v)=>({k:d.id+'_'+v,n:d.n,cat:d.cat,r:VC[v],v,bx:!!d.bx,no:v==='f'?(d
 for(const d of DESIGNS)for(const v of 'ber')CARDS.push(mk(d,v));
 for(const d of [...DESIGNS.filter(d=>d.f).sort((a,b)=>a.f-b.f),...DESIGNS.filter(d=>!d.f)])CARDS.push(mk(d,'f'));
 for(const c of CARDS)CB[c.k]=c;
+const LG=window.ICMX_LEGENDARY,LG_CARDS=LG.makeCards(DB);
+for(const c of LG_CARDS)CB[c.k]=c;
+VN.l='Legendary';VSHORT.l='Legendary';VC.l='legendary';
+let labForceLegendary=null,labOddPack=false;
+const lgOwned=()=>LG.owned(S.have);
+
 const AV=CARDS.filter(c=>c.img&&!c.bx),NAV=AV.length; // cartas con imagen que salen en sobres = las que se pueden conseguir hoy (nunca las bonus)
 const POOL={comun:[],holo:[],dorada:[],full:[]};for(const c of AV)POOL[c.r].push(c); // mismos grupos y pesos que antes
 const FA=DESIGNS.filter(d=>d.f).sort((a,b)=>a.f-b.f);
 /* claves: acepta la nueva (id_v) y la del modelo anterior (id → su rareza de entonces, F_id → Full, con alias) */
-const NEWK=/^([a-z0-9]{1,40})_([berf])$/;
-const cardKey=k=>{if(typeof k!=='string')return null;const m=NEWK.exec(k);if(m){const id=ALIAS[m[1]]||m[1];return DB[id]?id+'_'+m[2]:null}
+const NEWK=/^([a-z0-9]{1,40})_([berfl])$/;
+const cardKey=k=>{if(typeof k!=='string')return null;const m=NEWK.exec(k);if(m){const id=ALIAS[m[1]]||m[1];return DB[id]&&(m[2]!=='l'||CB[id+'_l'])?id+'_'+m[2]:null}
  const full=k.startsWith('F_'),s=full?k.slice(2):k,d=DB[ALIAS[s]||s];if(!d)return null;return full?d.id+'_f':(d.r?d.id+'_'+OLDV[d.r]:null)};
 const designId=k=>{if(typeof k!=='string')return null;const m=NEWK.exec(k);const s=m?m[1]:k.startsWith('F_')?k.slice(2):k;const id=ALIAS[s]||s;return DB[id]?id:null}; // id de diseño vigente (acepta alias, F_ y _v)
 const artOf=id=>DB[id]&&!DB[id].r&&DB[id].fk?'fa/'+DB[id].fk.slice(2)+'.webp?v='+IMGV:'d/'+id+'.webp?v='+IMGV; // arte del diseño (Tier, Retas)
@@ -2785,7 +2795,7 @@ function PH(c){return PHM[c.k]||(PHM[c.k]=(()=>{const e=s=>String(s).replace(/[&
  const ls=[];let l='';for(const w of String(c.n).split(' ')){if(l&&(l+' '+w).length>14){ls.push(l);l=w}else l=l?l+' '+w:w}ls.push(l);const n=Math.min(ls.length,3);
  const tx=ls.slice(0,3).map((x,i)=>`<text x="240" y="${330+(i-(n-1)/2)*46}" text-anchor="middle" font-size="36" font-weight="800" fill="#fff">${e(x)}</text>`).join('');
  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 670" font-family="Arial,Helvetica,sans-serif"><rect width="480" height="670" rx="26" fill="#120F1A"/><rect x="14" y="14" width="452" height="642" rx="18" fill="none" stroke="#FFD400" stroke-width="4" stroke-dasharray="14 10"/><text x="240" y="92" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="4" fill="#FFD400">INSERT COIN MX</text>${tx}<text x="240" y="510" text-anchor="middle" font-size="30" font-weight="800" letter-spacing="3" fill="#FFD400">${(VSHORT[c.v]||'').toUpperCase()}</text><text x="240" y="552" text-anchor="middle" font-size="20" font-weight="700" letter-spacing="3" fill="#8a86a3">PRÓXIMAMENTE</text></svg>`)})())}
-const imgOf=(c,dir)=>c&&c.img?dir+'/'+c.img+'.webp?v='+IMGV:PH(c||{k:'?',n:'Carta',v:'b'});
+const imgOf=(c,dir)=>c?.v==='l'?LG.art(c.d):c&&c.img?dir+'/'+c.img+'.webp?v='+IMGV:PH(c||{k:'?',n:'Carta',v:'b'});
 const imgK=(k,dir)=>imgOf(CB[cardKey(k)||k],dir);
 const W={comun:70,holo:18,dorada:5,full:7};
 const TN=['GOTY','GENIAL','OK','MMM'],TC=['#FFD400','#f0a830','#a9a3c4','#6e6a85'];
@@ -2844,7 +2854,7 @@ const isObj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
 /* ===== Analytics: eventos propios (nunca rompen el juego si GA no carga) ===== */
 const ga=()=>{};
 try{if(S.last&&S.last<today())ga('regreso',{dias_desde_ultimo_sobre:Math.round((new Date(today())-new Date(S.last))/864e5)})}catch(e){}
-const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx).length; // las bonus no cuentan para el álbum
+const uniq=()=>Object.keys(S.have).filter(k=>CB[k]&&!CB[k].bx&&CB[k].v!=='l').length; // las bonus no cuentan para el álbum
 const TRADE_COST=15;
 const dups=()=>Object.values(S.have).reduce((a,n)=>a+Math.max(0,n-1),0);
 let communityValueEngine=null;
@@ -2901,10 +2911,10 @@ let communityValueEngine=null;
 const validValueCards=()=>CARDS.filter(c=>!c.bx&&c.img).map(c=>c.k);
 function collectionPointsLocal(){
  if(!communityValueEngine)return null;
- try{return communityValueEngine.collectionPoints(Object.keys(S.have||{}),validValueCards()).points}
+ try{return communityValueEngine.collectionPoints(Object.keys(S.have||{}),validValueCards()).points+250*lgOwned().length}
  catch(_){return null}
 }
-const valueVariantPoints=v=>communityValueEngine?.VARIANT_POINTS?.[v]??null;
+const valueVariantPoints=v=>v==='l'?250:communityValueEngine?.VARIANT_POINTS?.[v]??null;
 function updateCardValueUI(card){
  // POP se revela únicamente cuando Supabase sirva resultados comunitarios verificables.
  // Los PTS pertenecen a la variante: son 10, 25, 50 o 100 según su rareza.
@@ -2913,7 +2923,8 @@ function updateCardValueUI(card){
 }
 function mountFaceValue(fx,card){
  if(!fx||!card)return;
- const task=window.ICMX_CARD_RUNTIME?.mount(fx,card,updateCardValueUI(card));
+ if(card.v==='l')return LG.mount(fx,card);
+ LG.clear(fx);const task=window.ICMX_CARD_RUNTIME?.mount(fx,card,updateCardValueUI(card));
  if(!task){const img=fx.querySelector('img');if(img&&!img.getAttribute('src')&&img.dataset.icmxOriginal)img.src=img.dataset.icmxOriginal;}
  return task;
 }
@@ -3019,7 +3030,7 @@ revealSfx.preload='auto';
 const revealSfxSeen=new Set();
 let revealFadeFrame=0,revealToken=0;
 function stopRevealSfx(){
- revealToken++;cancelAnimationFrame(revealFadeFrame);
+ window.ICMX_LG_AUDIO?.stop();revealToken++;cancelAnimationFrame(revealFadeFrame);
  revealSfx.onplaying=null;revealSfx.pause();
  try{revealSfx.currentTime=0}catch(e){}
 }
@@ -3068,6 +3079,7 @@ function musicStop(){
  for(const a of Object.values(MUSIC)){a.pause();a.volume=0}
 }
 function musicForScreen(){
+ if(window.ICMX_LG_AUDIO?.active()){musicStop();return}
  if(soundMuted||!musicAllowed||document.hidden){musicStop();return}
  const target=cur==='torneo'?'reta':'general',next=MUSIC[target];
  if(musicWanted===target&&!next.paused)return;
@@ -3103,15 +3115,15 @@ function setSoundMuted(muted){
  soundMuted=!!muted;
  try{localStorage.setItem(AUDIO_PREF_KEY,soundMuted?'1':'0')}catch(e){}
  showSoundState();notifyRetaSound();
- if(soundMuted){stopRevealSfx();musicStop()}else{musicAllowed=true;musicForScreen()}
+ if(soundMuted){stopRevealSfx();musicStop()}else{musicAllowed=true;window.ICMX_LG_AUDIO?.unlock();if(cur==='pack'&&$('disc').classList.contains('lg-reveal')&&$('disc').classList.contains('cov'))window.ICMX_LG_AUDIO?.play('wait');musicForScreen()}
 }
 function initSound(){
- showSoundState();
+ showSoundState();window.ICMX_LG_AUDIO?.prepare();
  document.addEventListener('pointerdown',e=>{
   if(e.target.closest&&e.target.closest('[data-sound-toggle]'))return;
-  beginMusic();
+  if(!soundMuted)window.ICMX_LG_AUDIO?.unlock();beginMusic();
  },{passive:true,capture:true});
- document.addEventListener('keydown',e=>{if(!e.repeat&&e.key!=='Tab')beginMusic()});
+ document.addEventListener('keydown',e=>{if(!e.repeat&&e.key!=='Tab'){if(!soundMuted)window.ICMX_LG_AUDIO?.unlock();beginMusic()}});
  document.addEventListener('click',e=>{
   const btn=e.target.closest&&e.target.closest('[data-sound-toggle]');
   if(btn){e.preventDefault();setSoundMuted(!soundMuted)}
@@ -3216,7 +3228,7 @@ document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g
 const ON=[
  {k:'EL ÁLBUM · 01 / 03',t:'Las playeras que hemos hecho, ahora tienen una carta.',p:'Redescubre nuestros diseños, consigue sus distintas versiones y completa tu colección.'},
  {k:'TUS PRIMEROS SOBRES · 02 / 03',t:'¡Tienes 5 sobres para empezar!',p:'3 de bienvenida + 2 de la franja actual. Cada sobre trae 5 cartas. Recibe 2 más cada 6 horas.'},
- {k:'TU OBJETIVO · 03 / 03',t:'Completa tu álbum.',p:'Consigue 25 diseños distintos para desbloquear otros 25. Cualquier versión de un diseño cuenta.'}
+ {k:'TU OBJETIVO · 03 / 03',t:'Completa tu álbum.',p:'Consigue 25 diseños distintos para desbloquear otros 25. Cualquier versión de un diseño cuenta. Todo buen juego tiene sus secretos. ¿Podrás descubrirlos?'}
 ];
 const ON_PREVIEW=new URLSearchParams(location.search).get('preview')==='onboarding';
 const ON_COUNT_KEY='icmx-ui-lab-onboarding-views-v1';
@@ -3437,7 +3449,7 @@ const firstPack=()=>!S.fg&&!veteran();
 function makeHand(first){
  const allowed=new Set(window.ICMX_PLAYER1_LEVELS.eligibleDesigns(S.have));
  labPackPool=Object.fromEntries(Object.entries(POOL).map(([r,cs])=>[r,cs.filter(c=>allowed.has(c.d))]));
- try{const cards=[pickBase(),pickBase(),pickBase(),Math.random()<SURP?pickSpecial():pickBase(),first&&currentPool().full.length?pickFrom('full'):pickSpecial()];if(labForceLevelUp){labForceLevelUp=false;const missing=player1.levels[0].designs.find(id=>!VL.some(v=>S.have[id+'_'+v]));if(missing)cards[0]={...CB[missing+'_b']};}return cards}finally{labPackPool=null}
+ try{const cards=[pickBase(),pickBase(),pickBase(),Math.random()<SURP?pickSpecial():pickBase(),first&&currentPool().full.length?pickFrom('full'):pickSpecial()];if(labForceLevelUp){labForceLevelUp=false;const missing=player1.levels[0].designs.find(id=>!VL.some(v=>S.have[id+'_'+v]));if(missing)cards[0]={...CB[missing+'_b']};}const force=labForceLegendary;labForceLegendary=null;labOddPack=force==='none';return LG.roll(cards,LG_CARDS,force)}finally{labPackPool=null}
 }
 const GLOW={holo:'#9ff3ff',dorada:'#FFD400',full:'#ff6fd0'};
 let hand=[],idx=0,hintT,lastOpenedPack=null;
@@ -3464,7 +3476,7 @@ $('p1UpExplore').onclick=()=>{stopRevealSfx();$('p1LevelUp').close();page=0;go('
 $('p1UpContinue').onclick=()=>{stopRevealSfx();$('p1LevelUp').close();$('sum').focus({preventScroll:true})};
 $('p1LevelUp').addEventListener('cancel',e=>{e.preventDefault();$('p1UpContinue').click()});
 
-const VORD={f:0,r:1,e:2,b:3}; // de mejor a peor
+const VORD={l:-1,f:0,r:1,e:2,b:3}; // de mejor a peor
 /* al rasgar, la luz que sale del sobre es la de su mejor carta: blanca (Base), arcoíris (Especial), oro (Rara), rosa (Full) */
 function leak(v){const L=$('leak');L.className='leak';void L.offsetWidth;L.className='leak on v-'+v;
  if(v==='b')beep(300,.2);else{beep(220,.12);setTimeout(()=>[523,659,784,1047,1319].slice(0,v==='e'?3:v==='r'?4:5).forEach((f,i)=>setTimeout(()=>beep(f,.09),i*90)),180)}}
@@ -3481,7 +3493,7 @@ function setPackPresentation(kind='standard'){
  img.alt=PACK_PRESENTATIONS[active].label;
  return active;
 }
-function resetPack(){stopRevealSfx();pendingLevelUp=false;setPackPresentation('standard');$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.webp?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut');$('cutp').style.width='0';$('hand').style.display='';
+function resetPack(){stopRevealSfx();pendingLevelUp=false;setPackPresentation('standard');$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.webp?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut','lg-secret','lg-odd');$('pk').querySelector('.lg-corruption')?.remove();$('cutp').style.width='0';$('hand').style.display='';
  $('stack').classList.remove('on');$('sum').classList.remove('on');$('stHint').style.display='none';$('openBtn').style.visibility='visible'}
 let tx=null;
 $('tearZone').addEventListener('pointerdown',e=>{tx=e.clientX;$('hand').style.display='none';try{$('tearZone').setPointerCapture(e.pointerId)}catch(_){}});
@@ -3547,6 +3559,7 @@ function openServerPack(){
 }
 function openPack(){
  if(opening||serverPackBusy)return;
+ if(!soundMuted)window.ICMX_LG_AUDIO?.unlock();
  if(cloudSync?.requiresServer?.()){openServerPack();return}
  if(VERIFIED_GUEST_PLAY){toast('PREPARANDO TU PARTIDA<br>NO SE CONSUMIÓ EL SOBRE');return}
  // No emitir sobres locales si falla la carga de nube para una cuenta vinculada.
@@ -3565,7 +3578,7 @@ function openPack(){
   const fp0=firstPack();hand=makeHand(fp0);p.fg=1;const seen={},seenD={};
   const doneB=new Set(DESIGNS.filter(d=>dState(d).done).map(d=>d.id));
   hand.forEach(c=>{c._new=!S.have[c.k]&&!seen[c.k];seen[c.k]=1;p.have[c.k]=(p.have[c.k]||0)+1;
-   c._prev=VL.filter(v=>S.have[c.d+'_'+v]);c._dnew=c._new&&!c._prev.length&&!seenD[c.d];seenD[c.d]=1;c._doneB=doneB.has(c.d)});
+   c._prev=VL.filter(v=>S.have[c.d+'_'+v]);c._dnew=c.v!=='l'&&c._new&&!c._prev.length&&!seenD[c.d];seenD[c.d]=1;c._doneB=doneB.has(c.d)});
   const u0=uniq(),beforeLevelHave={...S.have};applyPack(p);recordLevelUp(beforeLevelHave,S.have);
    // Se guarda el lugar de ESTE sobre, antes de agotar la cuota o cruzar medianoche.
    lastOpenedPack=p.welcome?{kind:'welcome',number:welcomeTotal()-S.welcomeLeft,total:welcomeTotal()}
@@ -3575,7 +3588,26 @@ function openPack(){
   ga('abrir_sobre',{tipo:p.welcome?'bienvenida':p.daily?'diario':p.extra?'extra':'prueba',primero:fp0?1:0});
   hand.forEach(c=>ga('carta_obtenida',{diseno:c.d,rareza:VC[c.v],nueva:c._new?1:0}));
   {const u1=uniq();GOALS.forEach(g=>{if(u0<g[0]&&u1>=g[0])ga('hito',{hito:g[1],cartas:u1})})}
-  setTimeout(()=>opening=false,900);$('env').classList.add('cut');const bv=hand.reduce((a,c)=>VORD[c.v]<VORD[a]?c.v:a,'b');leak(bv);idx=0;setTimeout(()=>{$('env').style.display='none';buildStack()},bv==='b'?450:1000)})}
+  beginLabPackAnimation()})}
+function beginLabPackAnimation(){
+ const env=$('env'),special=hand.some(c=>c.v==='l'),odd=!special&&(labOddPack||Math.random()<.1);labOddPack=false;
+ const best=hand.reduce((a,c)=>VORD[c.v]<VORD[a]?c.v:a,'b');
+ const delay=special||odd?2200:best==='b'?450:1000;
+ env.classList.add('cut');env.classList.toggle('lg-secret',special);env.classList.toggle('lg-odd',odd);
+ if(special||odd){
+  stopRevealSfx();musicStop();
+  const pk=$('pk'),src=pk.querySelector('.pkimg').src;
+  pk.querySelector('.lg-corruption')?.remove();
+  const fx=document.createElement('div');fx.className='lg-corruption';fx.setAttribute('aria-hidden','true');
+  for(const [top,bottom,dx,ms] of [[16,76,-17,0],[37,53,23,70],[57,35,-12,120],[74,20,16,35]]){
+   const im=document.createElement('img');im.src=src;im.alt='';im.style.cssText='--top:'+top+'%;--bottom:'+bottom+'%;--dx:'+dx+'px;--delay:'+ms+'ms';fx.append(im);
+  }
+  fx.insertAdjacentHTML('beforeend','<i class="lg-static"></i><i class="lg-seam"></i>');pk.append(fx);
+  if(!soundMuted)window.ICMX_LG_AUDIO?.play('glitch');
+ }else leak(best);
+ idx=0;$('openBtn').style.visibility='hidden';
+ setTimeout(()=>{opening=false;if(cur==='pack'){env.style.display='none';$('pk').querySelector('.lg-corruption')?.remove();buildStack();musicForScreen()}},delay)
+}
 /* ===== DESCUBRIMIENTO: una carta a la vez; la playera original es el escenario, la carta la complementa =====
    Cada caso tiene su respuesta: diseño nuevo, versión nueva de un diseño que ya tenías, repetida (útil para canje),
    versión especial (sale boca abajo) y colección completada (solo diseños con 2+ versiones disponibles). */
@@ -3663,8 +3695,8 @@ const lum=h=>{const n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;ret
 const icAwardsSeen=new Set(); // sellos vistos en el sobre actual
 let lastPack=new Set(); // diseños del último sobre (marca "nuevo" en el álbum, solo en esta sesión)
 function buildStack(){$('stack').classList.remove('on');$('stHint').style.display='none';idx=0;pi=0;REV=new Set();CINEMATIC_SHOWN.clear();revealSfxSeen.clear();stopRevealSfx();icAwardsSeen.clear();
- for(const c of hand)c._comp=!c._doneB&&dState(DB[c.d]).done&&hand.filter(x=>x.d===c.d).pop()===c; // completó en este sobre
- lastPack=new Set(hand.filter(c=>c._new).map(c=>c.d));showCard()}
+ for(const c of hand)c._comp=c.v!=='l'&&!c._doneB&&dState(DB[c.d]).done&&hand.filter(x=>x.d===c.d).pop()===c; // completó en este sobre
+ lastPack=new Set(hand.filter(c=>c._new&&c.v!=='l').map(c=>c.d));showCard()}
 function caseOf(c){return !c._new?'rep':c._comp?'comp':c._dnew?'dnew':'vnew'}
 /* Solo hay dos mensajes de logro; duplicados sin celebración. */
 function icAward(c){
@@ -3774,8 +3806,45 @@ function startCinematicReveal(c,D){
  return true;
 }
 
+function lgField(c,covered){
+ const art=covered?'':'<div class="lg-scene" style="background-image:url('+LG.art(c.d)+')"></div>';
+ return '<div class="lg-field'+(covered?' lg-field-wait':' lg-field-revealed')+'" aria-hidden="true">'+art+'<i class="lg-field-orbit"></i><i class="lg-field-rings"></i><i class="lg-field-scan"></i><i class="lg-field-vignette"></i></div>';
+}
+function showLegendary(c,D){
+ D.onclick=null;D.onkeydown=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._cinemaTimer);D.style.removeProperty('background-color');
+ D.className='disc on dx v-l lg-reveal'+(!REV.has(idx)?' cov':'');
+ D.style.setProperty('--bg','#0a0811');D.dataset.artId=c.d;
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(!REV.has(idx)){
+  if(!soundMuted){musicStop();window.ICMX_LG_AUDIO?.play('wait')}
+  D.innerHTML=lgField(c,true)+dxTop()+'<div class="lg-stage"><button id="dcBack" class="lg-back" aria-label="Revelar carta"><span class="lg-mark">?</span><i class="lg-sweep"></i></button><div class="lg-copy lg-signal">ALGO NO ES NORMAL…</div></div>'+dxControls(true);
+  let busy=false;const reveal=()=>{if(busy)return;busy=true;
+   $('dcBack').disabled=true;$('dcReveal').disabled=true;D.querySelector('.lg-stage').classList.add('lg-charging');D.querySelector('.lg-field').classList.add('lg-field-charge');musicStop();
+   if(!soundMuted){window.ICMX_LG_AUDIO?.unlock();if(!reduced)window.ICMX_LG_AUDIO?.play('charge');else window.ICMX_LG_AUDIO?.stop()}
+   const show=()=>{if(cur!=='pack'||hand[idx]!==c)return;REV.add(idx);showLegendary(c,D)};
+   if(reduced)show();else setTimeout(show,580);
+  };
+  D._dxReveal=reveal;$('dcBack').onclick=reveal;$('dcReveal').onclick=reveal;dxNav();return;
+ }
+ const first=!S.legendaryRevealed;
+ if(first){S.legendaryRevealed=1;save()}
+ const fresh=!CINEMATIC_SHOWN.has(idx);CINEMATIC_SHOWN.add(idx);
+ D.innerHTML=lgField(c,false)+dxTop()+'<div class="lg-stage'+(fresh&&!reduced?' lg-burst':'')+'">'+LG.face(c)+'<div class="lg-copy">'+(first?'<strong>¡SECRETO DESCUBIERTO!</strong><small>Has desbloqueado Legendary en tu álbum.</small>':'<strong>★★★★ LEGENDARY</strong>')+'<small>'+(c._new?'+250 PTS':'REPETIDA · 0 PTS')+'</small></div></div>'+dxControls();
+ LG.mount(D.querySelector('.lg-stage .fx'),c);
+ dxNav();
+ if(fresh&&!reduced){
+  const fx=document.createElement('div');fx.className='lg-cinema';fx.setAttribute('aria-hidden','true');
+  for(let i=0;i<16;i++){const ray=document.createElement('i');ray.className='lg-particle';ray.style.cssText='--angle:'+(i*22.5)+'deg;--distance:calc('+(130+(i%4)*35)+'px + '+(24+(i%4)*7)+'vmin)';fx.append(ray)}
+  fx.insertAdjacentHTML('beforeend','<div class="lg-cinema-title"><small>RAREZA DESCONOCIDA</small><span>★★★★</span><strong>LEGENDARY</strong></div>');D.append(fx);
+  const next=$('dcNext');next.disabled=true;
+  D._cinemaTimer=setTimeout(()=>{if(hand[idx]!==c)return;fx.remove();next.disabled=false;window.ICMX_LG_AUDIO?.stop();musicForScreen()},2450);
+ }else if(!fresh)musicForScreen();
+ if(fresh&&!soundMuted){stopRevealSfx();musicStop();window.ICMX_LG_AUDIO?.play('reveal')}
+ if(fresh&&reduced){D._cinemaTimer=setTimeout(()=>{if(cur==='pack'&&hand[idx]===c){window.ICMX_LG_AUDIO?.stop();musicForScreen()}},2450)}
+}
 function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
- D.style.removeProperty('background-color');delete D.dataset.artBgStatus;
+ if(c.v==='l'){showLegendary(c,D);return}
+ musicForScreen();D.style.removeProperty('background-color');delete D.dataset.artBgStatus;
  D.onclick=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._dxToastTimer);clearTimeout(D._cinemaTimer);
  if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
   D.className=`disc on dx cov v-${c.v}`;D.dataset.artId='';D.style.setProperty('--bg','#0c0a14');
@@ -3957,13 +4026,13 @@ function groupSummaryCards(cards,hero){
  return [...byKey.values()];
 }
 function showSum(){$('stack').classList.remove('on');$('stHint').style.display='none';const s=$('sum');const entering=!s.classList.contains('on');s.classList.add('on');
- const comp=hand.filter(c=>c._comp),rank=c=>(c._comp?-10:0)+VORD[c.v]+(c._new?0:5);
+ const comp=hand.filter(c=>c._comp),rank=c=>c.v==='l'?-20+(c._new?0:1):(c._comp?-10:0)+VORD[c.v]+(c._new?0:5);
  const H=hand.slice().sort((a,b)=>rank(a)-rank(b))[0],d=DB[H.d],v=H.v,st=dState(d);
- const fa=v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.webp?v='+IMGV:null;
+ const fa=v==='l'?LG.art(H.d):v==='f'&&d.fk?'fa/'+d.fk.slice(2)+'.webp?v='+IMGV:null;
  const art=fa?`<div class="dx-scene" style="background-image:url(${fa})"></div>`
   :(v==='e'||v==='r')?`<div class="dx-art dx-flat-art" style="background-color:${dcol(d.id)}"><img src="${artOf(d.id)}" alt="" decoding="async"></div>`
   :`<div class="dx-art"><span class="dx-mv">${hasCol(d.id)?artBox(d.id).replace(' loading="lazy"',''):`<span class="ab neu whole" style="--ar:.8"><img src="${artOf(d.id)}" alt=""></span>`}</span></div>`;
- const lab=H._comp?'COLECCIÓN COMPLETA':'LO MEJOR DE TU SOBRE';
+ const lab=H.v==='l'?'★★★★ LEGENDARY':H._comp?'COLECCIÓN COMPLETA':'LO MEJOR DE TU SOBRE';
  const vchips=st.vs.filter(x=>x.st!=='soon').map(x=>`<span class="rh-c${x.h?' on':''}">${x.h?'✓ ':''}${VSHORT[x.v]}</span>`).join('');
  const groups=groupSummaryCards(hand,H),counts=new Map(groups.map(g=>[g.card.k,g.count]));
  const tag=c=>{const qty=counts.get(c.k)||1,total=S.have[c.k]||0;return `<span class="rc-t"><span class="dx-v v-${c.v}">${VSHORT[c.v].toUpperCase()}</span>${c._new?'<span class="rc-n">NUEVA</span>':''}${!c._new||qty>1?`<span class="rc-qty">+${qty}</span><span class="rc-total">${total} en tu colección</span>`:''}</span>`};
@@ -4047,19 +4116,26 @@ function markLogros(){let ch=0;for(const d of DESIGNS){if(S.logro&&S.logro[d.id]
 const fday=f=>{const [y,m,d]=f.split('-').map(Number);return d+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m-1]+(y!==new Date().getFullYear()?' '+y:'')};
 const pips=(st,n=1)=>`<span class="pp">${st.vs.map(x=>`<i class="p ${x.v} ${x.st}"></i>`).join('')}${n?`<b>${st.got}/${st.tot}</b>`:''}</span>`;
 function renderAlbum(){
- const scope=renderPlayer1Panel();
+ const scope=renderPlayer1Panel();if(page===4&&!lgOwned().length)page=0;
  const D=[...scope].map(id=>DB[id]).filter(Boolean).map(d=>({d,st:dState(d)})).filter(x=>!x.d.bx||x.st.own);
  $('pTabs').innerHTML=APAGES.map((p,i)=>{const L=D.filter(x=>!x.d.bx&&p[1](x.d));return `<button class="btn ${i===page?'on':''}" data-p="${i}">${p[0]} <small>${L.reduce((n,x)=>n+x.st.got,0)}/${L.reduce((n,x)=>n+x.st.tot,0)}</small></button>`}).join('');
- const L=D.filter(x=>APAGES[page][1](x.d)),LN=L.filter(x=>!x.d.bx),DN=D.filter(x=>!x.d.bx),g=LN.reduce((n,x)=>n+x.st.got,0),t=LN.reduce((n,x)=>n+x.st.tot,0); // bonus: se ven si las tienes, pero no suman
+ const L=D.filter(x=>APAGES[page===4?0:page][1](x.d)),LN=L.filter(x=>!x.d.bx),DN=D.filter(x=>!x.d.bx),g=LN.reduce((n,x)=>n+x.st.got,0),t=LN.reduce((n,x)=>n+x.st.tot,0); // bonus: se ven si las tienes, pero no suman
  $('aProg').style.width=(t?g/t*100:0)+'%';$('aCount').textContent=DN.reduce((n,x)=>n+x.st.got,0)+' cartas';
  const dn=LN.filter(x=>x.st.all).length;
  $('aSub').innerHTML=`<b>${LN.filter(x=>x.st.own).length}</b> de ${LN.length} diseños descubiertos · ${dn} completos`;
  $('grid').innerHTML=L.map(({d,st})=>!st.own?`<button type="button" class="dt lock" data-release="${player1.numberOf(d.id)||''}" disabled aria-label="Diseño sin descubrir"><span class="cv"><span class="lk"><svg class="p1-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg><span class="p1-lock-name">???</span>${player1.numberOf(d.id)?`<small>#${String(player1.numberOf(d.id)).padStart(3,'0')}</small>`:''}</span></span><span class="p1-unseen">SIN DESCUBRIR</span></button>`:`<button data-release="${player1.numberOf(d.id)||''}" class="dt own ${st.done?'done':''} ${st.all?'all':''} r-${st.cover.r}" data-d="${d.id}" aria-label="${d.n.replace(/"/g,'&quot;')}: ${st.got} de ${st.tot}"><span class="cv fx idle r-${st.cover.r}"><img ${st.cover.img?'data-icmx-original':'src'}="${imgOf(st.cover,'c')}" alt=""><i class="foil"></i><i class="glare"></i>${st.done?'<span class="cr">★</span>':st.was?'<span class="cr was" title="Lo completaste; llegó una versión nueva">★</span>':''}${st.rep?`<span class="x">+${st.rep}</span>`:''}${lastPack.has(d.id)?'<span class="nw">NUEVO</span>':''}</span><span class="p1-card-caption">${esc(d.n)}</span>${pips(st)}</button>`).join('');
  if(!L.length)$('grid').innerHTML='<p class="p1-empty">No hay diseños en este filtro.</p>';
  for(const {d,st} of L)if(st.own)mountFaceValueLazy($('grid').querySelector('.dt[data-d="'+d.id+'"] .fx'),st.cover);
+ if(lgOwned().length){
+ $('pTabs').insertAdjacentHTML('beforeend','<button class="btn lg-tab '+(page===4?'on':'')+'" data-p="4">★★★★ Legendary <small>'+lgOwned().length+'/'+LG_CARDS.length+'</small></button>');
+ if(page===4){
+  $('grid').innerHTML=LG_CARDS.map(c=>S.have[c.k]?'<button type="button" class="dt own lg-tile" data-lg="'+c.k+'"><span class="cv">'+LG.face(c)+'</span><span class="p1-card-caption">'+esc(c.n)+'</span></button>':'<button type="button" class="dt lock lg-tile" disabled aria-label="Legendary sin descubrir"><span class="cv"><span>?</span></span><span class="p1-unseen">SIN DESCUBRIR</span></button>').join('');
+  for(const c of LG_CARDS)if(S.have[c.k])LG.mount($('grid').querySelector('[data-lg="'+c.k+'"] .fx'),c);
+ }
+ }
  if(fd&&$('ficha').classList.contains('on'))renderFicha()}
 $('pTabs').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;page=+b.dataset.p;beep(600,.04);renderAlbum();$('grid').parentNode.scrollTop=0};
-$('grid').onclick=e=>{const t=e.target.closest('.dt.own[data-d]');if(!t||t.disabled||!DB[t.dataset.d]||!dState(DB[t.dataset.d]).own)return;beep(880,.04);openFicha(t.dataset.d)};
+$('grid').onclick=e=>{const lg=e.target.closest('[data-lg]');if(lg){openCard(lg.dataset.lg);return}const t=e.target.closest('.dt.own[data-d]');if(!t||t.disabled||!DB[t.dataset.d]||!dState(DB[t.dataset.d]).own)return;beep(880,.04);openFicha(t.dataset.d)};
 function openFicha(id){if(!DB[id]||!dState(DB[id]).own)return;fd=id;ga('ver_ficha',{diseno:id});renderFicha();$('ficha').classList.add('on');$('ficha').setAttribute('aria-hidden','false');$('ficha').querySelector('.fsh').scrollTop=0}
 function closeFicha(){fd=null;$('ficha').classList.remove('on');$('ficha').setAttribute('aria-hidden','true')}
 function renderFicha(){const d=DB[fd];if(!d||!dState(d).own)return closeFicha();const st=dState(d);
@@ -4096,7 +4172,7 @@ function openCard(k,options={}){
  status.textContent='CARGANDO CARTA';
  img.alt=cc.n+' · '+VN[cc.v];
  img.onload=null;img.onerror=null;
- window.ICMX_CARD_RUNTIME?.reset(fx);
+ LG.clear(fx);window.ICMX_CARD_RUNTIME?.reset(fx);
  img.removeAttribute('src');
  delete img.dataset.icmxDynamic;
  fx.querySelectorAll(':scope > svg.icmx-data').forEach(el=>el.remove());
@@ -4115,7 +4191,7 @@ function openCard(k,options={}){
   fx.classList.add('idle');
   status.textContent='';
  };
- setVoting(true);
+ setVoting(cc.v!=='l');
  if(!zoom.open)zoom.showModal();
  // Un solo montaje controla imagen, SVG y fallback; no hay decode competidor.
  if(cc.img&&window.ICMX_CARD_RUNTIME){
@@ -4696,7 +4772,7 @@ async function frame(x,W,H,title){x.fillStyle='#0c0b2a';x.fillRect(0,0,W,H);x.fi
  const lg=await li('logo.png');if(lg)x.drawImage(lg,W/2-60,H-120,120,120*lg.height/lg.width)}
 async function shareGrid(title,keys,name){toast('PREPARANDO IMAGEN...');await document.fonts.ready;const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');await frame(x,W,H,title);
  const n=keys.length,cols=n===1?1:3,cw=n===1?560:300,ch=cw*670/480,rows=Math.ceil(n/cols);let y0=(H-rows*ch-(rows-1)*24)/2;
- for(let i=0;i<n;i++){const card=CB[cardKey(keys[i])||keys[i]];const row=i/cols|0,inRow=Math.min(cols,n-row*cols),col=i%cols;const x0=(W-inRow*cw-(inRow-1)*24)/2+col*(cw+24);if(card)await window.ICMX_CARD_RUNTIME.drawInto(x,card,updateCardValueUI(card),x0,y0+row*(ch+24),cw,ch)}
+ for(let i=0;i<n;i++){const card=CB[cardKey(keys[i])||keys[i]];const row=i/cols|0,inRow=Math.min(cols,n-row*cols),col=i%cols;const x0=(W-inRow*cw-(inRow-1)*24)/2+col*(cw+24);if(card?.v==='l')await LG.drawInto(x,card,x0,y0+row*(ch+24),cw,ch);else if(card)await window.ICMX_CARD_RUNTIME.drawInto(x,card,updateCardValueUI(card),x0,y0+row*(ch+24),cw,ch)}
  deliver(cv,name)}
 async function shareTier(){toast('PREPARANDO IMAGEN...');await document.fonts.ready;const W=1080,cw=96,ch=120,per=9;const m=tierKeys();const rows=TN.map((_,i)=>m.filter(c=>S.rate[c.k]===i));
  const hs=rows.map(r=>Math.max(1,Math.ceil(r.length/per))*(ch+8)+12);const H=Math.max(1350,170+hs.reduce((a,b)=>a+b+12,0)+150);
@@ -4820,6 +4896,7 @@ $('communityRankRows').addEventListener('click',e=>{const b=e.target.closest('[d
 if(MIGD)save(); // progreso del modelo anterior ya convertido: guardarlo
 claimPend();initSound();go('home');if(!LAB_ENTRY_FLOW)$('title').classList.remove('on');
 if(ON_PREVIEW){$('title').classList.remove('on');onMode='entry';onI=0;showOn()}
+const lgPreview=new URLSearchParams(location.search).get('legendary');if(LG.ids.includes(lgPreview)||lgPreview==='none'){labForceLegendary=lgPreview;go('pack')}
 /* Integración segura: nunca reemplaza un progreso distinto sin revisión.
    Los visitantes sin sesión continúan jugando y guardando localmente. */
 /* Laboratorio: sin backend y sin cuentas reales. */
@@ -4841,6 +4918,9 @@ if(ON_PREVIEW){$('title').classList.remove('on');onMode='entry';onI=0;showOn()}
    labHomePreview={ready:!!ready,dups};mi=0;closeMenu();go('home');return;
   }
   labHomePreview=null;
+  if(b.dataset.labLegendary!==undefined){
+   closeMenu();labForceLegendary=b.dataset.labLegendary;go('pack');return;
+  }
   if(b.dataset.labPop!==undefined){
    syncIn();
    let card=AV.find(c=>!c.bx&&c.img&&S.have[c.k])||AV.find(c=>!c.bx&&c.img&&c.v==='b');

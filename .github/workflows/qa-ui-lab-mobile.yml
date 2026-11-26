@@ -9,6 +9,7 @@ on:
       - 'content/card-runtime.js'
       - 'content/card-renderer.js'
       - 'qa/design-system-browsers.mjs'
+      - 'qa/legendary-lab-browsers.mjs'
       - 'scripts/generate-artwork-backgrounds.py'
       - 'content/design-tokens.css'
       - 'content/ui-components.css'
@@ -57,6 +58,8 @@ jobs:
         run: node qa/design-system-browsers.mjs
       - name: Comparar cartas dinámicas dentro del LAB
         run: node qa/design-system-card-dynamic-browsers.mjs
+      - name: Probar Legendary en sobres y álbum reales
+        run: node qa/legendary-lab-browsers.mjs
       - name: Conservar capturas del LAB
         if: always()
         uses: actions/upload-artifact@v4
