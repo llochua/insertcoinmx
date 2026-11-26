@@ -293,6 +293,24 @@
         "cartas/arte/virtual.png": "2cc9061ee14c749178714dc59a1d43d36dac2a8da838b12936f8bb6e2de49f93",
         "cartas/full/virtual.jpg": "a8c094846fcfb1576c564d60089bee77f3f5f437924ce3832059f5637f8c72a8"
       }
+    },
+    "navidadgamer": {
+      "outputs": {
+        "c/F_navidadgamer.webp": "24372e522b69b614240c8e9853cecd0a9eab3a62a58a776d8a163d5f84a2b166",
+        "c/navidadgamer.webp": "3f3cc31ca6a1ffdd6c0c2d578fa2339a3823195912a9c8c5f1c6a24665cbbc6f",
+        "c/navidadgamer_e.webp": "ef6525337059212358d115b864d1d14c77303e75ba41eaf812701d6838c6b360",
+        "c/navidadgamer_r.webp": "75065a1cb782b7b9107ccfc2a886b4ba32813767c2a3ac429d0c1db00b542dbf",
+        "c2/F_navidadgamer.webp": "a11398f01d591244aa6f4be97c5325a90ce56247d87ff2129091206d7493baf9",
+        "c2/navidadgamer.webp": "c8b3026700046246b375488ad53fe57bba0851464f547426c6466f972d1ec9eb",
+        "c2/navidadgamer_e.webp": "70e883a3efa4d595c5f63cb20bbc0cc0c59d4f9abe5dc8605e3ef6ea15af53a5",
+        "c2/navidadgamer_r.webp": "bc8acc0cf7951b74294284b73796b80a6bce9cbaa4363ac8444ab849c12ea33c",
+        "d/navidadgamer.webp": "3dbfa59054eb9575341f1547da670a85037b849a63acb66518909057f52b1e8d",
+        "fa/navidadgamer.webp": "5ec6106bd14273c8399483b655b93f42cba511fda8020447e75573ede97cf2f9"
+      },
+      "sources": {
+        "cartas/arte/navidadgamer.png": "4a7f54e72017df1f0fc67bb4e50965916b1612291262d1017a7f3d9b93b9592d",
+        "cartas/full/navidadgamer.jpg": "1e3017794c8155be913a79b5a1969cfbacc5408faa9faf3bd6b92ddcf75c1f48"
+      }
     }
   },
   "version": 1

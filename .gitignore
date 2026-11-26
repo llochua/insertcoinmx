@@ -1,2 +1,5 @@
 cartas/muestra.jpg
 __pycache__/
+.respaldo/
+.qa-cartas/
+node_modules

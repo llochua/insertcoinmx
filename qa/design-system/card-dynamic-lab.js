@@ -6,7 +6,7 @@ const ID='icmxDynamicLab';
 const qs=x=>document.getElementById(x);
 const variants={b:'Base',e:'Holo',r:'Dorada',f:'Full'};
 const pointsByVariant={b:10,e:25,r:50,f:100};
-const choices=['1up','sonic','abuket','aku','babyonboard','bitwars','booit','bort','captor','carton','enjoy','universe','versus','virtual','triforce','thankyou'];
+const choices=['1up','sonic','abuket','aku','babyonboard','bitwars','booit','bort','captor','carton','enjoy','universe','versus','virtual','triforce','thankyou','navidadgamer'];
 const css=document.createElement('style');
 css.textContent=`
 #${ID}{position:fixed;inset:0;z-index:20000;overflow-y:auto;background:#101024;color:#fff;padding:clamp(12px,3vw,30px);font:14px/1.4 AV,system-ui,sans-serif}
@@ -42,7 +42,7 @@ container.innerHTML=`<div class="icmx-lab-inner">
 <header><h2 id="icmxDynamicLabTitle">CARTAS DINÁMICAS · LAB</h2><button class="lab-close" id="icmxDynamicLabClose" type="button">CERRAR ×</button></header>
 <p>Comparación real del LAB. Izquierda: carta aprobada en imagen. Derecha: el mismo arte con textos y valores variables. No altera tu colección LAB.</p>
 <div class="dyn-fields">
-<label>Diseño<select id="dynDesign"><option value="1up">1UP</option><option value="sonic">Sonic</option><option value="abuket">Abuket</option><option value="aku">Aku</option><option value="babyonboard">Baby on Board</option><option value="bitwars">Guerra de los 16 Bits</option><option value="booit">Boo It</option><option value="bort">Bort</option><option value="captor">Captor</option><option value="carton">Recojo Cartón</option><option value="enjoy">Enjoy the Little Things</option><option value="universe">Universe</option><option value="versus">Versus</option><option value="virtual">Virtual</option><option value="triforce">Triforce</option><option value="thankyou">Thank You</option></select></label>
+<label>Diseño<select id="dynDesign"><option value="1up">1UP</option><option value="sonic">Sonic</option><option value="abuket">Abuket</option><option value="aku">Aku</option><option value="babyonboard">Baby on Board</option><option value="bitwars">Guerra de los 16 Bits</option><option value="booit">Boo It</option><option value="bort">Bort</option><option value="captor">Captor</option><option value="carton">Recojo Cartón</option><option value="enjoy">Enjoy the Little Things</option><option value="universe">Universe</option><option value="versus">Versus</option><option value="virtual">Virtual</option><option value="triforce">Triforce</option><option value="thankyou">Thank You</option><option value="navidadgamer">Navidad Gamer</option></select></label>
 <label>Rareza<select id="dynVariant"><option value="b">Base</option><option value="e">Holo</option><option value="r">Dorada</option><option value="f">Full</option></select></label>
 <label>PTS<input id="dynPoints" type="number" min="0" max="999999" value="10" inputmode="numeric"></label>
 <label>POP<input id="dynPop" type="number" min="0" max="1000" placeholder="—" inputmode="numeric"></label>
