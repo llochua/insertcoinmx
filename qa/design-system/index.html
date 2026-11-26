@@ -2381,7 +2381,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
  <div class="tray"><div class="h" id="tHint"></div><div class="z" id="tTray"></div></div>
 </section>
 <section class="view" id="torneo">
- <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Reta</h1><span class="sp"></span><button type="button" id="retaReroll" class="reta-reroll" aria-label="Cambiar retadores" title="Cambiar retadores"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg><b id="retaLeft">3</b></button><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div><div id="vRound" style="justify-content:center;padding:0 12px 6px"></div>
+ <div class="top"><button class="vback" data-home aria-label="Menú"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button><h1 class="vt">Reta</h1><span class="sp"></span><button type="button" id="retaReroll" class="reta-reroll" aria-label="Ver mi Top Insert" title="Ver mi Top Insert"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v6a5 5 0 0 1-10 0V4ZM7 6H3v2a4 4 0 0 0 4 4M17 6h4v2a4 4 0 0 1-4 4"/></svg><b id="retaLeft">TOP</b></button><button type="button" class="sound-toggle" data-sound-toggle aria-label="Activar o silenciar música y efectos" aria-pressed="true"></button></div><div id="vRound" style="justify-content:center;padding:0 12px 6px"></div>
  <div class="stage" id="vStage"></div>
 </section>
 <section class="view" id="scores">
@@ -4216,7 +4216,7 @@ function retaHash(txt){
  return h>>>0;
 }
 function retaValid(r,pool){
- if(!r||typeof r!=='object'||!DRE.test(r.day)||r.day<today())return false;
+ if(!r||typeof r!=='object'||!DRE.test(r.day))return false;
  if(!Array.isArray(r.roster)||r.roster.length!==8||new Set(r.roster).size!==8)return false;
  const ids=new Set(pool.map(d=>d.id));
  if(!r.roster.every(k=>ids.has(k)))return false;
@@ -4224,64 +4224,57 @@ function retaValid(r,pool){
  if(!r.roster.includes(r.champion)||!r.roster.includes(r.top)||!r.roster.includes(r.bottom)||r.top===r.bottom)return false;
  return true;
 }
-const RETA_REROLLS=3;
-function retaNueva(pool,reroll=false){
- const prev=S.reta2||{},day=today(),used=prev.day===day?Math.max(0,Math.min(RETA_REROLLS,prev.rerolls|0)):0;
- let seed=reroll?Math.floor(Math.random()*0x7fffffff)+1:(Number.isInteger(prev.seed)&&prev.seed>0?prev.seed:Math.floor(Math.random()*0x7fffffff)+1);
- // Al reiniciar una Reta terminada, el campeón previo es el de AYER,
- // no la ganadora provisional de hoy (S.champ).
- const previousChampion=reroll&&prev.day===day?prev.lastChampion:S.champ;
- const prior=previousChampion&&pool.some(d=>d.id===previousChampion)?previousChampion:null;
- const history=Array.isArray(prev.history)?prev.history.filter(h=>h&&(!reroll||h.day!==day)).slice(-30):[];
- const preDayDefenses=reroll
-  ?(Number.isInteger(prev.startingDefenses)?Math.max(0,prev.startingDefenses):Math.max(0,history.length?(history[history.length-1].defenses|0):0))
-  :Math.max(0,prev.defenses|0);
- const rosterFor=n=>{
-  const sorted=pool.slice().sort((a,b)=>retaHash(n+':'+day+':'+a.id)-retaHash(n+':'+day+':'+b.id)||a.id.localeCompare(b.id));
-  const first=prior||sorted[0].id;
-  return [first,...sorted.filter(d=>d.id!==first).slice(0,7).map(d=>d.id)];
- };
- let roster=rosterFor(seed);
- if(reroll&&Array.isArray(prev.roster)){
-  for(let i=0;i<10&&roster.join('|')===prev.roster.join('|');i++){
-   seed=(seed+7919)%0x7fffffff||1;roster=rosterFor(seed);
-  }
+function retaPersonal(r){
+ if(r?.personal?.ratings&&r.personal.pairs)return r.personal;
+ const p={ratings:{},pairs:{}};
+ for(const m of Array.isArray(r?.matches)?r.matches:[])if(m&&m.winner&&m.loser&&m.winner!==m.loser)retaScore(p,m.winner,m.loser);
+ if(r)r.personal=p;
+ return p;
+}
+function retaScore(p,w,l){
+ const a=p.ratings[w]||(p.ratings[w]={elo:1500,n:0,w:0}),b=p.ratings[l]||(p.ratings[l]={elo:1500,n:0,w:0});
+ const change=32*(1-1/(1+10**((b.elo-a.elo)/400)));
+ a.elo+=change;b.elo-=change;a.n++;b.n++;a.w++;
+ const [x,y]=[w,l].sort();const group=p.pairs[x]||(p.pairs[x]={});
+ const pair=group[y]||(group[y]={n:0,winner:w});pair.n++;pair.winner=w;
+}
+function retaTop(pool,r=S.reta2){
+ const p=retaPersonal(r);
+ return pool.filter(d=>p.ratings[d.id]?.w>0).map(d=>({id:d.id,...p.ratings[d.id]}))
+  .sort((a,b)=>b.elo-a.elo||b.w-a.w||a.id.localeCompare(b.id)).slice(0,5);
+}
+function retaNueva(pool){
+ const prev=S.reta2||{},personal=retaPersonal(prev),day=today(),seed=Math.floor(Math.random()*0x7fffffff)+1;
+ const pairCount=(a,b)=>{const [x,y]=[a,b].sort();return personal.pairs[x]?.[y]?.n||0};
+ const exposure=d=>personal.ratings[d.id]?.n||0;
+ const tie=(a,b)=>retaHash(seed+':'+a.id)-retaHash(seed+':'+b.id)||a.id.localeCompare(b.id);
+ const remaining=pool.slice().sort((a,b)=>exposure(a)-exposure(b)||tie(a,b));
+ const roster=[remaining.shift().id];
+ while(roster.length<8){
+  remaining.sort((a,b)=>{
+   const cost=d=>roster.reduce((n,id)=>n+pairCount(id,d.id),0);
+   return Number(exposure(a)>0)-Number(exposure(b)>0)||cost(a)-cost(b)||exposure(a)-exposure(b)||tie(a,b);
+  });
+  roster.push(remaining.shift().id);
  }
- const first=roster[0];
- return {day,seed,roster,round:0,champion:first,top:roster[0],bottom:roster[1],
-  streak:0,lastChampion:prior,startingChampion:first,lastSide:'top',
-  rerolls:used+(reroll?1:0),
-  done:false,matches:[],titleDefended:false,defenses:preDayDefenses,startingDefenses:preDayDefenses,
-  history};
+ const first=roster[0],prior=pool.some(d=>d.id===S.champ)?S.champ:null;
+ return {day,seed,roster,round:0,champion:first,top:first,bottom:roster[1],streak:0,lastChampion:prior,startingChampion:first,lastSide:'top',rerolls:0,done:false,matches:[],titleDefended:false,defenses:prev.defenses||0,startingDefenses:prev.defenses||0,history:Array.isArray(prev.history)?prev.history.slice(-29):[],personal};
 }
 function retaRerollUI(pool){
- const r=S.reta2,active=!!r&&r.day===today()&&retaValid(r,pool);
- const used=active?Math.max(0,Math.min(RETA_REROLLS,r.rerolls|0)):0;
- const left=RETA_REROLLS-used,btn=$('retaReroll');
- $('retaLeft').textContent=String(left);
- // El resultado de una Reta terminada no consume los cambios sin usar.
- btn.disabled=!active||left===0;
- btn.title=left?'Cambiar retadores: '+left+' cambios disponibles':'Sin cambios disponibles por hoy';
- btn.setAttribute('aria-label',btn.title);
+ const btn=$('retaReroll');btn.disabled=!retaValid(S.reta2,pool);
+ btn.title='Ver mi Top Insert';btn.setAttribute('aria-label',btn.title);
 }
 $('retaReroll').onclick=()=>{
- syncIn();const r=S.reta2,pool=retaPool();
- if(!retaValid(r,pool)||(r.rerolls|0)>=RETA_REROLLS){retaRerollUI(pool);return}
- const restart=()=>withLock(()=>{
-  syncIn();const current=S.reta2,available=retaPool();
-  if(!retaValid(current,available)||(current.rerolls|0)>=RETA_REROLLS){retaRerollUI(available);return}
-  const next=retaNueva(available,true);
-  // Revertir únicamente la campeona provisional de hoy cuando había finalizado.
-  // El registro definitivo se volverá a escribir al completar la nueva Reta.
-  if(current.done)S.champ=current.lastChampion||'';
-  S.reta2=next;
-  if(!save())toast('CAMBIO PENDIENTE DE GUARDAR');
-  ga('reta_cambio_retadores',{usados:next.rerolls,restantes:RETA_REROLLS-next.rerolls});
+ const f=$('retaLive');if(f)f.contentWindow.postMessage({type:'icmx-reta-top',rows:retaTop(retaPool())},location.origin);
+};
+function retaRestart(f){
+ withLock(()=>{
+  syncIn();const pool=retaPool();if(pool.length<8||!S.reta2?.done)return;
+  S.reta2=retaNueva(pool);
+  if(!save())toast('RETA: GUARDADO PENDIENTE');
   startTorneo();
  });
- if(r.round>0)uxShow({kicker:'RETA · CAMBIAR RETADORES',title:r.done?'¿Jugar otra Reta?':'¿Cambiar los enfrentamientos?',desc:r.done?'Tu resultado de hoy será reemplazado por el de la nueva Reta. Tus cartas y sobres siguen intactos.':'Se reiniciarán tus elecciones de esta Reta. Tus cartas y sobres siguen intactos.',note:'Te quedan '+(RETA_REROLLS-(r.rerolls|0))+' cambios hoy.',primary:'CAMBIAR PLAYERAS',secondary:'SEGUIR JUGANDO',onPrimary:restart});
- else restart();
-};
+}
 function retaUnlockCopy(count){
  const missing=8-count;
  return 'Tienes '+count+' de 8 diseños. '+(missing===1?'Te falta 1':'Te faltan '+missing)+' para jugar tu primera Reta';
@@ -4322,14 +4315,15 @@ function startTorneo(){
   S.reta2=retaNueva(pool);
   if(save())ga('reta_iniciada',{dia:S.reta2.day,retadores:7});
  }
+ retaPersonal(S.reta2);
  retaRerollUI(pool);
  retaOver=!!S.reta2.done;
- $('vStage').innerHTML='<iframe id="retaLive" class="reta-iframe" src="reta-diaria.html?embedded=1" title="Reta de playeras · 7 encuentros" loading="eager"></iframe>';
+ $('vStage').innerHTML='<iframe id="retaLive" class="reta-iframe" src="qa/design-system/reta-persistente.html?embedded=1&amp;v=1" title="Reta de playeras · 7 encuentros" loading="eager"></iframe>';
 }
 function retaInitFrame(f){
  const pool=retaPool();
  if(!retaValid(S.reta2,pool)){startTorneo();return}
- f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,packsAvailable:packReady(),canTrade:dups()>=TRADE_COST,audioMuted:soundMuted},location.origin);
+ f.contentWindow.postMessage({type:'icmx-reta-init',state:JSON.parse(JSON.stringify(S.reta2)),catalog:pool,rows:retaTop(pool),packsAvailable:packReady(),canTrade:dups()>=TRADE_COST,audioMuted:soundMuted},location.origin);
 }
 function retaElegir(f,msg){
  withLock(()=>{
@@ -4341,6 +4335,7 @@ function retaElegir(f,msg){
    retaInitFrame(f);return;
   }
   const lost=msg.side==='top'?'bottom':'top',previous=r.champion;
+  retaScore(retaPersonal(r),msg.winner,r[lost]);
   if(Array.isArray(r.matches)&&r.matches.length===r.round)r.matches.push({winner:msg.winner,loser:r[lost]});
   r.champion=msg.winner;r.streak=msg.winner===previous?r.streak+1:1;
   r.lastSide=msg.side;
@@ -4356,7 +4351,8 @@ function retaElegir(f,msg){
    ga('reta_completada',{campeona:r.champion,defendida:r.titleDefended?1:0});
   }else{r[lost]=r.roster[r.round+1]}
   const ok=save();
-  if(ok&&r.done&&r.matches?.length===7)communityReta(r.day,r.matches);
+  // LAB: no community votes; the latest winner per pair is kept only in personal.pairs.
+  if(ok)f.contentWindow.postMessage({type:"icmx-reta-top-update",rows:retaTop(retaPool())},location.origin);
   if(!ok)toast('RETA: GUARDADO PENDIENTE');
   retaRerollUI(retaPool());
   ga('reta_eleccion',{ronda:r.round,diseno:msg.winner,campeona:r.champion});
@@ -4369,6 +4365,7 @@ window.addEventListener('message',e=>{
  if(!m||typeof m!=='object')return;
  if(m.type==='icmx-reta-ready')retaInitFrame(f);
  if(m.type==='icmx-reta-choice')retaElegir(f,m);
+ if(m.type==='icmx-reta-restart')retaRestart(f);
  if(m.type==='icmx-reta-pack'&&S.reta2&&m.day===S.reta2.day){
   syncIn();
   if(m.action==='album')go('album');
