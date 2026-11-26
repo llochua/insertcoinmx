@@ -420,7 +420,8 @@ INSERT INTO private_sync.pack_pool(card_key,variant) VALUES
 ('enjoy_f','f'),
 ('universe_f','f'),
 ('versus_f','f'),
-('virtual_f','f')
+('virtual_f','f'),
+('navidadgamer_f','f')
 ON CONFLICT (card_key) DO UPDATE SET variant=EXCLUDED.variant;
 -- Evitar eliminar o cambiar filas al actualizar el catálogo: el proceso de
 -- baja de diseños necesita una migración revisada expresamente.

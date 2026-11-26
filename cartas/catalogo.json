@@ -706,15 +706,15 @@
  {
   "id": "navidadgamer",
   "nombre": "Navidad Gamer",
-  "disenado_por": "",
+  "disenado_por": "Mago",
   "categoria": "GAMER",
   "numero": "067/109",
   "ref": "Suéter navideño",
   "ref2": "",
-  "linea": "Abre los regalos antes de la cena de Navidad.",
+  "linea": "Teje cualquier sprite, si no trae gorrito.",
   "frase": "El suéter feo que sí queremos usar.",
   "tipo": "Álbum",
-  "full": "",
+  "full": "F87",
   "arte": "diseños/navidadgamer.png",
   "estado": "Propuesta · revisar",
   "version_original": "comun"
