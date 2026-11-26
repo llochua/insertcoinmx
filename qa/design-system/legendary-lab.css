@@ -13,13 +13,22 @@
 .fx.r-legendary:hover>.lg-shine{opacity:.48}
 .fx.r-legendary>.lg-data{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
 .lg-data text{font-family:Arial,system-ui,sans-serif;font-weight:800;text-anchor:middle}
-#pack .env.cut.lg-secret .pk,#pack .env.cut.lg-odd .pk{animation:lgPack 1.6s ease-in-out both!important}
-#pack .env.cut.lg-secret .pk{filter:drop-shadow(0 0 18px #d7aaff) drop-shadow(0 0 32px #80fff5)!important}
-#pack .env.cut.lg-secret .pk img{filter:hue-rotate(190deg) saturate(.65) contrast(1.35)}
-#pack .env.cut.lg-odd .pk img{filter:hue-rotate(50deg) saturate(1.3)}
-#pack .env.cut.lg-secret .pk:after,#pack .env.cut.lg-odd .pk:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 7px,#d9b9ff45 8px 9px,transparent 10px 16px);mix-blend-mode:screen;pointer-events:none;animation:lgScan .5s linear 3}
-@keyframes lgPack{0%{transform:scale(1);opacity:1}16%{transform:translateX(-5px) scale(1.03)}25%{transform:translateX(4px) skewX(-2deg)}40%{transform:translateX(0) scale(1.09)}75%{transform:scale(1.08);opacity:1}100%{transform:scale(1.16);opacity:0}}
-@keyframes lgScan{from{background-position:0 0}to{background-position:0 16px}}
+/* Corrupt the packet image itself: horizontal image slices, RGB offsets, material change. */
+#pack .env.cut:is(.lg-secret,.lg-odd) .pk{animation:lgPacketHold 2.2s linear both!important;filter:drop-shadow(0 0 15px #a6b9db70) drop-shadow(0 20px 22px #000b)!important;isolation:isolate}
+#pack .env.cut:is(.lg-secret,.lg-odd) .pk>.pkimg{animation:lgPacketMaterial 2.2s linear both}
+#pack .env.cut:is(.lg-secret,.lg-odd) .pkshine{animation:none!important;opacity:0}
+#pack .env.cut:is(.lg-secret,.lg-odd) .pk-top{visibility:hidden}
+#pack .lg-corruption{position:absolute;inset:0;z-index:4;pointer-events:none}
+#pack .lg-corruption>img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;clip-path:inset(var(--top) 0 var(--bottom) 0);filter:grayscale(.6) brightness(1.15) drop-shadow(3px 0 #80e8ec) drop-shadow(-3px 0 #bb80df);animation:lgPacketSlice 2.2s linear both;animation-delay:var(--delay)}
+#pack .lg-corruption>.lg-static{position:absolute;inset:0;mask:url('../../sobre.png') center/100% 100% no-repeat;background:repeating-linear-gradient(0deg,transparent 0 3px,#c6c8eb32 3px 4px,transparent 4px 7px);mix-blend-mode:screen;opacity:0;animation:lgPacketStatic 2.2s linear both}
+#pack .lg-corruption>.lg-seam{position:absolute;left:3%;right:5%;top:12%;height:2px;transform:rotate(-4deg);background:#c3d7f0;box-shadow:0 0 9px #b09cdb,0 0 20px #8ce1dd;opacity:0;animation:lgPacketSeam 2.2s linear both}
+#pack .env.cut.lg-secret .pk>.pkimg{--lg-final:grayscale(.95) brightness(.72) contrast(1.25)}
+#pack .env.cut.lg-odd .pk>.pkimg{--lg-final:grayscale(.15) brightness(1) contrast(1.05)}
+@keyframes lgPacketHold{0%,78%{transform:none;opacity:1}90%{transform:translateY(-3px) scale(1.015);opacity:1}100%{transform:translateY(-22px) scale(1.065);opacity:0}}
+@keyframes lgPacketMaterial{0%,10%{filter:none}24%,60%{filter:grayscale(.88) brightness(.72) contrast(1.2)}77%,100%{filter:var(--lg-final)}}
+@keyframes lgPacketSlice{0%,13%{opacity:0;transform:none}14%,25%{opacity:.92;transform:translateX(var(--dx))}26%,33%{opacity:0;transform:none}34%,51%{opacity:.86;transform:translateX(calc(var(--dx)*-.65))}52%,61%{opacity:0;transform:none}62%,71%{opacity:.65;transform:translateX(calc(var(--dx)*.4))}72%,100%{opacity:0;transform:none}}
+@keyframes lgPacketStatic{0%,10%{opacity:0}20%,65%{opacity:.75;background-position:0 10px}78%,100%{opacity:0}}
+@keyframes lgPacketSeam{0%,66%{opacity:0}82%{opacity:1}100%{opacity:.4}}
 .disc.dx.lg-reveal{background:#0a0811!important;--bg:#0a0811!important}
 .lg-reveal .lg-stage{position:absolute;inset:68px 14px 92px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;z-index:2}
 .lg-reveal .lg-stage .fx{width:min(84%,42dvh,390px);height:auto;aspect-ratio:960/1340;box-shadow:0 0 34px #9c75d63d,0 18px 40px #000b;flex:none}
@@ -38,3 +47,48 @@
 #grid .lg-tile:not(.own) .cv span{font-size:25px}
 @media(max-height:620px){.lg-reveal .lg-stage{inset:57px 12px 73px;gap:5px}.lg-reveal .lg-stage .fx{width:min(78%,37dvh,390px)}.lg-reveal .lg-copy strong{font-size:14px}.lg-reveal .lg-copy{font-size:10px}}
 @media(prefers-reduced-motion:reduce){#pack .env.cut.lg-secret .pk,#pack .env.cut.lg-odd .pk,#pack .env.cut.lg-secret .pk:after,#pack .env.cut.lg-odd .pk:after,.lg-reveal .lg-burst{animation:none!important}}
+
+/* Legendary: anticipation, rupture, cinematic title, then the collectible. */
+.disc.dx.lg-reveal{overflow:hidden;isolation:isolate}
+.lg-reveal .lg-stage{perspective:950px;isolation:isolate}
+.lg-reveal .lg-aura{position:absolute;inset:6% -15% 3%;pointer-events:none;z-index:-1;overflow:hidden}
+.lg-reveal .lg-aura:before,.lg-reveal .lg-aura:after{content:"";position:absolute;inset:9%;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 12%,#7672cf70 24%,transparent 37% 52%,#77d6df85 68%,transparent 83%);filter:blur(26px);animation:lgOrbit 6s linear infinite}
+.lg-reveal .lg-aura:after{inset:22% 5%;animation:lgOrbit 9s linear infinite reverse;opacity:.65}
+@keyframes lgOrbit{to{transform:rotate(360deg)}}
+.lg-reveal .lg-back{position:relative;z-index:1;isolation:isolate;overflow:hidden;border:1px solid #e0d1f0;background:linear-gradient(150deg,#181522,#0a0910 52%,#312941);box-shadow:0 0 12px #b5a5e080,0 0 45px #8072ba55,0 24px 45px #000b;animation:lgHover 3.4s ease-in-out infinite}
+.lg-reveal .lg-back:before{content:"";position:absolute;inset:-65%;z-index:-1;background:conic-gradient(transparent 0 32%,#a59ed22e 38%,#e9e2ffb0 41%,#7be0dd85 44%,transparent 49% 78%,#9b7fcf55 84%,transparent 90%);animation:lgOrbit 4s linear infinite}
+.lg-reveal .lg-back:after{content:"";position:absolute;inset:3px;border-radius:12px;z-index:-1;background:radial-gradient(circle at 50% 50%,#342d48,#100c1b 68%),repeating-linear-gradient(0deg,transparent 0 4px,#c6b2f015 4px 5px);box-shadow:inset 0 0 24px #b39ada35}
+.lg-reveal .lg-mark{font:700 clamp(44px,10vw,78px) AV,system-ui,sans-serif;color:#f4eaff;text-shadow:0 0 8px #bca2ed,0 0 30px #9bbbe8;animation:lgMark 3.4s ease-in-out infinite}
+.lg-reveal .lg-sweep{position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,transparent 34%,#c3d8ff30 47%,#fff5 50%,transparent 58%);background-size:250% 250%;animation:lgSweep 3.4s ease-in-out infinite}
+.lg-reveal .lg-signal{font:700 clamp(10px,2.8vw,15px)/1.5 AV,system-ui,sans-serif;letter-spacing:.13em;color:#f0e8ff;animation:lgSignal 2.4s ease-in-out infinite;text-shadow:0 0 10px #a9b5e4}
+@keyframes lgHover{0%,100%{transform:translateY(0) rotateY(-5deg)}50%{transform:translateY(-10px) rotateY(5deg)}}
+@keyframes lgMark{0%,100%{transform:scale(.95);opacity:.78}50%{transform:scale(1.09);opacity:1}}
+@keyframes lgSweep{0%,10%{background-position:100% 100%}70%,100%{background-position:0 0}}
+@keyframes lgSignal{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(-3px);opacity:1;letter-spacing:.17em}}
+.lg-reveal .lg-charging .lg-back{animation:lgCharge .58s cubic-bezier(.4,0,.7,1) both}
+.lg-reveal .lg-charging .lg-aura{animation:lgChargeAura .58s ease-in both}
+@keyframes lgCharge{0%{transform:scale(1)}45%{transform:scale(.92) rotateY(12deg);filter:brightness(1.2)}100%{transform:scale(.08,1.07) rotateY(85deg);opacity:.15}}
+@keyframes lgChargeAura{to{transform:scale(.3);opacity:.9}}
+.lg-reveal .lg-stage.lg-burst{animation:none}
+.lg-reveal .lg-stage.lg-burst .fx{animation:lgCardArrival 2.45s cubic-bezier(.16,.8,.2,1) both}
+.lg-reveal .lg-stage.lg-burst .lg-copy{animation:lgCopyArrival 2.45s ease both}
+@keyframes lgCardArrival{0%,16%{opacity:0;transform:scale(.72) rotateY(-36deg)}31%{opacity:1;transform:scale(1.07) rotateY(8deg)}48%{transform:scale(.97) rotateY(-3deg)}68%,100%{opacity:1;transform:scale(1) rotateY(0)}}
+@keyframes lgCopyArrival{0%,68%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:none}}
+.lg-reveal .lg-cinema{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden;display:grid;place-items:center;isolation:isolate;animation:lgCinemaEnd 2.45s linear both}
+.lg-reveal .lg-cinema:before{content:"";position:absolute;inset:-18%;z-index:-1;background:radial-gradient(ellipse at center,#efe8ff9c 0%,#a7a4ee6b 12%,#7363a635 26%,transparent 60%),conic-gradient(from 28deg,transparent,#b5b9fb48,transparent 25%,#79d4de48,transparent 52%,#c79ced50,transparent 80%);animation:lgShock 2.45s ease-out both}
+.lg-reveal .lg-cinema:after{content:"";position:absolute;inset:10%;border:1px solid #c6c5f5;border-radius:12px;box-shadow:0 0 24px #b6a4ef66,inset 0 0 18px #8cd8f155;animation:lgWave 2.45s ease-out both}
+.lg-reveal .lg-cinema-title{position:relative;display:grid;justify-items:center;gap:10px;text-align:center;animation:lgTitle 2.45s ease both}
+.lg-reveal .lg-cinema-title small{font:700 clamp(9px,2.6vw,13px)/1.4 AV,system-ui,sans-serif;letter-spacing:.23em;color:#f9f2ff;text-shadow:0 2px 12px #000}
+.lg-reveal .lg-cinema-title strong{font:clamp(22px,6.7vw,45px)/1.2 PX,monospace;color:#f5eeff;letter-spacing:.03em;text-shadow:0 0 12px #a7baf2,0 3px 0 #5c4f83,0 7px 22px #000}
+.lg-reveal .lg-cinema-title span{font-size:19px;letter-spacing:.35em;color:#e4e0ff;text-shadow:0 0 14px #a7c6fd}
+.lg-reveal .lg-particle{position:absolute;left:50%;top:50%;height:2px;width:clamp(16px,7vw,55px);background:linear-gradient(90deg,transparent,#d9ddff);box-shadow:0 0 8px #a8baff;transform-origin:0 50%;animation:lgParticle 2.45s ease-out both;transform:rotate(var(--angle))}
+@keyframes lgCinemaEnd{0%{opacity:1;background:#090812d9}24%{background:#09081260}60%{opacity:1;background:transparent}100%{opacity:0;background:transparent}}
+@keyframes lgShock{0%{opacity:.15;transform:scale(.12) rotate(-25deg)}20%{opacity:1;transform:scale(.85) rotate(0)}65%{opacity:.5;transform:scale(1.3) rotate(30deg)}100%{opacity:0;transform:scale(1.7) rotate(45deg)}}
+@keyframes lgWave{0%{opacity:0;transform:scale(.3)}23%{opacity:.9;transform:scale(.65)}65%,100%{opacity:0;transform:scale(1.45)}}
+@keyframes lgTitle{0%,20%{opacity:0;transform:scale(.82)}33%,61%{opacity:1;transform:scale(1)}79%,100%{opacity:0;transform:scale(1.06)}}
+@keyframes lgParticle{0%,14%{opacity:0;transform:rotate(var(--angle)) translateX(0)}25%{opacity:.9}75%,100%{opacity:0;transform:rotate(var(--angle)) translateX(var(--distance))}}
+@media(prefers-reduced-motion:reduce){
+ #pack .env.cut:is(.lg-secret,.lg-odd) .pk,#pack .env.cut:is(.lg-secret,.lg-odd) .pk>.pkimg,#pack .lg-corruption>*,
+ .lg-reveal .lg-back,.lg-reveal .lg-mark,.lg-reveal .lg-sweep,.lg-reveal .lg-signal,.lg-reveal .lg-aura:before,.lg-reveal .lg-aura:after,.lg-reveal .lg-stage.lg-burst .fx,.lg-reveal .lg-stage.lg-burst .lg-copy{animation:none!important}
+ .lg-reveal .lg-cinema{display:none!important}
+}

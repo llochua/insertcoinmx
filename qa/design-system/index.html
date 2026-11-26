@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"><head><base href="../../"><link rel="stylesheet" href="qa/design-system/legendary-lab.css?v=1"><meta name="robots" content="noindex,nofollow"><meta name="icmx-lab-baseline" content="71912062a13942a5d49e2534a83011c8f5e3bf22"><meta http-equiv="Content-Security-Policy" content="connect-src 'self'; form-action 'none'"><meta charset="utf-8"><meta name="referrer" content="strict-origin-when-cross-origin"><style>html:not([data-icmx-avatar-ready="true"]) #homePlayerAvatarImage,html:not([data-icmx-avatar-ready="true"]) #profileAvatarImage{visibility:hidden!important}
+<html lang="es"><head><base href="../../"><meta name="robots" content="noindex,nofollow"><meta name="icmx-lab-baseline" content="71912062a13942a5d49e2534a83011c8f5e3bf22"><meta http-equiv="Content-Security-Policy" content="connect-src 'self'; form-action 'none'"><meta charset="utf-8"><meta name="referrer" content="strict-origin-when-cross-origin"><style>html:not([data-icmx-avatar-ready="true"]) #homePlayerAvatarImage,html:not([data-icmx-avatar-ready="true"]) #profileAvatarImage{visibility:hidden!important}
 .icmx-captcha-dialog{box-sizing:border-box;width:min(92vw,390px);max-height:90dvh;padding:24px;border:1px solid #ffd400;border-radius:16px;background:#1b1738;color:#fff;font:600 14px/1.5 AV,system-ui,sans-serif;text-align:center;z-index:9999;overflow:auto}.icmx-captcha-dialog::backdrop{background:#080719d9}.icmx-captcha-dialog h2{font-size:22px;color:#ffd400;margin:0 0 8px}.icmx-captcha-dialog p{margin:0 0 16px}.icmx-captcha-widget{min-height:70px;display:flex;justify-content:center}.icmx-captcha-cancel{min-height:44px;width:100%;border:1px solid #ffffff45;border-radius:8px;background:none;color:#fff;font:700 12px AV,system-ui,sans-serif;margin-top:12px;cursor:pointer}.icmx-captcha-cancel:focus-visible{outline:2px solid #ffd400;outline-offset:3px}
 
 /* Resumen de sobre: pistas editoriales integradas en cada carta (móvil y escritorio).
@@ -2288,7 +2288,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-account:not([hidden]){margin-top:20px}
 @media(max-width:360px){#profile .profile-scroll{padding-inline:12px}#profile .pc-ticket,#profile .pc-collection{padding-inline:13px}#profile .pc-avatar{width:55px;height:55px;flex-basis:55px}#profile .pc-identity{gap:11px}#profile .pc-player-name h2{font-size:18px}#profile .pc-score-number #profileValuePoints{font-size:43px}#profile .pc-stats span{font-size:9px}#profile .pc-stats{padding-inline:6px}#profile .pc-collection-title{font-size:16px}}
 </style>
-</head><body>
+<link rel="stylesheet" href="qa/design-system/legendary-lab.css?v=2"></head><body>
 <aside id="icmxLabTools" aria-label="Controles del laboratorio">
  <button type="button" id="icmxLabToggle" aria-expanded="false" aria-controls="icmxLabPanel">LAB · ∞ SOBRES <span aria-hidden="true">⌄</span></button>
  <section id="icmxLabPanel" hidden>
@@ -3492,7 +3492,7 @@ function setPackPresentation(kind='standard'){
  img.alt=PACK_PRESENTATIONS[active].label;
  return active;
 }
-function resetPack(){stopRevealSfx();pendingLevelUp=false;setPackPresentation('standard');$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.webp?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut','lg-secret','lg-odd');$('cutp').style.width='0';$('hand').style.display='';
+function resetPack(){stopRevealSfx();pendingLevelUp=false;setPackPresentation('standard');$('disc').classList.remove('on');$('leak').className='leak';{const t=new Date();$('pkMeta').textContent='5 cartas · '+t.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][t.getMonth()]}{const F=FA;const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);const a=$('pkArt');if(a&&F.length)a.style.backgroundImage=`url(fa/${F[d%F.length].fk.slice(2)}.webp?v=${IMGV})`}const e=$('env');e.style.display='flex';e.classList.remove('cut','lg-secret','lg-odd');$('pk').querySelector('.lg-corruption')?.remove();$('cutp').style.width='0';$('hand').style.display='';
  $('stack').classList.remove('on');$('sum').classList.remove('on');$('stHint').style.display='none';$('openBtn').style.visibility='visible'}
 let tx=null;
 $('tearZone').addEventListener('pointerdown',e=>{tx=e.clientX;$('hand').style.display='none';try{$('tearZone').setPointerCapture(e.pointerId)}catch(_){}});
@@ -3590,14 +3590,21 @@ function openPack(){
 function beginLabPackAnimation(){
  const env=$('env'),special=hand.some(c=>c.v==='l'),odd=!special&&(labOddPack||Math.random()<.1);labOddPack=false;
  const best=hand.reduce((a,c)=>VORD[c.v]<VORD[a]?c.v:a,'b');
- const delay=special||odd?1600:best==='b'?450:1000;
+ const delay=special||odd?2200:best==='b'?450:1000;
  env.classList.add('cut');env.classList.toggle('lg-secret',special);env.classList.toggle('lg-odd',odd);
  if(special||odd){
-  stopRevealSfx();
-  if(!soundMuted){beep(105,.12);setTimeout(()=>{if(cur==='pack'&&opening)beep(170,.12)},260);setTimeout(()=>{if(cur==='pack'&&opening)beep(660,.16)},940)}
+  stopRevealSfx();musicStop();
+  const pk=$('pk'),src=pk.querySelector('.pkimg').src;
+  pk.querySelector('.lg-corruption')?.remove();
+  const fx=document.createElement('div');fx.className='lg-corruption';fx.setAttribute('aria-hidden','true');
+  for(const [top,bottom,dx,ms] of [[16,76,-17,0],[37,53,23,70],[57,35,-12,120],[74,20,16,35]]){
+   const im=document.createElement('img');im.src=src;im.alt='';im.style.cssText='--top:'+top+'%;--bottom:'+bottom+'%;--dx:'+dx+'px;--delay:'+ms+'ms';fx.append(im);
+  }
+  fx.insertAdjacentHTML('beforeend','<i class="lg-static"></i><i class="lg-seam"></i>');pk.append(fx);
+  if(!soundMuted)[[0,105,.15],[330,147,.08],[500,94,.12],[780,190,.09],[1630,440,.2]].forEach(([ms,f,d])=>setTimeout(()=>{if(cur==='pack'&&opening)beep(f,d)},ms));
  }else leak(best);
  idx=0;$('openBtn').style.visibility='hidden';
- setTimeout(()=>{opening=false;if(cur==='pack'){env.style.display='none';buildStack()}},delay)
+ setTimeout(()=>{opening=false;if(cur==='pack'){env.style.display='none';$('pk').querySelector('.lg-corruption')?.remove();buildStack();musicForScreen()}},delay)
 }
 /* ===== DESCUBRIMIENTO: una carta a la vez; la playera original es el escenario, la carta la complementa =====
    Cada caso tiene su respuesta: diseño nuevo, versión nueva de un diseño que ya tenías, repetida (útil para canje),
@@ -3801,18 +3808,31 @@ function showLegendary(c,D){
  D.onclick=null;D.onkeydown=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._cinemaTimer);D.style.removeProperty('background-color');
  D.className='disc on dx v-l lg-reveal'+(!REV.has(idx)?' cov':'');
  D.style.setProperty('--bg','#0a0811');D.dataset.artId=c.d;
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(!REV.has(idx)){
-  D.innerHTML=dxTop()+'<div class="lg-stage"><button id="dcBack" class="lg-back" aria-label="Revelar carta">?</button><div class="lg-copy">ALGO NO ES NORMAL...</div></div>'+dxControls(true);
-  let busy=false;const reveal=()=>{if(busy)return;busy=true;REV.add(idx);showLegendary(c,D)};
+  D.innerHTML=dxTop()+'<div class="lg-stage"><div class="lg-aura" aria-hidden="true"></div><button id="dcBack" class="lg-back" aria-label="Revelar carta"><span class="lg-mark">?</span><i class="lg-sweep"></i></button><div class="lg-copy lg-signal">ALGO NO ES NORMAL…</div></div>'+dxControls(true);
+  let busy=false;const reveal=()=>{if(busy)return;busy=true;
+   $('dcBack').disabled=true;$('dcReveal').disabled=true;D.querySelector('.lg-stage').classList.add('lg-charging');musicStop();
+   if(!soundMuted)beep(130,.22);
+   const show=()=>{if(cur!=='pack'||hand[idx]!==c)return;REV.add(idx);showLegendary(c,D)};
+   if(reduced)show();else setTimeout(show,580);
+  };
   D._dxReveal=reveal;$('dcBack').onclick=reveal;$('dcReveal').onclick=reveal;dxNav();return;
  }
  const first=!S.legendaryRevealed;
  if(first){S.legendaryRevealed=1;save()}
  const fresh=!CINEMATIC_SHOWN.has(idx);CINEMATIC_SHOWN.add(idx);
- D.innerHTML=dxTop()+'<div class="lg-stage'+(fresh?' lg-burst':'')+'">'+LG.face(c)+'<div class="lg-copy">'+(first?'<strong>¡SECRETO DESCUBIERTO!</strong><small>Has desbloqueado Legendary en tu álbum.</small>':'<strong>★★★★ LEGENDARY</strong>')+'<small>'+(c._new?'+250 PTS':'REPETIDA · 0 PTS')+'</small></div></div>'+dxControls();
+ D.innerHTML=dxTop()+'<div class="lg-stage'+(fresh&&!reduced?' lg-burst':'')+'"><div class="lg-aura" aria-hidden="true"></div>'+LG.face(c)+'<div class="lg-copy">'+(first?'<strong>¡SECRETO DESCUBIERTO!</strong><small>Has desbloqueado Legendary en tu álbum.</small>':'<strong>★★★★ LEGENDARY</strong>')+'<small>'+(c._new?'+250 PTS':'REPETIDA · 0 PTS')+'</small></div></div>'+dxControls();
  LG.mount(D.querySelector('.lg-stage .fx'),c);
- if(fresh&&!soundMuted){stopRevealSfx();[220,330,523,784,1175].forEach((f,i)=>setTimeout(()=>{if(cur==='pack'&&hand[idx]===c)beep(f,.14)},i*115))}
  dxNav();
+ if(fresh&&!reduced){
+  const fx=document.createElement('div');fx.className='lg-cinema';fx.setAttribute('aria-hidden','true');
+  for(let i=0;i<16;i++){const ray=document.createElement('i');ray.className='lg-particle';ray.style.cssText='--angle:'+(i*22.5)+'deg;--distance:'+(130+(i%4)*35)+'px';fx.append(ray)}
+  fx.insertAdjacentHTML('beforeend','<div class="lg-cinema-title"><small>RAREZA DESCONOCIDA</small><span>★★★★</span><strong>LEGENDARY</strong></div>');D.append(fx);
+  const next=$('dcNext');next.disabled=true;
+  D._cinemaTimer=setTimeout(()=>{if(hand[idx]!==c)return;fx.remove();next.disabled=false;musicForScreen()},2450);
+ }else musicForScreen();
+ if(fresh&&!soundMuted){stopRevealSfx();[[0,146,.2],[270,220,.2],[510,440,.22],[690,659,.26],[900,988,.3],[1100,1319,.4]].forEach(([ms,f,d])=>setTimeout(()=>{if(cur==='pack'&&hand[idx]===c)beep(f,d)},ms))}
 }
 function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
  if(c.v==='l'){showLegendary(c,D);return}
