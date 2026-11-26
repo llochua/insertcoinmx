@@ -92,3 +92,28 @@
  .lg-reveal .lg-back,.lg-reveal .lg-mark,.lg-reveal .lg-sweep,.lg-reveal .lg-signal,.lg-reveal .lg-aura:before,.lg-reveal .lg-aura:after,.lg-reveal .lg-stage.lg-burst .fx,.lg-reveal .lg-stage.lg-burst .lg-copy{animation:none!important}
  .lg-reveal .lg-cinema{display:none!important}
 }
+
+/* V3: the phenomenon occupies the entire discovery screen, never a clipped rectangle. */
+.disc.dx.lg-reveal>.lg-field{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;background:#0b0915;isolation:isolate}
+.lg-field>.lg-scene{position:absolute;inset:0;background-size:cover;background-position:center 35%;filter:brightness(.46) saturate(.85);opacity:.8;animation:lgSceneIn 1.35s ease-out both}
+.lg-field>.lg-field-orbit{position:absolute;inset:-55%;background:conic-gradient(from 30deg at 50% 50%,transparent 0 6%,#8075d020 11%,#bdabf48c 17%,#7276bd20 24%,transparent 31% 44%,#75cbd670 52%,#9ee4e550 57%,transparent 67% 78%,#b284d65c 89%,transparent 98%);filter:blur(32px);animation:lgFieldOrbit 7s linear infinite;opacity:.85;mix-blend-mode:screen}
+.lg-field>.lg-field-rings{position:absolute;inset:0;background:repeating-radial-gradient(ellipse at 50% 47%,transparent 0 11vmin,#c6baf215 11.1vmin,#c6baf200 11.45vmin,transparent 12vmin 15vmin);animation:lgFieldRings 4s cubic-bezier(.2,.45,.6,1) infinite;opacity:.7}
+.lg-field>.lg-field-scan{position:absolute;inset:0;background:linear-gradient(108deg,transparent 36%,#d0d4ff19 45%,#d9eaff48 49%,#e8c6ff12 53%,transparent 62%);background-size:270% 170%;animation:lgFieldScan 3.8s ease-in-out infinite;mix-blend-mode:screen}
+.lg-field>.lg-field-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 15%,#0b09152b 58%,#0907118c 100%),linear-gradient(0deg,#090711ed,transparent 23%,transparent 82%,#09071183)}
+.lg-field-revealed>.lg-field-orbit{opacity:.52}
+.lg-field-revealed>.lg-field-rings{opacity:.3}
+.lg-field-revealed>.lg-field-scan{opacity:.55}
+.lg-field-charge{animation:lgFieldCharge .58s ease-in both}
+.lg-reveal .lg-stage .fx{width:min(88%,45dvh,425px);box-shadow:0 0 50px #c5b8ff66,0 20px 48px #000b}
+.lg-reveal .lg-back{width:min(72%,38dvh,365px);box-shadow:0 0 18px #d7ceff9c,0 0 60px #8d86ce88,0 24px 45px #000a}
+.lg-reveal .lg-signal{font-size:clamp(12px,3vw,18px);color:#fff;text-shadow:0 0 14px #b5b6e8}
+.lg-reveal .lg-cinema-title strong{font-size:clamp(22px,6.7vw,64px)}
+.lg-reveal .lg-cinema:before{inset:-38%;background:radial-gradient(ellipse at center,#f0e8ffbe 0%,#a7a4ee8c 13%,#7363a650 29%,transparent 63%),conic-gradient(from 28deg,transparent,#b5b9fb70,transparent 25%,#79d4de80,transparent 52%,#c79ced70,transparent 80%)}
+.lg-reveal .lg-cinema:after{inset:3%;border-radius:2px}
+@keyframes lgSceneIn{from{opacity:0;transform:scale(1.05)}to{opacity:.8;transform:scale(1)}}
+@keyframes lgFieldOrbit{from{transform:rotate(0deg) scale(1.1)}to{transform:rotate(360deg) scale(1.1)}}
+@keyframes lgFieldRings{0%{transform:scale(.92);opacity:.25}50%{opacity:.75}100%{transform:scale(1.2);opacity:.25}}
+@keyframes lgFieldScan{0%,100%{background-position:100% 50%}50%{background-position:0 50%}}
+@keyframes lgFieldCharge{to{filter:brightness(1.45);transform:scale(1.045)}}
+@media(max-height:620px){.lg-reveal .lg-stage .fx{width:min(80%,38dvh,425px)}.lg-reveal .lg-back{width:min(68%,34dvh,365px)}}
+@media(prefers-reduced-motion:reduce){.lg-field,.lg-field>i,.lg-field>.lg-scene{animation:none!important}}

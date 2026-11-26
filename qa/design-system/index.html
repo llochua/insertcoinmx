@@ -2288,7 +2288,7 @@ dialog.zoom{box-sizing:border-box;width:100%;height:100%;max-width:none;max-heig
 #profile .profile-account:not([hidden]){margin-top:20px}
 @media(max-width:360px){#profile .profile-scroll{padding-inline:12px}#profile .pc-ticket,#profile .pc-collection{padding-inline:13px}#profile .pc-avatar{width:55px;height:55px;flex-basis:55px}#profile .pc-identity{gap:11px}#profile .pc-player-name h2{font-size:18px}#profile .pc-score-number #profileValuePoints{font-size:43px}#profile .pc-stats span{font-size:9px}#profile .pc-stats{padding-inline:6px}#profile .pc-collection-title{font-size:16px}}
 </style>
-<link rel="stylesheet" href="qa/design-system/legendary-lab.css?v=2"></head><body>
+<link rel="stylesheet" href="qa/design-system/legendary-lab.css?v=3"></head><body>
 <aside id="icmxLabTools" aria-label="Controles del laboratorio">
  <button type="button" id="icmxLabToggle" aria-expanded="false" aria-controls="icmxLabPanel">LAB · ∞ SOBRES <span aria-hidden="true">⌄</span></button>
  <section id="icmxLabPanel" hidden>
@@ -2669,7 +2669,7 @@ const DESIGNS=[
 {id:'jaws',ex:'er',n:"Jaws 19",cat:'PELÍCULAS',r:'comun',no:49},
 {id:'jokers',ex:'er',n:"Jokers",cat:'PELÍCULAS',r:'comun',no:50},
 {id:'kaiji',ex:'er',n:"Kaiju Club",cat:'PELÍCULAS',r:'comun',no:51},
-{id:'kame',ex:'er',n:"Kame Hame Ha",cat:'ANIME',r:'comun',no:52,f:46},
+{id:'kame',ex:'er',n:"Kame",cat:'ANIME',r:'comun',no:52,f:46},
 {id:'karma',ex:'er',n:"Karma",cat:'GAMER',r:'comun',no:53,f:71},
 {id:'karting',bx:1,ex:'er',n:"Karting Party",cat:'GAMER',r:'comun',no:0},
 {id:'keepcalm',ex:'er',n:"Keep Calm",cat:'ANIME',r:'comun',no:54,f:19},
@@ -3804,15 +3804,19 @@ function startCinematicReveal(c,D){
  return true;
 }
 
+function lgField(c,covered){
+ const art=covered?'':'<div class="lg-scene" style="background-image:url('+LG.art(c.d)+')"></div>';
+ return '<div class="lg-field'+(covered?' lg-field-wait':' lg-field-revealed')+'" aria-hidden="true">'+art+'<i class="lg-field-orbit"></i><i class="lg-field-rings"></i><i class="lg-field-scan"></i><i class="lg-field-vignette"></i></div>';
+}
 function showLegendary(c,D){
  D.onclick=null;D.onkeydown=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._cinemaTimer);D.style.removeProperty('background-color');
  D.className='disc on dx v-l lg-reveal'+(!REV.has(idx)?' cov':'');
  D.style.setProperty('--bg','#0a0811');D.dataset.artId=c.d;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(!REV.has(idx)){
-  D.innerHTML=dxTop()+'<div class="lg-stage"><div class="lg-aura" aria-hidden="true"></div><button id="dcBack" class="lg-back" aria-label="Revelar carta"><span class="lg-mark">?</span><i class="lg-sweep"></i></button><div class="lg-copy lg-signal">ALGO NO ES NORMAL…</div></div>'+dxControls(true);
+  D.innerHTML=lgField(c,true)+dxTop()+'<div class="lg-stage"><button id="dcBack" class="lg-back" aria-label="Revelar carta"><span class="lg-mark">?</span><i class="lg-sweep"></i></button><div class="lg-copy lg-signal">ALGO NO ES NORMAL…</div></div>'+dxControls(true);
   let busy=false;const reveal=()=>{if(busy)return;busy=true;
-   $('dcBack').disabled=true;$('dcReveal').disabled=true;D.querySelector('.lg-stage').classList.add('lg-charging');musicStop();
+   $('dcBack').disabled=true;$('dcReveal').disabled=true;D.querySelector('.lg-stage').classList.add('lg-charging');D.querySelector('.lg-field').classList.add('lg-field-charge');musicStop();
    if(!soundMuted)beep(130,.22);
    const show=()=>{if(cur!=='pack'||hand[idx]!==c)return;REV.add(idx);showLegendary(c,D)};
    if(reduced)show();else setTimeout(show,580);
@@ -3822,12 +3826,12 @@ function showLegendary(c,D){
  const first=!S.legendaryRevealed;
  if(first){S.legendaryRevealed=1;save()}
  const fresh=!CINEMATIC_SHOWN.has(idx);CINEMATIC_SHOWN.add(idx);
- D.innerHTML=dxTop()+'<div class="lg-stage'+(fresh&&!reduced?' lg-burst':'')+'"><div class="lg-aura" aria-hidden="true"></div>'+LG.face(c)+'<div class="lg-copy">'+(first?'<strong>¡SECRETO DESCUBIERTO!</strong><small>Has desbloqueado Legendary en tu álbum.</small>':'<strong>★★★★ LEGENDARY</strong>')+'<small>'+(c._new?'+250 PTS':'REPETIDA · 0 PTS')+'</small></div></div>'+dxControls();
+ D.innerHTML=lgField(c,false)+dxTop()+'<div class="lg-stage'+(fresh&&!reduced?' lg-burst':'')+'">'+LG.face(c)+'<div class="lg-copy">'+(first?'<strong>¡SECRETO DESCUBIERTO!</strong><small>Has desbloqueado Legendary en tu álbum.</small>':'<strong>★★★★ LEGENDARY</strong>')+'<small>'+(c._new?'+250 PTS':'REPETIDA · 0 PTS')+'</small></div></div>'+dxControls();
  LG.mount(D.querySelector('.lg-stage .fx'),c);
  dxNav();
  if(fresh&&!reduced){
   const fx=document.createElement('div');fx.className='lg-cinema';fx.setAttribute('aria-hidden','true');
-  for(let i=0;i<16;i++){const ray=document.createElement('i');ray.className='lg-particle';ray.style.cssText='--angle:'+(i*22.5)+'deg;--distance:'+(130+(i%4)*35)+'px';fx.append(ray)}
+  for(let i=0;i<16;i++){const ray=document.createElement('i');ray.className='lg-particle';ray.style.cssText='--angle:'+(i*22.5)+'deg;--distance:calc('+(130+(i%4)*35)+'px + '+(24+(i%4)*7)+'vmin)';fx.append(ray)}
   fx.insertAdjacentHTML('beforeend','<div class="lg-cinema-title"><small>RAREZA DESCONOCIDA</small><span>★★★★</span><strong>LEGENDARY</strong></div>');D.append(fx);
   const next=$('dcNext');next.disabled=true;
   D._cinemaTimer=setTimeout(()=>{if(hand[idx]!==c)return;fx.remove();next.disabled=false;musicForScreen()},2450);

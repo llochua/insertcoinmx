@@ -23,11 +23,14 @@ try{
   await page.locator('#openBtn').click();
   await page.locator('#env.lg-secret').waitFor({state:'attached'});
   await page.locator('#disc.lg-reveal.cov #dcReveal').waitFor();
+  assert.equal(await page.locator('#disc > .lg-field').count(),1);
+  const full=await page.locator('#disc > .lg-field').boundingBox(),screen=await page.locator('#disc').boundingBox();
+  assert.ok(full&&screen&&Math.abs(full.width-screen.width)<2&&Math.abs(full.height-screen.height)<2,'effect must cover the complete discovery screen');
   await page.locator('#dcReveal').click();
   await page.locator('#disc .lg-data').waitFor();
   await page.waitForFunction(()=>[...document.querySelectorAll('#disc .lg-art,#disc .lg-frame')].length===2&&[...document.querySelectorAll('#disc .lg-art,#disc .lg-frame')].every(i=>i.complete&&i.naturalWidth>0));
   assert.match(await page.locator('#disc .lg-copy').innerText(),/SECRETO DESCUBIERTO/);
-  assert.match(await page.locator('#disc .lg-data').textContent(),/Kame Hame Ha/);
+  assert.match(await page.locator('#disc .lg-data').textContent(),/Kame/);
   assert.equal(await page.evaluate(()=>hand[0].k),'kame_l');
   assert.equal(await page.evaluate(()=>S.have.kame_l),1);
   assert.equal(await page.evaluate(()=>player1.collectionProgress({kame_l:1}).discovered),0);
