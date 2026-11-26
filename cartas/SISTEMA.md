@@ -8,6 +8,30 @@ Hoja "Narrativas TCG" (Drive)  →  cartas/catalogo.json  →  cartas/generar.py
          textos                       copia en git             plantillas + arte
 ```
 
+## Regla de producción · Cartas Dinámicas 2.0 (26 nov 2026)
+
+Toda carta nueva o actualizada respeta el sistema visual vigente, **incluidas sus versiones de respaldo estáticas** (`c/`, `c2/`).
+
+- Sin **GOTY** ni **Likes** en ninguna parte.
+- Sin valores de **POP** ni puntuaciones incrustados en imágenes: el POP solo lo pone el runtime (en el respaldo va «—»).
+- El **renderer dinámico** (`content/card-renderer.js`) es la referencia visual definitiva.
+- Se conservan identidad gráfica, numeración y estrellas de cada rareza (Base 0 · Holo ★ · Dorada ★★ · Arte Especial ★★★).
+- Contenido por variante: **Base** = habilidad y frase · **Holo** = cómo se diseñó (`holo` en `content/card-texts.js`,
+  columna H de la hoja) · **Dorada** = anécdota o curiosidad (`dorada`, columna E) · **Arte Especial** = ilustración especial.
+- El valor junto a «Carta» (serie, colección, F##, ARCHIVO) lo pone el runtime encima; nunca va en las bases `cs/`/`cs2/`.
+- Solo se regeneran los recursos derivados que incumplan estas reglas; las ilustraciones originales
+  (`cartas/arte/`, `cartas/full/`) no se tocan.
+- Se verifican las 4 variantes a 320, 390 y 1280 px, en dinámica y en respaldo, y las capturas muestran la carta trabajada.
+
+Herramientas:
+```
+node cartas/respaldo-dinamico.mjs <id> [--etiqueta "Colección"]   # respaldo = base cs2 + capas del renderer
+python3 cartas/respaldo-webp.py <id>                              # → c2/ 960×1340, c/ 480×670 y manifiesto
+node qa/card-variants-browsers.mjs <id>                           # QA 4 variantes × 320/390/1280, dinámica y respaldo
+python3 qa/card-variants-sheet.py <id>                            # → qa/screenshots/cartas/<id>-<ancho>.jpg
+```
+`generar.py` (sistema anterior) sigue horneando GOTY y POP en `c/`/`c2/`: no usarlo para el respaldo de cartas nuevas.
+
 ## 1. Fuente de verdad: la hoja
 
 Hoja de Google: **Insert Coin MX — Narrativas TCG**, pestaña *Narrativas TCG*. Una fila = un diseño.
