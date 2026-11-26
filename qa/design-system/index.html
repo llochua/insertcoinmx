@@ -2590,7 +2590,7 @@ window.ICMX_VERIFIED_GUEST_PLAY=false;</script>
 <script src="content/card-data-adapter.js?v=20261124-hidden"></script>
 <script src="content/card-renderer.js?v=20261125popv2"></script>
 <script src="content/card-runtime.js?v=20261125popv2"></script>
-<script src="qa/design-system/legendary-lab.js?v=1"></script><script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
+<script src="qa/design-system/legendary-lab.js?v=1"></script><script src="qa/design-system/legendary-audio.js?v=1"></script><script>/* ===== CATÁLOGO · Etapas 2 y 3 =====
    Un diseño = una línea; cada diseño tiene CUATRO versiones coleccionables:
    b Base · e Especial · r Rara · f Full. La clave de una carta es diseño+'_'+letra (ej. fatality_r, x_f).
    Para agregar un diseño nuevo:
@@ -3030,7 +3030,7 @@ revealSfx.preload='auto';
 const revealSfxSeen=new Set();
 let revealFadeFrame=0,revealToken=0;
 function stopRevealSfx(){
- revealToken++;cancelAnimationFrame(revealFadeFrame);
+ window.ICMX_LG_AUDIO?.stop();revealToken++;cancelAnimationFrame(revealFadeFrame);
  revealSfx.onplaying=null;revealSfx.pause();
  try{revealSfx.currentTime=0}catch(e){}
 }
@@ -3079,6 +3079,7 @@ function musicStop(){
  for(const a of Object.values(MUSIC)){a.pause();a.volume=0}
 }
 function musicForScreen(){
+ if(window.ICMX_LG_AUDIO?.active()){musicStop();return}
  if(soundMuted||!musicAllowed||document.hidden){musicStop();return}
  const target=cur==='torneo'?'reta':'general',next=MUSIC[target];
  if(musicWanted===target&&!next.paused)return;
@@ -3114,15 +3115,15 @@ function setSoundMuted(muted){
  soundMuted=!!muted;
  try{localStorage.setItem(AUDIO_PREF_KEY,soundMuted?'1':'0')}catch(e){}
  showSoundState();notifyRetaSound();
- if(soundMuted){stopRevealSfx();musicStop()}else{musicAllowed=true;musicForScreen()}
+ if(soundMuted){stopRevealSfx();musicStop()}else{musicAllowed=true;window.ICMX_LG_AUDIO?.unlock();if(cur==='pack'&&$('disc').classList.contains('lg-reveal')&&$('disc').classList.contains('cov'))window.ICMX_LG_AUDIO?.play('wait');musicForScreen()}
 }
 function initSound(){
- showSoundState();
+ showSoundState();window.ICMX_LG_AUDIO?.prepare();
  document.addEventListener('pointerdown',e=>{
   if(e.target.closest&&e.target.closest('[data-sound-toggle]'))return;
-  beginMusic();
+  if(!soundMuted)window.ICMX_LG_AUDIO?.unlock();beginMusic();
  },{passive:true,capture:true});
- document.addEventListener('keydown',e=>{if(!e.repeat&&e.key!=='Tab')beginMusic()});
+ document.addEventListener('keydown',e=>{if(!e.repeat&&e.key!=='Tab'){if(!soundMuted)window.ICMX_LG_AUDIO?.unlock();beginMusic()}});
  document.addEventListener('click',e=>{
   const btn=e.target.closest&&e.target.closest('[data-sound-toggle]');
   if(btn){e.preventDefault();setSoundMuted(!soundMuted)}
@@ -3558,6 +3559,7 @@ function openServerPack(){
 }
 function openPack(){
  if(opening||serverPackBusy)return;
+ if(!soundMuted)window.ICMX_LG_AUDIO?.unlock();
  if(cloudSync?.requiresServer?.()){openServerPack();return}
  if(VERIFIED_GUEST_PLAY){toast('PREPARANDO TU PARTIDA<br>NO SE CONSUMIÓ EL SOBRE');return}
  // No emitir sobres locales si falla la carga de nube para una cuenta vinculada.
@@ -3601,7 +3603,7 @@ function beginLabPackAnimation(){
    const im=document.createElement('img');im.src=src;im.alt='';im.style.cssText='--top:'+top+'%;--bottom:'+bottom+'%;--dx:'+dx+'px;--delay:'+ms+'ms';fx.append(im);
   }
   fx.insertAdjacentHTML('beforeend','<i class="lg-static"></i><i class="lg-seam"></i>');pk.append(fx);
-  if(!soundMuted)[[0,105,.15],[330,147,.08],[500,94,.12],[780,190,.09],[1630,440,.2]].forEach(([ms,f,d])=>setTimeout(()=>{if(cur==='pack'&&opening)beep(f,d)},ms));
+  if(!soundMuted)window.ICMX_LG_AUDIO?.play('glitch');
  }else leak(best);
  idx=0;$('openBtn').style.visibility='hidden';
  setTimeout(()=>{opening=false;if(cur==='pack'){env.style.display='none';$('pk').querySelector('.lg-corruption')?.remove();buildStack();musicForScreen()}},delay)
@@ -3814,10 +3816,11 @@ function showLegendary(c,D){
  D.style.setProperty('--bg','#0a0811');D.dataset.artId=c.d;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(!REV.has(idx)){
+  if(!soundMuted){musicStop();window.ICMX_LG_AUDIO?.play('wait')}
   D.innerHTML=lgField(c,true)+dxTop()+'<div class="lg-stage"><button id="dcBack" class="lg-back" aria-label="Revelar carta"><span class="lg-mark">?</span><i class="lg-sweep"></i></button><div class="lg-copy lg-signal">ALGO NO ES NORMAL…</div></div>'+dxControls(true);
   let busy=false;const reveal=()=>{if(busy)return;busy=true;
    $('dcBack').disabled=true;$('dcReveal').disabled=true;D.querySelector('.lg-stage').classList.add('lg-charging');D.querySelector('.lg-field').classList.add('lg-field-charge');musicStop();
-   if(!soundMuted)beep(130,.22);
+   if(!soundMuted){window.ICMX_LG_AUDIO?.unlock();if(!reduced)window.ICMX_LG_AUDIO?.play('charge');else window.ICMX_LG_AUDIO?.stop()}
    const show=()=>{if(cur!=='pack'||hand[idx]!==c)return;REV.add(idx);showLegendary(c,D)};
    if(reduced)show();else setTimeout(show,580);
   };
@@ -3834,13 +3837,14 @@ function showLegendary(c,D){
   for(let i=0;i<16;i++){const ray=document.createElement('i');ray.className='lg-particle';ray.style.cssText='--angle:'+(i*22.5)+'deg;--distance:calc('+(130+(i%4)*35)+'px + '+(24+(i%4)*7)+'vmin)';fx.append(ray)}
   fx.insertAdjacentHTML('beforeend','<div class="lg-cinema-title"><small>RAREZA DESCONOCIDA</small><span>★★★★</span><strong>LEGENDARY</strong></div>');D.append(fx);
   const next=$('dcNext');next.disabled=true;
-  D._cinemaTimer=setTimeout(()=>{if(hand[idx]!==c)return;fx.remove();next.disabled=false;musicForScreen()},2450);
- }else musicForScreen();
- if(fresh&&!soundMuted){stopRevealSfx();[[0,146,.2],[270,220,.2],[510,440,.22],[690,659,.26],[900,988,.3],[1100,1319,.4]].forEach(([ms,f,d])=>setTimeout(()=>{if(cur==='pack'&&hand[idx]===c)beep(f,d)},ms))}
+  D._cinemaTimer=setTimeout(()=>{if(hand[idx]!==c)return;fx.remove();next.disabled=false;window.ICMX_LG_AUDIO?.stop();musicForScreen()},2450);
+ }else if(!fresh)musicForScreen();
+ if(fresh&&!soundMuted){stopRevealSfx();musicStop();window.ICMX_LG_AUDIO?.play('reveal')}
+ if(fresh&&reduced){D._cinemaTimer=setTimeout(()=>{if(cur==='pack'&&hand[idx]===c){window.ICMX_LG_AUDIO?.stop();musicForScreen()}},2450)}
 }
 function showCard(){const D=$('disc'),c=hand[idx];if(!c)return;
  if(c.v==='l'){showLegendary(c,D);return}
- D.style.removeProperty('background-color');delete D.dataset.artBgStatus;
+ musicForScreen();D.style.removeProperty('background-color');delete D.dataset.artBgStatus;
  D.onclick=null;D._dxPointer=null;D._dxReveal=null;clearTimeout(D._dxToastTimer);clearTimeout(D._cinemaTimer);
  if(c._new&&c.v!=='b'&&!REV.has(idx)){ /* especial nueva: llega cubierta y la revelas tú */
   D.className=`disc on dx cov v-${c.v}`;D.dataset.artId='';D.style.setProperty('--bg','#0c0a14');
