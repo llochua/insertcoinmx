@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+ <base href="../../">
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+ <meta name="theme-color" content="#0b0a11">
+ <title>Reta · Insert Coin MX</title>
+ <meta name="robots" content="noindex">
+ <meta name="description" content="Elige tu diseño favorito en siete enfrentamientos. Cada elección construye tu Top Insert.">
+ <link rel="preload" as="image" href="d/gatosamurai.webp">
+ <link rel="preload" as="image" href="d/x.webp">
+ <link rel="stylesheet" href="reta.css">
+<style>
+#finish .winner-next{border:0;cursor:pointer}
+.top-insert[hidden]{display:none!important}
+#finish.top-open{visibility:hidden!important;pointer-events:none!important}
+.top-insert{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;gap:7px;padding:10px 12px 9px;box-sizing:border-box;color:#fff;background:#0c0b2a;overflow:hidden;isolation:isolate}
+.top-insert::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 15%,#46327488,transparent 60%),repeating-linear-gradient(0deg,#0002 0 1px,transparent 1px 4px)}
+.top-insert header{flex:none;position:relative;text-align:left;padding:0 1px 5px;border-bottom:1px solid #ffffff24}
+.top-insert-kicker{display:flex;align-items:center;gap:7px;font:7px/1.4 PX,monospace;color:#d1cbe7;letter-spacing:.02em}
+.top-insert-kicker::after{content:"";height:1px;flex:1;background:#ffffff30}
+.top-insert h2{margin:5px 0 0;color:#FFD400;font:900 italic clamp(33px,10vw,48px)/.9 AVK,Arial,sans-serif;letter-spacing:-.075em;text-shadow:3px 3px 0 #302357}
+.top-insert-sub{font:700 11px/1.2 AV,Arial,sans-serif;color:#d4cfe8;margin:5px 0 0}
+.top-insert-list{flex:1 1 0;min-height:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1.5fr) repeat(var(--extra-rows,2),minmax(0,1fr));gap:5px;list-style:none;overflow:hidden}
+.top-insert-list[data-extra="0"]{grid-template-rows:minmax(0,1fr)}
+.top-insert-list[data-extra="1"]{grid-template-rows:minmax(0,1.9fr) minmax(0,1fr)}
+.top-insert-list[data-extra="2"]{grid-template-rows:minmax(0,1.5fr) repeat(2,minmax(0,1fr))}
+.top-insert-row{min-width:0;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:3px 3px 4px;box-sizing:border-box;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#30265a,#171438 75%);border-bottom:1px solid #ffffff22}
+.top-insert-row.champion{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:2px;padding:5px 9px 5px 4px;border:1px solid #FFD40088;background:radial-gradient(ellipse at 24% 50%,#ffd40033,transparent 65%),linear-gradient(120deg,#302444,#181333 66%);box-shadow:inset 0 0 20px #0003}
+.top-insert-rank{position:absolute;top:3px;left:5px;z-index:0;font:900 italic clamp(24px,8vw,34px)/.9 AVK,Arial,sans-serif;color:#ffffff38;letter-spacing:-.08em}
+.champion .top-insert-rank{font-size:clamp(58px,18vw,90px);top:5px;left:6px;color:#ffd40040}
+.top-insert-shirt{flex:1 1 0;min-height:0;min-width:0;width:100%;z-index:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.top-insert-shirt svg.shirt{position:static!important;display:block;height:100%!important;width:100%!important;transform:none!important;filter:drop-shadow(0 5px 4px #0008)!important;max-width:100%;max-height:100%}
+.champion .top-insert-shirt{height:100%;grid-column:1;grid-row:1}
+.top-insert-copy{z-index:2;flex:none;text-align:center;min-width:0;width:100%}
+.champion .top-insert-copy{grid-column:2;grid-row:1;text-align:left;align-self:center}
+.top-insert-tag{display:inline-block;color:#17112e;background:#FFD400;font:700 9px/1 AV,Arial,sans-serif;padding:4px 5px;margin:0 0 4px;transform:rotate(-3deg)}
+.top-insert-name{display:block;font:700 clamp(9px,2.9vw,13px)/1.05 AV,Arial,sans-serif;overflow-wrap:anywhere;line-height:1.12}
+.champion .top-insert-name{font:900 italic clamp(16px,5.1vw,25px)/.99 AVK,Arial,sans-serif;letter-spacing:-.045em;text-transform:uppercase}
+.top-insert-count{display:block;font:700 9px/1.1 AV,Arial,sans-serif;color:#bcb6d4;margin-top:3px}
+.champion .top-insert-count{color:#FFD400;font-size:11px;margin-top:6px}
+.top-insert footer{flex:none;display:flex;flex-direction:column;gap:4px}
+.top-insert-actions{display:flex;gap:7px}
+.top-insert-back{min-height:44px;min-width:44px;border:1px solid #ffd40088;border-radius:8px;color:#FFD400;background:transparent;font:700 24px AV,Arial,sans-serif;cursor:pointer}
+.top-insert .top-insert-next{display:flex;justify-content:center;align-items:center;flex:1;min-height:44px;padding:6px 8px;box-sizing:border-box;text-align:center;background:#FFD400;color:#100e23;border-radius:8px;box-shadow:0 3px 0 #9e8000;font:800 12px/1.15 AV,Arial,sans-serif;text-decoration:none;cursor:pointer}
+.top-insert-note{margin:0;text-align:center;font:700 10px/1.15 AV,Arial,sans-serif;color:#c9c5e0}
+.top-insert-empty{grid-column:1/-1;padding:20px 10px;text-align:center;color:#c9c5e0;font:700 13px/1.4 AV,Arial,sans-serif}
+@media(max-height:430px){.top-insert{gap:4px;padding:6px 8px}.top-insert h2{font-size:28px}.top-insert-sub{font-size:10px}.top-insert-kicker{font-size:6px}.top-insert-list{gap:3px}.top-insert-count{font-size:8px;margin-top:2px}.champion .top-insert-count{font-size:10px;margin-top:3px}.champion .top-insert-name{font-size:16px}.top-insert-row{padding:2px}.top-insert-note{font-size:9px}}
+#finish .winner-retry{display:none!important}.top-insert .top-insert-next[hidden]{display:none!important}.top-insert-list[data-extra="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}#topInsertWait[hidden]{display:none!important}#topInsertClock{color:#FFD400;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+ <main class="app" id="app">
+  <header class="brandbar">
+   <div class="brand">
+    <img src="coin.png" alt="">
+    <span class="brandword">Reta<small>EL ÁLBUM</small></span>
+   </div>
+   <div class="minictrls">
+    <button type="button" class="tinybtn" id="mute" aria-label="Silenciar sonido" aria-pressed="false" title="Sonido">♫</button>
+    <button type="button" class="tinybtn" id="reset" aria-label="Reiniciar la prueba" title="Reiniciar">↻</button>
+   </div>
+  </header>
+
+  <section class="hud" aria-label="Progreso">
+   <div class="hud-line">
+    <div class="hud-title">STAGE <b>01</b></div>
+    <div class="hud-meta"><span id="roundNum">01</span> / 07<br>ENCUENTROS</div>
+   </div>
+   <div class="progress" id="pips" aria-hidden="true"></div>
+  </section>
+
+  <div class="prompt"><strong>¿CON CUÁL FARMEAS MÁS AURA?</strong></div>
+
+  <section class="arena" id="arena" aria-label="Enfrentamiento de playeras">
+   <div class="slot" id="topWrap"></div>
+   <div class="vs-divider" aria-label="Comparación de diseños"><span class="duel-name duel-left" id="duelTop">Gato Samurái</span><b aria-hidden="true">VS</b><span class="duel-name duel-right" id="duelBottom">X</span></div>
+   <div class="slot" id="bottomWrap"></div>
+  </section>
+
+  
+  <div class="shock" id="shock" aria-hidden="true"><span id="impactText">HIT!</span></div>
+
+  <div class="intro" aria-hidden="true">
+   <small>HERE COMES A</small>
+   <strong>NEW<br>CHALLENGER!</strong>
+  </div>
+
+  <section class="winner-screen" id="finish" aria-hidden="true" aria-label="Resultado de la Reta" role="dialog" aria-modal="true" data-origin="top">
+   <div class="winner-bg" id="winnerBg" aria-hidden="true"></div>
+   <div class="winner-status"><span>07 / 07</span><span class="status-rule"></span><span>RETA COMPLETADA</span></div>
+   <button type="button" class="winner-retry" id="again" aria-label="Repetir demo" title="Repetir">↻</button>
+   <div class="winner-scene">
+    <div class="winner-tableau">
+     <div class="winner-type" aria-label="Winner is"><span class="winner-type-main">WINNER</span><span class="winner-type-sticker">IS...</span></div>
+     <div class="winner-halo" aria-hidden="true"></div>
+     <div class="winner-echo echo-left" id="winnerEchoLeft" aria-hidden="true"></div>
+     <div class="winner-echo echo-right" id="winnerEchoRight" aria-hidden="true"></div>
+     <div class="winner-shirt" id="winnerShirt" aria-hidden="true"></div>
+    </div>
+    <div class="winner-caption">
+     <h2 class="winner-name" id="winnerName">Gato Samurái</h2>
+     <div class="winner-result">
+      <span id="winnerStatus">TU NUEVA CAMPEONA</span>
+      <p id="winnerFuture">Cada elección cuenta.</p>
+      <p class="winner-pack-note" id="winnerPackNote" hidden></p>
+     </div>
+    </div>
+   </div>
+   <button type="button" class="winner-next" id="showTopInsert">VER MI TOP INSERT</button>
+  </section>
+  <section class="top-insert" id="topInsert" aria-label="Tu Top Insert personal" hidden>
+   <header>
+    <div class="top-insert-kicker">TUS FAVORITAS</div>
+    <h2 tabindex="-1" id="topInsertTitle">TU TOP INSERT</h2>
+    <p class="top-insert-sub">Tus favoritas de todas tus Retas.</p>
+   </header>
+   <ol class="top-insert-list" id="topInsertList"></ol>
+   <footer>
+    <p class="top-insert-note" id="topInsertNote">Cada elección cuenta.</p>
+    <p class="top-insert-note" id="topInsertWait" hidden>Próximos 2 sobres en <time id="topInsertClock"></time></p>
+    <div class="top-insert-actions">
+     <button class="top-insert-back" type="button" id="topInsertBack" aria-label="Volver a Reta">‹</button>
+     <button type="button" class="top-insert-next">JUGAR OTRA RETA</button>
+    </div>
+   </footer>
+  </section>
+ </main>
+
+ <script src="qa/design-system/reta-persistente.js?v=1"></script>
+</body>
+</html>
