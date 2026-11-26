@@ -19,7 +19,7 @@ const $=id=>document.getElementById(id);
 const isEmbedded=new URLSearchParams(location.search).get('embedded')==='1';
 if(isEmbedded)document.documentElement.classList.add('embedded');
 let dailyDay='',dailyState=null;
-let personalChoices=[];
+let personalChoices=[], accumulatedRows=[];
 function buildPersonalTop(choices,champion){
  const map=new Map();
  choices.forEach((id,i)=>{if(typeof id!=='string'||!id)return;const old=map.get(id);map.set(id,{id,count:(old?.count||0)+1,last:i})});
@@ -167,7 +167,7 @@ function select(side){
  locked=true;
  const id=slots[side],lostSide=side==="top"?"bottom":"top";
  personalChoices.push(id);
- if(isEmbedded)tellParent({type:'icmx-reta-choice',day:dailyDay,round,side,winner:id});
+ if(isEmbedded)tellParent({type:'icmx-reta-choice',day:dailyDay,seed:dailyState?.seed,round,side,winner:id});
  const winner=$(side),loser=$(lostSide),n=++run;
  winner.classList.add("win");
  loser.classList.add(lostSide==="top"?"ko-left":"ko-right");
@@ -202,33 +202,43 @@ function select(side){
 }
 function renderPersonalTop(){
  const list=$('topInsertList');list.replaceChildren();
- const rows=buildPersonalTop(personalChoices,champion);
- list.dataset.extra=String(Math.ceil(Math.max(0,rows.length-1)/3));
- if(personalChoices.length!==TOTAL){const msg=document.createElement('li');msg.className='top-insert-empty';msg.textContent='No tenemos el detalle completo de esta Reta.';list.append(msg);$('topInsertNote').hidden=true;return;}
+ const rows=isEmbedded?accumulatedRows.filter(row=>DESIGNS[row.id]).slice(0,5):buildPersonalTop(personalChoices,champion).slice(0,5);
+ list.dataset.extra=String(Math.ceil(Math.max(0,rows.length-1)/(rows.length>4?2:3)));
+ if(!rows.length){const msg=document.createElement('li');msg.className='top-insert-empty';msg.textContent='Elige tus primeras playeras para construir tu Top Insert.';list.append(msg);$('topInsertNote').hidden=true;return;}
  $('topInsertNote').hidden=false;
- $('topInsertNote').textContent=rows.length+' '+(rows.length===1?'playera elegida':'playeras elegidas')+' · 7 duelos';
+ $('topInsertNote').textContent='Cada elección cuenta.';
  for(const [i,row] of rows.entries()){
-  const item=document.createElement('li'),isChamp=row.id===champion;item.className='top-insert-row'+(isChamp?' champion':'');
+  const item=document.createElement('li'),isChamp=i===0;item.className='top-insert-row'+(isChamp?' champion':'');
   const rank=document.createElement('span');rank.className='top-insert-rank';rank.textContent=String(i+1).padStart(2,'0');rank.setAttribute('aria-hidden','true');
   const art=document.createElement('span');art.className='top-insert-shirt';art.innerHTML=shirt(row.id,'top-'+i);bgSample(row.id);
   const copy=document.createElement('div');copy.className='top-insert-copy';
-  if(isChamp){const crown=document.createElement('span');crown.className='top-insert-tag';crown.textContent='TU CAMPEONA';copy.append(crown)}
+  if(isChamp){const crown=document.createElement('span');crown.className='top-insert-tag';crown.textContent='TU FAVORITA';copy.append(crown)}
   const name=document.createElement('span');name.className='top-insert-name';name.textContent=safeName(row.id);
-  const count=document.createElement('span');count.className='top-insert-count';count.textContent='×'+row.count+' '+(row.count===1?'elección':'elecciones');
+  const count=document.createElement('span');count.className='top-insert-count';count.hidden=true;
   copy.append(name,count);item.append(rank,art,copy);list.append(item);
  }
 }
-$('showTopInsert').onclick=()=>{renderPersonalTop();$('finish').setAttribute('aria-hidden','true');$('finish').inert=true;$('finish').classList.add('top-open');$('topInsert').hidden=false;$('topInsertTitle').focus({preventScroll:true})};
-$('topInsertBack').onclick=()=>{$('topInsert').hidden=true;$('finish').inert=false;$('finish').classList.remove('top-open');$('finish').setAttribute('aria-hidden','false');$('showTopInsert').focus({preventScroll:true})};
-function closePersonalTop(){$('topInsert').hidden=true;$('finish').inert=false;$('finish').classList.remove('top-open');}
+function openPersonalTop(){
+ renderPersonalTop();$('finish').setAttribute('aria-hidden','true');$('finish').inert=true;$('finish').classList.add('top-open');
+ $('arena').inert=true;$('topInsert').hidden=false;
+ $('topInsert').querySelector('.top-insert-next').hidden=round<TOTAL;
+ $('topInsertTitle').focus({preventScroll:true});
+}
+$('showTopInsert').onclick=openPersonalTop;
+$('topInsertBack').onclick=()=>{
+ closePersonalTop();$('arena').inert=false;
+ if(round>=TOTAL){$('finish').setAttribute('aria-hidden','false');$('showTopInsert').focus({preventScroll:true})}
+ else $(slots.top?'top':'bottom')?.focus({preventScroll:true});
+};
+function closePersonalTop(){$('arena').inert=false;$('topInsert').hidden=true;$('finish').inert=false;$('finish').classList.remove('top-open');}
 function end(side){
  // La pantalla de victoria no es una ficha ni un resumen: solo la
  // playera ganadora, WINNER IS y la siguiente acción.
  const titleDefended=previousChampion===champion;
  previousChampion=champion;
  $('winnerName').textContent=safeName(champion);
- $('winnerStatus').textContent=(dailyState&&dailyState.done?dailyState.titleDefended:titleDefended)?'TÍTULO DEFENDIDO':'TU NUEVA CAMPEONA';
- $('winnerFuture').textContent='Mañana podrás defenderla.';
+ $('winnerStatus').textContent='GANADORA DE ESTA RETA';
+ $('winnerFuture').textContent='Cada elección cuenta.';
  const fallen=slots[side==='top'?'bottom':'top'];
  const earlier=PAIRS.filter(id=>id!==champion&&id!==fallen).slice(-1)[0]||fallen;
  $('winnerShirt').innerHTML=shirt(champion,'finish');
@@ -258,14 +268,14 @@ function reset(){
 $("reset").onclick=isEmbedded?()=>{}:reset;
 $("again").onclick=isEmbedded?()=>{}:reset;
 const sobres=$('topInsert').querySelector('.top-insert-next');
-if(isEmbedded&&sobres)sobres.onclick=e=>{e.preventDefault();tellParent({type:'icmx-reta-pack',day:dailyDay,action:sobres.dataset.action||'pack'})};
+if(sobres)sobres.onclick=e=>{e.preventDefault();if(isEmbedded)tellParent({type:'icmx-reta-restart',seed:dailyState?.seed});else reset()};
 $("mute").onclick=()=>{
  muted=!muted;$("mute").textContent=muted?"♪̸":"♫";
  $("mute").setAttribute("aria-label",muted?"Activar sonido":"Silenciar sonido");
  $("mute").setAttribute("aria-pressed",String(muted));
 };
 document.addEventListener("keydown",e=>{
- if(locked)return;
+ if(locked||!$('topInsert').hidden)return;
  if(e.key==="ArrowUp"){e.preventDefault();select("top")}
  if(e.key==="ArrowDown"){e.preventDefault();select("bottom")}
 });
@@ -273,12 +283,7 @@ document.addEventListener("keydown",e=>{
    por mensajería mismo origen. El iframe no escribe en localStorage. */
 function topPackAction(config){return config.packsAvailable?'pack':config.canTrade?'trade':'album'}
 function updateTopPackAction(config){
- const action=topPackAction(config);
- sobres.dataset.action=action;
- sobres.textContent=action==='pack'?'ABRIR SOBRE':action==='trade'?'CANJEAR UN SOBRE EXTRA':'VER MI ÁLBUM';
- $('topInsertWait').hidden=action!=='album';
- $('topInsertClock').textContent=typeof config.nextPackCountdown==='string'?config.nextPackCountdown:'';
- $('winnerPackNote').hidden=true;
+ $('topInsertWait').hidden=true;$('winnerPackNote').hidden=true;
 }
 function hydrate(config){
  const entries=Array.isArray(config.catalog)?config.catalog:[];
@@ -293,7 +298,7 @@ function hydrate(config){
  }
  const state=config.state;
  if(!state||!Array.isArray(state.roster)||state.roster.length!==8||state.roster.some(id=>!DESIGNS[id]))return;
- dailyState=state;dailyDay=state.day;closePersonalTop();
+ dailyState=state;dailyDay=state.day;accumulatedRows=Array.isArray(config.rows)?config.rows:[];closePersonalTop();
  personalChoices=Array.isArray(state.matches)?state.matches.slice(0,state.round).map(m=>m?.winner).filter(id=>state.roster.includes(id)):[];
  // El sitio principal gobierna el audio: no hay segundo mute independiente.
  if(isEmbedded)muted=!!config.audioMuted;
@@ -314,6 +319,10 @@ if(isEmbedded){
   const data=event.data;
   if(data?.type==='icmx-audio-state')muted=!!data.muted;
   if(data?.type==='icmx-reta-init')hydrate(data);
+  if(data?.type==='icmx-reta-top-update'||data?.type==='icmx-reta-top'){
+   accumulatedRows=Array.isArray(data.rows)?data.rows:[];
+   if(data.type==='icmx-reta-top')openPersonalTop();else if(!$('topInsert').hidden)renderPersonalTop();
+  }
   if(data?.type==='icmx-reta-pack-state'&&data.day===dailyDay)updateTopPackAction(data);
  });
  window.parent.postMessage({type:'icmx-reta-ready'},location.origin);
