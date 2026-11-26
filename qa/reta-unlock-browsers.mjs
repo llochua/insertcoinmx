@@ -153,42 +153,37 @@ try{
   await frame.locator('#showTopInsert').waitFor({state:'visible'});
   await frame.locator('#showTopInsert').click();
   await frame.locator('#topInsert').waitFor({state:'visible'});
-  const expected=await page.evaluate(()=>({champ:S.reta2.champion,choices:S.reta2.matches.map(m=>m.winner)}));
+  const expected=await page.evaluate(()=>({ids:retaTop(retaPool()).map(x=>x.id),choices:Object.values(S.reta2.personal.ratings).reduce((sum,x)=>sum+x.w,0),seed:S.reta2.seed}));
   const actualTop=await page.locator('#retaLive').evaluate(f=>{
    const d=f.contentDocument,list=d.getElementById('topInsertList'),top=d.getElementById('topInsert');
-   return {ids:[...list.querySelectorAll('.top-insert-shirt svg')].map(e=>e.dataset.shirtId),counts:[...list.querySelectorAll('.top-insert-count')].map(e=>Number(e.textContent.match(/\d+/)[0])),
+   return {ids:[...list.querySelectorAll('.top-insert-shirt svg')].map(e=>e.dataset.shirtId),
     champ:list.querySelector('.champion svg')?.dataset.shirtId,visible:!top.hidden&&d.elementFromPoint(12,12)?.closest('#topInsert')!==null,
     listFits:list.scrollHeight<=list.clientHeight+1,footerFits:top.querySelector('footer').getBoundingClientRect().bottom<=f.contentWindow.innerHeight+1};
   });
-  assert.equal(actualTop.champ,expected.champ);
-  assert.equal(actualTop.ids.length,new Set(expected.choices).size);
-  assert.equal(actualTop.counts.reduce((a,b)=>a+b,0),7);
+  assert.deepEqual(actualTop.ids,expected.ids);
+  assert.equal(actualTop.champ,expected.ids[0]);
+  assert.equal(expected.choices,7);
   assert.ok(actualTop.visible&&actualTop.listFits&&actualTop.footerFits,'Top visible sin scroll: '+JSON.stringify(actualTop));
-  await frame.locator('.top-insert-next').waitFor();
-  assert.equal(await frame.locator('.top-insert-next').textContent(),'VER MI ÁLBUM');
-  assert.match(await frame.locator('#topInsertClock').textContent(),/^\d{2}:\d{2}:\d{2}$/);
-  await page.screenshot({path:'qa/screenshots/reta-top-insert-'+width+'.png'});
-  // Canje: 14 repetidas todavía no alcanzan; 15 sí, incluyendo otras variantes.
-  const below=await page.evaluate(()=>{
-   const k=Object.keys(S.have)[0];S.have[k]=1;
-   S.have[k]=1+14-dups();save();return dups();
-  });
-  assert.equal(below,14);
-  assert.equal(await frame.locator('.top-insert-next[data-action="trade"]').count(),0);
-  assert.equal(await frame.locator('.top-insert-next').textContent(),'VER MI ÁLBUM');
-  const eligible=await page.evaluate(()=>{const k=Object.keys(S.have)[0];S.have[k]++;save();return dups()});
-  assert.equal(eligible,15);
-  await frame.locator('.top-insert-next[data-action="trade"]').waitFor();
-  assert.equal(await frame.locator('.top-insert-next').textContent(),'CANJEAR UN SOBRE EXTRA');
+  assert.equal(await frame.locator('.top-insert-next').textContent(),'JUGAR OTRA RETA');
   assert.equal(await frame.locator('#topInsertWait').isVisible(),false);
-  await page.evaluate(()=>{S.extra=1;save()});
-  await frame.locator('.top-insert-next[data-action="pack"]').waitFor();
-  assert.equal(await frame.locator('.top-insert-next').textContent(),'ABRIR SOBRE');
-  await frame.locator('#topInsertBack').click();
-  await frame.locator('#showTopInsert').waitFor({state:'visible'});
-  await frame.locator('#showTopInsert').click();
+  await page.screenshot({path:'qa/screenshots/reta-top-insert-'+width+'.png'});
   await frame.locator('.top-insert-next').click();
-  await page.locator('#pack.on').waitFor();
+  await page.waitForFunction(seed=>S.reta2?.seed!==seed&&S.reta2?.round===0,expected.seed);
+  await frame.locator('#top').waitFor({state:'visible'});
+  await page.locator('#retaReroll').click();
+  await frame.locator('#topInsert').waitFor({state:'visible'});
+  assert.deepEqual(await page.locator('#retaLive').evaluate(f=>[...f.contentDocument.querySelectorAll('#topInsertList .top-insert-shirt svg')].map(x=>x.dataset.shirtId)),expected.ids);
+  assert.equal(await frame.locator('.top-insert-next').isVisible(),false);
+  await frame.locator('#topInsertBack').click();
+  for(let r=0;r<7;r++){
+   await page.waitForFunction(()=>!document.getElementById('retaLive').contentDocument.getElementById('app').classList.contains('impact'));
+   await frame.locator('.fighter:not(.is-champion)').click();
+   await page.waitForFunction(n=>S.reta2?.round===n,r+1);
+  }
+  await frame.locator('#showTopInsert').waitFor({state:'visible'});
+  const persisted=await page.evaluate(()=>({choices:Object.values(S.reta2.personal.ratings).reduce((sum,x)=>sum+x.w,0),local:JSON.parse(localStorage.getItem(KEY)).reta2.personal,actual:S.reta2.personal}));
+  assert.equal(persisted.choices,14,'second session contributes without deleting previous choices');
+  assert.deepEqual(persisted.local,persisted.actual,'personal ranking is persisted with backup state');
   assert.deepEqual(errors,[],'sin excepciones de navegador');
   console.log('✓ Reta móvil '+width+'px: 5 con sobres → abrir; 7 agotados → contador/álbum; 8 → juega 1ª ronda');
   await context.close();

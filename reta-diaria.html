@@ -6,7 +6,7 @@
  <meta name="theme-color" content="#0b0a11">
  <title>Reta · Insert Coin MX</title>
  <meta name="robots" content="noindex">
- <meta name="description" content="Elige tu diseño favorito en siete enfrentamientos. Tu campeona vuelve mañana.">
+ <meta name="description" content="Elige tu diseño favorito en siete enfrentamientos. Cada elección construye tu Top Insert.">
  <link rel="preload" as="image" href="d/gatosamurai.webp">
  <link rel="preload" as="image" href="d/x.webp">
  <link rel="stylesheet" href="reta.css">
@@ -46,7 +46,7 @@
 .top-insert-note{margin:0;text-align:center;font:700 10px/1.15 AV,Arial,sans-serif;color:#c9c5e0}
 .top-insert-empty{grid-column:1/-1;padding:20px 10px;text-align:center;color:#c9c5e0;font:700 13px/1.4 AV,Arial,sans-serif}
 @media(max-height:430px){.top-insert{gap:4px;padding:6px 8px}.top-insert h2{font-size:28px}.top-insert-sub{font-size:10px}.top-insert-kicker{font-size:6px}.top-insert-list{gap:3px}.top-insert-count{font-size:8px;margin-top:2px}.champion .top-insert-count{font-size:10px;margin-top:3px}.champion .top-insert-name{font-size:16px}.top-insert-row{padding:2px}.top-insert-note{font-size:9px}}
-#topInsertWait[hidden]{display:none!important}#topInsertClock{color:#FFD400;font-variant-numeric:tabular-nums}
+#finish .winner-retry{display:none!important}.top-insert .top-insert-next[hidden]{display:none!important}.top-insert-list[data-extra="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}#topInsertWait[hidden]{display:none!important}#topInsertClock{color:#FFD400;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -102,31 +102,31 @@
      <h2 class="winner-name" id="winnerName">Gato Samurái</h2>
      <div class="winner-result">
       <span id="winnerStatus">TU NUEVA CAMPEONA</span>
-      <p id="winnerFuture">Mañana podrás defenderla.</p>
+      <p id="winnerFuture">Cada elección cuenta.</p>
       <p class="winner-pack-note" id="winnerPackNote" hidden></p>
      </div>
     </div>
    </div>
    <button type="button" class="winner-next" id="showTopInsert">VER MI TOP INSERT</button>
   </section>
-  <section class="top-insert" id="topInsert" aria-label="Tu Top Insert de esta Reta" hidden>
+  <section class="top-insert" id="topInsert" aria-label="Tu Top Insert personal" hidden>
    <header>
-    <div class="top-insert-kicker">07 / 07 · RETA COMPLETADA</div>
+    <div class="top-insert-kicker">TUS FAVORITAS</div>
     <h2 tabindex="-1" id="topInsertTitle">TU TOP INSERT</h2>
-    <p class="top-insert-sub">Las playeras que elegiste en esta Reta.</p>
+    <p class="top-insert-sub">Tus favoritas de todas tus Retas.</p>
    </header>
    <ol class="top-insert-list" id="topInsertList"></ol>
    <footer>
-    <p class="top-insert-note" id="topInsertNote">Tus elegidas de hoy</p>
+    <p class="top-insert-note" id="topInsertNote">Cada elección cuenta.</p>
     <p class="top-insert-note" id="topInsertWait" hidden>Próximos 2 sobres en <time id="topInsertClock"></time></p>
     <div class="top-insert-actions">
-     <button class="top-insert-back" type="button" id="topInsertBack" aria-label="Volver a tu campeona">‹</button>
-     <a class="top-insert-next" href="https://insertcoinmx.com/">DESCUBRE MÁS DISEÑOS</a>
+     <button class="top-insert-back" type="button" id="topInsertBack" aria-label="Volver a Reta">‹</button>
+     <button type="button" class="top-insert-next">JUGAR OTRA RETA</button>
     </div>
    </footer>
   </section>
  </main>
 
- <script src="reta-diaria.js?v=top-insert-1"></script>
+ <script src="reta-diaria.js?v=top-persistente-1"></script>
 </body>
 </html>
